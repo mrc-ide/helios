@@ -1,7 +1,6 @@
 ##' variables.R
 ##'
 ##' This file contains the function(s) required to initate the list of model variables.
-
 create_variables <- function(parameters) {
 
   # Initialise and populate the disease state variable:
@@ -12,107 +11,148 @@ create_variables <- function(parameters) {
 
   # Initialise and populate the age class variable:
   age_classes <- c("child", "adult", "elderly")
-  initial_age_classes <- generate_age_classes(parameters = parameters)
+  initial_age_classes <- generate_initial_age_classes(parameters = parameters)
   age_class_variable <- individual::CategoricalVariable$new(categories = age_classes,
                                                             initial_values = initial_age_classes)
 
   # Initialise and populate the workplace setting variable:
-  initial_workplace_settings <- generate_workplaces(parameters = parameters, age_class_variable = age_class_variable)
+  initial_workplace_settings <- generate_initial_workplaces(parameters = parameters, age_class_variable = age_class_variable)
   workplace_variable <- CategoricalVariable$new(categories = as.character(0:parameters$num_workplaces), ## change this to be the maximum of as.numeric(initial_workplace_settings) when proper function is in
                                                 initial_values = initial_workplace_settings)
 
   # Initialise and populate the school setting variable:
-  initial_school_settings <- generate_schools(parameters = parameters, age_class_variable = age_class_variable)
+  initial_school_settings <- generate_initial_schools(parameters = parameters, age_class_variable = age_class_variable)
   school_variable <- CategoricalVariable$new(categories = as.character(0:parameters$num_schools), ## change this to be the maximum of as.numeric(initial_school_settings) when proper function is in
                                              initial_values = initial_school_settings)
 
   # Initialise and populate the household variable
-  initial_households <- generate_households(parameters = parameters, age_class_variable = age_class_variable)
+  initial_households <- generate_initial_households(parameters = parameters, age_class_variable = age_class_variable)
   household_variable <- CategoricalVariable$new(categories = as.character(1:max(initial_households)),
                                                 initial_values = as.character(initial_households))
 
-  variables <- list(disease_state_variable,
-                    age_class_variable,
-                    workplace_variable,
-                    school_variable,
-                    household_variable)
+  # Store the model variables in a single list:
+  variables <- list(
+    disease_state = disease_state_variable,
+    age_class = age_class_variable,
+    workplace = workplace_variable,
+    school = school_variable,
+    household = household_variable
+    )
+
+  # Return the list of model variables:
   return(variables)
 
 }
 
-
 # Function that gets the initial disease state of all individuals the system:
 generate_initial_disease_states <- function(parameters) {
 
-  ## Checking that parameters contains "initial_infections" and "N"
-  if (!("initial_infections" %in% names(parameters))) {
-    stop("parameters list must contain a variable called initial_infections")
+  # Checking that the parameters contain the initial human population size, proportion
+  # initially exposed, and a seed:
+  if (!("number_initially_exposed" %in% names(parameters))) {
+    stop("parameters list must contain a variable called number_initially_exposed")
   }
-  if (!("N" %in% names(parameters))) {
-    stop("parameters list must contain a variable called N")
+  if (!("human_population" %in% names(parameters))) {
+    stop("parameters list must contain a variable called human_population")
   }
   if (!("seed" %in% names(parameters))) {
     stop("parameters list must contain a variable called seed")
   }
 
-  ## Initialising the disease states
+  # Set the seed from the parameter list:
   set.seed(parameters$seed)
-  initial_disease_states <- rep("S", parameters$N)
+
+  # Create a vector of disease states of length human_population:
+  initial_disease_states <- rep("S", parameters$human_population)
+
+  # Sample indices between 1:human population to set an initially exposed:
   infection_index <- sample(x = 1:length(initial_disease_states),
-                            size = parameters$initial_infections,
-                            replace = FALSE, prob = NULL)
+                            size = parameters$number_initially_exposed,
+                            replace = FALSE,
+                            prob = NULL)
+
+  # Replace the disease state at the sampled indices with to "E" (Exposed)
   initial_disease_states[infection_index] <- "E"
+
+  # Return the vector of initial disease states:
   return(initial_disease_states)
 
 }
 
-
 # Function that gets the age classes for all individuals in the system:
-generate_age_classes <- function(parameters) {
+generate_initial_age_classes <- function(parameters) {
 
-  ## Checking that parameters contains "age_group_proportions" and "N"
-  if (!("age_group_proportions" %in% names(parameters))) {
-    stop("parameters list must contain a variable called age_group_proportions")
+  # Check the parameters required are present in the parameters list:
+  if (!("initial_proportion_child" %in% names(parameters))) {
+    stop("parameters list must contain a variable called initial_proportion_child")
   }
-  if (!("N" %in% names(parameters))) {
-    stop("parameters list must contain a variable called N")
+  if (!("initial_proportion_adult" %in% names(parameters))) {
+    stop("parameters list must contain a variable called initial_proportion_adult")
+  }
+  if (!("initial_proportion_elderly" %in% names(parameters))) {
+    stop("parameters list must contain a variable called initial_proportion_elderly")
+  }
+  if (!("human_population" %in% names(parameters))) {
+    stop("parameters list must contain a variable called human_population")
   }
   if (!("seed" %in% names(parameters))) {
     stop("parameters list must contain a variable called seed")
   }
 
-  ## Initialising the disease states
+  # Check the initial age class proportions sum to 1:
+  if (sum(parameters$initial_proportion_child, parameters$initial_proportion_adult, parameters$initial_proportion_elderly) != 1) {
+    stop("initial age class proportions do not sum to 1")
+  }
+
+  # Set the seed stored in the parameter list:
   set.seed(parameters$seed)
+
+  # Store age group proportions in a single vector:
+  age_group_proportions <- c(parameters$initial_proportion_child,
+                             parameters$initial_proportion_adult,
+                             parameters$initial_proportion_elderly)
+
+  # Use the initial age class proportions to sample and create a vector of initial age classes:
   age_classes <- sample(c("child", "adult", "elderly"),
-                        size = parameters$N, replace = TRUE,
-                        prob = parameters$age_group_proportions)
+                        size = parameters$human_population,
+                        replace = TRUE,
+                        prob = age_group_proportions)
+
+  # Return the vector of initial age classes:
   return(age_classes)
 
 }
 
-
 # Function that gets the workplace assignments for all individuals in the system:
 ## THIS IS JUST A PLACEHOLDER FOR THE REAL THING
-generate_workplaces <- function(parameters, age_class_variable) {
+generate_initial_workplaces <- function(parameters, age_class_variable) {
 
-  ## Replace this with a test to check the relevant parameters are held in the parameters list
-  ## E.g. N, workplace size distribution parameters etc
-  # if (!("initial_infections" %in% names(parameters))) {
-  #   stop("parameters list must contain a variable called N")
-  # }
+  # Checking that the parameter list contains the requisite parameters
+  if (!("human_population" %in% names(parameters))) {
+    stop("parameters list must contain a variable called human_population")
+  }
+  if (!("seed" %in% names(parameters))) {
+    stop("parameters list must contain a variable called seed")
+  }
+  if (!("num_workplaces" %in% names(parameters))) {
+    stop("parameters list must contain a variable called num_workplaces")
+  }
 
   ## Note the below is wrong and just a placeholder - I don't think we want to fix the number of
   ## schools manually, instead let it be a function of the distribution of workplace sizes and the population size
 
-  ## Calculating number of adults and assigning them to workplaces
+  # Calculating number of adults and assigning them to workplaces
   set.seed(parameters$seed)
   num_adults <- age_class_variable$get_size_of("adult") # get number of adults
   index_adults <- age_class_variable$get_index_of("adult")$to_vector() # get the index of adults in age_class_variable
-  adult_workplace_assignments <- sample(as.character(1:parameters$num_workplaces), size = length(index_adults), replace = TRUE, prob = NULL) # randomly sample workplaces for each adult
+  adult_workplace_assignments <- sample(x = as.character(1:parameters$num_workplaces),
+                                        size = length(index_adults),
+                                        replace = TRUE,
+                                        prob = NULL) # randomly sample workplaces for each adult
 
-  ## Creating a vector containing workplace assignments for all individuals (i.e. adult_workplace_assignments for adults,
-  ## 0 for children and elderly)
-  workplace_vector <- vector(mode = "character", length = parameters$N) # create an empty vector to be filled with workplace assignments
+  # Creating a vector containing workplace assignments for all individuals (i.e. adult_workplace_assignments for adults,
+  # 0 for children and elderly)
+  workplace_vector <- vector(mode = "character", length = parameters$human_population) # create an empty vector to be filled with workplace assignments
   workplace_vector[index_adults] <- adult_workplace_assignments # append workplace assignments to main workplaces vector
   workplace_vector[workplace_vector == ""] <- "0" # replace blanks with 0s (these are children/elderly people)
 
@@ -122,13 +162,20 @@ generate_workplaces <- function(parameters, age_class_variable) {
 
 # Function that generates the school assignments for all individuals in the system:
 ## THIS IS JUST A PLACEHOLDER FOR THE REAL THING
-generate_schools <- function(parameters, age_class_variable) {
+generate_initial_schools <- function(parameters, age_class_variable) {
 
   ## Replace this with a test to check the relevant parameters are held in the parameters list
   ## E.g. N, school size distribution parameters etc
-  # if (!("initial_infections" %in% names(parameters))) {
-  #   stop("parameters list must contain a variable called N")
-  # }
+  # Check that the requisite parameters are present:
+  if (!("human_population" %in% names(parameters))) {
+    stop("parameters list must contain a variable called human_population")
+  }
+  if (!("seed" %in% names(parameters))) {
+    stop("parameters list must contain a variable called seed")
+  }
+  if (!("num_schools" %in% names(parameters))) {
+    stop("parameters list must contain a variable called num_schools")
+  }
 
   ## Note the below is wrong and just a placeholder - I don't think we want to fix the number of
   ## schools manually, instead let it be a function of the distribution of workplace sizes and the population size
@@ -137,11 +184,14 @@ generate_schools <- function(parameters, age_class_variable) {
   set.seed(parameters$seed)
   num_children <- age_class_variable$get_size_of("child") # get number of children
   index_children <- age_class_variable$get_index_of("child")$to_vector() # get the index of children in age_class_variable
-  child_school_assignments <- sample(as.character(1:parameters$num_schools), size = length(index_children), replace = TRUE, prob = NULL) # randomly sample schools for each child
+  child_school_assignments <- sample(x = as.character(1:parameters$num_schools),
+                                     size = length(index_children),
+                                     replace = TRUE,
+                                     prob = NULL) # randomly sample schools for each child
 
   ## Creating a vector containing school assignments for all individuals (i.e. child_school_assignments for children,
   ## 0 for adults and elderly)
-  schools_vector <- vector(mode = "character", length = parameters$N) # create empty vector to be filled with school assignments
+  schools_vector <- vector(mode = "character", length = parameters$human_population) # create empty vector to be filled with school assignments
   schools_vector[index_children] <- child_school_assignments # append school assignment to main schools vector
   schools_vector[schools_vector == ""] <- "0" # replace blanks with 0s (these are adults/elderly people)
 
@@ -150,29 +200,40 @@ generate_schools <- function(parameters, age_class_variable) {
 }
 
 # Function that generates the household assignments for all individuals in the system:
-generate_households <- function(parameters, age_class_variable) {
+generate_initial_households <- function(parameters, age_class_variable) {
 
-  ## Setting seed
+  # Check that the requisite parameters are present:
+  if (!("human_population" %in% names(parameters))) {
+    stop("parameters list must contain a variable called human_population")
+  }
+  if (!("seed" %in% names(parameters))) {
+    stop("parameters list must contain a variable called seed")
+  }
+  if (!("mean_household_size" %in% names(parameters))) {
+    stop("parameters list must contain a variable called mean_household_size")
+  }
+
+  # Setting seed
   set.seed(parameters$seed)
 
   ## Checking population size N is the same as implied by age_class_variable
-  if (parameters$N != age_class_variable$get_size_of(age_class_variable$get_categories())) {
-    stop("N and implied age_class_vector are different lengths")
+  if (parameters$human_population != age_class_variable$get_size_of(age_class_variable$get_categories())) {
+    stop("Human population and age_class_vector are different lengths")
   }
 
   ## Extracting out the vector of underlying values from age_class_variable
-  age_class_vector <- rep("", parameters$N)
+  age_class_vector <- rep("", parameters$human_population)
   age_class_vector[age_class_variable$get_index_of("child")$to_vector()] <- "child"
   age_class_vector[age_class_variable$get_index_of("adult")$to_vector()] <- "adult"
   age_class_vector[age_class_variable$get_index_of("elderly")$to_vector()] <- "elderly"
 
   ## Track which individuals are assigned
-  assigned <- rep(FALSE, parameters$N)
-  individual_households <- rep(NA, parameters$N)
+  assigned <- rep(FALSE, parameters$human_population)
+  individual_households <- rep(NA, parameters$human_population)
   household_counter <- 1
 
   ## Looping over this whilst there still remain any unassigned individuals
-  while(sum(assigned) < parameters$N) {
+  while(sum(assigned) < parameters$human_population) {
 
     # Check if only children are left unassigned - if this is the case, then we just distribute
     # them randomly across households
@@ -194,7 +255,7 @@ generate_households <- function(parameters, age_class_variable) {
     temp_household <- c()
 
     ## Looping over this whilst current household isn't full
-    while(length(temp_household) < household_size && sum(assigned) < parameters$N) {
+    while(length(temp_household) < household_size && sum(assigned) < parameters$human_population) {
 
       # Randomly select an unassigned individual
       candidates <- which(!assigned)

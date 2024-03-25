@@ -7,16 +7,21 @@
 get_parameters(overrides = list())
 }
 \arguments{
-\item{overrides}{a named list of parameter values to use instead of defaults
-The parameters are defined below.
+\item{overrides}{a named list of parameters values to be used instead of the defaults. The
+parameters are defined below.
 
-Example parameters:
+Human Population Parameters:
 
-* example_parameters - An example of a parameter; default = example}
+* human_population - the number of humans to model; default = 10000
+* initial_proportion_child - proportion of population initially in the 'child' age class; default = 0.2
+* initial_proportion_adult - proportion of population initially in the 'adult' age class; default = 0.6
+* initial_proportion_elderly - proportion of population initially in the 'elderly' age class; default = 0.2
+* proportion_initially_exposed - proportion of humans initially exposed (state = E); default = 0.0005
+* seed - a seed to run the simulation with ;default = NULL
+* mean_household_size - mean number of individuals per household; default = 3
+* num_workplaces - total number of workplaces; default = 5
+* num_schools - total number of schools; default = 2}
 }
 \description{
-get_parameters creates a named list of parameters for use in the model. These
-parameters are passed to process functions. These parameters are explained in
-"The US President's Malaria Initiative, Plasmodium falciparum transmission
-and mortality: A modelling study."
+The get_parameters() function creates a named list of model parameters.
 }
