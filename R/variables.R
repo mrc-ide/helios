@@ -138,6 +138,9 @@ generate_initial_workplaces <- function(parameters, age_class_variable) {
   if (!("seed" %in% names(parameters))) {
     stop("parameters list must contain a variable called seed")
   }
+  if (!("workplace_prop_max" %in% names(parameters))) {
+    stop("parameters list must contain a variable called workplace_prop_max")
+  }
   if (!("workplace_a" %in% names(parameters))) {
     stop("parameters list must contain a variable called workplace_a")
   }
@@ -149,7 +152,10 @@ generate_initial_workplaces <- function(parameters, age_class_variable) {
   set.seed(parameters$seed)
   num_adults <- age_class_variable$get_size_of("adult") # get number of adults
   index_adults <- age_class_variable$get_index_of("adult")$to_vector() # get the index of adults in age_class_variable
-  workplace_sizes <- sample_offset_truncated_power_distribution(N = num_adults, a = parameters$workplace_a, c = parameters$workplace_c)
+  workplace_sizes <- sample_offset_truncated_power_distribution(N = num_adults,
+                                                                prop_max = parameters$workplace_prop_max,
+                                                                a = parameters$workplace_a,
+                                                                c = parameters$workplace_c)
   workplace_indices <- unlist(sapply(1:length(workplace_sizes), function(i) rep(as.character(i), workplace_sizes[i])))
   adult_workplace_assignments <- sample(workplace_indices, replace = FALSE)
 

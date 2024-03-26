@@ -31,6 +31,7 @@ get_parameters <- function(overrides = list()) {
     seed = NULL,
     mean_household_size = 3,
     num_schools = 2,
+    workplace_prop_max = 0.1,
     workplace_a = 5.36,
     workplace_c = 1.34
   )
