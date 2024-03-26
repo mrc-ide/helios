@@ -30,8 +30,10 @@ get_parameters <- function(overrides = list()) {
     number_initially_exposed = 5,
     seed = NULL,
     mean_household_size = 3,
-    num_schools = 2
-    )
+    num_schools = 2,
+    workplace_a = 5.36,
+    workplace_c = 1.34
+  )
 
   # Ensure overridden parameters are passed as a list:
   if (!is.list(overrides)) {
