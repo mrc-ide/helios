@@ -138,9 +138,6 @@ generate_initial_workplaces <- function(parameters, age_class_variable) {
   if (!("seed" %in% names(parameters))) {
     stop("parameters list must contain a variable called seed")
   }
-  if (!("num_workplaces" %in% names(parameters))) {
-    stop("parameters list must contain a variable called num_workplaces")
-  }
 
   # Calculating number of adults and assigning them to workplaces
   set.seed(parameters$seed)

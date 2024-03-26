@@ -16,7 +16,6 @@
 #' * number_initially_exposed - number of humans initially exposed (state = E); default = 0.0005
 #' * seed - a seed to run the simulation with ;default = NULL
 #' * mean_household_size - mean number of individuals per household; default = 3
-#' * num_workplaces - total number of workplaces; default = 5
 #' * num_schools - total number of schools; default = 2
 #'
 #' @export
@@ -31,7 +30,6 @@ get_parameters <- function(overrides = list()) {
     number_initially_exposed = 5,
     seed = NULL,
     mean_household_size = 3,
-    num_workplaces = 5,
     num_schools = 2
     )
 
