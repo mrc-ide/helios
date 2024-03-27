@@ -17,7 +17,8 @@ create_variables <- function(parameters) {
 
   # Initialise and populate the workplace setting variable:
   initial_workplace_settings <- generate_initial_workplaces(parameters = parameters, age_class_variable = age_class_variable)
-  workplace_variable <- CategoricalVariable$new(categories = as.character(0:parameters$num_workplaces), ## change this to be the maximum of as.numeric(initial_workplace_settings) when proper function is in
+  num_workplaces <- max(as.numeric(initial_workplace_settings))
+  workplace_variable <- CategoricalVariable$new(categories = as.character(0:num_workplaces),
                                                 initial_values = initial_workplace_settings)
 
   # Initialise and populate the school setting variable:

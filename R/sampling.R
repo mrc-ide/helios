@@ -17,7 +17,7 @@ sample_offset_truncated_power_distribution <- function(N, prop_max = 0.1, a = 5.
     warning("prop_max is 0.2 or more! This may be an inappropriate choice.")
   }
 
-  max <- N * prop_max
+  max <- round(N * prop_max)
   m <- 1:max
   cdf <- 1 - (((1 + max / a) / (1 + m / a))^c - 1) / ((1 + max / a)^c - 1)
 
