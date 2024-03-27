@@ -184,24 +184,28 @@ generate_initial_schools <- function(parameters, age_class_variable) {
   if (!("seed" %in% names(parameters))) {
     stop("parameters list must contain a variable called seed")
   }
+  if (!("school_meanlog" %in% names(parameters))) {
+    stop("parameters list must contain a variable called school_meanlog")
+  }
+  if (!("school_sdlog" %in% names(parameters))) {
+    stop("parameters list must contain a variable called school_sdlog")
+  }
 
   # Calculating number of children and assigning them to schools
   set.seed(parameters$seed)
   num_children <- age_class_variable$get_size_of("child") # get number of children
   index_children <- age_class_variable$get_index_of("child")$to_vector() # get the index of children in age_class_variable
-  child_school_assignments <- sample(x = as.character(1:parameters$num_schools),
-                                     size = length(index_children),
-                                     replace = TRUE,
-                                     prob = NULL) # randomly sample schools for each child
+  school_sizes <- sample_log_normal(N = num_children, meanlog = parameters$school_meanlog, sdlog = parameters$school_sdlog)
+  school_indices <- unlist(sapply(1:length(school_sizes), function(i) rep(as.character(i), school_sizes[i])))
+  child_school_assignments <- sample(school_indices, replace = FALSE)
 
-  ## Creating a vector containing school assignments for all individuals (i.e. child_school_assignments for children,
-  ## 0 for adults and elderly)
+  # Creating a vector containing school assignments for all individuals (i.e. child_school_assignments for children,
+  # 0 for adults and elderly)
   schools_vector <- vector(mode = "character", length = parameters$human_population) # create empty vector to be filled with school assignments
   schools_vector[index_children] <- child_school_assignments # append school assignment to main schools vector
   schools_vector[schools_vector == ""] <- "0" # replace blanks with 0s (these are adults/elderly people)
 
   return(schools_vector)
-
 }
 
 # Function that generates the household assignments for all individuals in the system:
