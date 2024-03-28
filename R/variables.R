@@ -206,7 +206,10 @@ generate_initial_schools <- function(parameters, age_class_variable) {
   set.seed(parameters$seed)
   num_children <- age_class_variable$get_size_of("child") # get number of children
   index_children <- age_class_variable$get_index_of("child")$to_vector() # get the index of children in age_class_variable
-  school_sizes <- sample_log_normal(N = num_children, meanlog = parameters$school_meanlog, sdlog = parameters$school_sdlog)
+  school_sizes <- sample_log_normal(N = num_children,
+                                    prop_max = parameters$school_prop_max,
+                                    meanlog = parameters$school_meanlog,
+                                    sdlog = parameters$school_sdlog)
   school_indices <- unlist(sapply(1:length(school_sizes), function(i) rep(as.character(i), school_sizes[i])))
   child_school_assignments <- sample(school_indices, replace = FALSE)
 
