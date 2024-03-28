@@ -6,9 +6,9 @@
 #'
 #' @export
 create_processes <- function(
+    parameters,
     variables,
-    events,
-    parameters) {
+    events) {
 
   # Open a list of processes to store the model processes in:
   processes <- list(
