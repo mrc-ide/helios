@@ -124,7 +124,7 @@ SE_process <- function(parameters, variables){
     # Subset the indices of all children:
     # child_subset <- variables$age_class$get_index_of("child")
 
-    # Retrieve the index of all individuals with a school:
+    # Retrieve the index of all individuals with a school (0's have no school):
     school_child_only_var <- variables$school$get_index_of(as.character(1:max(num_schools)))
 
     # For each school:
