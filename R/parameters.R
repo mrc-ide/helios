@@ -35,7 +35,12 @@ get_parameters <- function(overrides = list()) {
     workplace_a = 5.36,
     workplace_c = 1.34,
     duration_exposed = 2,
-    duration_infectious = 4
+    duration_infectious = 4,
+    beta_household = 0.5, # check this as default
+    beta_workplace = 0.5, # check this as default
+    beta_school = 0.5, # check this as default
+    beta_community = 0.2, # check this as default
+    dt = 0.5 # check this as default
   )
 
   # Ensure overridden parameters are passed as a list:
