@@ -151,7 +151,7 @@ SE_process <- function(parameters, variables){
     ## I think we can also possibly save computational cost generally by only doing all of the FOI calculations
     ## for individuals who are susceptible. Unclear how much of a speed boost that will bring us.
 
-    # Creating vector to store which leisure
+    # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
     leisure_visit <- vector(mode = "numeric", length = parameters$human_population)
 
     # For each individual, work out which leisure setting they go to that particular night - 0 = they don't go to any
@@ -163,8 +163,8 @@ SE_process <- function(parameters, variables){
       # How many leisure settings do individuals have associated with them (and could visit)
       number_potential_leisure_visits <- length(potential_leisure_visits)
 
-      # What's the probability of visiting each (considered equal), with probability of visiting none (staying home)
-      # given by 1 - parameters$leisure_prob_visit
+      # What's the probability of visiting each potential setting (considered equal) and the probability of visiting none (staying home)
+      # (probability of staying home is given by 1 - parameters$leisure_prob_visit)
       prob_visiting_each <- parameters$leisure_prob_visit / number_potential_leisure_visits
 
       # Sampling wich leisure setting actually visited (0 = visit none and staying home)
@@ -177,7 +177,7 @@ SE_process <- function(parameters, variables){
     # Open empty vector to store each individuals leisure-specific FOI:
     leisure_FOI <- vector(mode = "numeric", length = parameters$human_population)
 
-    # Get unique leisure settings actually visited in this timestep (currently, wrong) / day (what we need)
+    # Get all unique leisure settings actually visited in this timestep (NOTE: we need to change this to day)
     leisure_settings_visited <- unique(leisure_visit)
 
     # Create temporary leisure variable that contains leisure settings visited in that day
