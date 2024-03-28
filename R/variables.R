@@ -29,10 +29,15 @@ create_variables <- function(parameters) {
   school_variable <- CategoricalVariable$new(categories = as.character(0:num_schools), ## change this to be the maximum of as.numeric(initial_school_settings) when proper function is in
                                              initial_values = initial_school_settings)
 
+  # Initialise and populate the leisure setting variable
+  initial_leisure_settings <- generate_initial_leisure(parameters = parameters) # returns list to initialise RaggedInteger
+  leisure_variabe <- RaggedInteger$new(initial_values = initial_leisure_settings)
+
   # Initialise and populate the household variable
   initial_households <- generate_initial_households(parameters = parameters, age_class_variable = age_class_variable)
   household_variable <- CategoricalVariable$new(categories = as.character(1:max(initial_households)),
                                                 initial_values = as.character(initial_households))
+
 
   # Store the model variables in a single list:
   variables <- list(
