@@ -97,7 +97,7 @@ SE_process <- function(parameters, variables){
     workplace_adults_only_var <- variables$workplace$get_index_of(as.character(1:max(num_workplaces)))
 
     # For each workplace:
-    for (i in seq(parameters$num_workplaces)) {
+    for (i in 1:max(num_workplaces)) {
 
       # Get the indices of individuals that work in the i-th workplace:
       spec_workplace <- variables$workplace$get_index_of(as.character(i))
