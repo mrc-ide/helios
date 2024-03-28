@@ -16,16 +16,16 @@ create_processes <- function(
     # ===============================
     # Disease State Progression
     # ===============================
-    SE_process(parameters = parameters,
-               variables = variables),
+    SE_process = SE_process(parameters = parameters,
+                            variables = variables),
 
-    EI_process(parameters = parameters,
-               variables = variables,
-               events = events),
+    EI_process = EI_process(parameters = parameters,
+                            variables = variables,
+                            events = events),
 
-    IR_process(parameters = parameters,
-               variables = variables,
-               events = events),
+    IR_process = IR_process(parameters = parameters,
+                            variables = variables,
+                            events = events),
 
     # ===============================
     # Intervention processes
@@ -35,7 +35,7 @@ create_processes <- function(
     # ===============================
     # Rendering processes
     # ===============================
-    health_render_process
+    # health_render_process
 
   )
 
@@ -240,9 +240,15 @@ IR_process <- function(parameters, variables, events) {
 }
 
 # Define the process which renders the number of individuals in each time step:
-# health_render_process <- categorical_count_renderer_process(
-#   renderer = renderer,
-#   variable = variables$disease_state,
-#   categories =  c("S", "E", "I", "R")
-# )
+# disease_state_count_render_process <- function(renderers, parameters, variables) {
+#
+#   # Create the disease state count render
+#   disease_state_count_render <- Render$new(timesteps = round(parameters$simulation_time / parameters$dt))
+#   disease_states <- variables$disease_state$get_categories()
+#   function(t) {
+#     for (i in disease_states) {
+#       disease_state_count_render$render(paste0(i, '_count'), variables$disease_state$get_size_of(i), t)
+#     }
+#   }
+# }
 
