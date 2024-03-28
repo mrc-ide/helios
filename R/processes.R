@@ -88,7 +88,7 @@ SE_process <- function(parameters, variables){
     workplace_FOI <- vector(mode = "numeric", length = parameters$human_population)
 
     # Store the number of households:
-    num_workplaces <- as.numeric(variables$workplace$get_categories())
+    num_workplaces <- max(as.numeric(variables$workplace$get_categories()))
 
     # Retrieve the indices of all adults in the current population (only adult age class work):
     adults_subset <- variables$age_class$get_index_of("adult")
@@ -97,7 +97,7 @@ SE_process <- function(parameters, variables){
     workplace_adults_only_var <- variables$workplace$get_index_of(as.character(1:max(num_workplaces)))
 
     # For each workplace:
-    for (i in 1:max(num_workplaces)) {
+    for (i in seq(parameters$num_workplaces)) {
 
       # Get the indices of individuals that work in the i-th workplace:
       spec_workplace <- variables$workplace$get_index_of(as.character(i))
