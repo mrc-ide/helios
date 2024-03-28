@@ -9,10 +9,10 @@ create_events <- function(parameters) {
   events <- list(
 
     # Event moving exposed individuals to the infectious state
-    EI_event <- TargetedEvent$new(population_size = parameters$human_population),
+    EI_event = TargetedEvent$new(population_size = parameters$human_population),
 
     # Event moving exposed individuals to the infectious state
-    IR_event <- TargetedEvent$new(population_size = parameters$human_population)
+    IR_event = TargetedEvent$new(population_size = parameters$human_population)
 
   )
 
