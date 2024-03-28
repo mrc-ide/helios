@@ -24,7 +24,8 @@ create_processes <- function(
                events = events),
 
     IR_process(parameters = parameters,
-               variables = variables),
+               variables = variables,
+               events = events),
 
     # ===============================
     # Intervention processes
