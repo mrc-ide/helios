@@ -231,7 +231,7 @@ IR_process <- function(parameters, variables, events) {
     I$and(IR_already_scheduled$not(inplace = TRUE))
 
     # Calculate recovery times for infectious individuals without transitions scheduled:
-    R_times <- round((rgamma(I$size(), 4, 1) + 1) / parameters$dt)
+    R_times <- round((rgamma(I$size(), 2 * parameters$duration_infectious, 1) + 1) / parameters$dt)
 
     # Schedule the recovery events for infectious individuals without transitions scheduled:
     events$IR_event$schedule(target = I, delay = R_times)
