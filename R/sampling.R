@@ -38,3 +38,41 @@ sample_offset_truncated_power_distribution <- function(N, prop_max = 0.1, a = 5.
 
   return(samples)
 }
+
+#' Sample from an log-normal distribution
+#'
+#' The final sample is adjusted to ensure that the total sum of samples equals to `N`.
+#' All samples are rounded.
+#'
+#' @param N The total population size
+#' @param meanlog See `dlnorm`
+#' @param sdlog See `dlnorm`
+#'
+#' @export
+sample_log_normal <- function(N, prop_max = 0.1, meanlog, sdlog) {
+  if (prop_max <= 0 | prop_max > 1) {
+    stop("prop_max should be in (0, 1]")
+  }
+  if (prop_max >= 0.2) {
+    warning("prop_max is 0.2 or more! This may be an inappropriate choice.")
+  }
+
+  max <- round(N * prop_max)
+
+  samples <- c()
+  remaining <- N
+
+  while(remaining > 0) {
+    draw <- round(rlnorm(n = 1, meanlog = meanlog, sdlog = sdlog))
+    if (draw < max) {
+      samples <- c(samples, draw)
+      remaining <- remaining - draw
+    }
+  }
+
+  if(sum(samples) >= N) {
+    samples[length(samples)] <- samples[length(samples)] - (sum(samples) - N)
+  }
+
+  return(samples)
+}

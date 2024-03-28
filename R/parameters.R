@@ -15,8 +15,11 @@
 #' * initial_proportion_elderly - proportion of population initially in the 'elderly' age class; default = 0.2
 #' * number_initially_exposed - number of humans initially exposed (state = E); default = 0.0005
 #' * seed - a seed to run the simulation with ;default = NULL
-#' * mean_household_size - mean number of individuals per household; default = 3
-#' * num_schools - total number of schools; default = 2
+#' * workplace_prop_max - maximum size of a workplace as a proportion of total adult population size; default = 0.1
+#' * workplace_a - the a parameter for the Zipf-like distribution on workplace size; default = 5.36
+#' * workplace_c - the c parameter for the Zipf-like distribution on workplace size; default = 1.34
+#' * school_meanlog - the meanlog parameter for the log-normal distribution on school size; default = 5.49
+#' * school_sdlog - the sdlog parameter for the log-normal distribution on school size; default = 1.02
 #'
 #' @export
 get_parameters <- function(overrides = list()) {
@@ -30,10 +33,12 @@ get_parameters <- function(overrides = list()) {
     number_initially_exposed = 5,
     seed = NULL,
     mean_household_size = 3,
-    num_schools = 2,
     workplace_prop_max = 0.1,
     workplace_a = 5.36,
     workplace_c = 1.34,
+    school_prop_max = 0.1,
+    school_meanlog = 5.49,
+    school_sdlog = 1.02,
     duration_exposed = 2,
     duration_infectious = 4,
     beta_household = 0.5, # check this as default
