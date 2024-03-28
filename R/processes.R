@@ -202,7 +202,7 @@ EI_process <- function(parameters, variables, events){
     E$and(EI_already_scheduled$not(inplace = TRUE))
 
     # Calculate the delay until each exposed individual without a delay transitions to infected:
-    I_times <- round((rgamma(E$size(), 4, 2) + 1) / parameters$dt)
+    I_times <- round((rgamma(E$size(), 2 * parameters$duration_exposed, 2) + 1) / parameters$dt)
 
     # Schedule the new transitions from exposed to infected:
     events$EI_event$schedule(target = E, delay = I_times)

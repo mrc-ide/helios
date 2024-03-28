@@ -33,7 +33,8 @@ get_parameters <- function(overrides = list()) {
     num_schools = 2,
     workplace_prop_max = 0.1,
     workplace_a = 5.36,
-    workplace_c = 1.34
+    workplace_c = 1.34,
+    duration_exposed = 5
   )
 
   # Ensure overridden parameters are passed as a list:
