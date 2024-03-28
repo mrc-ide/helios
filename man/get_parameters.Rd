@@ -16,10 +16,9 @@ Human Population Parameters:
 * initial_proportion_child - proportion of population initially in the 'child' age class; default = 0.2
 * initial_proportion_adult - proportion of population initially in the 'adult' age class; default = 0.6
 * initial_proportion_elderly - proportion of population initially in the 'elderly' age class; default = 0.2
-* proportion_initially_exposed - proportion of humans initially exposed (state = E); default = 0.0005
+* number_initially_exposed - number of humans initially exposed (state = E); default = 0.0005
 * seed - a seed to run the simulation with ;default = NULL
 * mean_household_size - mean number of individuals per household; default = 3
-* num_workplaces - total number of workplaces; default = 5
 * num_schools - total number of schools; default = 2}
 }
 \description{
