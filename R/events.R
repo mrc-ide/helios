@@ -29,14 +29,14 @@ create_events <- function(parameters) {
 add_event_listeners <- function(variables, events) {
 
   # Add listener for function governing transition of individuals from E to I:
-  EI_event$add_listener(
+  events$EI_event$add_listener(
     function(t, target) {
       variables$disease_state$queue_update("I", target)
     }
   )
 
   # Add listener for function governing transition of individuals from I to R:
-  IR_event$add_listener(
+  events$IR_event$add_listener(
     function(t, target) {
       variables$disease_state$queue_update("R", target)
     }
