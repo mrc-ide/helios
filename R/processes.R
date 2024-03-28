@@ -150,6 +150,8 @@ SE_process <- function(parameters, variables){
     ## only at the beginning of a new day.
     ## I think we can also possibly save computational cost generally by only doing all of the FOI calculations
     ## for individuals who are susceptible. Unclear how much of a speed boost that will bring us.
+    ## Also - do we need to take into account fact some people might visit different times of the day?
+    ## Unclear - probably leave this for now.
 
     # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
     leisure_visit <- vector(mode = "numeric", length = parameters$human_population)

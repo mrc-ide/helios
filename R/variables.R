@@ -235,8 +235,39 @@ generate_initial_schools <- function(parameters, age_class_variable) {
 #' @export
 generate_initial_leisure <- function(parameters) {
 
-  ## Code to generate leisure list in here
+  # Check that the requisite parameters are present:
+  if (!("human_population" %in% names(parameters))) {
+    stop("parameters list must contain a variable called human_population")
+  }
+  if (!("seed" %in% names(parameters))) {
+    stop("parameters list must contain a variable called seed")
+  }
+  if (!("leisure_mean_size" %in% names(parameters))) {
+    stop("parameters list must contain a variable called leisure_mean_size")
+  }
+  if (!("leisure_overdispersion_size" %in% names(parameters))) {
+    stop("parameters list must contain a variable called leisure_overdispersion_size")
+  }
+  if (!("leisure_mean_number_settings" %in% names(parameters))) {
+    stop("parameters list must contain a variable called leisure_overdispersion_size")
+  }
 
+  # Assigning individuals to their first leisure setting
+  set.seed(parameters$seed)
+  leisure_sizes <- sample_negbinom(N = parameters$human_population,
+                                   prop_max = parameters$leisure_prop_max,
+                                   mu = parameters$leisure_mean_size,
+                                   size = parameters$leisure_overdispersion_size)
+  leisure_indices <- unlist(sapply(1:length(leisure_sizes), function(i) rep(as.character(i), leisure_sizes[i])))
+  leisure_assignments <- sample(leisure_indices, replace = FALSE)
+
+  ## I think here we need to like then calculate size of each leisure setting,
+  ## then do a draw for each individual to determine the number of leisure settings they visit
+  ## (capped at 7) and assign them to a different leisure setting for each based
+  ## on the size of that leisure setting. Not confident this is the best bet though.
+
+  school_indices <- unlist(sapply(1:length(school_sizes), function(i) rep(as.character(i), school_sizes[i])))
+  child_school_assignments <- sample(school_indices, replace = FALSE)
   return(leisure_list) # a list where each element contains a vector that specifies the ids of the leisure settings
                        # that each individual visits e.g. list(c(2, 6, 19, 35), c(1, 8), c(6, 10, 45)... etc)
 
