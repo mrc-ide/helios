@@ -249,27 +249,52 @@ generate_initial_leisure <- function(parameters) {
     stop("parameters list must contain a variable called leisure_overdispersion_size")
   }
   if (!("leisure_mean_number_settings" %in% names(parameters))) {
-    stop("parameters list must contain a variable called leisure_overdispersion_size")
+    stop("parameters list must contain a variable called leisure_mean_number_settings")
   }
 
-  # Assigning individuals to their first leisure setting
+  # Setting the seed
   set.seed(parameters$seed)
-  leisure_sizes <- sample_negbinom(N = parameters$human_population,
-                                   prop_max = parameters$leisure_prop_max,
-                                   mu = parameters$leisure_mean_size,
-                                   size = parameters$leisure_overdispersion_size)
-  leisure_indices <- unlist(sapply(1:length(leisure_sizes), function(i) rep(as.character(i), leisure_sizes[i])))
-  leisure_assignments <- sample(leisure_indices, replace = FALSE)
 
-  ## I think here we need to like then calculate size of each leisure setting,
-  ## then do a draw for each individual to determine the number of leisure settings they visit
-  ## (capped at 7) and assign them to a different leisure setting for each based
-  ## on the size of that leisure setting. Not confident this is the best bet though.
+  # Generating the sizes of each leisure setting
+  leisure_setting_sizes <- sample_negbinom(N = parameters$human_population,
+                                           prop_max = parameters$leisure_prop_max,
+                                           mu = parameters$leisure_mean_size,
+                                           size = parameters$leisure_overdispersion_size)
 
-  school_indices <- unlist(sapply(1:length(school_sizes), function(i) rep(as.character(i), school_sizes[i])))
-  child_school_assignments <- sample(school_indices, replace = FALSE)
-  return(leisure_list) # a list where each element contains a vector that specifies the ids of the leisure settings
-                       # that each individual visits e.g. list(c(2, 6, 19, 35), c(1, 8), c(6, 10, 45)... etc)
+  # Calculating the number of leisure visits that each person makes per week
+  leisure_visits_per_person_per_week <- rpois(n = parameters$human_population,
+                                              lambda = parameters$leisure_mean_number_settings)
+  leisure_visits_per_person_per_week[leisure_visits_per_person_per_week > 7] <- 7  # capping it at 1 leisure visit per day (max 7 per week)
+
+  # Populating list with leisure visits made by each individual
+  leisure_visit_list <- vector(mode = "list", length = parameters$human_population)
+  for (i in 1:parameters$human_population) {
+
+    # Creating a temporary vector of leisure visits for that person
+    # -> Each element indicates where they visit on which day of the week
+    #    and a 0 means no-where visited on that day of the week
+    temp_leisure_visit <- rep(0, 7)
+
+    # Sampling which locations individuals visit for their leisure visits (weighted according to leisure setting size)
+    temp_location_leisure_visits <- sample(x = 1:length(leisure_setting_sizes),
+                                           size = leisure_visits_per_person_per_week[i],
+                                           replace = FALSE,
+                                           prob = leisure_setting_sizes)
+
+    # Sampling which day(s) of the week the individual makes those visit(s) and assigning visits randomly
+    days_visits_made <- sample(x = 1:7, size = leisure_visits_per_person_per_week[i], replace = FALSE)
+    if (leisure_visits_per_person_per_week[i] == 1) {
+      temp_leisure_visit[days_visits_made] <- temp_location_leisure_visits
+    } else {
+      temp_leisure_visit[days_visits_made] <- sample(x = temp_location_leisure_visits,
+                                                     size = leisure_visits_per_person_per_week[i],
+                                                     replace = FALSE)
+    }
+    leisure_visit_list[[i]] <- temp_leisure_visit
+  }
+
+  return(leisure_visit_list) # a list where each element contains a vector that specifies the ids of the leisure settings
+                             # that each individual visits e.g. list(c(2, 6, 19, 35), c(1, 8), c(6, 10, 45)... etc)
 
 }
 
