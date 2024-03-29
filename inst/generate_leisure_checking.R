@@ -39,3 +39,5 @@ length(table(y[, 5][y[, 5] > 0]))
 length(table(y[, 6][y[, 6] > 0]))
 length(table(y[, 7][y[, 7] > 0]))
 
+x <- create_variables(parameters)
+x$leisure
