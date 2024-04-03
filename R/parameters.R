@@ -1,25 +1,36 @@
 #' Establish the list of model parameters
 #'
-#' @description
-#' The get_parameters() function creates a named list of model parameters.
+#' @description The get_parameters() function creates a named list of model parameters.
 #'
+#' @param overrides a named list of parameters values to be used instead of the defaults.
+#' The parameters are defined below:
 #'
-#' @param overrides a named list of parameters values to be used instead of the defaults. The
-#' parameters are defined below.
-#'
-#' Human Population Parameters:
-#'
-#' * human_population - the number of humans to model; default = 10000
-#' * initial_proportion_child - proportion of population initially in the 'child' age class; default = 0.2
-#' * initial_proportion_adult - proportion of population initially in the 'adult' age class; default = 0.6
-#' * initial_proportion_elderly - proportion of population initially in the 'elderly' age class; default = 0.2
-#' * number_initially_exposed - number of humans initially exposed (state = E); default = 0.0005
-#' * seed - a seed to run the simulation with ;default = NULL
-#' * workplace_prop_max - maximum size of a workplace as a proportion of total adult population size; default = 0.1
-#' * workplace_a - the a parameter for the Zipf-like distribution on workplace size; default = 5.36
-#' * workplace_c - the c parameter for the Zipf-like distribution on workplace size; default = 1.34
-#' * school_meanlog - the meanlog parameter for the log-normal distribution on school size; default = 5.49
-#' * school_sdlog - the sdlog parameter for the log-normal distribution on school size; default = 1.02
+#' * `human_population`: the number of humans to model
+#' * `initial_proportion_child`: proportion of population initially in the 'child' age class
+#' * `initial_proportion_adult`: proportion of population initially in the 'adult' age class
+#' * `initial_proportion_elderly`: proportion of population initially in the 'elderly' age class
+#' * `number_initially_exposed`: number of humans initially exposed (state = E)
+#' * `seed`: a seed to run the simulation with
+#' * `mean_household_size`: TBD
+#' * `workplace_prop_max`: maximum size of a workplace as a proportion of total adult population size
+#' * `workplace_a`: the a parameter for the Zipf-like distribution on workplace size
+#' * `workplace_c`: the c parameter for the Zipf-like distribution on workplace size
+#' * `school_prop_max`: maximum size of a school as a proporiton of total child population size
+#' * `school_meanlog`: the meanlog parameter for the log-normal distribution on school size
+#' * `school_sdlog`: the sdlog parameter for the log-normal distribution on school size
+#' * `leisure_mean_number_settings`: TBD
+#' * `leisure_mean_size`: TBD
+#' * `leisure_overdispersion_size`: TBD
+#' * `leisure_prop_max`: TBD
+#' * `duration_exposed`: TBD
+#' * `duration_infectious`: TBD
+#' * `beta_household`: TBD
+#' * `beta_workplace`: TBD
+#' * `beta_school`: TBD
+#' * `beta_leisure`: TBD
+#' * `beta_community`: TBD
+#' * `dt`: TBD
+#' * `simulation_time`: TBD
 #'
 #' @export
 get_parameters <- function(overrides = list()) {
@@ -39,11 +50,17 @@ get_parameters <- function(overrides = list()) {
     school_prop_max = 0.1,
     school_meanlog = 5.49,
     school_sdlog = 1.02,
+    leisure_prob_visit = 0.6,
+    leisure_mean_number_settings = 3,
+    leisure_mean_size = 50,
+    leisure_overdispersion_size = 2,
+    leisure_prop_max = 0.1,
     duration_exposed = 2,
     duration_infectious = 4,
     beta_household = 0.5, # check this as default
     beta_workplace = 0.5, # check this as default
     beta_school = 0.5, # check this as default
+    beta_leisure = 0.5, # check this as default
     beta_community = 0.2, # check this as default
     dt = 0.5, # check this as default
     simulation_time = 150

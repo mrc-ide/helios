@@ -145,9 +145,70 @@ SE_process <- function(parameters, variables){
 
     #=== Leisure FOI ===#
     #=====================#
-    ### Calculate Leisure FOI (real-valued for all individuals)
-    ### NOT DONE YET
-    leisure_FOI <- 0
+    ## IMPORTANT NOTE:
+    ## Currently I think this will be updated every time-step which isn't quite right - we need this calculated
+    ## only at the beginning of a new day.
+    ## I think we can also possibly save computational cost generally by only doing all of the FOI calculations
+    ## for individuals who are susceptible. Unclear how much of a speed boost that will bring us.
+    ## Also - do we need to take into account fact some people might visit different times of the day?
+    ## Unclear - probably leave this for now.
+
+    # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
+    leisure_visit <- vector(mode = "numeric", length = parameters$human_population)
+
+    # For each individual, work out which leisure setting they go to that particular night - 0 = they don't go to any
+    for (i in seq(parameters$human_population)) {
+
+      # Which leisure settings do individuals have associated with them (and could visit)
+      potential_leisure_visits <- variables$leisure$get_values(i)
+
+      # How many leisure settings do individuals have associated with them (and could visit)
+      number_potential_leisure_visits <- length(potential_leisure_visits)
+
+      # What's the probability of visiting each potential setting (considered equal) and the probability of visiting none (staying home)
+      # (probability of staying home is given by 1 - parameters$leisure_prob_visit)
+      prob_visiting_each <- parameters$leisure_prob_visit / number_potential_leisure_visits
+
+      # Sampling wich leisure setting actually visited (0 = visit none and staying home)
+      leisure_visit[i] <- sample(x = c(0, seq(number_potential_leisure_visits)),
+                                 size = 1,
+                                 prob = c(1 - parameters$leisure_prob_visit,
+                                          rep(prob_visiting_each, number_potential_leisure_visits)))
+    }
+
+    # Open empty vector to store each individuals leisure-specific FOI:
+    leisure_FOI <- vector(mode = "numeric", length = parameters$human_population)
+
+    # Get all unique leisure settings actually visited in this timestep (NOTE: we need to change this to day)
+    leisure_settings_visited <- unique(leisure_visit)
+
+    # Create temporary leisure variable that contains leisure settings visited in that day
+    temp_leisure_variable <- CategoricalVariable$new(categories = leisure_settings_visited,
+                                                     initial_values = leisure_visit)
+
+    # Calculating leisure-specific FOI for each individual
+    for (i in 1:length(leisure_settings_visited)) {
+
+      # Access the index of the specific leisure setting being considered
+      spec_leisure_setting <- leisure_settings_visited[i]
+
+      # Only going through below steps if leisure setting actually visited (i.e. != 0)
+      if (spec_leisure_setting != 0) {
+
+        # Retrieve the indices of individuals visiting the specific leisure setting
+        spec_leisure <- temp_leisure_variable$get_index_of(as.character(spec_leisure_setting))
+
+        # Retrieve the indices of all infectious individuals in the particular leisure setting being considered
+        spec_leisure_I <- I$and(spec_leisure)
+
+        # Calculate the school-specific FOI for the i-th school:
+        spec_leisure_FOI <- parameters$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+
+        # Store the school-specific FOI at the indices of all children that attend it:
+        leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
+      }
+
+    }
 
     #=== Community FOI ===#
     #=====================#
