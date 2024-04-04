@@ -1,0 +1,21 @@
+---
+title: "An individual-based model for assessing far UVC interventions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette presents the modelling approach used in `helios`.
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(helios)
+```
