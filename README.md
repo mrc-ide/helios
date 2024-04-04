@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# helios <img src='images/helios_hex.png' align="right" height="139" />
+# helios <img src="man/figures/helios_hex.png" align="right" height="200" style="float:right; height:200px;">
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -13,7 +13,8 @@
 transmission model that simulates the effect of far ultra-violet light
 emitters as a method for curtailing disease transmission. `helios` is
 built using the [`individual`](https://github.com/mrc-ide/individual)
-package.
+package developed at the MRC Centre for Global Infectious Disease
+Analysis.
 
 ## Installation
 
