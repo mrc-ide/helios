@@ -9,33 +9,34 @@ get_parameters(overrides = list())
 \arguments{
 \item{overrides}{a named list of parameters values to be used instead of the defaults.
 The parameters are defined below:
-
-* `human_population`: the number of humans to model
-* `initial_proportion_child`: proportion of population initially in the 'child' age class
-* `initial_proportion_adult`: proportion of population initially in the 'adult' age class
-* `initial_proportion_elderly`: proportion of population initially in the 'elderly' age class
-* `number_initially_exposed`: number of humans initially exposed (state = E)
-* `seed`: a seed to run the simulation with
-* `mean_household_size`: TBD
-* `workplace_prop_max`: maximum size of a workplace as a proportion of total adult population size
-* `workplace_a`: the a parameter for the Zipf-like distribution on workplace size
-* `workplace_c`: the c parameter for the Zipf-like distribution on workplace size
-* `school_prop_max`: maximum size of a school as a proporiton of total child population size
-* `school_meanlog`: the meanlog parameter for the log-normal distribution on school size
-* `school_sdlog`: the sdlog parameter for the log-normal distribution on school size
-* `leisure_mean_number_settings`: TBD
-* `leisure_mean_size`: TBD
-* `leisure_overdispersion_size`: TBD
-* `leisure_prop_max`: TBD
-* `duration_exposed`: TBD
-* `duration_infectious`: TBD
-* `beta_household`: TBD
-* `beta_workplace`: TBD
-* `beta_school`: TBD
-* `beta_leisure`: TBD
-* `beta_community`: TBD
-* `dt`: TBD
-* `simulation_time`: TBD}
+\itemize{
+\item \code{human_population}: the number of humans to model
+\item \code{initial_proportion_child}: proportion of population initially in the 'child' age class
+\item \code{initial_proportion_adult}: proportion of population initially in the 'adult' age class
+\item \code{initial_proportion_elderly}: proportion of population initially in the 'elderly' age class
+\item \code{number_initially_exposed}: number of humans initially exposed (state = E)
+\item \code{seed}: a seed to run the simulation with
+\item \code{mean_household_size}: TBD
+\item \code{workplace_prop_max}: maximum size of a workplace as a proportion of total adult population size
+\item \code{workplace_a}: the a parameter for the Zipf-like distribution on workplace size
+\item \code{workplace_c}: the c parameter for the Zipf-like distribution on workplace size
+\item \code{school_prop_max}: maximum size of a school as a proporiton of total child population size
+\item \code{school_meanlog}: the meanlog parameter for the log-normal distribution on school size
+\item \code{school_sdlog}: the sdlog parameter for the log-normal distribution on school size
+\item \code{leisure_mean_number_settings}: TBD
+\item \code{leisure_mean_size}: TBD
+\item \code{leisure_overdispersion_size}: TBD
+\item \code{leisure_prop_max}: TBD
+\item \code{duration_exposed}: TBD
+\item \code{duration_infectious}: TBD
+\item \code{beta_household}: TBD
+\item \code{beta_workplace}: TBD
+\item \code{beta_school}: TBD
+\item \code{beta_leisure}: TBD
+\item \code{beta_community}: TBD
+\item \code{dt}: TBD
+\item \code{simulation_time}: TBD
+}}
 }
 \description{
 The get_parameters() function creates a named list of model parameters.

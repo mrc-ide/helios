@@ -7,13 +7,13 @@
 sample_log_normal(N, prop_max = 0.1, meanlog, sdlog)
 }
 \arguments{
-\item{N}{The total population size}
+\item{N}{An integer giving the sum of generated random variables}
 
-\item{meanlog}{See `dlnorm`}
+\item{meanlog}{See \code{dlnorm}}
 
-\item{sdlog}{See `dlnorm`}
+\item{sdlog}{See \code{dlnorm}}
 }
 \description{
-The final sample is adjusted to ensure that the total sum of samples equals to `N`.
+The final sample is adjusted to ensure that the total sum of samples equals to \code{N}.
 All samples are rounded.
 }

@@ -7,13 +7,16 @@
 sample_negbinom(N, prop_max = 0.1, mu, size)
 }
 \arguments{
-\item{N}{The total population size}
+\item{N}{An integer giving the sum of generated random variables}
 
-\item{mu}{See `rnbinom`}
+\item{mu}{See the \code{mu} argument of \code{\link[=rnbinom]{rnbinom()}}}
 
-\item{size}{See `rnbinom`}
+\item{size}{See the \code{size} argument of \code{\link[=rnbinom]{rnbinom()}}}
 }
 \description{
-The final sample is adjusted to ensure that the total sum of samples equals to `N`.
-All samples are rounded.
+This function samples from a negative binomial distribution. Rather than
+specifying the total number of samples, as with \code{rnbinom}, this function
+takes as input an integer \code{N} which the resulting samples must sum to. This
+is achieved by adjusting the final sample. As such, the resulting samples
+are not strictly speaking from a negative binomial distribution.
 }

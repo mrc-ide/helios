@@ -12,9 +12,9 @@ sample_offset_truncated_power_distribution(
 )
 }
 \arguments{
-\item{N}{The total population size}
+\item{N}{An integer giving the sum of generated random variables}
 
-\item{prop_max}{The proportion of `N` which is the maximum value of a single sample}
+\item{prop_max}{The proportion of \code{N} which is the maximum value of a single sample}
 
 \item{a}{A parameter of the distribution (?)}
 
@@ -22,5 +22,5 @@ sample_offset_truncated_power_distribution(
 }
 \description{
 Default values adapted from Ferguson et al. (2005). The final sample is
-adjusted to ensure that the total sum of samples equals to `N`.
+adjusted to ensure that the total sum of samples equals to \code{N}.
 }

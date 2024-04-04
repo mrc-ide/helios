@@ -3,6 +3,9 @@
 
 # helios <img src="man/figures/helios_hex.png" align="right" height="200" style="float:right; height:200px;">
 
+> \[!WARNING\]  
+> Package under active development! All functions may change.
+
 <!-- badges: start -->
 <!-- badges: end -->
 
