@@ -3,7 +3,7 @@
 #' Default values adapted from Ferguson et al. (2005). The final sample is
 #' adjusted to ensure that the total sum of samples equals to `N`.
 #'
-#' @param N The total population size
+#' @param N An integer giving the sum of generated random variables
 #' @param prop_max The proportion of `N` which is the maximum value of a single sample
 #' @param a A parameter of the distribution (?)
 #' @param c A parameter of the distribution (?)
@@ -44,7 +44,7 @@ sample_offset_truncated_power_distribution <- function(N, prop_max = 0.1, a = 5.
 #' The final sample is adjusted to ensure that the total sum of samples equals to `N`.
 #' All samples are rounded.
 #'
-#' @param N The total population size
+#' @param N An integer giving the sum of generated random variables
 #' @param meanlog See `dlnorm`
 #' @param sdlog See `dlnorm`
 #'
@@ -79,12 +79,15 @@ sample_log_normal <- function(N, prop_max = 0.1, meanlog, sdlog) {
 
 #' Sample from a negative binomial distribution
 #'
-#' The final sample is adjusted to ensure that the total sum of samples equals to `N`.
-#' All samples are rounded.
+#' This function samples from a negative binomial distribution. Rather than
+#' specifying the total number of samples, as with `rnbinom`, this function
+#' takes as input an integer `N` which the resulting samples must sum to. This
+#' is achieved by adjusting the final sample. As such, the resulting samples
+#' are not strictly speaking from a negative binomial distribution.
 #'
-#' @param N The total population size
-#' @param mu See `rnbinom`
-#' @param size See `rnbinom`
+#' @param N An integer giving the sum of generated random variables
+#' @param mu See the `mu` argument of [rnbinom()]
+#' @param size See the `size` argument of [rnbinom()]
 #'
 #' @export
 sample_negbinom <- function(N, prop_max = 0.1, mu, size) {
