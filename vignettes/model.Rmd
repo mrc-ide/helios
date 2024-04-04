@@ -7,8 +7,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette presents the modelling approach used in `helios`.
-
 ```{r, include = FALSE}
 options(rmarkdown.html_vignette.check_title = FALSE)
 
@@ -18,6 +16,44 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(helios)
-```
+This vignette describes the modelling approach used in `helios`.
+
+## Population
+
+The population consists of a certain number of individuals with properties.
+
+## Disease states
+
+Compartmental model with susceptible ($S$), exposed ($E$), infectious ($I$), and recovered ($R$) disease states.
+Individuals move from state $S \to E$ with rate something, from state $E \to I$ with rate something, and from state $I \to R$ with rate something.
+
+## Age structure
+
+Age categories are children, adults, and the elderly.
+
+## Households
+
+Households are comprised of the following individuals.
+
+## Workplaces
+
+Workplaces are attended by adults.
+Workplace sizes are drawn from the following distribution.
+
+## Schools
+
+Schools are attended by children.
+School sizes are drawn from the following distribution.
+
+## Leisure
+
+Leisure venues are attended by who.
+Leisure venue sizes are drawn from the following distribution.
+
+## Community mixing
+
+Overall community mixing is implemented via some mechanism.
+
+## Interventions
+
+To be described once implemented!
