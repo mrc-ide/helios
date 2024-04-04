@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# helios
+# helios <img src='images/helios_hex.png' align="right" height="139" />
 
 <!-- badges: start -->
 <!-- badges: end -->
