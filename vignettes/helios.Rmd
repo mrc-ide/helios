@@ -10,6 +10,8 @@ vignette: >
 This vignette presents a quickstart guide to using `helios`.
 
 ```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
