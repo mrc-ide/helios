@@ -1,34 +1,29 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# helios
+# helios <img src="man/figures/helios_hex.png" align="right" height="200" style="float:right; height:200px;">
 
 <!-- badges: start -->
+
+[![Project Status: WIP – Initial development is in progress, but there
+has not yet been a stable, usable release suitable for the
+public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 <!-- badges: end -->
 
-helios is a stochastic, spatially-explicit, individual-based infectious
-disease transmission model that simulates the effect of far ultra-violet
-light emitters as a method for curtailing disease transmission. helios
-is built using the `individual` package (REF).
+> In ancient Greek religion and mythology, Helios is the god who
+> personifies the Sun.
+
+`helios` is a stochastic individual-based infectious disease
+transmission model that simulates the effect of far ultra-violet light
+emitters as a method for curtailing disease transmission. `helios` is
+built using the [`individual`](https://github.com/mrc-ide/individual)
+package developed at the MRC Centre for Global Infectious Disease
+Analysis.
 
 ## Installation
 
-You can install the development version of helios from
-[GitHub](https://github.com/) with:
+You can install the development version of `helios` from GitHub using:
 
 ``` r
-# install.packages("devtools")
-#devtools::install_github("mrc-ide/helios")
+devtools::install_github("mrc-ide/helios")
 ```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-#library(helios)
-## basic example code
-```
-
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:

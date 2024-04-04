@@ -1,0 +1,23 @@
+---
+title: "Quickstart guide"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{quickstart}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette presents a quickstart guide to using `helios`.
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(helios)
+```
