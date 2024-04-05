@@ -150,7 +150,7 @@ SE_process <- function(parameters, variables){
     ## Unclear - probably leave this for now.
 
     ## Only updating this on whole numbered timesteps (start of a new day)
-    if (t == floor(t)) { # is this correct?
+    if ((t * dt) == floor((t * dt))) { # is this correct?
 
       # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
       leisure_visit <- vector(mode = "numeric", length = parameters$human_population)
