@@ -9,7 +9,7 @@ run_simulation(parameters, timesteps)
 \arguments{
 \item{parameters}{A list of the model parameters as generated using `get_parameters`}
 
-\item{timesteps}{An integer of the number of timesteps, in days, to simulate}
+\item{timesteps}{An integer representing the number of timesteps to simulate}
 }
 \description{
 Run the simulation
