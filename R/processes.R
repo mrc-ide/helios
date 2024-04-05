@@ -90,11 +90,9 @@ SE_process <- function(parameters, variables){
     # Store the number of households:
     num_workplaces <- max(as.numeric(variables$workplace$get_categories()))
 
-    # Retrieve the indices of all adults in the current population (only adult age class work):
-    # adults_subset <- variables$age_class$get_index_of("adult")
-
     # Get the indices of all individuals with a workplace (0's have no workplace):
     workplace_adults_only_var <- variables$workplace$get_index_of(as.character(1:max(num_workplaces)))
+    ## I think we can make this more efficient if we use workplace_adults_only_var below
 
     # For each workplace:
     for (i in seq(num_workplaces)) {
@@ -121,11 +119,9 @@ SE_process <- function(parameters, variables){
     # Get the number of schools:
     num_schools <- max(as.numeric(variables$school$get_categories()))
 
-    # Subset the indices of all children:
-    # child_subset <- variables$age_class$get_index_of("child")
-
     # Retrieve the index of all individuals with a school (0's have no school):
     school_child_only_var <- variables$school$get_index_of(as.character(1:max(num_schools)))
+    ## I think we can make this more efficient if we use school_child_only_var below
 
     # For each school:
     for (i in seq(num_schools)) {
@@ -153,59 +149,54 @@ SE_process <- function(parameters, variables){
     ## Also - do we need to take into account fact some people might visit different times of the day?
     ## Unclear - probably leave this for now.
 
-    # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
-    leisure_visit <- vector(mode = "numeric", length = parameters$human_population)
+    ## Only updating this on whole numbered timesteps (start of a new day)
+    if (t == floor(t)) { # is this correct?
 
-    # For each individual, work out which leisure setting they go to that particular night - 0 = they don't go to any
-    for (i in seq(parameters$human_population)) {
+      # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
+      leisure_visit <- vector(mode = "numeric", length = parameters$human_population)
 
-      # Which leisure settings do individuals have associated with them (and could visit)
-      potential_leisure_visits <- variables$leisure$get_values(i)
+      # For each individual, work out which leisure setting they go to that particular night - 0 = they don't go to any
+      for (i in seq(parameters$human_population)) {
 
-      # How many leisure settings do individuals have associated with them (and could visit)
-      number_potential_leisure_visits <- length(potential_leisure_visits)
+        # Which leisure settings do individuals have associated with them (and could visit)
+        potential_leisure_visits <- variables$leisure$get_values(i)
 
-      # What's the probability of visiting each potential setting (considered equal) and the probability of visiting none (staying home)
-      # (probability of staying home is given by 1 - parameters$leisure_prob_visit)
-      prob_visiting_each <- parameters$leisure_prob_visit / number_potential_leisure_visits
+        # Sampling wich leisure setting actually visited (0 = visit none and staying home)
+        leisure_visit[i] <- sample(x = unlist(potential_leisure_visits), size = 1)
+      }
 
-      # Sampling wich leisure setting actually visited (0 = visit none and staying home)
-      leisure_visit[i] <- sample(x = c(0, seq(number_potential_leisure_visits)),
-                                 size = 1,
-                                 prob = c(1 - parameters$leisure_prob_visit,
-                                          rep(prob_visiting_each, number_potential_leisure_visits)))
-    }
+      # Open empty vector to store each individuals leisure-specific FOI:
+      leisure_FOI <- vector(mode = "numeric", length = parameters$human_population)
 
-    # Open empty vector to store each individuals leisure-specific FOI:
-    leisure_FOI <- vector(mode = "numeric", length = parameters$human_population)
+      # Get all unique leisure settings actually visited in this timestep (NOTE: we need to change this to day)
+      leisure_settings_visited <- unique(leisure_visit)
 
-    # Get all unique leisure settings actually visited in this timestep (NOTE: we need to change this to day)
-    leisure_settings_visited <- unique(leisure_visit)
+      # Create temporary leisure variable that contains leisure settings visited in that day
+      temp_leisure_variable <- CategoricalVariable$new(categories = leisure_settings_visited,
+                                                       initial_values = leisure_visit)
 
-    # Create temporary leisure variable that contains leisure settings visited in that day
-    temp_leisure_variable <- CategoricalVariable$new(categories = leisure_settings_visited,
-                                                     initial_values = leisure_visit)
+      # Calculating leisure-specific FOI for each individual
+      for (i in 1:length(leisure_settings_visited)) {
 
-    # Calculating leisure-specific FOI for each individual
-    for (i in 1:length(leisure_settings_visited)) {
+        # Access the index of the specific leisure setting being considered
+        spec_leisure_setting <- leisure_settings_visited[i]
 
-      # Access the index of the specific leisure setting being considered
-      spec_leisure_setting <- leisure_settings_visited[i]
+        # Only going through below steps if leisure setting actually visited (i.e. != 0)
+        if (spec_leisure_setting != 0) {
 
-      # Only going through below steps if leisure setting actually visited (i.e. != 0)
-      if (spec_leisure_setting != 0) {
+          # Retrieve the indices of individuals visiting the specific leisure setting
+          spec_leisure <- temp_leisure_variable$get_index_of(as.character(spec_leisure_setting))
 
-        # Retrieve the indices of individuals visiting the specific leisure setting
-        spec_leisure <- temp_leisure_variable$get_index_of(as.character(spec_leisure_setting))
+          # Retrieve the indices of all infectious individuals in the particular leisure setting being considered
+          spec_leisure_I <- I$and(spec_leisure)
 
-        # Retrieve the indices of all infectious individuals in the particular leisure setting being considered
-        spec_leisure_I <- I$and(spec_leisure)
+          # Calculate the school-specific FOI for the i-th school:
+          spec_leisure_FOI <- parameters$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
 
-        # Calculate the school-specific FOI for the i-th school:
-        spec_leisure_FOI <- parameters$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+          # Store the school-specific FOI at the indices of all children that attend it:
+          leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
+        }
 
-        # Store the school-specific FOI at the indices of all children that attend it:
-        leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
       }
 
     }
