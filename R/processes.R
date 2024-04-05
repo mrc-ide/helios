@@ -147,7 +147,7 @@ SE_process <- function(parameters, variables){
     ## Also - do we need to take into account fact some people might visit different times of the day? Leave this for now.
 
     ## Only updating this on whole numbered timesteps (start of a new day)
-    if ((t * dt) == floor((t * dt))) {
+    if ((t * parameters$dt) == floor((t * parameters$dt))) {
 
       # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
       leisure_visit <- vector(mode = "numeric", length = parameters$human_population)
@@ -166,8 +166,8 @@ SE_process <- function(parameters, variables){
       leisure_settings_visited <- unique(leisure_visit)
 
       # Create temporary leisure variable that contains leisure settings visited in that day
-      temp_leisure_variable <- CategoricalVariable$new(categories = leisure_settings_visited,
-                                                       initial_values = leisure_visit)
+      temp_leisure_variable <- CategoricalVariable$new(categories = as.character(leisure_settings_visited),
+                                                       initial_values = as.character(leisure_visit))
     }
 
     # Open empty vector to store each individuals leisure-specific FOI:
