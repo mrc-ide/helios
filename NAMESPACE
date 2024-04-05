@@ -3,7 +3,6 @@
 export(EI_process)
 export(IR_process)
 export(SE_process)
-export(add_event_listeners)
 export(create_events)
 export(create_processes)
 export(create_variables)
