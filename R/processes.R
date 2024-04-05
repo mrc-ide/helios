@@ -67,11 +67,11 @@ create_SE_process <- function(variables, events, parameters){
     print(t)
     print(t * parameters$dt)
     print("VARIABLES")
-    print(variables[[1]])
-    print("EVENTS")
-    print(events[[1]])
-    print("PARAMETERS")
-    print(parameters[[1]])
+    print(variables)
+    # print("EVENTS")
+    # print(events[[1]])
+    # print("PARAMETERS")
+    # print(parameters[[1]])
     # Retrieve the indices of Infected individuals:
     I <- variables$disease_state$get_index_of("I")
 
@@ -165,10 +165,10 @@ create_SE_process <- function(variables, events, parameters){
     ## Also - do we need to take into account fact some people might visit different times of the day? Leave this for now.
 
     ## Only updating this on whole numbered timesteps (start of a new day)
-    if (t == 1) {
-      leisure_settings_visited <- 0
-      leisure_visit <- rep(0, parameters$human_population)
-    }
+    # if (t == 1) {
+    #   leisure_settings_visited <- 0
+    #   leisure_visit <- rep(0, parameters$human_population)
+    # }
     if ((t * parameters$dt) == floor((t * parameters$dt))) {
 
       # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
@@ -190,8 +190,8 @@ create_SE_process <- function(variables, events, parameters){
       # Update (strictly we're using "initialise" to reinitialise the variable each time, ask Giovanni if easier way of doing this)
       # the temporary leisure variable to contain the leisure settings visited in that day
       all_leisure_settings <- variables$specific_leisure$get_categories()
-      variables$specific_leisure$initialise(categories = all_leisure_settings,
-                                            initial_values = leisure_visit) #  update the states with leisure_visit for that day
+      variables$specific_leisure$initialize(categories = as.character(all_leisure_settings),
+                                            initial_values = as.character(leisure_visit)) #  update the states with leisure_visit for that day
     }
 
     # Open empty vector to store each individuals leisure-specific FOI:
@@ -208,7 +208,7 @@ create_SE_process <- function(variables, events, parameters){
       if (spec_leisure_setting != 0) {
 
         # Retrieve the indices of individuals visiting the specific leisure setting
-        spec_leisure <- temp_leisure_variable$get_index_of(as.character(spec_leisure_setting))
+        spec_leisure <- variables$specific_leisure$get_index_of(as.character(spec_leisure_setting))
 
         # Retrieve the indices of all infectious individuals in the particular leisure setting being considered
         spec_leisure_I <- I$and(spec_leisure)
