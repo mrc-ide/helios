@@ -16,17 +16,26 @@ create_processes <- function(
     # ===============================
     # Disease State Progression
     # ===============================
-    SE_process = create_SE_process(variables = variables,
-                                   events = events,
-                                   parameters = parameters),
+    # SE_process = create_SE_process(variables = variables,
+    #                                events = events,
+    #                                parameters = parameters),
+    SE_process = create_SE_process(variables = parameters,
+                                   events = variables,
+                                   parameters = events),
 
-    EI_process = create_EI_process(variables = variables,
-                                   events = events,
-                                   parameters = parameters),
+    # EI_process = create_EI_process(variables = variables,
+    #                                events = events,
+    #                                parameters = parameters),
+    EI_process = create_EI_process(variables = parameters,
+                                   events = variables,
+                                   parameters = events),
 
-    IR_process = create_IR_process(variables = variables,
-                                   events = events,
-                                   parameters = parameters)
+    # IR_process = create_IR_process(variables = variables,
+    #                                events = events,
+    #                                parameters = parameters)
+    IR_process = create_IR_process(variables = parameters,
+                                   events = variables,
+                                   parameters = events)
 
     # ===============================
     # Intervention processes
@@ -55,6 +64,8 @@ create_SE_process <- function(variables, events, parameters){
 
   function(t) {
 
+    print(t)
+    print(t * parameters$dt)
     print("VARIABLES")
     print(variables[[1]])
     print("EVENTS")
@@ -154,6 +165,10 @@ create_SE_process <- function(variables, events, parameters){
     ## Also - do we need to take into account fact some people might visit different times of the day? Leave this for now.
 
     ## Only updating this on whole numbered timesteps (start of a new day)
+    if (t == 1) {
+      leisure_settings_visited <- 0
+      leisure_visit <- rep(0, parameters$human_population)
+    }
     if ((t * parameters$dt) == floor((t * parameters$dt))) {
 
       # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
