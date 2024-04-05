@@ -10,7 +10,7 @@ run_simulation <- function(parameters, timesteps) {
   variables <- create_variables(parameters)
 
   # Generate the model events:
-  events <- create_events(parameters)
+  events <- create_events(parameters, variables)
 
   # Initialise the model events: (Not currently needed, but may be when we add interventions)
   #initialise_events(events, variables, parameters)
