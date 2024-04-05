@@ -16,6 +16,7 @@ run_simulation <- function(parameters, timesteps) {
   #initialise_events(events, variables, parameters)
 
   # Set up the model renderer:
+  timesteps <- round(parameters$simulation_time/parameters$dt)
   renderer <- individual::Render$new(timesteps)
 
   # Generate the model processes:
