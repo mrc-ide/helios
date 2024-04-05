@@ -24,9 +24,9 @@ run_simulation <- function(parameters, timesteps) {
 
   # Use individual::simulation_loop() to run the model for the specified number of timesteps
   individual::simulation_loop(
-    processes = processes,
     variables = variables,
     events = unlist(events),
+    processes = processes,
     timesteps = timesteps
   )
   renderer$to_dataframe()
