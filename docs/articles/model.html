@@ -98,15 +98,6 @@ interventions</h1>
 properties.</p>
 </div>
 <div class="section level2">
-<h2 id="disease-states">Disease states<a class="anchor" aria-label="anchor" href="#disease-states"></a>
-</h2>
-<p>Compartmental model with susceptible (<span class="math inline">\(S\)</span>), exposed (<span class="math inline">\(E\)</span>), infectious (<span class="math inline">\(I\)</span>), and recovered (<span class="math inline">\(R\)</span>) disease states. Individuals move from
-state <span class="math inline">\(S \to E\)</span> with rate something,
-from state <span class="math inline">\(E \to I\)</span> with rate
-something, and from state <span class="math inline">\(I \to R\)</span>
-with rate something.</p>
-</div>
-<div class="section level2">
 <h2 id="age-structure">Age structure<a class="anchor" aria-label="anchor" href="#age-structure"></a>
 </h2>
 <p>Age categories are children, adults, and the elderly.</p>
@@ -143,6 +134,46 @@ from the following distribution.</p>
 <h2 id="interventions">Interventions<a class="anchor" aria-label="anchor" href="#interventions"></a>
 </h2>
 <p>To be described once implemented!</p>
+</div>
+<div class="section level2">
+<h2 id="disease-states">Disease states<a class="anchor" aria-label="anchor" href="#disease-states"></a>
+</h2>
+<p>We consider a compartmental model with susceptible (<span class="math inline">\(S\)</span>), exposed (<span class="math inline">\(E\)</span>), infectious (<span class="math inline">\(I\)</span>), and recovered (<span class="math inline">\(R\)</span>) disease states.</p>
+<div class="section level3">
+<h3 id="transition-from-state-s-to-e">Transition from state <span class="math inline">\(S \to
+E\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-s-to-e"></a>
+</h3>
+<p>The total force of infection <span class="math inline">\(\lambda\)</span> for each individual is a sum of
+household, workplace, school, leisure, and community specific force of
+infections <span class="math display">\[
+\lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l + \lambda_c.
+\]</span> The probability of infection in a given time step <span class="math inline">\(\delta &gt; 0\)</span> is <span class="math display">\[
+\mathbb{P}(S \to E) = 1 - \exp(\lambda \delta)
+\]</span></p>
+</div>
+<div class="section level3">
+<h3 id="transition-from-state-e-to-i">Transition from state <span class="math inline">\(E \to
+I\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-e-to-i"></a>
+</h3>
+<p>Individuals progress from exposed to infectious with a random delay
+<span class="math inline">\(d \geq 1\)</span> such that <span class="math display">\[
+c \sim \text{Gamma}(2\gamma, 2), \\
+d = \text{round}(c + 1).
+\]</span> where <span class="math inline">\(\gamma &gt; 0\)</span> is
+the duration exposed which we set to 2. The delay <span class="math inline">\(d\)</span> is a number of time steps <span class="math inline">\(\delta\)</span>.</p>
+</div>
+<div class="section level3">
+<h3 id="transition-from-state-i-to-r">Transition from state <span class="math inline">\(I \to
+R\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-i-to-r"></a>
+</h3>
+<p>Individuals progress from infectious to recovered after a random
+disease duration <span class="math inline">\(f \geq 1\)</span> such that
+<span class="math display">\[
+e \sim \text{Gamma}(2\upsilon, 2), \\
+f = \text{round}(e + 1).
+\]</span> where <span class="math inline">\(\upsilon\)</span> is the
+duration of infectiousness which we set to 4. The disease duration <span class="math inline">\(f\)</span> is a number of time steps <span class="math inline">\(\delta\)</span>.</p>
+</div>
 </div>
   </div>
 
