@@ -22,11 +22,6 @@ This vignette describes the modelling approach used in `helios`.
 
 The population consists of a certain number of individuals with properties.
 
-## Disease states
-
-Compartmental model with susceptible ($S$), exposed ($E$), infectious ($I$), and recovered ($R$) disease states.
-Individuals move from state $S \to E$ with rate something, from state $E \to I$ with rate something, and from state $I \to R$ with rate something.
-
 ## Age structure
 
 Age categories are children, adults, and the elderly.
@@ -57,3 +52,38 @@ Overall community mixing is implemented via some mechanism.
 ## Interventions
 
 To be described once implemented!
+
+## Disease states
+
+We consider a compartmental model with susceptible ($S$), exposed ($E$), infectious ($I$), and recovered ($R$) disease states.
+
+### Transition from state $S \to E$
+
+The total force of infection $\lambda$ for each individual is a sum of household, workplace, school, leisure, and community specific force of infections
+$$
+\lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l + \lambda_c.
+$$
+The probability of infection in a given time step $\delta > 0$ is
+$$
+\mathbb{P}(S \to E) = 1 - \exp(\lambda \delta)
+$$
+
+### Transition from state $E \to I$
+
+Individuals progress from exposed to infectious with a random delay $d \geq 1$ such that
+$$
+c \sim \text{Gamma}(2\gamma, 2), \\
+d = \text{round}(c + 1).
+$$
+where $\gamma > 0$ is the duration exposed which we set to 2.
+The delay $d$ is a number of time steps $\delta$.
+
+### Transition from state $I \to R$
+
+Individuals progress from infectious to recovered after a random disease duration $f \geq 1$ such that
+$$
+e \sim \text{Gamma}(2\upsilon, 2), \\
+f = \text{round}(e + 1).
+$$
+where $\upsilon$ is the duration of infectiousness which we set to 4.
+The disease duration $f$ is a number of time steps $\delta$.
