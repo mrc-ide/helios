@@ -19,6 +19,8 @@ create_processes <- function(
     # SE_process = create_SE_process(variables = variables,
     #                                events = events,
     #                                parameters = parameters),
+    #### STOP! I'VE HAD TO CHANGE ROUND THE ARGUMENT INPUTS BECAUSE
+    #### SOMETHING ISN'T WORKING - DO NOT MERGE UNTIL THIS IS SORTED
     SE_process = create_SE_process(variables = parameters,
                                    events = variables,
                                    parameters = events),
@@ -26,6 +28,8 @@ create_processes <- function(
     # EI_process = create_EI_process(variables = variables,
     #                                events = events,
     #                                parameters = parameters),
+    #### STOP! I'VE HAD TO CHANGE ROUND THE ARGUMENT INPUTS BECAUSE
+    #### SOMETHING ISN'T WORKING - DO NOT MERGE UNTIL THIS IS SORTED
     EI_process = create_EI_process(variables = parameters,
                                    events = variables,
                                    parameters = events),
@@ -33,6 +37,8 @@ create_processes <- function(
     # IR_process = create_IR_process(variables = variables,
     #                                events = events,
     #                                parameters = parameters)
+    #### STOP! I'VE HAD TO CHANGE ROUND THE ARGUMENT INPUTS BECAUSE
+    #### SOMETHING ISN'T WORKING - DO NOT MERGE UNTIL THIS IS SORTED
     IR_process = create_IR_process(variables = parameters,
                                    events = variables,
                                    parameters = events)
