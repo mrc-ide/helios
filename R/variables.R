@@ -29,9 +29,15 @@ create_variables <- function(parameters) {
   school_variable <- CategoricalVariable$new(categories = as.character(0:num_schools),
                                              initial_values = initial_school_settings)
 
-  # Initialise and populate the leisure setting variable
+  # Initialise and populate the leisure setting variable that stores all the leisure locations individual COULD go to
   initial_leisure_settings <- generate_initial_leisure(parameters = parameters) # returns list to initialise RaggedInteger
-  leisure_variabe <- RaggedInteger$new(initial_values = initial_leisure_settings)
+  leisure_variable <- RaggedInteger$new(initial_values = initial_leisure_settings)
+
+  # Initialise and populate the leisure setting variable for where individuals go to on a particular day
+  possible_leisure_settings <- unique(unlist(initial_leisure_settings))
+  possible_leisure_settings <- possible_leisure_settings[order(possible_leisure_settings)]
+  specific_day_leisure_variable <- CategoricalVariable$new(categories = as.character(possible_leisure_settings),
+                                                           initial_values = rep(as.character(0), parameters$human_population))
 
   # Initialise and populate the household variable
   initial_households <- generate_initial_households(parameters = parameters, age_class_variable = age_class_variable)
@@ -46,7 +52,8 @@ create_variables <- function(parameters) {
     workplace = workplace_variable,
     school = school_variable,
     household = household_variable,
-    leisure = leisure_variabe
+    leisure = leisure_variable,
+    specific_leisure = specific_day_leisure_variable
     )
 
   # Return the list of model variables:

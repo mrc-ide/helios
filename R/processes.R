@@ -187,15 +187,18 @@ create_SE_process <- function(variables, events, parameters){
       # Get all unique leisure settings actually visited in this timestep (NOTE: we need to change this to day)
       leisure_settings_visited <- unique(leisure_visit)
 
-      # Create temporary leisure variable that contains leisure settings visited in that day
-      temp_leisure_variable <- CategoricalVariable$new(categories = as.character(leisure_settings_visited),
-                                                       initial_values = as.character(leisure_visit))
+      # Update (strictly we're using "initialise" to reinitialise the variable each time, ask Giovanni if easier way of doing this)
+      # the temporary leisure variable to contain the leisure settings visited in that day
+      all_leisure_settings <- variables$specific_leisure$get_categories()
+      variables$specific_leisure$initialise(categories = all_leisure_settings,
+                                            initial_values = leisure_visit) #  update the states with leisure_visit for that day
     }
 
     # Open empty vector to store each individuals leisure-specific FOI:
     leisure_FOI <- vector(mode = "numeric", length = parameters$human_population)
 
     # Calculating leisure-specific FOI for each individual
+    leisure_settings_visited <-  variables$specific_leisure$get_categories()
     for (i in 1:length(leisure_settings_visited)) {
 
       # Access the index of the specific leisure setting being considered
