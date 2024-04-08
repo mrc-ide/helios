@@ -408,6 +408,7 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
       individual_households[temp_household] <- household_counter
       household_counter <- household_counter + 1
     }
+    # print(sum(assigned))
   }
 
   return(individual_households = individual_households)
