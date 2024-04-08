@@ -24,7 +24,8 @@ renderer <- individual::Render$new(timesteps)
 source("R/processes.R")
 processes_list <- create_processes(variables_list = variables_list,
                                    events_list = events_list,
-                                   parameters_list = parameters_list)
+                                   parameters_list = parameters_list,
+                                   renderer = renderer)
 
 # Use individual::simulation_loop() to run the model for the specified number of timesteps
 individual::simulation_loop(
@@ -34,6 +35,31 @@ individual::simulation_loop(
   timesteps = timesteps
 )
 
-source("R/model.R")
-run_simulation(parameters_list, 10)
+states <- renderer$to_dataframe()
+health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
+matplot(
+  x = states[[1]]*parameters_list$dt, y = states[-1],
+  type="l",lwd=2,lty = 1,col = adjustcolor(col = health_cols, alpha.f = 0.85),
+  xlab = "Time",ylab = "Count"
+)
+health_states <- colnames(states)[-1]
+legend(
+  x = "topright",pch = rep(16,3),
+  col = health_cols,bg = "transparent",
+  legend = health_states, cex = 1.5
+)
 
+source("R/model.R")
+x <- run_simulation(parameters_list, 10)
+health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
+matplot(
+  x = x[[1]]*parameters_list$dt, y = x[-1],
+  type="l",lwd=2,lty = 1,col = adjustcolor(col = health_cols, alpha.f = 0.85),
+  xlab = "Time",ylab = "Count"
+)
+health_states <- colnames(x)[-1]
+legend(
+  x = "topright",pch = rep(16,3),
+  col = health_cols,bg = "transparent",
+  legend = health_states, cex = 1.5
+)

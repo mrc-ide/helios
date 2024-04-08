@@ -22,7 +22,8 @@ run_simulation <- function(parameters_list, timesteps) {
   # Generate the model processes:
   processes_list <- create_processes(variables_list = variables_list,
                                      events_list = events_list,
-                                     parameters_list = parameters_list)
+                                     parameters_list = parameters_list,
+                                     renderer = renderer)
 
   # Use individual::simulation_loop() to run the model for the specified number of timesteps
   individual::simulation_loop(

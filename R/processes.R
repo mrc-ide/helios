@@ -65,6 +65,10 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
 
   function(t) {
 
+    if (t %% 10 == 0) {
+      print(paste0("timestep = ", (t * parameters_list$dt)))
+    }
+
     I <- variables_list$disease_state$get_index_of("I")
 
     #=== Household FOI ===#
