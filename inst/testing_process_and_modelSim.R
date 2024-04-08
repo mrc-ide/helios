@@ -28,12 +28,15 @@ processes_list <- create_processes(variables_list = variables_list,
                                    renderer = renderer)
 
 # Use individual::simulation_loop() to run the model for the specified number of timesteps
-individual::simulation_loop(
-  variables = variables_list,
-  events = events_list,
-  processes = processes_list,
-  timesteps = timesteps
-)
+profvis::profvis({
+  individual::simulation_loop(
+    variables = variables_list,
+    events = events_list,
+    processes = processes_list,
+    timesteps = timesteps
+  )
+})
+
 
 states <- renderer$to_dataframe()
 health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
