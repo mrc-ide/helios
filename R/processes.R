@@ -8,7 +8,8 @@
 create_processes <- function(
     variables_list,
     events_list,
-    parameters_list) {
+    parameters_list,
+    renderer) {
 
   # Open a list of processes to store the model processes in:
   processes_list <- list(
@@ -28,6 +29,8 @@ create_processes <- function(
                                    events_list = events_list,
                                    parameters_list = parameters_list)
 
+  )
+
     # ===============================
     # Intervention processes
     # ===============================
@@ -37,8 +40,14 @@ create_processes <- function(
     # Rendering processes
     # ===============================
     # health_render_process
-
-  )
+    processes <- c(
+      processes,
+      individual::categorical_count_renderer_process(
+        renderer,
+        variables$disease_state,
+        c('S', 'E', 'I', 'R')
+      )
+    )
 
   # Return the model processes:
   return(processes_list)
