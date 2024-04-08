@@ -40,8 +40,8 @@ create_processes <- function(
     # Rendering processes
     # ===============================
     # health_render_process
-    processes <- c(
-      processes,
+  processes_list <- c(
+      processes_list,
       individual::categorical_count_renderer_process(
         renderer,
         variables$disease_state,
