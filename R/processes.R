@@ -44,7 +44,7 @@ create_processes <- function(
       processes_list,
       individual::categorical_count_renderer_process(
         renderer,
-        variables$disease_state,
+        variables_list$disease_state,
         c('S', 'E', 'I', 'R')
       )
     )
