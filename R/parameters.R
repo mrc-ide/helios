@@ -79,6 +79,14 @@ get_parameters <- function(overrides = list()) {
     parameters[[name]] <- overrides[[name]]
   }
 
+  # Check if dt is < 1 and whether it can evenly divide 1 (i.e. 1/x should return an integer)
+  if (parameters$dt > 1 | parameters$dt == 0) {
+    stop("dt must be less than 1 and greater than 0")
+  }
+  if ((1/parameters$dt) != floor(1/parameters$dt)) {
+    stop("dt must evenly divide into 1 e.g. 0.1, 0.2, 0.25, 0.5")
+  }
+
   # Return the list of parameters
   parameters
 
