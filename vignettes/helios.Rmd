@@ -1,13 +1,11 @@
 ---
-title: "Quickstart guide"
+title: "Get started"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{quickstart}
+  %\VignetteIndexEntry{get-started}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-This vignette presents a quickstart guide to using `helios`.
 
 ```{r, include = FALSE}
 options(rmarkdown.html_vignette.check_title = FALSE)
@@ -18,6 +16,118 @@ knitr::opts_chunk$set(
 )
 ```
 
+## Introduction {#intro}
+
+`helios` is an R package which allows users to simulate the effect of [far UVC](https://www.nature.com/articles/s41598-018-21058-w) interventions on the spread of infectious disease outbreaks.
+Outbreaks are implemented as individual-level SEIR [compartmental models](https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology).
+In this vignette, we demonstrate basic use of the package.
+
 ```{r setup}
 library(helios)
+library(individual)
+library(ggplot2)
+theme_set(theme_minimal())
+```
+
+## Parameters {#param}
+
+First, define constant parameters:
+
+```{r}
+parameters_list <- get_parameters()
+names(parameters_list)
+```
+
+## Variables {#var}
+
+Next, define model variables:
+
+```{r}
+variables_list <- create_variables(parameters_list)
+names(variables_list)
+```
+
+Mostly [`CategoricalVariable`](https://mrc-ide.github.io/individual/reference/CategoricalVariable.html) class:
+
+```
+class(variables_list$disease_state)
+```
+
+### Disease states
+
+```{r}
+(disease_states <- variables_list$disease_state$get_categories())
+disease_state_counts <- purrr::map_vec(disease_states, function(x) variables_list$disease_state$get_size_of(values = x))
+
+data.frame("State" = disease_states, "Count" = disease_state_counts) |>
+  gt::gt()
+```
+
+### Age classes
+
+```{r}
+(age_classes <- variables_list$age_class$get_categories())
+age_class_counts <- purrr::map_vec(age_classes, function(x) variables_list$age_class$get_size_of(values = x))
+
+data.frame(age_classes, age_class_counts) |>
+  ggplot(aes(x = age_classes, y = age_class_counts)) +
+  geom_col() +
+  labs(x = "Age class", y = "Count") +
+  coord_flip()
+```
+
+### Workplaces
+
+```{r}
+workplaces <- variables_list$workplace$get_categories()
+workplace_sizes <- purrr::map_vec(workplaces, function(x) variables_list$workplace$get_size_of(values = x))
+
+data.frame(workplace_sizes) |>
+  ggplot(aes(x = log(workplace_sizes))) +
+  geom_histogram() +
+  labs(x = "log(Workplace size)", y = "Count")
+```
+
+### Schools
+
+```{r}
+schools <- variables_list$school$get_categories()
+school_sizes <- purrr::map_vec(schools, function(x) variables_list$school$get_size_of(values = x))
+
+data.frame(school_sizes) |>
+  ggplot(aes(x = log(school_sizes))) +
+  geom_histogram() +
+  labs(x = "log(School size)", y = "Count")
+```
+
+### Households
+
+```{r}
+households <- variables_list$household$get_categories()
+household_sizes <- purrr::map_vec(households, function(x) variables_list$household$get_size_of(values = x))
+
+table(household_sizes) |>
+  data.frame() |>
+  ggplot(aes(x = household_sizes, y = Freq)) +
+  geom_col() +
+  labs(x = "Household size", y = "Count")
+```
+
+### Leisure
+
+```{r}
+leisure_places <- variables_list$leisure$get_values()
+number_leisure_places <- sapply(leisure_places, function(x) sum(x > 0))
+
+table(number_leisure_places) |>
+  data.frame() |>
+  ggplot(aes(x = number_leisure_places, y = Freq)) +
+  geom_col() +
+  labs(x = "Number of leisure places attended in a week", y = "Count")
+```
+
+## Events
+
+```{r}
+events_list <- create_events(variables_list = variables_list, parameters_list = parameters_list)
 ```
