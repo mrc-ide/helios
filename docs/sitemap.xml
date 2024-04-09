@@ -40,6 +40,15 @@
     <loc>/reference/add_event_listeners.html</loc>
   </url>
   <url>
+    <loc>/reference/create_EI_process.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_IR_process.html</loc>
+  </url>
+  <url>
+    <loc>/reference/create_SE_process.html</loc>
+  </url>
+  <url>
     <loc>/reference/create_events.html</loc>
   </url>
   <url>
@@ -71,6 +80,9 @@
   </url>
   <url>
     <loc>/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>/reference/run_simulation.html</loc>
   </url>
   <url>
     <loc>/reference/sample_log_normal.html</loc>
