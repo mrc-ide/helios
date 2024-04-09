@@ -17,28 +17,35 @@ knitr::opts_chunk$set(
 ```
 
 This vignette describes the modelling approach used in `helios`.
+For an introduction to practical use of the package, see the [Get started](https://mrc-ide.github.io/helios/articles/helios.html) vignette.
 
 ## Population
 
-The population consists of a certain number of individuals with properties.
+The population consists of a fixed number of individuals.
+Each individual has properties.
+Some properties remain constant over time, and others which change.
 
 ## Age structure
 
-Age categories are children, adults, and the elderly.
+The age categories included in the model are children, adults, and the elderly.
+Each individual has a fixed age category.
 
 ## Households
 
-Households are comprised of the following individuals.
+Households are comprised of collections of one or more individuals.
 
 ## Workplaces
 
 Workplaces are attended by adults.
-Workplace sizes are drawn from the following distribution.
+The sizes of workplaces are drawn from the following distribution.
+Assignment of adults to particular workplaces is at random.
+
 
 ## Schools
 
 Schools are attended by children.
-School sizes are drawn from the following distribution.
+The sizes of schools are drawn from the following distribution.
+Assignment of children to particular schools is at random.
 
 ## Leisure
 
@@ -55,7 +62,9 @@ To be described once implemented!
 
 ## Disease states
 
-We consider a compartmental model with susceptible ($S$), exposed ($E$), infectious ($I$), and recovered ($R$) disease states.
+We consider a SEIR compartmental model with susceptible, exposed, infectious, and recovered disease states.
+At a given time, each individual is in exactly one of the states $\{S, E, I, R\}$.
+Transitions between states are simulated as follows.
 
 ### Transition from state $S \to E$
 
@@ -63,6 +72,14 @@ The total force of infection $\lambda$ for each individual is a sum of household
 $$
 \lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l + \lambda_c.
 $$
+The location specific force of infection terms are given as:
+
+* Household $\lambda_h$:
+* Workplace  $\lambda_w$:
+* School $\lambda_s$:
+* Leisure $\lambda_l$:
+* Community $\lambda_c$:
+
 The probability of infection in a given time step $\delta > 0$ is
 $$
 \mathbb{P}(S \to E) = 1 - \exp(\lambda \delta)

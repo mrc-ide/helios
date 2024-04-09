@@ -90,34 +90,41 @@ interventions</h1>
     
     
 <p>This vignette describes the modelling approach used in
-<code>helios</code>.</p>
+<code>helios</code>. For an introduction to practical use of the
+package, see the <a href="https://mrc-ide.github.io/helios/articles/helios.html" class="external-link">Get
+started</a> vignette.</p>
 <div class="section level2">
 <h2 id="population">Population<a class="anchor" aria-label="anchor" href="#population"></a>
 </h2>
-<p>The population consists of a certain number of individuals with
-properties.</p>
+<p>The population consists of a fixed number of individuals. Each
+individual has properties. Some properties remain constant over time,
+and others which change.</p>
 </div>
 <div class="section level2">
 <h2 id="age-structure">Age structure<a class="anchor" aria-label="anchor" href="#age-structure"></a>
 </h2>
-<p>Age categories are children, adults, and the elderly.</p>
+<p>The age categories included in the model are children, adults, and
+the elderly. Each individual has a fixed age category.</p>
 </div>
 <div class="section level2">
 <h2 id="households">Households<a class="anchor" aria-label="anchor" href="#households"></a>
 </h2>
-<p>Households are comprised of the following individuals.</p>
+<p>Households are comprised of collections of one or more
+individuals.</p>
 </div>
 <div class="section level2">
 <h2 id="workplaces">Workplaces<a class="anchor" aria-label="anchor" href="#workplaces"></a>
 </h2>
-<p>Workplaces are attended by adults. Workplace sizes are drawn from the
-following distribution.</p>
+<p>Workplaces are attended by adults. The sizes of workplaces are drawn
+from the following distribution. Assignment of adults to particular
+workplaces is at random.</p>
 </div>
 <div class="section level2">
 <h2 id="schools">Schools<a class="anchor" aria-label="anchor" href="#schools"></a>
 </h2>
-<p>Schools are attended by children. School sizes are drawn from the
-following distribution.</p>
+<p>Schools are attended by children. The sizes of schools are drawn from
+the following distribution. Assignment of children to particular schools
+is at random.</p>
 </div>
 <div class="section level2">
 <h2 id="leisure">Leisure<a class="anchor" aria-label="anchor" href="#leisure"></a>
@@ -138,7 +145,10 @@ from the following distribution.</p>
 <div class="section level2">
 <h2 id="disease-states">Disease states<a class="anchor" aria-label="anchor" href="#disease-states"></a>
 </h2>
-<p>We consider a compartmental model with susceptible (<span class="math inline">\(S\)</span>), exposed (<span class="math inline">\(E\)</span>), infectious (<span class="math inline">\(I\)</span>), and recovered (<span class="math inline">\(R\)</span>) disease states.</p>
+<p>We consider a SEIR compartmental model with susceptible, exposed,
+infectious, and recovered disease states. At a given time, each
+individual is in exactly one of the states <span class="math inline">\(\{S, E, I, R\}\)</span>. Transitions between
+states are simulated as follows.</p>
 <div class="section level3">
 <h3 id="transition-from-state-s-to-e">Transition from state <span class="math inline">\(S \to
 E\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-s-to-e"></a>
@@ -147,7 +157,16 @@ E\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-s-t
 household, workplace, school, leisure, and community specific force of
 infections <span class="math display">\[
 \lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l + \lambda_c.
-\]</span> The probability of infection in a given time step <span class="math inline">\(\delta &gt; 0\)</span> is <span class="math display">\[
+\]</span> The location specific force of infection terms are given
+as:</p>
+<ul>
+<li>Household <span class="math inline">\(\lambda_h\)</span>:</li>
+<li>Workplace <span class="math inline">\(\lambda_w\)</span>:</li>
+<li>School <span class="math inline">\(\lambda_s\)</span>:</li>
+<li>Leisure <span class="math inline">\(\lambda_l\)</span>:</li>
+<li>Community <span class="math inline">\(\lambda_c\)</span>:</li>
+</ul>
+<p>The probability of infection in a given time step <span class="math inline">\(\delta &gt; 0\)</span> is <span class="math display">\[
 \mathbb{P}(S \to E) = 1 - \exp(\lambda \delta)
 \]</span></p>
 </div>

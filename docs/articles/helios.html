@@ -92,11 +92,9 @@
 <h2 id="intro">Introduction<a class="anchor" aria-label="anchor" href="#intro"></a>
 </h2>
 <p><code>helios</code> is an R package which allows users to simulate
-the effect of <a href="https://www.nature.com/articles/s41598-018-21058-w" class="external-link">far UVC</a>
-interventions on the spread of infectious disease outbreaks. Outbreaks
-are implemented as individual-level SEIR <a href="https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology" class="external-link">compartmental
-models</a>. In this vignette, we demonstrate basic use of the
-package.</p>
+the impact of <a href="https://www.nature.com/articles/s41598-018-21058-w" class="external-link">far UVC</a>
+interventions in curtailing the spread of infectious disease outbreaks.
+In this vignette, we demonstrate basic use of the package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/helios" class="external-link">helios</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/individual" class="external-link">individual</a></span><span class="op">)</span></span>
@@ -106,10 +104,14 @@ package.</p>
 <div class="section level2">
 <h2 id="param">Parameters<a class="anchor" aria-label="anchor" href="#param"></a>
 </h2>
-<p>First, define constant parameters:</p>
+<p>First, define constant parameters. In this vignette, we set the
+<code>human_population</code> to 1000. Otherwise, we use the default
+options:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">parameters_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_parameters.html">get_parameters</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">parameters_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_parameters.html">get_parameters</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>human_population <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>The names of all parameters are as follows:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "human_population"             "initial_proportion_child"    </span></span>
 <span><span class="co">#&gt;  [3] "initial_proportion_adult"     "initial_proportion_elderly"  </span></span>
 <span><span class="co">#&gt;  [5] "number_initially_exposed"     "seed"                        </span></span>
@@ -128,42 +130,70 @@ package.</p>
 <div class="section level2">
 <h2 id="var">Variables<a class="anchor" aria-label="anchor" href="#var"></a>
 </h2>
-<p>Next, define model variables:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>Next, we define the model variables:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">variables_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_variables.html">create_variables</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">variables_list</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "disease_state"    "age_class"        "workplace"        "school"          </span></span>
 <span><span class="co">#&gt; [5] "household"        "leisure"          "specific_leisure"</span></span></code></pre></div>
-<p>Mostly <a href="https://mrc-ide.github.io/individual/reference/CategoricalVariable.html" class="external-link"><code>CategoricalVariable</code></a>
+<p>Aside from <code>$leisure</code>, each entry of
+<code>variables_list</code> is of the <a href="https://mrc-ide.github.io/individual/reference/CategoricalVariable.html" class="external-link"><code>CategoricalVariable</code></a>
 class:</p>
-<pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">variables_list</span><span class="op">$</span><span class="va">disease_state</span><span class="op">)</span></span></code></pre>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">variables_list</span>, <span class="va">class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $disease_state</span></span>
+<span><span class="co">#&gt; [1] "CategoricalVariable" "R6"                 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $age_class</span></span>
+<span><span class="co">#&gt; [1] "CategoricalVariable" "R6"                 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $workplace</span></span>
+<span><span class="co">#&gt; [1] "CategoricalVariable" "R6"                 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $school</span></span>
+<span><span class="co">#&gt; [1] "CategoricalVariable" "R6"                 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $household</span></span>
+<span><span class="co">#&gt; [1] "CategoricalVariable" "R6"                 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $leisure</span></span>
+<span><span class="co">#&gt; [1] "RaggedInteger" "R6"           </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $specific_leisure</span></span>
+<span><span class="co">#&gt; [1] "CategoricalVariable" "R6"</span></span></code></pre></div>
+<p>Some variables change over time, while other remain fixed.</p>
 <div class="section level3">
 <h3 id="disease-states">Disease states<a class="anchor" aria-label="anchor" href="#disease-states"></a>
 </h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<p>Outbreaks are implemented as individual-level SEIR <a href="https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology" class="external-link">compartmental
+models</a>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">disease_states</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">disease_state</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "S" "E" "I" "R"</span></span>
-<span><span class="va">disease_state_counts</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">disease_states</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">disease_state</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "S" "E" "I" "R"</span></span></code></pre></div>
+<p>The number of individuals initially exposed is controlled by
+<code>parameters_list$number_initially_exposed</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">disease_state_counts</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">disease_states</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">disease_state</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"State"</span> <span class="op">=</span> <span class="va">disease_states</span>, <span class="st">"Count"</span> <span class="op">=</span> <span class="va">disease_state_counts</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div id="qjbwlnhaqz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#qjbwlnhaqz table {
+<div id="tgvxzibwuz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#tgvxzibwuz table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#qjbwlnhaqz thead, #qjbwlnhaqz tbody, #qjbwlnhaqz tfoot, #qjbwlnhaqz tr, #qjbwlnhaqz td, #qjbwlnhaqz th {
+#tgvxzibwuz thead, #tgvxzibwuz tbody, #tgvxzibwuz tfoot, #tgvxzibwuz tr, #tgvxzibwuz td, #tgvxzibwuz th {
   border-style: none;
 }
 
-#qjbwlnhaqz p {
+#tgvxzibwuz p {
   margin: 0;
   padding: 0;
 }
 
-#qjbwlnhaqz .gt_table {
+#tgvxzibwuz .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -189,12 +219,12 @@ class:</p>
   border-left-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_caption {
+#tgvxzibwuz .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#qjbwlnhaqz .gt_title {
+#tgvxzibwuz .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -206,7 +236,7 @@ class:</p>
   border-bottom-width: 0;
 }
 
-#qjbwlnhaqz .gt_subtitle {
+#tgvxzibwuz .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -218,7 +248,7 @@ class:</p>
   border-top-width: 0;
 }
 
-#qjbwlnhaqz .gt_heading {
+#tgvxzibwuz .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -230,13 +260,13 @@ class:</p>
   border-right-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_bottom_border {
+#tgvxzibwuz .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_col_headings {
+#tgvxzibwuz .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -251,7 +281,7 @@ class:</p>
   border-right-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_col_heading {
+#tgvxzibwuz .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -271,7 +301,7 @@ class:</p>
   overflow-x: hidden;
 }
 
-#qjbwlnhaqz .gt_column_spanner_outer {
+#tgvxzibwuz .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -283,15 +313,15 @@ class:</p>
   padding-right: 4px;
 }
 
-#qjbwlnhaqz .gt_column_spanner_outer:first-child {
+#tgvxzibwuz .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qjbwlnhaqz .gt_column_spanner_outer:last-child {
+#tgvxzibwuz .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qjbwlnhaqz .gt_column_spanner {
+#tgvxzibwuz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -303,11 +333,11 @@ class:</p>
   width: 100%;
 }
 
-#qjbwlnhaqz .gt_spanner_row {
+#tgvxzibwuz .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#qjbwlnhaqz .gt_group_heading {
+#tgvxzibwuz .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -333,7 +363,7 @@ class:</p>
   text-align: left;
 }
 
-#qjbwlnhaqz .gt_empty_group_heading {
+#tgvxzibwuz .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -348,15 +378,15 @@ class:</p>
   vertical-align: middle;
 }
 
-#qjbwlnhaqz .gt_from_md > :first-child {
+#tgvxzibwuz .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qjbwlnhaqz .gt_from_md > :last-child {
+#tgvxzibwuz .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qjbwlnhaqz .gt_row {
+#tgvxzibwuz .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -375,7 +405,7 @@ class:</p>
   overflow-x: hidden;
 }
 
-#qjbwlnhaqz .gt_stub {
+#tgvxzibwuz .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -388,7 +418,7 @@ class:</p>
   padding-right: 5px;
 }
 
-#qjbwlnhaqz .gt_stub_row_group {
+#tgvxzibwuz .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -402,15 +432,15 @@ class:</p>
   vertical-align: top;
 }
 
-#qjbwlnhaqz .gt_row_group_first td {
+#tgvxzibwuz .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#qjbwlnhaqz .gt_row_group_first th {
+#tgvxzibwuz .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#qjbwlnhaqz .gt_summary_row {
+#tgvxzibwuz .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -420,16 +450,16 @@ class:</p>
   padding-right: 5px;
 }
 
-#qjbwlnhaqz .gt_first_summary_row {
+#tgvxzibwuz .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_first_summary_row.thick {
+#tgvxzibwuz .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#qjbwlnhaqz .gt_last_summary_row {
+#tgvxzibwuz .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -439,7 +469,7 @@ class:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_grand_summary_row {
+#tgvxzibwuz .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -449,7 +479,7 @@ class:</p>
   padding-right: 5px;
 }
 
-#qjbwlnhaqz .gt_first_grand_summary_row {
+#tgvxzibwuz .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -459,7 +489,7 @@ class:</p>
   border-top-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_last_grand_summary_row_top {
+#tgvxzibwuz .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -469,11 +499,11 @@ class:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_striped {
+#tgvxzibwuz .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#qjbwlnhaqz .gt_table_body {
+#tgvxzibwuz .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -482,7 +512,7 @@ class:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_footnotes {
+#tgvxzibwuz .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -496,7 +526,7 @@ class:</p>
   border-right-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_footnote {
+#tgvxzibwuz .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -505,7 +535,7 @@ class:</p>
   padding-right: 5px;
 }
 
-#qjbwlnhaqz .gt_sourcenotes {
+#tgvxzibwuz .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -519,7 +549,7 @@ class:</p>
   border-right-color: #D3D3D3;
 }
 
-#qjbwlnhaqz .gt_sourcenote {
+#tgvxzibwuz .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -527,67 +557,67 @@ class:</p>
   padding-right: 5px;
 }
 
-#qjbwlnhaqz .gt_left {
+#tgvxzibwuz .gt_left {
   text-align: left;
 }
 
-#qjbwlnhaqz .gt_center {
+#tgvxzibwuz .gt_center {
   text-align: center;
 }
 
-#qjbwlnhaqz .gt_right {
+#tgvxzibwuz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qjbwlnhaqz .gt_font_normal {
+#tgvxzibwuz .gt_font_normal {
   font-weight: normal;
 }
 
-#qjbwlnhaqz .gt_font_bold {
+#tgvxzibwuz .gt_font_bold {
   font-weight: bold;
 }
 
-#qjbwlnhaqz .gt_font_italic {
+#tgvxzibwuz .gt_font_italic {
   font-style: italic;
 }
 
-#qjbwlnhaqz .gt_super {
+#tgvxzibwuz .gt_super {
   font-size: 65%;
 }
 
-#qjbwlnhaqz .gt_footnote_marks {
+#tgvxzibwuz .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#qjbwlnhaqz .gt_asterisk {
+#tgvxzibwuz .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#qjbwlnhaqz .gt_indent_1 {
+#tgvxzibwuz .gt_indent_1 {
   text-indent: 5px;
 }
 
-#qjbwlnhaqz .gt_indent_2 {
+#tgvxzibwuz .gt_indent_2 {
   text-indent: 10px;
 }
 
-#qjbwlnhaqz .gt_indent_3 {
+#tgvxzibwuz .gt_indent_3 {
   text-indent: 15px;
 }
 
-#qjbwlnhaqz .gt_indent_4 {
+#tgvxzibwuz .gt_indent_4 {
   text-indent: 20px;
 }
 
-#qjbwlnhaqz .gt_indent_5 {
+#tgvxzibwuz .gt_indent_5 {
   text-indent: 25px;
 }
 
-#qjbwlnhaqz .katex-display {
+#tgvxzibwuz .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
@@ -600,7 +630,7 @@ class:</p>
 <tbody class="gt_table_body">
 <tr>
 <td headers="State" class="gt_row gt_left">S</td>
-<td headers="Count" class="gt_row gt_right">9995</td>
+<td headers="Count" class="gt_row gt_right">995</td>
 </tr>
 <tr>
 <td headers="State" class="gt_row gt_left">E</td>
@@ -621,7 +651,8 @@ class:</p>
 <div class="section level3">
 <h3 id="age-classes">Age classes<a class="anchor" aria-label="anchor" href="#age-classes"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>Age classes remain fixed and are as follows:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">age_classes</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">age_class</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "child"   "adult"   "elderly"</span></span>
 <span><span class="va">age_class_counts</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">age_classes</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">age_class</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
@@ -631,12 +662,13 @@ class:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Age class"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="helios_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
+<p><img src="helios_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="workplaces">Workplaces<a class="anchor" aria-label="anchor" href="#workplaces"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>Each adult attends a fixed workplace:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">workplaces</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">workplace</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">workplace_sizes</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">workplaces</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">workplace</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -645,12 +677,13 @@ class:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"log(Workplace size)"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre></div>
-<p><img src="helios_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="helios_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="schools">Schools<a class="anchor" aria-label="anchor" href="#schools"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p>Each child attends a fixed school:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">schools</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">school</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">school_sizes</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">schools</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">school</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -659,12 +692,14 @@ class:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"log(School size)"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span></span></code></pre></div>
-<p><img src="helios_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><img src="helios_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="households">Households<a class="anchor" aria-label="anchor" href="#households"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<p>Children, adults and elderly people are grouped into fixed
+households:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">households</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">household</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">household_sizes</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">households</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">household</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -673,12 +708,13 @@ class:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">household_sizes</span>, y <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Household size"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="helios_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="helios_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="leisure">Leisure<a class="anchor" aria-label="anchor" href="#leisure"></a>
 </h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<p>Each week, individuals attend lesiure venues:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">leisure_places</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">leisure</span><span class="op">$</span><span class="fu">get_values</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">number_leisure_places</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">leisure_places</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -687,14 +723,109 @@ class:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">number_leisure_places</span>, y <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Number of leisure places attended in a week"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="helios_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
+<p><img src="helios_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="events">Events<a class="anchor" aria-label="anchor" href="#events"></a>
 </h2>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">events_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_events.html">create_events</a></span><span class="op">(</span>variables_list <span class="op">=</span> <span class="va">variables_list</span>, parameters_list <span class="op">=</span> <span class="va">parameters_list</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">events_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_events.html">create_events</a></span><span class="op">(</span>variables_list <span class="op">=</span> <span class="va">variables_list</span>, parameters_list <span class="op">=</span> <span class="va">parameters_list</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">events_list</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "EI_event" "IR_event"</span></span></code></pre></div>
+<p>Each event is in the <a href="https://mrc-ide.github.io/individual/reference/TargetedEvent.html" class="external-link"><code>TargetedEvent</code></a>
+class:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">events_list</span>, <span class="va">class</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $EI_event</span></span>
+<span><span class="co">#&gt; [1] "TargetedEvent" "EventBase"     "R6"           </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $IR_event</span></span>
+<span><span class="co">#&gt; [1] "TargetedEvent" "EventBase"     "R6"</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="render">Render<a class="anchor" aria-label="anchor" href="#render"></a>
+</h2>
+<p>We use a fixed number of timesteps to simulate over:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">$</span><span class="va">simulation_time</span> <span class="op">/</span> <span class="va">parameters_list</span><span class="op">$</span><span class="va">dt</span><span class="op">)</span></span></code></pre></div>
+<p>The object <code>renderer</code> is of class <a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link"><code>Render</code></a>:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">renderer</span> <span class="op">&lt;-</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">timesteps</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">renderer</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Render" "R6"</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="processes">Processes<a class="anchor" aria-label="anchor" href="#processes"></a>
+</h2>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">processes_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_processes.html">create_processes</a></span><span class="op">(</span></span>
+<span>  variables_list <span class="op">=</span> <span class="va">variables_list</span>,</span>
+<span>  events_list <span class="op">=</span> <span class="va">events_list</span>,</span>
+<span>  parameters_list <span class="op">=</span> <span class="va">parameters_list</span>,</span>
+<span>  renderer <span class="op">=</span> <span class="va">renderer</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">processes_list</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "SE_process" "EI_process" "IR_process" ""</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="simulate">Simulate<a class="anchor" aria-label="anchor" href="#simulate"></a>
+</h2>
+<p>See <a href="https://mrc-ide.github.io/individual/reference/simulation_loop.html" class="external-link"><code>individual::simulation_loop</code></a>:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">individual</span><span class="fu">::</span><span class="fu"><a href="https://mrc-ide.github.io/individual/reference/simulation_loop.html" class="external-link">simulation_loop</a></span><span class="op">(</span></span>
+<span>  variables <span class="op">=</span> <span class="va">variables_list</span>,</span>
+<span>  events <span class="op">=</span> <span class="va">events_list</span>,</span>
+<span>  processes <span class="op">=</span> <span class="va">processes_list</span>,</span>
+<span>  timesteps <span class="op">=</span> <span class="va">timesteps</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "timestep = 5"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 10"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 15"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 20"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 25"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 30"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 35"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 40"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 45"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 50"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 55"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 60"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 65"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 70"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 75"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 80"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 85"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 90"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 95"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 100"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 105"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 110"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 115"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 120"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 125"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 130"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 135"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 140"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 145"</span></span>
+<span><span class="co">#&gt; [1] "timestep = 150"</span></span></code></pre></div>
+<p>The output of the simulation is contained within
+<code>renderer</code>, and can be accessed using the
+<code>to_dataframe()</code> method:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">states</span> <span class="op">&lt;-</span> <span class="va">renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">states</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu">ends_with</span><span class="op">(</span><span class="st">"count"</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"compartment"</span>, values_to <span class="op">=</span> <span class="st">"value"</span>, names_pattern <span class="op">=</span> <span class="st">"(.*)_count"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    compartment <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_relevel.html" class="external-link">fct_relevel</a></span><span class="op">(</span><span class="va">compartment</span>, <span class="st">"S"</span>, <span class="st">"E"</span>, <span class="st">"I"</span>, <span class="st">"R"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">timestep</span>, y <span class="op">=</span> <span class="va">value</span>, col <span class="op">=</span> <span class="va">compartment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"royalblue3"</span>, <span class="st">"firebrick3"</span>, <span class="st">"darkorchid3"</span>, <span class="st">"orange2"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time-step"</span>, y <span class="op">=</span> <span class="st">"Count"</span>, col <span class="op">=</span> <span class="st">"Compartment"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="helios_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
 </div>
   </div>
 
