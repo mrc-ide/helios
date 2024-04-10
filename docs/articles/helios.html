@@ -99,6 +99,16 @@ In this vignette, we demonstrate basic use of the package.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/helios" class="external-link">helios</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mrc-ide/individual" class="external-link">individual</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme_get.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -108,7 +118,7 @@ In this vignette, we demonstrate basic use of the package.</p>
 <code>human_population</code> to 1000. Otherwise, we use the default
 options:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">parameters_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_parameters.html">get_parameters</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>human_population <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">parameters_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_parameters.html">get_parameters</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>human_population <span class="op">=</span> <span class="fl">1000</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>The names of all parameters are as follows:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">)</span></span>
@@ -140,7 +150,7 @@ options:</p>
 <code>variables_list</code> is of the <a href="https://mrc-ide.github.io/individual/reference/CategoricalVariable.html" class="external-link"><code>CategoricalVariable</code></a>
 class:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">variables_list</span>, <span class="va">class</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">variables_list</span>, <span class="va">class</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $disease_state</span></span>
 <span><span class="co">#&gt; [1] "CategoricalVariable" "R6"                 </span></span>
 <span><span class="co">#&gt; </span></span>
@@ -177,23 +187,23 @@ models</a>.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"State"</span> <span class="op">=</span> <span class="va">disease_states</span>, <span class="st">"Count"</span> <span class="op">=</span> <span class="va">disease_state_counts</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div id="tgvxzibwuz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#tgvxzibwuz table {
+<div id="jxwpjgakkr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jxwpjgakkr table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#tgvxzibwuz thead, #tgvxzibwuz tbody, #tgvxzibwuz tfoot, #tgvxzibwuz tr, #tgvxzibwuz td, #tgvxzibwuz th {
+#jxwpjgakkr thead, #jxwpjgakkr tbody, #jxwpjgakkr tfoot, #jxwpjgakkr tr, #jxwpjgakkr td, #jxwpjgakkr th {
   border-style: none;
 }
 
-#tgvxzibwuz p {
+#jxwpjgakkr p {
   margin: 0;
   padding: 0;
 }
 
-#tgvxzibwuz .gt_table {
+#jxwpjgakkr .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -219,12 +229,12 @@ models</a>.</p>
   border-left-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_caption {
+#jxwpjgakkr .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#tgvxzibwuz .gt_title {
+#jxwpjgakkr .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -236,7 +246,7 @@ models</a>.</p>
   border-bottom-width: 0;
 }
 
-#tgvxzibwuz .gt_subtitle {
+#jxwpjgakkr .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -248,7 +258,7 @@ models</a>.</p>
   border-top-width: 0;
 }
 
-#tgvxzibwuz .gt_heading {
+#jxwpjgakkr .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -260,13 +270,13 @@ models</a>.</p>
   border-right-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_bottom_border {
+#jxwpjgakkr .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_col_headings {
+#jxwpjgakkr .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -281,7 +291,7 @@ models</a>.</p>
   border-right-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_col_heading {
+#jxwpjgakkr .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -301,7 +311,7 @@ models</a>.</p>
   overflow-x: hidden;
 }
 
-#tgvxzibwuz .gt_column_spanner_outer {
+#jxwpjgakkr .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -313,15 +323,15 @@ models</a>.</p>
   padding-right: 4px;
 }
 
-#tgvxzibwuz .gt_column_spanner_outer:first-child {
+#jxwpjgakkr .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#tgvxzibwuz .gt_column_spanner_outer:last-child {
+#jxwpjgakkr .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#tgvxzibwuz .gt_column_spanner {
+#jxwpjgakkr .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -333,11 +343,11 @@ models</a>.</p>
   width: 100%;
 }
 
-#tgvxzibwuz .gt_spanner_row {
+#jxwpjgakkr .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#tgvxzibwuz .gt_group_heading {
+#jxwpjgakkr .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -363,7 +373,7 @@ models</a>.</p>
   text-align: left;
 }
 
-#tgvxzibwuz .gt_empty_group_heading {
+#jxwpjgakkr .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -378,15 +388,15 @@ models</a>.</p>
   vertical-align: middle;
 }
 
-#tgvxzibwuz .gt_from_md > :first-child {
+#jxwpjgakkr .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#tgvxzibwuz .gt_from_md > :last-child {
+#jxwpjgakkr .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#tgvxzibwuz .gt_row {
+#jxwpjgakkr .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -405,7 +415,7 @@ models</a>.</p>
   overflow-x: hidden;
 }
 
-#tgvxzibwuz .gt_stub {
+#jxwpjgakkr .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -418,7 +428,7 @@ models</a>.</p>
   padding-right: 5px;
 }
 
-#tgvxzibwuz .gt_stub_row_group {
+#jxwpjgakkr .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -432,15 +442,15 @@ models</a>.</p>
   vertical-align: top;
 }
 
-#tgvxzibwuz .gt_row_group_first td {
+#jxwpjgakkr .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#tgvxzibwuz .gt_row_group_first th {
+#jxwpjgakkr .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#tgvxzibwuz .gt_summary_row {
+#jxwpjgakkr .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -450,16 +460,16 @@ models</a>.</p>
   padding-right: 5px;
 }
 
-#tgvxzibwuz .gt_first_summary_row {
+#jxwpjgakkr .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_first_summary_row.thick {
+#jxwpjgakkr .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#tgvxzibwuz .gt_last_summary_row {
+#jxwpjgakkr .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -469,7 +479,7 @@ models</a>.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_grand_summary_row {
+#jxwpjgakkr .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -479,7 +489,7 @@ models</a>.</p>
   padding-right: 5px;
 }
 
-#tgvxzibwuz .gt_first_grand_summary_row {
+#jxwpjgakkr .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -489,7 +499,7 @@ models</a>.</p>
   border-top-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_last_grand_summary_row_top {
+#jxwpjgakkr .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -499,11 +509,11 @@ models</a>.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_striped {
+#jxwpjgakkr .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#tgvxzibwuz .gt_table_body {
+#jxwpjgakkr .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -512,7 +522,7 @@ models</a>.</p>
   border-bottom-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_footnotes {
+#jxwpjgakkr .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -526,7 +536,7 @@ models</a>.</p>
   border-right-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_footnote {
+#jxwpjgakkr .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -535,7 +545,7 @@ models</a>.</p>
   padding-right: 5px;
 }
 
-#tgvxzibwuz .gt_sourcenotes {
+#jxwpjgakkr .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -549,7 +559,7 @@ models</a>.</p>
   border-right-color: #D3D3D3;
 }
 
-#tgvxzibwuz .gt_sourcenote {
+#jxwpjgakkr .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -557,67 +567,67 @@ models</a>.</p>
   padding-right: 5px;
 }
 
-#tgvxzibwuz .gt_left {
+#jxwpjgakkr .gt_left {
   text-align: left;
 }
 
-#tgvxzibwuz .gt_center {
+#jxwpjgakkr .gt_center {
   text-align: center;
 }
 
-#tgvxzibwuz .gt_right {
+#jxwpjgakkr .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#tgvxzibwuz .gt_font_normal {
+#jxwpjgakkr .gt_font_normal {
   font-weight: normal;
 }
 
-#tgvxzibwuz .gt_font_bold {
+#jxwpjgakkr .gt_font_bold {
   font-weight: bold;
 }
 
-#tgvxzibwuz .gt_font_italic {
+#jxwpjgakkr .gt_font_italic {
   font-style: italic;
 }
 
-#tgvxzibwuz .gt_super {
+#jxwpjgakkr .gt_super {
   font-size: 65%;
 }
 
-#tgvxzibwuz .gt_footnote_marks {
+#jxwpjgakkr .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#tgvxzibwuz .gt_asterisk {
+#jxwpjgakkr .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#tgvxzibwuz .gt_indent_1 {
+#jxwpjgakkr .gt_indent_1 {
   text-indent: 5px;
 }
 
-#tgvxzibwuz .gt_indent_2 {
+#jxwpjgakkr .gt_indent_2 {
   text-indent: 10px;
 }
 
-#tgvxzibwuz .gt_indent_3 {
+#jxwpjgakkr .gt_indent_3 {
   text-indent: 15px;
 }
 
-#tgvxzibwuz .gt_indent_4 {
+#jxwpjgakkr .gt_indent_4 {
   text-indent: 20px;
 }
 
-#tgvxzibwuz .gt_indent_5 {
+#jxwpjgakkr .gt_indent_5 {
   text-indent: 25px;
 }
 
-#tgvxzibwuz .katex-display {
+#jxwpjgakkr .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
@@ -709,12 +719,534 @@ households:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Household size"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="helios_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p>What is the age distribution in households?</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">household_df</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_df</a></span><span class="op">(</span><span class="va">households</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">indices</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">household</span><span class="op">$</span><span class="fu">get_index_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">$</span><span class="fu">to_vector</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">indices</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"individual"</span> <span class="op">=</span> <span class="va">indices</span>, <span class="st">"household"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">age_df</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_df</a></span><span class="op">(</span><span class="va">age_classes</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">indices</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">age_class</span><span class="op">$</span><span class="fu">get_index_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">$</span><span class="fu">to_vector</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">indices</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"individual"</span> <span class="op">=</span> <span class="va">indices</span>, <span class="st">"age_class"</span> <span class="op">=</span> <span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">household_df</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">age_df</span>, by <span class="op">=</span> <span class="st">"individual"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">household</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
+<span>    child <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">age_class</span> <span class="op">==</span> <span class="st">"child"</span><span class="op">)</span>,</span>
+<span>    adult <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">age_class</span> <span class="op">==</span> <span class="st">"adult"</span><span class="op">)</span>,</span>
+<span>    elderly <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">age_class</span> <span class="op">==</span> <span class="st">"elderly"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">child</span>, <span class="va">adult</span>, <span class="va">elderly</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
+<span>    count <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">count</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `summarise()` has grouped output by 'child', 'adult'. You can override using</span></span>
+<span><span class="co">#&gt; the `.groups` argument.</span></span></code></pre></div>
+<div id="aqelrnztfs" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#aqelrnztfs table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#aqelrnztfs thead, #aqelrnztfs tbody, #aqelrnztfs tfoot, #aqelrnztfs tr, #aqelrnztfs td, #aqelrnztfs th {
+  border-style: none;
+}
+
+#aqelrnztfs p {
+  margin: 0;
+  padding: 0;
+}
+
+#aqelrnztfs .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#aqelrnztfs .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#aqelrnztfs .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#aqelrnztfs .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#aqelrnztfs .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#aqelrnztfs .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#aqelrnztfs .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#aqelrnztfs .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#aqelrnztfs .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#aqelrnztfs .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#aqelrnztfs .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#aqelrnztfs .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#aqelrnztfs .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#aqelrnztfs .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#aqelrnztfs .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aqelrnztfs .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#aqelrnztfs .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#aqelrnztfs .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#aqelrnztfs .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aqelrnztfs .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#aqelrnztfs .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aqelrnztfs .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#aqelrnztfs .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aqelrnztfs .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#aqelrnztfs .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#aqelrnztfs .gt_left {
+  text-align: left;
+}
+
+#aqelrnztfs .gt_center {
+  text-align: center;
+}
+
+#aqelrnztfs .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#aqelrnztfs .gt_font_normal {
+  font-weight: normal;
+}
+
+#aqelrnztfs .gt_font_bold {
+  font-weight: bold;
+}
+
+#aqelrnztfs .gt_font_italic {
+  font-style: italic;
+}
+
+#aqelrnztfs .gt_super {
+  font-size: 65%;
+}
+
+#aqelrnztfs .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#aqelrnztfs .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#aqelrnztfs .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#aqelrnztfs .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#aqelrnztfs .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#aqelrnztfs .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#aqelrnztfs .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#aqelrnztfs .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+</style>
+<table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead><tr class="gt_col_headings">
+<th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="child">child</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="adult">adult</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="elderly">elderly</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="count">count</th>
+    </tr></thead>
+<tbody class="gt_table_body">
+<tr>
+<td headers="child" class="gt_row gt_right">0</td>
+<td headers="adult" class="gt_row gt_right">1</td>
+<td headers="elderly" class="gt_row gt_right">0</td>
+<td headers="count" class="gt_row gt_right">138</td>
+</tr>
+<tr>
+<td headers="child" class="gt_row gt_right">0</td>
+<td headers="adult" class="gt_row gt_right">2</td>
+<td headers="elderly" class="gt_row gt_right">0</td>
+<td headers="count" class="gt_row gt_right">54</td>
+</tr>
+<tr>
+<td headers="child" class="gt_row gt_right">1</td>
+<td headers="adult" class="gt_row gt_right">0</td>
+<td headers="elderly" class="gt_row gt_right">0</td>
+<td headers="count" class="gt_row gt_right">37</td>
+</tr>
+<tr>
+<td headers="child" class="gt_row gt_right">1</td>
+<td headers="adult" class="gt_row gt_right">1</td>
+<td headers="elderly" class="gt_row gt_right">0</td>
+<td headers="count" class="gt_row gt_right">36</td>
+</tr>
+<tr>
+<td headers="child" class="gt_row gt_right">0</td>
+<td headers="adult" class="gt_row gt_right">0</td>
+<td headers="elderly" class="gt_row gt_right">1</td>
+<td headers="count" class="gt_row gt_right">35</td>
+</tr>
+<tr>
+<td headers="child" class="gt_row gt_right">0</td>
+<td headers="adult" class="gt_row gt_right">1</td>
+<td headers="elderly" class="gt_row gt_right">1</td>
+<td headers="count" class="gt_row gt_right">35</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div class="section level3">
 <h3 id="leisure">Leisure<a class="anchor" aria-label="anchor" href="#leisure"></a>
 </h3>
 <p>Each week, individuals attend lesiure venues:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">leisure_places</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">leisure</span><span class="op">$</span><span class="fu">get_values</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">number_leisure_places</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">leisure_places</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -723,19 +1255,19 @@ households:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">number_leisure_places</span>, y <span class="op">=</span> <span class="va">Freq</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Number of leisure places attended in a week"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="helios_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p><img src="helios_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="events">Events<a class="anchor" aria-label="anchor" href="#events"></a>
 </h2>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">events_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_events.html">create_events</a></span><span class="op">(</span>variables_list <span class="op">=</span> <span class="va">variables_list</span>, parameters_list <span class="op">=</span> <span class="va">parameters_list</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">events_list</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "EI_event" "IR_event"</span></span></code></pre></div>
 <p>Each event is in the <a href="https://mrc-ide.github.io/individual/reference/TargetedEvent.html" class="external-link"><code>TargetedEvent</code></a>
 class:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">events_list</span>, <span class="va">class</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $EI_event</span></span>
 <span><span class="co">#&gt; [1] "TargetedEvent" "EventBase"     "R6"           </span></span>
@@ -747,10 +1279,10 @@ class:</p>
 <h2 id="render">Render<a class="anchor" aria-label="anchor" href="#render"></a>
 </h2>
 <p>We use a fixed number of timesteps to simulate over:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">$</span><span class="va">simulation_time</span> <span class="op">/</span> <span class="va">parameters_list</span><span class="op">$</span><span class="va">dt</span><span class="op">)</span></span></code></pre></div>
 <p>The object <code>renderer</code> is of class <a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link"><code>Render</code></a>:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">renderer</span> <span class="op">&lt;-</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">timesteps</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">renderer</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Render" "R6"</span></span></code></pre></div>
@@ -758,7 +1290,7 @@ class:</p>
 <div class="section level2">
 <h2 id="processes">Processes<a class="anchor" aria-label="anchor" href="#processes"></a>
 </h2>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">processes_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_processes.html">create_processes</a></span><span class="op">(</span></span>
 <span>  variables_list <span class="op">=</span> <span class="va">variables_list</span>,</span>
 <span>  events_list <span class="op">=</span> <span class="va">events_list</span>,</span>
@@ -773,7 +1305,7 @@ class:</p>
 <h2 id="simulate">Simulate<a class="anchor" aria-label="anchor" href="#simulate"></a>
 </h2>
 <p>See <a href="https://mrc-ide.github.io/individual/reference/simulation_loop.html" class="external-link"><code>individual::simulation_loop</code></a>:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">individual</span><span class="fu">::</span><span class="fu"><a href="https://mrc-ide.github.io/individual/reference/simulation_loop.html" class="external-link">simulation_loop</a></span><span class="op">(</span></span>
 <span>  variables <span class="op">=</span> <span class="va">variables_list</span>,</span>
 <span>  events <span class="op">=</span> <span class="va">events_list</span>,</span>
@@ -813,19 +1345,19 @@ class:</p>
 <p>The output of the simulation is contained within
 <code>renderer</code>, and can be accessed using the
 <code>to_dataframe()</code> method:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">states</span> <span class="op">&lt;-</span> <span class="va">renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">states</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu">ends_with</span><span class="op">(</span><span class="st">"count"</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"compartment"</span>, values_to <span class="op">=</span> <span class="st">"value"</span>, names_pattern <span class="op">=</span> <span class="st">"(.*)_count"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">ends_with</a></span><span class="op">(</span><span class="st">"count"</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"compartment"</span>, values_to <span class="op">=</span> <span class="st">"value"</span>, names_pattern <span class="op">=</span> <span class="st">"(.*)_count"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    compartment <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_relevel.html" class="external-link">fct_relevel</a></span><span class="op">(</span><span class="va">compartment</span>, <span class="st">"S"</span>, <span class="st">"E"</span>, <span class="st">"I"</span>, <span class="st">"R"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">timestep</span>, y <span class="op">=</span> <span class="va">value</span>, col <span class="op">=</span> <span class="va">compartment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"royalblue3"</span>, <span class="st">"firebrick3"</span>, <span class="st">"darkorchid3"</span>, <span class="st">"orange2"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Time-step"</span>, y <span class="op">=</span> <span class="st">"Count"</span>, col <span class="op">=</span> <span class="st">"Compartment"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="helios_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
+<p><img src="helios_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
 </div>
   </div>
 

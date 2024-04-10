@@ -104,33 +104,44 @@ and others which change.</p>
 <h2 id="age-structure">Age structure<a class="anchor" aria-label="anchor" href="#age-structure"></a>
 </h2>
 <p>The age categories included in the model are children, adults, and
-the elderly. Each individual has a fixed age category.</p>
+the elderly. Each individual has a fixed age category, assumed not to
+change during the simulation, sampled from a categorical distribution at
+initialisation.</p>
 </div>
 <div class="section level2">
 <h2 id="households">Households<a class="anchor" aria-label="anchor" href="#households"></a>
 </h2>
-<p>Households are comprised of collections of one or more
-individuals.</p>
+<p>Households are comprised of collections of one or more individuals.
+Household sizes are drawn from a Poisson distribution with rate
+parameter <code>mean_household_size</code>. Individuals are assigned to
+households, ensuring that no household contains only children by pairing
+an adult to each child assigned to a household without any existing
+adults.</p>
 </div>
 <div class="section level2">
 <h2 id="workplaces">Workplaces<a class="anchor" aria-label="anchor" href="#workplaces"></a>
 </h2>
 <p>Workplaces are attended by adults. The sizes of workplaces are drawn
-from the following distribution. Assignment of adults to particular
-workplaces is at random.</p>
+from an offset truncated power distribution. Assignment of adults to
+particular workplaces is done using random sampling without
+replacement.</p>
 </div>
 <div class="section level2">
 <h2 id="schools">Schools<a class="anchor" aria-label="anchor" href="#schools"></a>
 </h2>
 <p>Schools are attended by children. The sizes of schools are drawn from
-the following distribution. Assignment of children to particular schools
-is at random.</p>
+a lognormal distribution. Assignment of children to particular schools
+is done using random sampling without replacement.</p>
 </div>
 <div class="section level2">
 <h2 id="leisure">Leisure<a class="anchor" aria-label="anchor" href="#leisure"></a>
 </h2>
-<p>Leisure venues are attended by who. Leisure venue sizes are drawn
-from the following distribution.</p>
+<p>Leisure venues are attended by all individuals. Leisure venue sizes
+are drawn from a negative binomial distribution. The number of leisure
+visits per person per week is drawn from a Poisson distribution,
+truncated at 7 corresponding to one leisure visit every day. The
+locations for each individual’s leisure visits are sampled without
+replacement with probability proportional to leisure venue size.</p>
 </div>
 <div class="section level2">
 <h2 id="community-mixing">Community mixing<a class="anchor" aria-label="anchor" href="#community-mixing"></a>

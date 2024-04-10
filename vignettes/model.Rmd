@@ -28,29 +28,32 @@ Some properties remain constant over time, and others which change.
 ## Age structure
 
 The age categories included in the model are children, adults, and the elderly.
-Each individual has a fixed age category.
+Each individual has a fixed age category, assumed not to change during the simulation, sampled from a categorical distribution at initialisation.
 
 ## Households
 
 Households are comprised of collections of one or more individuals.
+Household sizes are drawn from a Poisson distribution with rate parameter `mean_household_size`.
+Individuals are assigned to households, ensuring that no household contains only children by pairing an adult to each child assigned to a household without any existing adults.
 
 ## Workplaces
 
 Workplaces are attended by adults.
-The sizes of workplaces are drawn from the following distribution.
-Assignment of adults to particular workplaces is at random.
-
+The sizes of workplaces are drawn from an offset truncated power distribution.
+Assignment of adults to particular workplaces is done using random sampling without replacement.
 
 ## Schools
 
 Schools are attended by children.
-The sizes of schools are drawn from the following distribution.
-Assignment of children to particular schools is at random.
+The sizes of schools are drawn from a lognormal distribution.
+Assignment of children to particular schools is  done using random sampling without replacement.
 
 ## Leisure
 
-Leisure venues are attended by who.
-Leisure venue sizes are drawn from the following distribution.
+Leisure venues are attended by all individuals.
+Leisure venue sizes are drawn from a negative binomial distribution.
+The number of leisure visits per person per week is drawn from a Poisson distribution, truncated at 7 corresponding to one leisure visit every day.
+The locations for each individual's leisure visits are sampled without replacement with probability proportional to leisure venue size.
 
 ## Community mixing
 

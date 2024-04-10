@@ -37,7 +37,7 @@ In this vignette, we set the `human_population` to 1000.
 Otherwise, we use the default options:
 
 ```{r}
-parameters_list <- get_parameters(list(human_population = 1000))
+parameters_list <- get_parameters(list(human_population = 1000, seed = 1))
 ```
 
 The names of all parameters are as follows:
@@ -143,12 +143,12 @@ What is the age distribution in households?
 ```{r}
 household_df <- purrr::map_df(households, function(x) {
   indices <- variables_list$household$get_index_of(values = x)$to_vector()
-  data.frame("individual" = indices, "household" = as.numeric(x))
+  if(length(indices > 0)) data.frame("individual" = indices, "household" = as.numeric(x))
 })
 
 age_df <- purrr::map_df(age_classes, function(x) {
   indices <- variables_list$age_class$get_index_of(values = x)$to_vector()
-  data.frame("individual" = indices, "age_class" = x)
+  if(length(indices > 0)) data.frame("individual" = indices, "age_class" = x)
 })
 
 household_df |>
