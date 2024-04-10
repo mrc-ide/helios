@@ -6,17 +6,18 @@ Authors@R: c(
   person(
     given = "Charlie",
     family = "Whittaker",
-    role = c('aut', 'cre')
+    role = c('aut', 'cre'),
+    email = "charles.whittaker16@imperial.ac.uk"
   ),
   person(
     given = "Tom",
     family = "Brewer",
-    role = c('aut', 'cre')
+    role = c('aut')
   ),
   person(
     given = "Adam",
     family = "Howes",
-    role = c('aut', 'cre')
+    role = c('aut')
   ))
 Description: A package for simulating the effect of far UVC interventions on infectious
     disease outbreaks.
