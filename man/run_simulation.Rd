@@ -4,10 +4,10 @@
 \alias{run_simulation}
 \title{Run the simulation}
 \usage{
-run_simulation(parameters, timesteps)
+run_simulation(parameters_list, timesteps)
 }
 \arguments{
-\item{parameters}{A list of the model parameters as generated using \code{get_parameters}}
+\item{parameters_list}{A list of the model parameters as generated using \code{get_parameters}}
 
 \item{timesteps}{An integer representing the number of timesteps to simulate}
 }
