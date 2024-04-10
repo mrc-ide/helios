@@ -31,15 +31,23 @@ create_processes <- function(
 
   )
 
-    # ===============================
-    # Intervention processes
-    # ===============================
+  ## Adding RS_process in if endemic pathogen is required
+  if (parameters_list$endemic_or_epidemic == "endemic") {
+    processes_list <- c(processes_list,
+                        list(RS_process = create_RS_process(variables_list = variables_list,
+                                                            events_list = events_list,
+                                                            parameters_list = parameters_list)))
+  }
+
+  # ===============================
+  # Intervention processes
+  # ===============================
 
 
-    # ===============================
-    # Rendering processes
-    # ===============================
-    # health_render_process
+  # ===============================
+  # Rendering processes
+  # ===============================
+  # health_render_process
   processes_list <- c(
       processes_list,
       individual::categorical_count_renderer_process(
