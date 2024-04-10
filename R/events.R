@@ -21,7 +21,7 @@ create_events <- function(variables_list, parameters_list) {
   ## Add RS_event if endemic pathogen is required
   if (parameters_list$endemic_or_epidemic == "endemic") {
     RS_event <- TargetedEvent$new(population_size = parameters_list$human_population)
-    events_list <- c(events_list, list(RS_event))
+    events_list <- c(events_list, list(RS_event = RS_event))
   }
 
   # Add listener to the EI event:
