@@ -177,7 +177,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       spec_school_I <- I$and(spec_school)
 
       # Calculate the school-specific FOI for the i-th school:
-      spec_school_FOI <- parameters_list$beta_school * spec_school_I$size() / school_size_list ## this calculation needs more in it
+      spec_school_FOI <- parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]] ## this calculation needs more in it
 
       # Store the school-specific FOI at the indices of all children that attend it:
       school_FOI[school_index_list[[i]]] <- spec_school_FOI
