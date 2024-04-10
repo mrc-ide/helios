@@ -11,11 +11,36 @@ create_variables <- function(parameters_list) {
   disease_state_variable <- individual::CategoricalVariable$new(categories = disease_states,
                                                                 initial_values = initial_disease_states)
 
-  # Initialise and populate the age class variable:
-  age_classes <- c("child", "adult", "elderly")
-  initial_age_classes <- generate_initial_age_classes(parameters_list = parameters_list)
-  age_class_variable <- individual::CategoricalVariable$new(categories = age_classes,
-                                                            initial_values = initial_age_classes)
+  # If user wants to use empirical distribution of households from ONS - this generates
+  # both the household variable AND the age class variable
+  if (parameters_list$household_distribution_generation == "empirical") {
+
+    # Bootstrap sampling of households from ONS 2011 Census reference panel of household sizes and age composition
+    household_age_list <- generate_initial_households_boostrap(parameters_list = parameters_list)
+
+    # Initialise and populate the age class variable:
+    age_classes <- c("child", "adult", "elderly")
+    age_class_variable <- individual::CategoricalVariable$new(categories = age_classes,
+                                                              initial_values = household_age_list$age_class_vector)
+
+    # Initialise and populate the household variable
+    household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(household_age_list$individual_households)),
+                                                              initial_values = as.character(household_age_list$individual_households))
+
+  ## If user wants to specify age-class proportions manually
+  } else {
+
+    # Initialise and populate the age class variable:
+    age_classes <- c("child", "adult", "elderly")
+    initial_age_classes <- generate_initial_age_classes(parameters_list = parameters_list)
+    age_class_variable <- individual::CategoricalVariable$new(categories = age_classes,
+                                                              initial_values = initial_age_classes)
+
+    # Initialise and populate the household variable
+    initial_households <- generate_initial_households(parameters_list = parameters_list, age_class_variable = age_class_variable)
+    household_variable <- CategoricalVariable$new(categories = as.character(1:max(initial_households)),
+                                                  initial_values = as.character(initial_households))
+  }
 
   # Initialise and populate the workplace setting variable:
   initial_workplace_settings <- generate_initial_workplaces(parameters_list = parameters_list, age_class_variable = age_class_variable)
@@ -38,12 +63,6 @@ create_variables <- function(parameters_list) {
   possible_leisure_settings <- possible_leisure_settings[order(possible_leisure_settings)]
   specific_day_leisure_variable <- CategoricalVariable$new(categories = as.character(possible_leisure_settings),
                                                            initial_values = rep(as.character(0), parameters_list$human_population))
-
-  # Initialise and populate the household variable
-  initial_households <- generate_initial_households(parameters_list = parameters_list, age_class_variable = age_class_variable)
-  household_variable <- CategoricalVariable$new(categories = as.character(1:max(initial_households)),
-                                                initial_values = as.character(initial_households))
-
 
   # Store the model variables in a single list:
   variables_list <- list(
@@ -428,10 +447,10 @@ generate_initial_households_boostrap <- function(parameters_list) {
 
   ## Processing Hinch et al to match our age-classes
   ref_panel <- read.csv("data/Hinch_et_al_baseline_household_demographics.csv")
-  ref_panel$children <- ref_panel$a_0_9 + ref_panel$a_10_19
-  ref_panel$adults <- ref_panel$a_20_29 + ref_panel$a_30_39 + ref_panel$a_40_49 + ref_panel$a_50_59 + ref_panel$a_60_69
+  ref_panel$child <- ref_panel$a_0_9 + ref_panel$a_10_19
+  ref_panel$adult <- ref_panel$a_20_29 + ref_panel$a_30_39 + ref_panel$a_40_49 + ref_panel$a_50_59 + ref_panel$a_60_69
   ref_panel$elderly <- ref_panel$a_70_79 + ref_panel$a_80
-  ref_panel <- ref_panel[, c("children", "adults", "elderly")]
+  ref_panel <- ref_panel[, c("child", "adult", "elderly")]
 
   # Creating blank age-class vectors and household assignment vectors to populate
   age_class_vector <- rep("", parameters_list$human_population)
@@ -468,7 +487,14 @@ generate_initial_households_boostrap <- function(parameters_list) {
                                       prob = unname(table(age_class_vector)) / parameters_list$human_population)
   }
 
-  return(list(individual_households = individual_households, age_class_vector = age_class_vector))
+  ## Scrambling the order of individuals so that household members don't appear right next to each other
+  ## -> This might not be needed, need to give this some thought
+  scrambled_index <- sample(x = 1:parameters_list$human_population,
+                            size = parameters_list$human_population,
+                            replace = FALSE)
+
+  return(list(individual_households = individual_households[scrambled_index],
+              age_class_vector = age_class_vector[scrambled_index]))
 
 }
 

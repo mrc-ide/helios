@@ -63,7 +63,8 @@ get_parameters <- function(overrides = list()) {
     beta_leisure = 0.5, # check this as default
     beta_community = 0.2, # check this as default
     dt = 0.5, # check this as default
-    simulation_time = 150
+    simulation_time = 150,
+    household_distribution_generation = "empirical"
   )
 
   # Ensure overridden parameters are passed as a list:
