@@ -16,10 +16,12 @@ parameters_list <- get_parameters()
 # parameters_list$human_population <- 100000
 timesteps <- round(parameters_list$simulation_time/parameters_list$dt)
 tic()
-run_simulation(parameters_list = parameters_list, timesteps = timesteps)
+x <- run_simulation(parameters_list = parameters_list, timesteps = timesteps)
 toc()
 
-variables_list <- create_variables(parameters_list)
-events_list <- create_events(variables_list = variables_list, parameters_list = parameters_list)
-
-variables_list$household$get_index_of("10")
+health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
+matplot(
+  x = x[[1]]*parameters_list$dt, y = x[-1],
+  type="l",lwd=2,lty = 1,col = adjustcolor(col = health_cols, alpha.f = 0.85),
+  xlab = "Time",ylab = "Count"
+)
