@@ -307,17 +307,3 @@ create_IR_process <- function(variables_list, events_list, parameters_list) {
 
   }
 }
-
-# Define the process which renders the number of individuals in each time step:
-# disease_state_count_render_process <- function(renderers, parameters, variables) {
-#
-#   # Create the disease state count render
-#   disease_state_count_render <- Render$new(timesteps = round(parameters$simulation_time / parameters$dt))
-#   disease_states <- variables$disease_state$get_categories()
-#   function(t) {
-#     for (i in disease_states) {
-#       disease_state_count_render$render(paste0(i, '_count'), variables$disease_state$get_size_of(i), t)
-#     }
-#   }
-# }
-
