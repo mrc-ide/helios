@@ -65,7 +65,7 @@ get_parameters <- function(overrides = list()) {
     dt = 0.5, # check this as default
     simulation_time = 150,
     endemic_or_epidemic = "epidemic",
-    duration_immune = NULL,
+    duration_immune = NULL
   )
 
   # Ensure overridden parameters are passed as a list:
@@ -90,10 +90,10 @@ get_parameters <- function(overrides = list()) {
   }
 
   # Check duration_immune is set if endemic_or_epidemic == "endemic"
-  if (!(paramters$endemic_or_epidemic %in% c("endemic", "epidemic"))) {
+  if (!(parameters$endemic_or_epidemic %in% c("endemic", "epidemic"))) {
     stop("endemic_or_epidemic must be set to either epidemic or endemic")
   }
-  if (paramters$endemic_or_epidemic == "endemic" & is.null(parameters$duration_immune)) {
+  if (parameters$endemic_or_epidemic == "endemic" & is.null(parameters$duration_immune)) {
     stop("duration_immune must be specified if endemic_or_epidemic is set to endemic")
   }
 
