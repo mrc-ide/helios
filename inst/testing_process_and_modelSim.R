@@ -6,7 +6,7 @@ source("R/parameters.R")
 parameters_list <- get_parameters()
 parameters_list$seed <- 10
 parameters_list$beta_household <- 1.0
-parameters_list$human_population <- 100000
+parameters_list$human_population <- 10000
 
 ## Generate the model variables:
 source("R/variables.R")
