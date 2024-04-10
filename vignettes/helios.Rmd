@@ -25,6 +25,8 @@ In this vignette, we demonstrate basic use of the package.
 library(helios)
 library(individual)
 library(ggplot2)
+library(dplyr)
+library(purrr)
 theme_set(theme_minimal())
 ```
 
@@ -56,7 +58,7 @@ names(variables_list)
 Aside from `$leisure`, each entry of `variables_list` is of the [`CategoricalVariable`](https://mrc-ide.github.io/individual/reference/CategoricalVariable.html) class:
 
 ```{r}
-lapply(variables_list, class)
+map(variables_list, class)
 ```
 
 Some variables change over time, while other remain fixed.
@@ -136,6 +138,38 @@ table(household_sizes) |>
   labs(x = "Household size", y = "Count")
 ```
 
+What is the age distribution in households?
+
+```{r}
+household_df <- purrr::map_df(households, function(x) {
+  indices <- variables_list$household$get_index_of(values = x)$to_vector()
+  data.frame("individual" = indices, "household" = as.numeric(x))
+})
+
+age_df <- purrr::map_df(age_classes, function(x) {
+  indices <- variables_list$age_class$get_index_of(values = x)$to_vector()
+  data.frame("individual" = indices, "age_class" = x)
+})
+
+household_df |>
+  left_join(age_df, by = "individual") |>
+  group_by(household) |>
+  summarise(
+    child = sum(age_class == "child"),
+    adult = sum(age_class == "adult"),
+    elderly = sum(age_class == "elderly")
+  ) |>
+  group_by(child, adult, elderly) |>
+  summarise(
+    count = n()
+  ) |>
+  ungroup() |>
+  arrange(desc(count)) |>
+  head() |>
+  gt::gt()
+```
+
+
 ### Leisure
 
 Each week, individuals attend lesiure venues:
@@ -212,7 +246,7 @@ states <- renderer$to_dataframe()
 
 states |>
   tidyr::pivot_longer(cols = ends_with("count"), names_to = "compartment", values_to = "value", names_pattern = "(.*)_count") |>
-  dplyr::mutate(
+  mutate(
     compartment = forcats::fct_relevel(compartment, "S", "E", "I", "R")
   ) |>
   ggplot(aes(x = timestep, y = value, col = compartment)) +
