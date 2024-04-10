@@ -63,12 +63,59 @@ create_processes <- function(
 #' @export
 create_SE_process <- function(variables_list, events_list, parameters_list){
 
+  ## Pre-calculating the things that only have to be calculated once
+
+  ##### HOUSEHOLDS #####
+  # Calculate the number of households:
+  num_households <- max(as.numeric(variables_list$household$get_categories()))
+
+  # Retrieve and store the indices of individuals in the i-th household
+  household_bitset_list <- vector(mode = "list", length = num_households)
+  household_index_list <- vector(mode = "list", length = num_households)
+  household_size_list <- vector(mode = "list", length = num_households)
+  for (i in seq(num_households)) {
+    household_bitset_list[[i]] <- variables_list$household$get_index_of(as.character(i))
+    household_index_list[[i]] <- household_bitset_list[[i]]$to_vector()
+    household_size_list[[i]] <- length(household_index_list[[i]])
+  }
+
+  ##### WORKPLACES #####
+  # Calculate the number of workplaces:
+  num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
+
+  # Retrieve and store the indices of individuals in the i-th household
+  workplace_bitset_list <- vector(mode = "list", length = num_workplaces)
+  workplace_index_list <- vector(mode = "list", length = num_workplaces)
+  workplace_size_list <- vector(mode = "list", length = num_workplaces)
+  for (i in seq(num_workplaces)) {
+    workplace_bitset_list[[i]] <- variables_list$workplace$get_index_of(as.character(i))
+    workplace_index_list[[i]] <- workplace_bitset_list[[i]]$to_vector()
+    workplace_size_list[[i]] <- length(workplace_index_list[[i]])
+  }
+
+  ##### SCHOOLS #####
+  # Calculate the number of schools:
+  num_schools <- max(as.numeric(variables_list$school$get_categories()))
+
+  # Retrieve and store the indices of individuals in the i-th household
+  school_bitset_list <- vector(mode = "list", length = num_schools)
+  school_index_list <- vector(mode = "list", length = num_schools)
+  school_size_list <- vector(mode = "list", length = num_workplaces)
+  for (i in seq(num_schools)) {
+    school_bitset_list[[i]] <- variables_list$school$get_index_of(as.character(i))
+    school_index_list[[i]] <- school_bitset_list[[i]]$to_vector()
+    school_size_list[[i]] <- length(school_index_list[[i]])
+  }
+
+  ## Process Function
   function(t) {
 
+    ## Timestep printing
     if (t %% 10 == 0) {
       print(paste0("timestep = ", (t * parameters_list$dt)))
     }
 
+    ## Bitset for all infectious individuals
     I <- variables_list$disease_state$get_index_of("I")
 
     #=== Household FOI ===#
@@ -76,23 +123,20 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
     # Open vector to store household FOIs experienced by each individual
     household_FOI <- vector(mode = "numeric", length = parameters_list$human_population)
 
-    # Store the number of households:
-    num_households <- max(as.numeric(variables_list$household$get_categories()))
-
     # Calculate the household FOI for each individual (if HH size = 1, FOI = 0)
     for (i in seq(num_households)) {
 
-      # Retrieve the indices of individuals in the i-th household
-      spec_household <- variables_list$household$get_index_of(as.character(i))
+      # Retrieve the bitset of individuals in the i-th household
+      spec_household <- household_bitset_list[[i]]
 
-      # Retrieve the indices of all infectious individuals in the i-th household
+      # Retrieve the bitset of all infectious individuals in the i-th household
       spec_household_I <- I$and(spec_household)
 
       #  Calculate the FOI for the i-th household
-      spec_household_FOI <- parameters_list$beta_household * spec_household_I$size() / spec_household$size() ## this calculation needs more in it
+      spec_household_FOI <- parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]] ## this calculation needs more in it
 
       # Assign the i-th households FOI to the indices of the individuals residing in that household
-      household_FOI[spec_household$to_vector()] <- spec_household_FOI
+      household_FOI[household_index_list[[i]]] <- spec_household_FOI
     }
 
     #=== Workplace FOI ===#
@@ -101,27 +145,20 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
     # Open an empty vector for the workplace FOI for each individual:
     workplace_FOI <- vector(mode = "numeric", length = parameters_list$human_population)
 
-    # Store the number of households:
-    num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
-
-    # Get the indices of all individuals with a workplace (0's have no workplace):
-    workplace_adults_only_var <- variables_list$workplace$get_index_of(as.character(1:max(num_workplaces)))
-    ## I think we can make this more efficient if we use workplace_adults_only_var below
-
     # For each workplace:
     for (i in seq(num_workplaces)) {
 
       # Get the indices of individuals that work in the i-th workplace:
-      spec_workplace <- variables_list$workplace$get_index_of(as.character(i))
+      spec_workplace <- workplace_bitset_list[[i]]
 
       # Get the indices of infectious individuals in the i-th workplace:
       spec_workplace_I <- I$and(spec_workplace)
 
       # Calculate the workplace-specific FOI of the i-th workplace:
-      spec_workplace_FOI <- parameters_list$beta_workplace * spec_workplace_I$size() / spec_workplace$size() ## this calculation needs more in it
+      spec_workplace_FOI <- parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]] ## this calculation needs more in it
 
       # Store the workplace-specific FOR in the indices of all individuals that work there:
-      workplace_FOI[spec_workplace$to_vector()] <- spec_workplace_FOI
+      workplace_FOI[workplace_index_list[[i]]] <- spec_workplace_FOI
     }
 
     #=== School FOI ===#
@@ -130,41 +167,25 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
     # Open empty vector to store each individuals school-specific FOI:
     school_FOI <- vector(mode = "numeric", length = parameters_list$human_population)
 
-    # Get the number of schools:
-    num_schools <- max(as.numeric(variables_list$school$get_categories()))
-
-    # Retrieve the index of all individuals with a school (0's have no school):
-    school_child_only_var <- variables_list$school$get_index_of(as.character(1:max(num_schools)))
-    ## I think we can make this more efficient if we use school_child_only_var below
-
     # For each school:
     for (i in seq(num_schools)) {
 
       # Retrieve the indices of children in the i-th school
-      spec_school <- variables_list$school$get_index_of(as.character(i))
+      spec_school <- school_bitset_list[[i]]
 
       # Retrieve the indices of all infectious individuals in the i-th school:
       spec_school_I <- I$and(spec_school)
 
       # Calculate the school-specific FOI for the i-th school:
-      spec_school_FOI <- parameters_list$beta_school * spec_school_I$size() / spec_school$size() ## this calculation needs more in it
+      spec_school_FOI <- parameters_list$beta_school * spec_school_I$size() / school_size_list ## this calculation needs more in it
 
       # Store the school-specific FOI at the indices of all children that attend it:
-      school_FOI[spec_school$to_vector()] <- spec_school_FOI
+      school_FOI[school_index_list[[i]]] <- spec_school_FOI
     }
 
     #=== Leisure FOI ===#
     #=====================#
-    ## IMPORTANT NOTE:
-    ## I think we can also possibly save computational cost generally by only doing all of the FOI calculations
-    ## for individuals who are susceptible. Unclear how much of a speed boost that will bring us.
-    ## Also - do we need to take into account fact some people might visit different times of the day? Leave this for now.
 
-    ## Only updating this on whole numbered timesteps (start of a new day)
-    # if (t == 1) {
-    #   leisure_settings_visited <- 0
-    #   leisure_visit <- rep(0, parameters$human_population)
-    # }
     if ((t * parameters_list$dt) == floor((t * parameters_list$dt))) {
 
       # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
@@ -180,14 +201,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
         leisure_visit[i] <- sample(x = unlist(potential_leisure_visits), size = 1)
       }
 
-      # Get all unique leisure settings actually visited in this timestep (NOTE: we need to change this to day)
-      leisure_settings_visited <- unique(leisure_visit)
-
-      # Update (strictly we're using "initialise" to reinitialise the variable each time, ask Giovanni if easier way of doing this)
-      # the temporary leisure variable to contain the leisure settings visited in that day
+      # Updating the leisure setting visited that day
+      # variables_list$specific_leisure$queue_update(value = as.character(leisure_visit),
+      #                                              index = as.integer(1:parameters_list$human_population))
       all_leisure_settings <- variables_list$specific_leisure$get_categories()
       variables_list$specific_leisure$initialize(categories = as.character(all_leisure_settings),
-                                            initial_values = as.character(leisure_visit)) #  update the states with leisure_visit for that day
+                                                 initial_values = as.character(leisure_visit)) #  update the states with leisure_visit for that day
     }
 
     # Open empty vector to store each individuals leisure-specific FOI:
