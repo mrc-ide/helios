@@ -47,19 +47,6 @@ task_result(id)
 task_info(id)
 task_log_watch(id)
 
-## Getting parallel version set up
-resources <- hipercow_resources(cores = 5)
-hipercow_environment_create(packages = c("helios", "individual"))
-
-id2 <- task_create_call(
-  fn = run_simulation,
-  args = list(parameters_list_of_lists),
-  parallel = hipercow_parallel("parallel"),
-  resources = resources)
-task_status(id2)
-task_log_watch(id2)
-task_result(id2)
-
 ## Create list of parameter lists
 params <- helios::get_parameters()
 list_params <- vector(mode = "list", length = 10)
