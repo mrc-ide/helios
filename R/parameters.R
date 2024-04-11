@@ -65,6 +65,7 @@ get_parameters <- function(overrides = list()) {
     dt = 0.5, # check this as default
     simulation_time = 150,
     household_distribution_generation = "empirical",
+    school_distribution_generation = "empirical",
     endemic_or_epidemic = "epidemic",
     duration_immune = NULL
   )
