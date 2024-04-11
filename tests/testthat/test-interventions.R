@@ -3,9 +3,6 @@ test_that("set_uvc errors if function given multiple settings in a single call",
   # Establish the list of model parameters:
   parameters <- get_parameters()
 
-  # Establish the list of model variables:
-  variables <- create_variables(parameters_list = parameters)
-
   # Check that set_uvc() errors when the setting input not either "workplace",
   # "school", or "leisure"
   expect_error(object = set_uvc(parameters_list = parameters,
@@ -19,13 +16,28 @@ test_that("set_uvc errors if function given multiple settings in a single call",
 
 })
 
-test_that("set_uvc() errors when setting input not from allowed list of Far UVC settings", {
+test_that("set_uvc errors if function given multiple coverage types in a single call", {
 
   # Establish the list of model parameters:
   parameters <- get_parameters()
 
-  # Establish the list of model variables:
-  variables <- create_variables(parameters_list = parameters)
+  # Check that set_uvc() errors when the setting input not either "workplace",
+  # "school", or "leisure"
+  expect_error(object = set_uvc(parameters_list = parameters,
+                                setting = "workplace",
+                                coverage = c(0.8),
+                                coverage_type = c("random", "targeted"),
+                                efficacy = c(0.8),
+                                timestep = c(1)),
+               regexp = "Error: Number of coverage types input greater than 1, parameterise for one coverage type at a time")
+
+
+})
+
+test_that("set_uvc() errors when setting input not from allowed list of Far UVC settings", {
+
+  # Establish the list of model parameters:
+  parameters <- get_parameters()
 
   # Check that set_uvc() errors when the setting input not either "workplace",
   # "school", or "leisure"
@@ -43,12 +55,6 @@ test_that("set_uvc() errors when coverage_type input not from allowed list of Fa
   # Establish the list of model parameters:
   parameters <- get_parameters()
 
-  # Establish the list of model variables:
-  variables <- create_variables(parameters_list = parameters)
-
-  # Establish the list of model events:
-  events <- create_events(variables_list = variables, parameters_list = parameters)
-
   # Check that set_uvc() errors when the setting input not either "workplace",
   # "school", or "leisure"
   expect_error(object = set_uvc(parameters_list = parameters,
@@ -58,6 +64,42 @@ test_that("set_uvc() errors when coverage_type input not from allowed list of Fa
                                 efficacy = c(0.8),
                                 timestep = c(1)),
                regexp = "Error: Input setting invalid - far UvC only deployable in random or targeted coverage types")
+})
+
+test_that("set_uvc errors if coverage not between 0 and 1", {
+
+  # Establish the list of model parameters:
+  parameters <- get_parameters()
+
+  # Check that set_uvc() errors when the setting input not either "workplace",
+  # "school", or "leisure"
+  expect_error(object = set_uvc(parameters_list = parameters,
+                                setting = "workplace",
+                                coverage = c(-0.8),
+                                coverage_type = c("targeted"),
+                                efficacy = c(0.8),
+                                timestep = c(1)),
+               regexp = "Error: coverage must take a value between 0 and 1")
+
+
+})
+
+test_that("set_uvc errors if efficacy not between 0 and 1", {
+
+  # Establish the list of model parameters:
+  parameters <- get_parameters()
+
+  # Check that set_uvc() errors when the setting input not either "workplace",
+  # "school", or "leisure"
+  expect_error(object = set_uvc(parameters_list = parameters,
+                                setting = "workplace",
+                                coverage = c(0.8),
+                                coverage_type = c("targeted"),
+                                efficacy = c(1.01),
+                                timestep = c(1)),
+               regexp = "Error: efficacy must take a value between 0 and 1")
+
+
 })
 
 test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and coverage types", {

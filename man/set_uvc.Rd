@@ -17,8 +17,6 @@ set_uvc(parameters_list, setting, coverage, coverage_type, efficacy, timestep)
 
 \item{timestep}{A numeric value describing the timestep in which Far UVC is deployed}
 
-\item{variables_list}{A list of model variables as generated using \code{create_variables}}
-
 \item{coverage_style}{A character describing the type of coverage (random or targeted)}
 }
 \description{
