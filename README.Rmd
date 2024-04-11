@@ -31,3 +31,8 @@ You can install the development version of `helios` from GitHub using:
 ``` r
 devtools::install_github("mrc-ide/helios")
 ```
+
+## Vignettes
+
+* [Get started](https://mrc-ide.github.io/helios/articles/helios.html) gives an introduction to use of the package
+* [An individual-based model for assessing far UVC interventions](https://mrc-ide.github.io/helios/articles/model.html) gives a more detailed description of the model

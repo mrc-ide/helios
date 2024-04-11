@@ -7,8 +7,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette presents the modelling approach used in `helios`.
-
 ```{r, include = FALSE}
 options(rmarkdown.html_vignette.check_title = FALSE)
 
@@ -18,6 +16,94 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(helios)
-```
+This vignette describes the modelling approach used in `helios`.
+For an introduction to practical use of the package, see the [Get started](https://mrc-ide.github.io/helios/articles/helios.html) vignette.
+
+## Population
+
+The population consists of a fixed number of individuals.
+Each individual has properties.
+Some properties remain constant over time, and others which change.
+
+## Age structure
+
+The age categories included in the model are children, adults, and the elderly.
+Each individual has a fixed age category, assumed not to change during the simulation, sampled from a categorical distribution at initialisation.
+
+## Households
+
+Households are comprised of collections of one or more individuals.
+Household sizes are drawn from a Poisson distribution with rate parameter `mean_household_size`.
+Individuals are assigned to households, ensuring that no household contains only children by pairing an adult to each child assigned to a household without any existing adults.
+
+## Workplaces
+
+Workplaces are attended by adults.
+The sizes of workplaces are drawn from an offset truncated power distribution.
+Assignment of adults to particular workplaces is done using random sampling without replacement.
+
+## Schools
+
+Schools are attended by children.
+The sizes of schools are drawn from a log-normal distribution.
+Assignment of children to particular schools is  done using random sampling without replacement.
+
+## Leisure
+
+Leisure venues are attended by all individuals.
+Leisure venue sizes are drawn from a negative binomial distribution.
+The number of leisure visits per person per week is drawn from a Poisson distribution, truncated at 7 corresponding to one leisure visit every day.
+The locations for each individual's leisure visits are sampled without replacement with probability proportional to leisure venue size.
+
+## Community mixing
+
+Overall community mixing is implemented via some mechanism.
+
+## Interventions
+
+To be described once implemented!
+
+## Disease states
+
+We consider a SEIR compartmental model with susceptible, exposed, infectious, and recovered disease states.
+At a given time, each individual is in exactly one of the states $\{S, E, I, R\}$.
+Transitions between states are simulated as follows.
+
+### Transition from state $S \to E$
+
+The total force of infection $\lambda$ for each individual is a sum of household, workplace, school, leisure, and community specific force of infections
+$$
+\lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l + \lambda_c.
+$$
+The location specific force of infection terms are given as:
+
+* Household $\lambda_h$: ...
+* Workplace  $\lambda_w$: ...
+* School $\lambda_s$: ...
+* Leisure $\lambda_l$: ...
+* Community $\lambda_c$: ...
+
+The probability of infection in a given time step $\delta > 0$ is
+$$
+\mathbb{P}(S \to E) = 1 - \exp(\lambda \delta)
+$$
+
+### Transition from state $E \to I$
+
+Individuals progress from exposed to infectious with a random delay $d \geq 1$ such that
+$$
+c \sim \text{Gamma}(2\gamma, 2), \\
+d = \text{round}(c + 1).
+$$
+where $\gamma > 0$ is the duration exposed which we set to 2.
+The delay $d$ is a number of time steps $\delta$.
+
+### Transition from state $I \to R$
+
+Individuals progress from infectious to recovered after a random disease duration $f \geq 1$ such that
+$$
+e \sim \text{Gamma}(2\upsilon, 2), \\
+f = \text{round}(e + 1).
+$$
+where $\upsilon$ is the duration of infectiousness which we set to 4.
+The disease duration $f$ is a number of time steps $\delta$.

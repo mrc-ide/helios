@@ -61,25 +61,22 @@
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="EI_process.html">EI_process()</a></code> </p>
+          <p><code><a href="create_EI_process.html">create_EI_process()</a></code> </p>
         </td>
         <td><p>Create the process governing the transition of exposed individuals to the infectious disease state:</p></td>
       </tr><tr><td>
-          <p><code><a href="IR_process.html">IR_process()</a></code> </p>
+          <p><code><a href="create_IR_process.html">create_IR_process()</a></code> </p>
         </td>
         <td><p>Create the process governing the transition of infectious individuals to recovered disease state:</p></td>
       </tr><tr><td>
-          <p><code><a href="SE_process.html">SE_process()</a></code> </p>
+          <p><code><a href="create_SE_process.html">create_SE_process()</a></code> </p>
         </td>
         <td><p>Create the process governing the transition of susceptible individuals to the exposed disease state:</p></td>
       </tr><tr><td>
-          <p><code><a href="add_event_listeners.html">add_event_listeners()</a></code> </p>
-        </td>
-        <td><p>Attach listener functions to event-based processes</p></td>
-      </tr><tr><td>
           <p><code><a href="create_events.html">create_events()</a></code> </p>
         </td>
-        <td><p>Generate a list of the model events</p></td>
+        <td><p>Generate a list of the model events and add listeners. Listeners are arbitrary functions called
+when the event is fired with the current time step, t, as their only arguments.</p></td>
       </tr><tr><td>
           <p><code><a href="create_processes.html">create_processes()</a></code> </p>
         </td>
@@ -118,6 +115,10 @@ that the person stays in on that day.</p></td>
           <p><code><a href="get_parameters.html">get_parameters()</a></code> </p>
         </td>
         <td><p>Establish the list of model parameters</p></td>
+      </tr><tr><td>
+          <p><code><a href="run_simulation.html">run_simulation()</a></code> </p>
+        </td>
+        <td><p>Run the simulation</p></td>
       </tr><tr><td>
           <p><code><a href="sample_log_normal.html">sample_log_normal()</a></code> </p>
         </td>
