@@ -135,8 +135,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       # Retrieve the bitset of all infectious individuals in the i-th household
       spec_household_I <- I$and(spec_household)
 
-      #  Calculate the FOI for the i-th household
-      spec_household_FOI <- parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]] ## this calculation needs more in it
+      #  Calculate the FOI for the i-th household - with and without farUVC installed
+      if ((variables_list$uvc_household[i] == 1) & (t > parameters_list$far_uvc_household_timestep)) {
+        spec_household_FOI <- (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]) ## this calculation needs more in it
+      } else {
+        spec_household_FOI <- parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]] ## this calculation needs more in it
+      }
 
       # Assign the i-th households FOI to the indices of the individuals residing in that household
       household_FOI[household_index_list[[i]]] <- spec_household_FOI
@@ -157,8 +161,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       # Get the indices of infectious individuals in the i-th workplace:
       spec_workplace_I <- I$and(spec_workplace)
 
-      # Calculate the workplace-specific FOI of the i-th workplace:
-      spec_workplace_FOI <- parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]] ## this calculation needs more in it
+      # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
+      if ((variables_list$uvc_workplace[i] == 1) & (t > parameters_list$far_uvc_workplace_timestep)) {
+        spec_workplace_FOI <- (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]) ## this calculation needs more in it
+      } else {
+        spec_workplace_FOI <- parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]] ## this calculation needs more in it
+      }
 
       # Store the workplace-specific FOR in the indices of all individuals that work there:
       workplace_FOI[workplace_index_list[[i]]] <- spec_workplace_FOI
@@ -179,8 +187,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       # Retrieve the indices of all infectious individuals in the i-th school:
       spec_school_I <- I$and(spec_school)
 
-      # Calculate the school-specific FOI for the i-th school:
-      spec_school_FOI <- parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]] ## this calculation needs more in it
+      # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
+      if ((variables_list$uvc_school[i] == 1) & (t > parameters_list$far_uvc_school_timestep)) {
+        spec_school_FOI <- (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]) ## this calculation needs more in it
+      } else {
+        spec_school_FOI <- parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]] ## this calculation needs more in it
+      }
 
       # Store the school-specific FOI at the indices of all children that attend it:
       school_FOI[school_index_list[[i]]] <- spec_school_FOI
@@ -231,8 +243,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
         # Retrieve the indices of all infectious individuals in the particular leisure setting being considered
         spec_leisure_I <- I$and(spec_leisure)
 
-        # Calculate the school-specific FOI for the i-th leisure setting:
-        spec_leisure_FOI <- parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+        # Calculate the leisure-specific FOI for the i-th leisure setting - with and without farUVC installed
+        if ((variables_list$uvc_leisure[i] == 1) & (t > parameters_list$far_uvc_leisure_timestep)) {
+          spec_leisure_FOI <- (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
+        } else {
+          spec_leisure_FOI <- parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+        }
 
         # Store the leisure setting-specific FOI at the indices of all individuals that attend it:
         leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
