@@ -22,7 +22,7 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_type, efficacy,
 
   # Ensure input setting is from the allowed options
   if(setting != "workplace" & setting != "school" & setting != "leisure" & setting != "household") {
-    stop("Error: Input setting invalid - far UvC only deployable in workplace, school, leisure, or household settings")
+    stop("Error: Input setting invalid - far UVC only deployable in workplace, school, leisure, or household settings")
   }
 
   # Ensure the coverage type is from the allowed options:
