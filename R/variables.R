@@ -100,39 +100,95 @@ create_variables <- function(parameters_list) {
 
     # Get the number of workplaces:
     number_of_workplaces <- length(variables_list$workplace$get_categories())
+
+    # Open a vector to store the workplace UVC on/off values:
     uvc_workplace <- rep(0, number_of_workplaces)
+
+    # Calculate the number of workplaces that will have Far UVC:
     number_of_workplaces_with_uvc <- floor(parameters_list$far_uvc_workplace_coverage * number_of_workplaces)
 
     # If coverage type is random, assign workplaces at random:
     if(parameters_list$far_uvc_workplace_coverage_type == "random") {
+
+      # Sample the indices of workplaces to have Far UVC at random:
       indices_of_workplaces_with_uvc <- sample.int(n = number_of_workplaces,
                                                    size = number_of_workplaces_with_uvc,
                                                    replace = FALSE)
+
+      # Insert 1's at the indices of workplaces selected to have Far-UVC:
       uvc_workplace[indices_of_workplaces_with_uvc] <- 1
+
+      # Append the vector of workplace UVC on/off values to the variables_list:
       variables_list$uvc_workplace <- uvc_workplace
     }
 
     # If coverage type is targeted, assign UVC to the most populous workplaces:
     if(parameters_list$far_uvc_workplace_coverage_type == "targeted") {
 
+      # Get the indices of the indices of workplaces with Far UVC based on their sizes:
+      indices_of_workplaces_with_uvc <- sort(x = variables_list$setting_sizes$workplace,
+                                             decreasing = T,
+                                             index.return = TRUE)$ix[1:number_of_workplaces_with_uvc]
+
+      # Insert 1's at the indices of workplaces selected to have Far-UVC:
+      uvc_workplace[indices_of_workplaces_with_uvc] <- 1
+
+      # Append the vector of workplace UVC on/off values to the variables_list:
+      variables_list$uvc_workplace <- uvc_workplace
+
     }
   }
 
-  # # Parameterise Far UVC in the school setting:
-  # if(parameters_list$far_uvc_school) {
-  #   if(coverage_type == "random") {
-  #   }
-  #   if(coverage_type == "targeted") {
-  #   }
-  # }
-  #
-  # # Parameterise Far UVC in the leisure setting:
-  # if(parameters_list$far_uvc_leisure) {
-  #   if(coverage_type == "random") {
-  #   }
-  #   if(coverage_type == "targeted") {
-  #   }
-  # }
+  # Parameterise Far UVC in the school setting:
+  if(parameters_list$far_uvc_school) {
+
+    # Get the number of schools:
+    number_of_schools <- length(variables_list$school$get_categories())
+
+    # Open a vector to store the school UVC on/off values:
+    uvc_school <- rep(0, number_of_schools)
+
+    # Calculate the number of schools that will have Far UVC:
+    number_of_schools_with_uvc <- floor(parameters_list$far_uvc_school_coverage * number_of_schools)
+
+    if(coverage_type == "random") {
+
+      # Sample the indices of schools to have Far UVC at random:
+      indices_of_schools_with_uvc <- sample.int(n = number_of_schools,
+                                                   size = number_of_schools_with_uvc,
+                                                   replace = FALSE)
+
+      # Insert 1's at the indices of schools selected to have Far-UVC:
+      uvc_school[indices_of_schools_with_uvc] <- 1
+
+      # Append the vector of school UVC on/off values to the variables_list:
+      variables_list$uvc_school <- uvc_school
+
+    }
+
+    if(coverage_type == "targeted") {
+
+      # Get the indices of the indices of schools with Far UVC based on their sizes:
+      indices_of_schools_with_uvc <- sort(x = variables_list$setting_sizes$school,
+                                             decreasing = T,
+                                             index.return = TRUE)$ix[1:number_of_workplaces_with_uvc]
+
+      # Insert 1's at the indices of workplaces selected to have Far-UVC:
+      uvc_school[indices_of_schools_with_uvc] <- 1
+
+      # Append the vector of workplace UVC on/off values to the variables_list:
+      variables_list$uvc_school <- uvc_school
+
+    }
+  }
+
+  # Parameterise Far UVC in the leisure setting:
+  if(parameters_list$far_uvc_leisure) {
+    if(coverage_type == "random") {
+    }
+    if(coverage_type == "targeted") {
+    }
+  }
   #
   # # Parameterise Far UVC in the household setting:
   # if(parameters_list$far_uvc_household) {
