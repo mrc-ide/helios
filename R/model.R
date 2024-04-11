@@ -4,7 +4,7 @@
 #' @param timesteps An integer representing the number of timesteps to simulate
 #'
 #' @export
-run_simulation <- function(parameters_list, timesteps) {
+run_simulation <- function(parameters_list) {
 
   # Generate the model variables:
   variables_list <- create_variables(parameters_list)
