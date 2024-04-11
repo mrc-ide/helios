@@ -16,7 +16,7 @@ create_variables <- function(parameters_list) {
   if (parameters_list$household_distribution_generation == "empirical") {
 
     # Bootstrap sampling of households from ONS 2011 Census reference panel of household sizes and age composition
-    household_age_list <- generate_initial_households_boostrap(parameters_list = parameters_list)
+    household_age_list <- generate_initial_households_bootstrap(parameters_list = parameters_list)
 
     # Initialise and populate the age class variable:
     age_classes <- c("child", "adult", "elderly")
@@ -443,7 +443,7 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
 #' @param age_class_variable An `individual::CategoricalVariable` for the age classes
 #'
 #' @export
-generate_initial_households_boostrap <- function(parameters_list) {
+generate_initial_households_bootstrap <- function(parameters_list) {
 
   ## Processing Hinch et al to match our age-classes
   ref_panel <- read.csv("data/Hinch_et_al_baseline_household_demographics.csv")
