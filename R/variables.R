@@ -27,7 +27,7 @@ create_variables <- function(parameters_list) {
     household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(household_age_list$individual_households)),
                                                               initial_values = as.character(household_age_list$individual_households))
 
-  ## If user wants to specify age-class proportions manually
+  ## If user wants to specify age-class proportions and associated household distribution manually
   } else {
 
     # Initialise and populate the age class variable:
@@ -45,22 +45,22 @@ create_variables <- function(parameters_list) {
   # Initialise and populate the workplace setting variable:
   initial_workplace_settings <- generate_initial_workplaces(parameters_list = parameters_list, age_class_variable = age_class_variable)
   num_workplaces <- max(as.numeric(initial_workplace_settings))
-  if(num_workplaces <= 2) message("There are less than or equal to 2 workplaces. Consider the population size may be too small!")
-
+  if(num_workplaces <= 2) {
+    message("There are less than or equal to 2 workplaces. Consider the population size may be too small!")
+  }
   workplace_variable <- CategoricalVariable$new(categories = as.character(0:num_workplaces),
                                                 initial_values = initial_workplace_settings)
 
-  # Initialise and populate the school setting variable:
-
-  if (parameters_list$school_distribution_generation == "empirical") {
+  # Initialise and populate the school setting variable
+  if (parameters_list$school_distribution_generation == "empirical") { # using empirical distribution of school sizes from ONS
     initial_school_settings <- generate_initial_schools_bootstrap(parameters_list = parameters_list, age_class_variable = age_class_variable)
-  } else {
+  } else {                                                             # using manually defined distribution of school sizes
     initial_school_settings <- generate_initial_schools(parameters_list = parameters_list, age_class_variable = age_class_variable)
   }
-
   num_schools <- max(as.numeric(initial_school_settings))
-  if(num_schools <= 2) message("There are less than or equal to 2 schools. Consider the population size may be too small!")
-
+  if(num_schools <= 2) {
+    message("There are less than or equal to 2 schools. Consider the population size may be too small!")
+  }
   school_variable <- CategoricalVariable$new(categories = as.character(0:num_schools),
                                              initial_values = initial_school_settings)
 
@@ -292,16 +292,19 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
   school_sizes <- c()
   remaining <- num_children
 
+  # Sampling schools and calculating the number of children remaining to allocate
   while(remaining > 0) {
     draw <- sample(empirical_school_sizes, size = 1)
     school_sizes <- c(school_sizes, draw)
     remaining <- remaining - draw
   }
 
+  # Correcting for instances where we overflow above the total number of children
   if(sum(school_sizes) >= num_children) {
     school_sizes[length(school_sizes)] <- school_sizes[length(school_sizes)] - (sum(school_sizes) - num_children)
   }
 
+  # Creating schools assignment vector and randomising the ordering
   school_indices <- unlist(sapply(1:length(school_sizes), function(i) rep(as.character(i), school_sizes[i])))
   child_school_assignments <- sample(school_indices, replace = FALSE)
 
