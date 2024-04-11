@@ -141,7 +141,6 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
         if ((variables_list$uvc_household[i] == 1) & (t > parameters_list$far_uvc_household_timestep)) {
           spec_household_FOI <- (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]) ## this calculation needs more in it
         }
-      }
       } else {
         spec_household_FOI <- parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]] ## this calculation needs more in it
       }
