@@ -45,6 +45,8 @@ create_variables <- function(parameters_list) {
   # Initialise and populate the workplace setting variable:
   initial_workplace_settings <- generate_initial_workplaces(parameters_list = parameters_list, age_class_variable = age_class_variable)
   num_workplaces <- max(as.numeric(initial_workplace_settings))
+  if(num_workplaces <= 2) message("There are less than or equal to 2 workplaces. Consider the population size may be too small!")
+
   workplace_variable <- CategoricalVariable$new(categories = as.character(0:num_workplaces),
                                                 initial_values = initial_workplace_settings)
 
@@ -57,6 +59,8 @@ create_variables <- function(parameters_list) {
   }
 
   num_schools <- max(as.numeric(initial_school_settings))
+  if(num_schools <= 2) message("There are less than or equal to 2 schools. Consider the population size may be too small!")
+
   school_variable <- CategoricalVariable$new(categories = as.character(0:num_schools),
                                              initial_values = initial_school_settings)
 
