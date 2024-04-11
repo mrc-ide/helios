@@ -16,25 +16,25 @@ get_setting_sizes <- function(variables_list, leisure_sizes) {
   # Open list to store the vectors of setting population sizes:
   setting_populations <- list()
 
-  # Retrieve the workplace populations
+  # Retrieve the workplace sizes
   workplace_sizes <- vector()
-  workplaces <- 1:max(as.numeric(variables_list$workplace$get_categories()))
+  workplaces <- 1:max(as.numeric(variables_list$workplace_variable$get_categories()))
   for(i in workplaces) {
-    workplace_sizes[i] <- variables_list$workplace$get_size_of(as.character(i))
+    workplace_sizes[i] <- variables_list$workplace_variable$get_size_of(as.character(i))
   }
 
-  # Retrieve the school populations
+  # Retrieve the school sizes
   school_sizes <- vector()
-  schools <- 1:max(as.numeric(variables_list$school$get_categories()))
+  schools <- 1:max(as.numeric(variables_list$school_variable$get_categories()))
   for(i in schools) {
-    school_sizes[i] <- variables_list$school$get_size_of(as.character(i))
+    school_sizes[i] <- variables_list$school_variable$get_size_of(as.character(i))
   }
 
-  # Retrieve the household populations
+  # Retrieve the household sizes
   household_sizes <- vector()
-  households <- 1:max(as.numeric(variables_list$household$get_categories()))
+  households <- 1:max(as.numeric(variables_list$household_variable$get_categories()))
   for(i in households) {
-    household_sizes[i] <- variables_list$household$get_size_of(as.character(i))
+    household_sizes[i] <- variables_list$household_variable$get_size_of(as.character(i))
   }
 
   # Populate the list of workplace populations:
@@ -44,6 +44,6 @@ get_setting_sizes <- function(variables_list, leisure_sizes) {
   setting_populations$household <- household_sizes
 
   # Return the list of setting populations:
-  setting_populations
+  return(setting_populations)
 
 }
