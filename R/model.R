@@ -8,6 +8,8 @@ run_simulation <- function(parameters_list) {
 
   # Generate the model variables:
   variables_list <- create_variables(parameters_list)
+  parameters_list <- variables_list$parameters_list
+  variables_list <- variables_list$variables_list
 
   # Generate the model events:
   events_list <- create_events(variables_list = variables_list, parameters_list = parameters_list)

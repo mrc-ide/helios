@@ -92,7 +92,7 @@ create_variables <- function(parameters_list) {
                                        leisure_sizes = leisure_setting_sizes)
 
     # Append setting sizes to variables_list:
-    variables_list$setting_sizes <- setting_sizes
+    parameters_list$setting_sizes <- setting_sizes
   }
 
   # Parameterise Far UVC in the workplace setting:
@@ -119,7 +119,7 @@ create_variables <- function(parameters_list) {
       uvc_workplace[indices_of_workplaces_with_uvc] <- 1
 
       # Append the vector of workplace UVC on/off values to the variables_list:
-      variables_list$uvc_workplace <- uvc_workplace
+      parameters_list$uvc_workplace <- uvc_workplace
 
     }
 
@@ -136,7 +136,7 @@ create_variables <- function(parameters_list) {
       uvc_workplace[indices_of_workplaces_with_uvc] <- 1
 
       # Append the vector of workplace UVC on/off values to the variables_list:
-      variables_list$uvc_workplace <- uvc_workplace
+      parameters_list$uvc_workplace <- uvc_workplace
 
     }
   }
@@ -165,7 +165,7 @@ create_variables <- function(parameters_list) {
       uvc_school[indices_of_schools_with_uvc] <- 1
 
       # Append the vector of school UVC on/off values to the variables_list:
-      variables_list$uvc_school <- uvc_school
+      parameters_list$uvc_school <- uvc_school
 
     }
     # If coverage type is targeted, assign UVC to the most populous schools:
@@ -181,7 +181,7 @@ create_variables <- function(parameters_list) {
       uvc_school[indices_of_schools_with_uvc] <- 1
 
       # Append the vector of school UVC on/off values to the variables_list:
-      variables_list$uvc_school <- uvc_school
+      parameters_list$uvc_school <- uvc_school
 
     }
   }
@@ -210,7 +210,7 @@ create_variables <- function(parameters_list) {
       uvc_leisure[indices_of_leisures_with_uvc] <- 1
 
       # Append the vector of leisure UVC on/off values to the variables_list:
-      variables_list$uvc_leisure <- uvc_leisure
+      parameters_list$uvc_leisure <- uvc_leisure
 
     }
     # If coverage type is targeted, assign UVC to the most populous leisure settings:
@@ -226,7 +226,7 @@ create_variables <- function(parameters_list) {
       uvc_leisure[indices_of_leisures_with_uvc] <- 1
 
       # Append the vector of leisure setting UVC on/off values to the variables_list:
-      variables_list$uvc_leisure <- uvc_leisure
+      parameters_list$uvc_leisure <- uvc_leisure
 
     }
   }
@@ -255,7 +255,7 @@ create_variables <- function(parameters_list) {
       uvc_household[indices_of_households_with_uvc] <- 1
 
       # Append the vector of household UVC on/off values to the variables_list:
-      variables_list$uvc_household <- uvc_household
+      parameters_list$uvc_household <- uvc_household
 
     }
 
@@ -271,13 +271,14 @@ create_variables <- function(parameters_list) {
       uvc_household[indices_of_households_with_uvc] <- 1
 
       # Append the vector of leisure setting UVC on/off values to the variables_list:
-      variables_list$uvc_household <- uvc_household
+      parameters_list$uvc_household <- uvc_household
 
     }
   }
 
   # Return the list of model variables:
-  return(variables_list)
+  return(list(variables_list = variables_list,
+              parameters_list = parameters_list))
 
 }
 
