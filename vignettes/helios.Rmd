@@ -37,7 +37,14 @@ In this vignette, we set the `human_population` to 1000.
 Otherwise, we use the default options:
 
 ```{r}
-parameters_list <- get_parameters(list(human_population = 1000, seed = 1))
+parameters_list <- get_parameters(
+  list(
+    human_population = 1000,
+    seed = 1,
+    household_distribution_generation = "sampling",
+    school_distribution_generation = "sampling"
+  )
+)
 ```
 
 The names of all parameters are as follows:
@@ -101,6 +108,7 @@ Each adult attends a fixed workplace:
 
 ```{r}
 workplaces <- variables_list$workplace$get_categories()
+workplaces <- workplaces[workplaces != "0"]
 workplace_sizes <- purrr::map_vec(workplaces, function(x) variables_list$workplace$get_size_of(values = x))
 
 data.frame(workplace_sizes) |>
@@ -115,6 +123,7 @@ Each child attends a fixed school:
 
 ```{r}
 schools <- variables_list$school$get_categories()
+schools <- schools[schools != "0"]
 school_sizes <- purrr::map_vec(schools, function(x) variables_list$school$get_size_of(values = x))
 
 data.frame(school_sizes) |>
