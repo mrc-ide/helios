@@ -40,11 +40,6 @@ create_processes <- function(
   }
 
   # ===============================
-  # Intervention processes
-  # ===============================
-
-
-  # ===============================
   # Rendering processes
   # ===============================
   # health_render_process
