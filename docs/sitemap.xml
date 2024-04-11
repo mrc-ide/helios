@@ -46,6 +46,9 @@
     <loc>/reference/create_IR_process.html</loc>
   </url>
   <url>
+    <loc>/reference/create_RS_process.html</loc>
+  </url>
+  <url>
     <loc>/reference/create_SE_process.html</loc>
   </url>
   <url>
@@ -67,10 +70,16 @@
     <loc>/reference/generate_initial_households.html</loc>
   </url>
   <url>
+    <loc>/reference/generate_initial_households_bootstrap.html</loc>
+  </url>
+  <url>
     <loc>/reference/generate_initial_leisure.html</loc>
   </url>
   <url>
     <loc>/reference/generate_initial_schools.html</loc>
+  </url>
+  <url>
+    <loc>/reference/generate_initial_schools_bootstrap.html</loc>
   </url>
   <url>
     <loc>/reference/generate_initial_workplaces.html</loc>
