@@ -137,8 +137,11 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       spec_household_I <- I$and(spec_household)
 
       #  Calculate the FOI for the i-th household - with and without farUVC installed
-      if ((variables_list$uvc_household[i] == 1) & (t > parameters_list$far_uvc_household_timestep)) {
-        spec_household_FOI <- (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]) ## this calculation needs more in it
+      if (parameters_list$far_uvc_household) {
+        if ((variables_list$uvc_household[i] == 1) & (t > parameters_list$far_uvc_household_timestep)) {
+          spec_household_FOI <- (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]) ## this calculation needs more in it
+        }
+      }
       } else {
         spec_household_FOI <- parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]] ## this calculation needs more in it
       }
@@ -163,8 +166,10 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       spec_workplace_I <- I$and(spec_workplace)
 
       # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
-      if ((variables_list$uvc_workplace[i] == 1) & (t > parameters_list$far_uvc_workplace_timestep)) {
-        spec_workplace_FOI <- (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]) ## this calculation needs more in it
+      if (parameters_list$far_uvc_workplace) {
+        if ((variables_list$uvc_workplace[i] == 1) & (t > parameters_list$far_uvc_workplace_timestep)) {
+          spec_workplace_FOI <- (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]) ## this calculation needs more in it
+        }
       } else {
         spec_workplace_FOI <- parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]] ## this calculation needs more in it
       }
@@ -189,8 +194,10 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       spec_school_I <- I$and(spec_school)
 
       # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
-      if ((variables_list$uvc_school[i] == 1) & (t > parameters_list$far_uvc_school_timestep)) {
-        spec_school_FOI <- (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]) ## this calculation needs more in it
+      if (parameters_list$far_uvc_school) {
+        if ((variables_list$uvc_school[i] == 1) & (t > parameters_list$far_uvc_school_timestep)) {
+          spec_school_FOI <- (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]) ## this calculation needs more in it
+        }
       } else {
         spec_school_FOI <- parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]] ## this calculation needs more in it
       }
@@ -245,8 +252,10 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
         spec_leisure_I <- I$and(spec_leisure)
 
         # Calculate the leisure-specific FOI for the i-th leisure setting - with and without farUVC installed
-        if ((variables_list$uvc_leisure[i] == 1) & (t > parameters_list$far_uvc_leisure_timestep)) {
-          spec_leisure_FOI <- (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
+        if (parameters_list$far_uvc_leisure) {
+          if ((variables_list$uvc_leisure[i] == 1) & (t > parameters_list$far_uvc_leisure_timestep)) {
+            spec_leisure_FOI <- (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
+          }
         } else {
           spec_leisure_FOI <- parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
         }
