@@ -363,4 +363,3 @@ create_RS_process <- function(variables_list, events_list, parameters_list) {
 
   }
 }
-
