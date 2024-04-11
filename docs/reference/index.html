@@ -69,6 +69,10 @@
         </td>
         <td><p>Create the process governing the transition of infectious individuals to recovered disease state:</p></td>
       </tr><tr><td>
+          <p><code><a href="create_RS_process.html">create_RS_process()</a></code> </p>
+        </td>
+        <td><p>Create the process governing the transition of recovered (and immune) individuals back to susceptible state:</p></td>
+      </tr><tr><td>
           <p><code><a href="create_SE_process.html">create_SE_process()</a></code> </p>
         </td>
         <td><p>Create the process governing the transition of susceptible individuals to the exposed disease state:</p></td>
@@ -98,6 +102,14 @@ when the event is fired with the current time step, t, as their only arguments.<
         </td>
         <td><p>Generates a vector of households for all individuals in the population</p></td>
       </tr><tr><td>
+          <p><code><a href="generate_initial_households_bootstrap.html">generate_initial_households_bootstrap()</a></code> </p>
+        </td>
+        <td><p>Generates a vector of households for all individuals in the population
+Alternative to generate_initial_households where instead households
+are generated through bootstrapping of reference panel from ONS 2011 data
+(see Hinch et al for further details). Note this is different as it generates
+both the household and age class assignments together.</p></td>
+      </tr><tr><td>
           <p><code><a href="generate_initial_leisure.html">generate_initial_leisure()</a></code> </p>
         </td>
         <td><p>Generates a list of leisure settings that each individual visits, for all individuals in the population
@@ -105,6 +117,10 @@ Each element of this list indicates which settings each individual visits on whi
 that the person stays in on that day.</p></td>
       </tr><tr><td>
           <p><code><a href="generate_initial_schools.html">generate_initial_schools()</a></code> </p>
+        </td>
+        <td><p>Gets school assignments for all individuals</p></td>
+      </tr><tr><td>
+          <p><code><a href="generate_initial_schools_bootstrap.html">generate_initial_schools_bootstrap()</a></code> </p>
         </td>
         <td><p>Gets school assignments for all individuals</p></td>
       </tr><tr><td>
