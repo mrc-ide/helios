@@ -89,15 +89,129 @@ interventions</h1>
 
     
     
-<p>This vignette presents the modelling approach used in
-<code>helios</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">helios</span><span class="op">)</span></span></code></pre></div>
+<p>This vignette describes the modelling approach used in
+<code>helios</code>. For an introduction to practical use of the
+package, see the <a href="https://mrc-ide.github.io/helios/articles/helios.html" class="external-link">Get
+started</a> vignette.</p>
+<div class="section level2">
+<h2 id="population">Population<a class="anchor" aria-label="anchor" href="#population"></a>
+</h2>
+<p>The population consists of a fixed number of individuals. Each
+individual has properties. Some properties remain constant over time,
+and others which change.</p>
+</div>
+<div class="section level2">
+<h2 id="age-structure">Age structure<a class="anchor" aria-label="anchor" href="#age-structure"></a>
+</h2>
+<p>The age categories included in the model are children, adults, and
+the elderly. Each individual has a fixed age category, assumed not to
+change during the simulation, sampled from a categorical distribution at
+initialisation.</p>
+</div>
+<div class="section level2">
+<h2 id="households">Households<a class="anchor" aria-label="anchor" href="#households"></a>
+</h2>
+<p>Households are comprised of collections of one or more individuals.
+Household sizes are drawn from a Poisson distribution with rate
+parameter <code>mean_household_size</code>. Individuals are assigned to
+households, ensuring that no household contains only children by pairing
+an adult to each child assigned to a household without any existing
+adults.</p>
+</div>
+<div class="section level2">
+<h2 id="workplaces">Workplaces<a class="anchor" aria-label="anchor" href="#workplaces"></a>
+</h2>
+<p>Workplaces are attended by adults. The sizes of workplaces are drawn
+from an offset truncated power distribution. Assignment of adults to
+particular workplaces is done using random sampling without
+replacement.</p>
+</div>
+<div class="section level2">
+<h2 id="schools">Schools<a class="anchor" aria-label="anchor" href="#schools"></a>
+</h2>
+<p>Schools are attended by children. The sizes of schools are drawn from
+a log-normal distribution. Assignment of children to particular schools
+is done using random sampling without replacement.</p>
+</div>
+<div class="section level2">
+<h2 id="leisure">Leisure<a class="anchor" aria-label="anchor" href="#leisure"></a>
+</h2>
+<p>Leisure venues are attended by all individuals. Leisure venue sizes
+are drawn from a negative binomial distribution. The number of leisure
+visits per person per week is drawn from a Poisson distribution,
+truncated at 7 corresponding to one leisure visit every day. The
+locations for each individual’s leisure visits are sampled without
+replacement with probability proportional to leisure venue size.</p>
+</div>
+<div class="section level2">
+<h2 id="community-mixing">Community mixing<a class="anchor" aria-label="anchor" href="#community-mixing"></a>
+</h2>
+<p>Overall community mixing is implemented via some mechanism.</p>
+</div>
+<div class="section level2">
+<h2 id="interventions">Interventions<a class="anchor" aria-label="anchor" href="#interventions"></a>
+</h2>
+<p>To be described once implemented!</p>
+</div>
+<div class="section level2">
+<h2 id="disease-states">Disease states<a class="anchor" aria-label="anchor" href="#disease-states"></a>
+</h2>
+<p>We consider a SEIR compartmental model with susceptible, exposed,
+infectious, and recovered disease states. At a given time, each
+individual is in exactly one of the states <span class="math inline">\(\{S, E, I, R\}\)</span>. Transitions between
+states are simulated as follows.</p>
+<div class="section level3">
+<h3 id="transition-from-state-s-to-e">Transition from state <span class="math inline">\(S \to
+E\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-s-to-e"></a>
+</h3>
+<p>The total force of infection <span class="math inline">\(\lambda\)</span> for each individual is a sum of
+household, workplace, school, leisure, and community specific force of
+infections <span class="math display">\[
+\lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l + \lambda_c.
+\]</span> The location specific force of infection terms are given
+as:</p>
+<ul>
+<li>Household <span class="math inline">\(\lambda_h\)</span>: …</li>
+<li>Workplace <span class="math inline">\(\lambda_w\)</span>: …</li>
+<li>School <span class="math inline">\(\lambda_s\)</span>: …</li>
+<li>Leisure <span class="math inline">\(\lambda_l\)</span>: …</li>
+<li>Community <span class="math inline">\(\lambda_c\)</span>: …</li>
+</ul>
+<p>The probability of infection in a given time step <span class="math inline">\(\delta &gt; 0\)</span> is <span class="math display">\[
+\mathbb{P}(S \to E) = 1 - \exp(\lambda \delta)
+\]</span></p>
+</div>
+<div class="section level3">
+<h3 id="transition-from-state-e-to-i">Transition from state <span class="math inline">\(E \to
+I\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-e-to-i"></a>
+</h3>
+<p>Individuals progress from exposed to infectious with a random delay
+<span class="math inline">\(d \geq 1\)</span> such that <span class="math display">\[
+c \sim \text{Gamma}(2\gamma, 2), \\
+d = \text{round}(c + 1).
+\]</span> where <span class="math inline">\(\gamma &gt; 0\)</span> is
+the duration exposed which we set to 2. The delay <span class="math inline">\(d\)</span> is a number of time steps <span class="math inline">\(\delta\)</span>.</p>
+</div>
+<div class="section level3">
+<h3 id="transition-from-state-i-to-r">Transition from state <span class="math inline">\(I \to
+R\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-i-to-r"></a>
+</h3>
+<p>Individuals progress from infectious to recovered after a random
+disease duration <span class="math inline">\(f \geq 1\)</span> such that
+<span class="math display">\[
+e \sim \text{Gamma}(2\upsilon, 2), \\
+f = \text{round}(e + 1).
+\]</span> where <span class="math inline">\(\upsilon\)</span> is the
+duration of infectiousness which we set to 4. The disease duration <span class="math inline">\(f\)</span> is a number of time steps <span class="math inline">\(\delta\)</span>.</p>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

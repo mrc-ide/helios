@@ -65,6 +65,8 @@ get_parameters <- function(overrides = list()) {
     dt = 0.5, # check this as default
     simulation_time = 150,
     household_distribution_generation = "empirical"
+    endemic_or_epidemic = "epidemic",
+    duration_immune = NULL
   )
 
   # Ensure overridden parameters are passed as a list:
@@ -86,6 +88,14 @@ get_parameters <- function(overrides = list()) {
   }
   if ((1/parameters$dt) != floor(1/parameters$dt)) {
     stop("dt must evenly divide into 1 e.g. 0.1, 0.2, 0.25, 0.5")
+  }
+
+  # Check duration_immune is set if endemic_or_epidemic == "endemic"
+  if (!(parameters$endemic_or_epidemic %in% c("endemic", "epidemic"))) {
+    stop("endemic_or_epidemic must be set to either epidemic or endemic")
+  }
+  if (parameters$endemic_or_epidemic == "endemic" & is.null(parameters$duration_immune)) {
+    stop("duration_immune must be specified if endemic_or_epidemic is set to endemic")
   }
 
   # Return the list of parameters
