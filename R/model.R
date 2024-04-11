@@ -12,9 +12,6 @@ run_simulation <- function(parameters_list, timesteps) {
   # Generate the model events:
   events_list <- create_events(variables_list = variables_list, parameters_list = parameters_list)
 
-  # Initialise the model events: (Not currently needed, but may be when we add interventions)
-  #initialise_events(events, variables, parameters)
-
   # Set up the model renderer:
   timesteps <- round(parameters_list$simulation_time/parameters_list$dt)
   renderer <- individual::Render$new(timesteps)
