@@ -45,7 +45,7 @@ Assignment of adults to particular workplaces is done using random sampling with
 ## Schools
 
 Schools are attended by children.
-The sizes of schools are drawn from a lognormal distribution.
+The sizes of schools are drawn from a log-normal distribution.
 Assignment of children to particular schools is  done using random sampling without replacement.
 
 ## Leisure
@@ -77,11 +77,11 @@ $$
 $$
 The location specific force of infection terms are given as:
 
-* Household $\lambda_h$:
-* Workplace  $\lambda_w$:
-* School $\lambda_s$:
-* Leisure $\lambda_l$:
-* Community $\lambda_c$:
+* Household $\lambda_h$: ...
+* Workplace  $\lambda_w$: ...
+* School $\lambda_s$: ...
+* Leisure $\lambda_l$: ...
+* Community $\lambda_c$: ...
 
 The probability of infection in a given time step $\delta > 0$ is
 $$

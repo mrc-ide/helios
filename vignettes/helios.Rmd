@@ -172,7 +172,7 @@ household_df |>
 
 ### Leisure
 
-Each week, individuals attend lesiure venues:
+Each week, individuals attend leisure venues:
 
 ```{r}
 leisure_places <- variables_list$leisure$get_values()
@@ -200,7 +200,7 @@ lapply(events_list, class)
 
 ## Render
 
-We use a fixed number of timesteps to simulate over:
+We use a fixed number of time-steps to simulate over:
 
 ```{r}
 timesteps <- round(parameters_list$simulation_time / parameters_list$dt)

@@ -1245,7 +1245,7 @@ households:</p>
 <div class="section level3">
 <h3 id="leisure">Leisure<a class="anchor" aria-label="anchor" href="#leisure"></a>
 </h3>
-<p>Each week, individuals attend lesiure venues:</p>
+<p>Each week, individuals attend leisure venues:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">leisure_places</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">leisure</span><span class="op">$</span><span class="fu">get_values</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">number_leisure_places</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">leisure_places</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
@@ -1278,7 +1278,7 @@ class:</p>
 <div class="section level2">
 <h2 id="render">Render<a class="anchor" aria-label="anchor" href="#render"></a>
 </h2>
-<p>We use a fixed number of timesteps to simulate over:</p>
+<p>We use a fixed number of time-steps to simulate over:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">$</span><span class="va">simulation_time</span> <span class="op">/</span> <span class="va">parameters_list</span><span class="op">$</span><span class="va">dt</span><span class="op">)</span></span></code></pre></div>
 <p>The object <code>renderer</code> is of class <a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link"><code>Render</code></a>:</p>
