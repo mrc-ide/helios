@@ -11,13 +11,13 @@ source("R/model.R")
 source("R/utils.R")
 
 ## Running the model with no farUVC
-nofarUVC_parameters_list <- get_parameters(overrides = list(beta_household = 1,
-                                                            beta_workplace = 1,
-                                                            beta_school = 1,
-                                                            beta_community = 0.15,
-                                                            beta_leisure = 1,
-                                                            simulation_time = 150,
-                                                            number_initially_exposed = 5))
+nofarUVC_parameters_list <- get_parameters(overrides = list(beta_household = 0.15,
+                                                            beta_workplace = 0.15,
+                                                            beta_school = 0.15,
+                                                            beta_leisure = 0.15,
+                                                            beta_community = 0.05,
+                                                            simulation_time = 75,
+                                                            number_initially_exposed = 50))
 nofarUVC_output <- run_simulation(nofarUVC_parameters_list)
 health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
 matplot(
