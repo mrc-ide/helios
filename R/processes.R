@@ -115,9 +115,6 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
   function(t) {
 
     ## Timestep printing
-    # if (t %% 10 == 0) {
-    #   print(paste0("timestep = ", (t * parameters_list$dt)))
-    # }
     print(t)
 
     ## Bitset for all infectious individuals
@@ -135,7 +132,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       spec_household <- household_bitset_list[[i]]
 
       # Retrieve the bitset of all infectious individuals in the i-th household
-      spec_household_I <- I$and(spec_household)
+      spec_household_I <- I$copy()$and(spec_household)
 
       #  Calculate the FOI for the i-th household - with and without farUVC installed
       if (parameters_list$far_uvc_household) {
@@ -165,7 +162,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       spec_workplace <- workplace_bitset_list[[i]]
 
       # Get the indices of infectious individuals in the i-th workplace:
-      spec_workplace_I <- I$and(spec_workplace)
+      spec_workplace_I <- I$copy()$and(spec_workplace)
 
       # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
       if (parameters_list$far_uvc_workplace) {
@@ -195,7 +192,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
       spec_school <- school_bitset_list[[i]]
 
       # Retrieve the indices of all infectious individuals in the i-th school:
-      spec_school_I <- I$and(spec_school)
+      spec_school_I <- I$copy()$and(spec_school)
 
       # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
       if (parameters_list$far_uvc_school) {
@@ -256,7 +253,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
         spec_leisure <- variables_list$specific_leisure$get_index_of(as.character(spec_leisure_setting))
 
         # Retrieve the indices of all infectious individuals in the particular leisure setting being considered
-        spec_leisure_I <- I$and(spec_leisure)
+        spec_leisure_I <- I$copy()$and(spec_leisure)
 
         # Calculate the leisure-specific FOI for the i-th leisure setting - with and without farUVC installed
         if (parameters_list$far_uvc_leisure) {
@@ -287,7 +284,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
     # Sum the household, workplace, school leisure, and community FOIs to get the total FOI for each
     # individual:
     total_FOI <- household_FOI + workplace_FOI + school_FOI + leisure_FOI + community_FOI
-    print(c(max(household_FOI), max(workplace_FOI), max(school_FOI), max(leisure_FOI), max(community_FOI), max(total_FOI)))
+    print(c(max(household_FOI), max(workplace_FOI), max(school_FOI), max(leisure_FOI), max(community_FOI)))
 
     # Calculate the probability of getting infected in the current interval for each individual:
     p_inf <- 1 - exp(-total_FOI * parameters_list$dt)

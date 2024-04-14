@@ -14,9 +14,10 @@ source("R/utils.R")
 nofarUVC_parameters_list <- get_parameters(overrides = list(beta_household = 1,
                                                             beta_workplace = 1,
                                                             beta_school = 1,
-                                                            beta_community = 1,
+                                                            beta_community = 0.15,
                                                             beta_leisure = 1,
-                                                            simulation_time = 35))
+                                                            simulation_time = 150,
+                                                            number_initially_exposed = 5))
 nofarUVC_output <- run_simulation(nofarUVC_parameters_list)
 health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
 matplot(
@@ -25,39 +26,34 @@ matplot(
   xlab = "Time",ylab = "Count"
 )
 
-
-
-
 ## Running the model with farUVC
 farUVC_parameters_list <- get_parameters(overrides = list(beta_household = 1,
                                                           beta_workplace = 1,
                                                           beta_school = 1,
-                                                          beta_community = 0,
+                                                          beta_community = 0.05,
                                                           beta_leisure = 1,
-                                                          simulation_time = 35,
+                                                          simulation_time = 150,
                                                           far_uvc_workplace = TRUE,
                                                           far_uvc_workplace_coverage_type = "random",
                                                           far_uvc_workplace_coverage = 1,
-                                                          far_uvc_workplace_efficacy = 1,
+                                                          far_uvc_workplace_efficacy = 0.85,
                                                           far_uvc_workplace_timestep = 0,
                                                           far_uvc_school = TRUE,
                                                           far_uvc_school_coverage_type = "random",
                                                           far_uvc_school_coverage = 1,
-                                                          far_uvc_school_efficacy = 1,
+                                                          far_uvc_school_efficacy = 0.85,
                                                           far_uvc_school_timestep = 0,
                                                           far_uvc_leisure = TRUE,
                                                           far_uvc_leisure_coverage_type = "random",
                                                           far_uvc_leisure_coverage = 1,
-                                                          far_uvc_leisure_efficacy = 1,
+                                                          far_uvc_leisure_efficacy = 0.85,
                                                           far_uvc_leisure_timestep = 0,
                                                           far_uvc_household = TRUE,
                                                           far_uvc_household_coverage_type = "random",
                                                           far_uvc_household_coverage = 1,
-                                                          far_uvc_household_efficacy = 1,
+                                                          far_uvc_household_efficacy = 0.85,
                                                           far_uvc_household_timestep = 0))
 farUVC_output <- run_simulation(farUVC_parameters_list)
-# parameters_list <- farUVC_parameters_list
-
 
 par(mfrow = c(1, 2))
 health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
@@ -72,8 +68,8 @@ matplot(
   xlab = "Time",ylab = "Count"
 )
 
-
-
+plot(nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, nofarUVC_output[, 3], type = "l")
+lines(farUVC_output[[1]]*farUVC_parameters_list$dt, farUVC_output[, 3], col = "red")
 
 parameters_list$seed <- 10
 parameters_list$beta_household <- 1.0
