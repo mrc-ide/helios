@@ -42,12 +42,12 @@ test_that("set_uvc() errors when setting input not from allowed list of Far UVC 
   # Check that set_uvc() errors when the setting input not either "workplace",
   # "school", or "leisure"
   expect_error(object = set_uvc(parameters_list = parameters,
-                                setting = "hosptial",
+                                setting = "hospital",
                                 coverage = c(0.8),
                                 coverage_type = "random",
                                 efficacy = c(0.8),
                                 timestep = c(1)),
-               regexp = "Error: Input setting invalid - far UvC only deployable in workplace, school, leisure, or household settings")
+               regexp = "Error: Input setting invalid - far UVC only deployable in workplace, school, leisure, or household settings")
 })
 
 test_that("set_uvc() errors when coverage_type input not from allowed list of Far UVC settings", {
