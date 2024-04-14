@@ -127,7 +127,6 @@ create_variables <- function(parameters_list) {
     if(parameters_list$far_uvc_workplace_coverage_type == "targeted") {
 
       # Get the indices of the indices of workplaces with Far UVC based on their sizes:
-      ## CHECK - IS THIS RIGHT???
       indices_of_workplaces_with_uvc <- sort(x = variables_list$setting_sizes$workplace,
                                              decreasing = TRUE,
                                              index.return = TRUE)$ix[1:number_of_workplaces_with_uvc]
@@ -172,7 +171,6 @@ create_variables <- function(parameters_list) {
     if(parameters_list$far_uvc_school_coverage_type == "targeted") {
 
       # Get the indices of the indices of schools with Far UVC based on their sizes:
-      ## CHECK - IS THIS RIGHT???
       indices_of_schools_with_uvc <- sort(x = variables_list$setting_sizes$school,
                                           decreasing = TRUE,
                                           index.return = TRUE)$ix[1:number_of_schools_with_uvc]
@@ -217,7 +215,6 @@ create_variables <- function(parameters_list) {
     if(parameters_list$far_uvc_leisure_coverage_type == "targeted") {
 
       # Get the indices of the indices of leisure settings with Far UVC based on their sizes:
-      ## CHECK - IS THIS RIGHT???
       indices_of_leisures_with_uvc <- sort(x = variables_list$setting_sizes$leisure,
                                            decreasing = TRUE,
                                            index.return = TRUE)$ix[1:number_of_leisures_with_uvc]

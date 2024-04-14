@@ -16,7 +16,7 @@ nofarUVC_parameters_list <- get_parameters(overrides = list(beta_household = 0.1
                                                             beta_school = 0.1,
                                                             beta_leisure = 0.1,
                                                             beta_community = 0.05,
-                                                            simulation_time = 300,
+                                                            simulation_time = 400,
                                                             number_initially_exposed = 50))
 nofarUVC_output <- run_simulation(nofarUVC_parameters_list)
 health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
@@ -25,51 +25,58 @@ matplot(
   type="l",lwd=2,lty = 1,col = adjustcolor(col = health_cols, alpha.f = 0.85),
   xlab = "Time",ylab = "Count"
 )
+# betas = 0.1 ~ AR = 38% (finished by 200)
+# betas = 0.2 ~ R0 =
 
 ## Running the model with farUVC
-farUVC_parameters_list <- get_parameters(overrides = list(beta_household = 1,
-                                                          beta_workplace = 1,
-                                                          beta_school = 1,
+farUVC_parameters_list <- get_parameters(overrides = list(beta_household = 0.1,
+                                                          beta_workplace = 0.1,
+                                                          beta_school = 0.1,
+                                                          beta_leisure = 0.1,
                                                           beta_community = 0.05,
-                                                          beta_leisure = 1,
-                                                          simulation_time = 150,
+                                                          simulation_time = 400,
                                                           far_uvc_workplace = TRUE,
                                                           far_uvc_workplace_coverage_type = "random",
-                                                          far_uvc_workplace_coverage = 1,
-                                                          far_uvc_workplace_efficacy = 0.85,
+                                                          far_uvc_workplace_coverage = 0.25,
+                                                          far_uvc_workplace_efficacy = 0.6,
                                                           far_uvc_workplace_timestep = 0,
                                                           far_uvc_school = TRUE,
                                                           far_uvc_school_coverage_type = "random",
-                                                          far_uvc_school_coverage = 1,
-                                                          far_uvc_school_efficacy = 0.85,
+                                                          far_uvc_school_coverage = 0.25,
+                                                          far_uvc_school_efficacy = 0.6,
                                                           far_uvc_school_timestep = 0,
                                                           far_uvc_leisure = TRUE,
                                                           far_uvc_leisure_coverage_type = "random",
-                                                          far_uvc_leisure_coverage = 1,
-                                                          far_uvc_leisure_efficacy = 0.85,
+                                                          far_uvc_leisure_coverage = 0.25,
+                                                          far_uvc_leisure_efficacy = 0.6,
                                                           far_uvc_leisure_timestep = 0,
                                                           far_uvc_household = TRUE,
                                                           far_uvc_household_coverage_type = "random",
-                                                          far_uvc_household_coverage = 1,
-                                                          far_uvc_household_efficacy = 0.85,
+                                                          far_uvc_household_coverage = 0.25,
+                                                          far_uvc_household_efficacy = 0.6,
                                                           far_uvc_household_timestep = 0))
 farUVC_output <- run_simulation(farUVC_parameters_list)
 
 par(mfrow = c(1, 2))
 health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
 matplot(
-  x = farUVC_output[[1]]*farUVC_parameters_list$dt, y = farUVC_output[-1],
+  x = nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, y = nofarUVC_output[-c(1, 2, 5)],
   type="l",lwd=2,lty = 1,col = adjustcolor(col = health_cols, alpha.f = 0.85),
   xlab = "Time",ylab = "Count"
 )
 matplot(
-  x = nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, y = nofarUVC_output[-1],
+  x = farUVC_output[[1]]*farUVC_parameters_list$dt, y = farUVC_output[-c(1, 2, 5)],
   type="l",lwd=2,lty = 1,col = adjustcolor(col = health_cols, alpha.f = 0.85),
   xlab = "Time",ylab = "Count"
 )
 
 plot(nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, nofarUVC_output[, 3], type = "l")
 lines(farUVC_output[[1]]*farUVC_parameters_list$dt, farUVC_output[, 3], col = "red")
+
+par(mfrow = c(1, 1))
+plot(nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, nofarUVC_output[, 5], type = "l", xlab = "Time (Days)", ylab = "Total Infected")
+lines(farUVC_output[[1]]*farUVC_parameters_list$dt, farUVC_output[, 5], col = "red")
+
 
 parameters_list$seed <- 10
 parameters_list$beta_household <- 1.0
