@@ -3,7 +3,7 @@
 \docType{data}
 \name{schools_england}
 \alias{schools_england}
-\title{Data on English schools}
+\title{Data on English schools from the 2022/2023 School Census}
 \format{
 An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 24442 rows and 268 columns.
 }
@@ -16,4 +16,9 @@ schools_england
 \description{
 A data frame with 24,442 rows and 268 columns.
 }
+\seealso{
+Other data: 
+\code{\link{baseline_household_demographics}}
+}
+\concept{data}
 \keyword{datasets}

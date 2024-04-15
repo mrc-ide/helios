@@ -2,7 +2,7 @@
 % Please edit documentation in R/sampling.R
 \name{sample_offset_truncated_power_distribution}
 \alias{sample_offset_truncated_power_distribution}
-\title{Sample from an offset truncated power distribution}
+\title{Sample variables from an offset truncated power distribution with fixed sum}
 \usage{
 sample_offset_truncated_power_distribution(
   N,
@@ -24,3 +24,9 @@ sample_offset_truncated_power_distribution(
 Default values adapted from Ferguson et al. (2005). The final sample is
 adjusted to ensure that the total sum of samples equals to \code{N}.
 }
+\seealso{
+Other sampling: 
+\code{\link{sample_log_normal}()},
+\code{\link{sample_negbinom}()}
+}
+\concept{sampling}
