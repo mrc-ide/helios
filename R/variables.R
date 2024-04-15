@@ -284,8 +284,7 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
 
   # Calculating number of children and assigning them to schools
   set.seed(parameters_list$seed)
-  school_data <- read.csv("data/spc_school_level_underlying_data_23112023.csv")
-  empirical_school_sizes <- school_data$headcount.of.pupil
+  empirical_school_sizes <- schools_england$headcount.of.pupil
   empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
   num_children <- age_class_variable$get_size_of("child") # get number of children
   index_children <- age_class_variable$get_index_of("child")$to_vector() # get the index of children in age_class_variable
@@ -505,7 +504,7 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
 generate_initial_households_bootstrap <- function(parameters_list) {
 
   ## Processing Hinch et al to match our age-classes
-  ref_panel <- read.csv("data/Hinch_et_al_baseline_household_demographics.csv")
+  ref_panel <- baseline_household_demographics
   ref_panel$child <- ref_panel$a_0_9 + ref_panel$a_10_19
   ref_panel$adult <- ref_panel$a_20_29 + ref_panel$a_30_39 + ref_panel$a_40_49 + ref_panel$a_50_59 + ref_panel$a_60_69
   ref_panel$elderly <- ref_panel$a_70_79 + ref_panel$a_80
