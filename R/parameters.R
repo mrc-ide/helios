@@ -1,11 +1,13 @@
 #' Establish the list of model parameters
 #'
-#' @description The get_parameters() function creates a named list of model parameters.
+#' This function creates a named list of model parameters which are to be used
+#' in the model. For example, the output of [get_parameters()] provides input to
+#' functions such as [create_variables()] and [create_events()].
 #'
-#' @param overrides a named list of parameters values to be used instead of the defaults.
-#' The parameters are defined below:
+#' @param overrides A named list of parameters values to be used instead of the defaults.
+#' These parameters are:
 #'
-#' * `human_population`: the number of humans to model
+#' * `human_population`: the number of humans to include in the model
 #' * `initial_proportion_child`: proportion of population initially in the 'child' age class
 #' * `initial_proportion_adult`: proportion of population initially in the 'adult' age class
 #' * `initial_proportion_elderly`: proportion of population initially in the 'elderly' age class
@@ -33,10 +35,11 @@
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
 #'
+#' @family parameters
 #' @export
 get_parameters <- function(overrides = list()) {
 
-  # Open a list of parameters to store:
+  # Open a list of parameters to store
   parameters <- list(
     human_population = 10000,
     initial_proportion_child = 0.2,
@@ -72,12 +75,12 @@ get_parameters <- function(overrides = list()) {
     duration_immune = NULL
   )
 
-  # Ensure overridden parameters are passed as a list:
+  # Ensure overridden parameters are passed as a list
   if (!is.list(overrides)) {
     stop('overrides must be a list')
   }
 
-  # Override parameter values in the overrides input:
+  # Override parameter values in the overrides input
   for (name in names(overrides)) {
     if (!(name %in% names(parameters))) {
       stop(paste('unknown parameter', name, sep=' '))

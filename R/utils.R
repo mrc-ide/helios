@@ -6,9 +6,10 @@ bitset_at <- function(b, i) {
   individual::filter_bitset(b, i)
 }
 
-#' @title find the indices of a where it intersects with b
-#' @description synonymous with \code{which(a$to_vector() %in%
-#' b$to_vector())} but faster
+#' Find the indices of `a` where it intersects with `b`
+#'
+#' Synonymous with `which(a$to_vector() %in% b$to_vector())` but faster
+#'
 #' @param a the bitset to index
 #' @param b the bitset to check
 #' @noRd

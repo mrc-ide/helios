@@ -2,18 +2,26 @@
 % Please edit documentation in R/sampling.R
 \name{sample_log_normal}
 \alias{sample_log_normal}
-\title{Sample from an log-normal distribution}
+\title{Sample variables from an log-normal distribution with fixed sum}
 \usage{
 sample_log_normal(N, prop_max = 0.1, meanlog, sdlog)
 }
 \arguments{
 \item{N}{An integer giving the sum of generated random variables}
 
-\item{meanlog}{See \code{dlnorm}}
+\item{prop_max}{The proportion of \code{N} which is the maximum value of a single sample}
 
-\item{sdlog}{See \code{dlnorm}}
+\item{meanlog}{See the \code{meanlog} argument of \code{\link[=dlnorm]{dlnorm()}}}
+
+\item{sdlog}{See the \code{sdlog} argument of \code{\link[=dlnorm]{dlnorm()}}}
 }
 \description{
 The final sample is adjusted to ensure that the total sum of samples equals to \code{N}.
 All samples are rounded.
 }
+\seealso{
+Other sampling: 
+\code{\link{sample_negbinom}()},
+\code{\link{sample_offset_truncated_power_distribution}()}
+}
+\concept{sampling}

@@ -3,14 +3,12 @@
 \docType{data}
 \name{baseline_household_demographics}
 \alias{baseline_household_demographics}
-\title{Data on on baseline household demographics from Hinch et al.}
+\title{Data from ONS 2011 on baseline household demographics from Hinch et al.}
 \format{
 An object of class \code{spec_tbl_df} (inherits from \code{tbl_df}, \code{tbl}, \code{data.frame}) with 10000 rows and 9 columns.
 }
 \source{
-\if{html}{\out{
-<UNKOWN>
-}}
+\url{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1009146}
 }
 \usage{
 baseline_household_demographics
@@ -18,4 +16,9 @@ baseline_household_demographics
 \description{
 A data frame with 10,000 rows and 9 columns.
 }
+\seealso{
+Other data: 
+\code{\link{schools_england}}
+}
+\concept{data}
 \keyword{datasets}
