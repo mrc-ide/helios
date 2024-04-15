@@ -18,6 +18,7 @@
 #' * `school_prop_max`: maximum size of a school as a proporiton of total child population size
 #' * `school_meanlog`: the meanlog parameter for the log-normal distribution on school size
 #' * `school_sdlog`: the sdlog parameter for the log-normal distribution on school size
+#' * `school_student_staff_ratio`: the number of students to each adult staff member
 #' * `leisure_mean_number_settings`: TBD
 #' * `leisure_mean_size`: TBD
 #' * `leisure_overdispersion_size`: TBD
@@ -50,6 +51,7 @@ get_parameters <- function(overrides = list()) {
     school_prop_max = 0.1,
     school_meanlog = 5.49,
     school_sdlog = 1.02,
+    school_student_staff_ratio = 20,
     leisure_prob_visit = 0.6,
     leisure_mean_number_settings = 3,
     leisure_mean_size = 50,
