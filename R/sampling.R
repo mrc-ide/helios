@@ -45,7 +45,7 @@ sample_offset_truncated_power_distribution <- function(N, prop_max = 0.1, a = 5.
 #' The final sample is adjusted to ensure that the total sum of samples equals to `N`.
 #' All samples are rounded.
 #'
-#' @param N An integer giving the sum of generated random variables
+#' @inheritParams sample_offset_truncated_power_distribution
 #' @param meanlog See `dlnorm`
 #' @param sdlog See `dlnorm`
 #'
@@ -87,7 +87,7 @@ sample_log_normal <- function(N, prop_max = 0.1, meanlog, sdlog) {
 #' is achieved by adjusting the final sample. As such, the resulting samples
 #' are not strictly speaking from a negative binomial distribution.
 #'
-#' @param N An integer giving the sum of generated random variables
+#' @inheritParams sample_offset_truncated_power_distribution
 #' @param mu See the `mu` argument of [rnbinom()]
 #' @param size See the `size` argument of [rnbinom()]
 #'
