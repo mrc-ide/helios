@@ -3,6 +3,7 @@
 #' @param parameters_list A list of the model parameters as generated using `get_parameters`
 #' @param timesteps An integer representing the number of timesteps to simulate
 #'
+#' @family model
 #' @export
 run_simulation <- function(parameters_list, timesteps) {
 

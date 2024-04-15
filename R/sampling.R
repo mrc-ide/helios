@@ -8,6 +8,7 @@
 #' @param a A parameter of the distribution (?)
 #' @param c A parameter of the distribution (?)
 #'
+#' @family sampling
 #' @export
 sample_offset_truncated_power_distribution <- function(N, prop_max = 0.1, a = 5.36, c = 1.34) {
   if (prop_max <= 0 | prop_max > 1) {
@@ -48,6 +49,7 @@ sample_offset_truncated_power_distribution <- function(N, prop_max = 0.1, a = 5.
 #' @param meanlog See `dlnorm`
 #' @param sdlog See `dlnorm`
 #'
+#' @family sampling
 #' @export
 sample_log_normal <- function(N, prop_max = 0.1, meanlog, sdlog) {
   if (prop_max <= 0 | prop_max > 1) {
@@ -89,6 +91,7 @@ sample_log_normal <- function(N, prop_max = 0.1, meanlog, sdlog) {
 #' @param mu See the `mu` argument of [rnbinom()]
 #' @param size See the `size` argument of [rnbinom()]
 #'
+#' @family sampling
 #' @export
 sample_negbinom <- function(N, prop_max = 0.1, mu, size) {
   if (prop_max <= 0 | prop_max > 1) {

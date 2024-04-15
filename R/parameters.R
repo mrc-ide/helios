@@ -33,6 +33,7 @@
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
 #'
+#' @family parameters
 #' @export
 get_parameters <- function(overrides = list()) {
 
