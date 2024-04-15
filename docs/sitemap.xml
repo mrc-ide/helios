@@ -40,6 +40,9 @@
     <loc>/reference/add_event_listeners.html</loc>
   </url>
   <url>
+    <loc>/reference/baseline_household_demographics.html</loc>
+  </url>
+  <url>
     <loc>/reference/create_EI_process.html</loc>
   </url>
   <url>
@@ -101,5 +104,8 @@
   </url>
   <url>
     <loc>/reference/sample_offset_truncated_power_distribution.html</loc>
+  </url>
+  <url>
+    <loc>/reference/schools_england.html</loc>
   </url>
 </urlset>
