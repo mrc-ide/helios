@@ -10,6 +10,6 @@
 #'
 #' A data frame with 10,000 rows and 9 columns.
 #'
-#' @source <UNKNOWN>
+#' @source <https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1009146>
 #' @family data
 "baseline_household_demographics"
