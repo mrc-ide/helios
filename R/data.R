@@ -1,4 +1,4 @@
-#' Data on English schools
+#' Data on English schools from the 2022/2023 School Census
 #'
 #' A data frame with 24,442 rows and 268 columns.
 #'
@@ -6,7 +6,7 @@
 #' @family data
 "schools_england"
 
-#' Data on on baseline household demographics from Hinch et al.
+#' Data from ONS 2011 on baseline household demographics from Hinch et al.
 #'
 #' A data frame with 10,000 rows and 9 columns.
 #'

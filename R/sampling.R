@@ -1,4 +1,4 @@
-#' Sample from an offset truncated power distribution
+#' Sample variables from an offset truncated power distribution with fixed sum
 #'
 #' Default values adapted from Ferguson et al. (2005). The final sample is
 #' adjusted to ensure that the total sum of samples equals to `N`.
@@ -40,14 +40,14 @@ sample_offset_truncated_power_distribution <- function(N, prop_max = 0.1, a = 5.
   return(samples)
 }
 
-#' Sample from an log-normal distribution
+#' Sample variables from an log-normal distribution with fixed sum
 #'
 #' The final sample is adjusted to ensure that the total sum of samples equals to `N`.
 #' All samples are rounded.
 #'
 #' @inheritParams sample_offset_truncated_power_distribution
-#' @param meanlog See `dlnorm`
-#' @param sdlog See `dlnorm`
+#' @param meanlog See the `meanlog` argument of [dlnorm()]
+#' @param sdlog See the `sdlog` argument of [dlnorm()]
 #'
 #' @family sampling
 #' @export
@@ -79,7 +79,7 @@ sample_log_normal <- function(N, prop_max = 0.1, meanlog, sdlog) {
   return(samples)
 }
 
-#' Sample from a negative binomial distribution
+#' Sample variables from a negative binomial distribution with fixed sum
 #'
 #' This function samples from a negative binomial distribution. Rather than
 #' specifying the total number of samples, as with `rnbinom`, this function

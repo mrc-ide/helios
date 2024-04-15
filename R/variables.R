@@ -170,7 +170,7 @@ generate_initial_age_classes <- function(parameters_list) {
 
 }
 
-#' Gets school assignments for all individuals
+#' Generate a vector of school assignments for all individuals in the population
 #'
 #' @inheritParams create_variables
 #' @param age_class_variable An `individual::CategoricalVariable` for the age classes
@@ -224,9 +224,11 @@ generate_initial_schools <- function(parameters_list, age_class_variable) {
   return(schools_vector)
 }
 
-#' Gets school assignments for all individuals
+#' Generate a vector of school assignments for all individuals in the population
 #'
-#' Alternative to `generate_initial_schools`
+#' Alternative to `generate_initial_schools`. Rather than using a parametric
+#' distribution, this function uses sampling with replacement from a reference
+#' dataset. This is known as bootstrapping. The dataset used is [`schools_england`].
 #'
 #' @inheritParams generate_initial_schools
 #'
@@ -332,9 +334,10 @@ generate_initial_workplaces <- function(parameters_list, age_class_variable, sch
   return(workplace_vector)
 }
 
-#' Generates a list of leisure settings that each individual visits, for all individuals in the population
-#' Each element of this list indicates which settings each individual visits on which day - a 0 indicates
-#' that the person stays in on that day.
+#' Generate a list of leisure settings that each individual visits
+#'
+#' Each element of this list indicates which settings each individual visits on
+#' which day. The value 0 indicates that the person stays in on that day.
 #'
 #' @inheritParams create_variables
 #'
@@ -513,10 +516,12 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
 }
 
 #' Generates a vector of households for all individuals in the population
-#' Alternative to generate_initial_households where instead households
-#' are generated through bootstrapping of reference panel from ONS 2011 data
-#' (see Hinch et al for further details). Note this is different as it generates
-#' both the household and age class assignments together.
+#'
+#' Alternative to [generate_initial_households()]. Rather than using a parametric
+#' distribution, this function uses sampling with replacement from a reference
+#' dataset. This is known as bootstrapping. The dataset used is
+#' [`baseline_household_demographics`]. Unlike [generate_initial_households()],
+#' this function generates both the household and age class assignments together.
 #'
 #' @inheritParams create_variables
 #'
