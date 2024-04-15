@@ -2,24 +2,24 @@ url: https://mrc-ide.github.io/helios/
 destination: docs
 
 reference:
-- title: Model
-  contents:
-  - has_concept("model")
 - title: Parameters
   contents:
   - has_concept("parameters")
-- title: Processes
-  contents:
-  - has_concept("processes")
-- title: Sampling
-  contents:
-  - has_concept("sampling")
-- title: Events
-  contents:
-  - has_concept("events")
 - title: Variables
   contents:
   - has_concept("variables")
+- title: Processes
+  contents:
+  - has_concept("processes")
+- title: Events
+  contents:
+  - has_concept("events")
+- title: Model
+  contents:
+  - has_concept("model")
+- title: Sampling
+  contents:
+  - has_concept("sampling")
 - title: Data
   contents:
   - has_concept("data")
