@@ -292,6 +292,9 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
   if (!("seed" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called seed")
   }
+  if (!("school_student_staff_ratio" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called school_student_staff_ratio")
+  }
 
   # Calculating number of children and assigning them to schools
   set.seed(parameters_list$seed)
@@ -319,11 +322,18 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
   school_indices <- unlist(sapply(1:length(school_sizes), function(i) rep(as.character(i), school_sizes[i])))
   child_school_assignments <- sample(school_indices, replace = FALSE)
 
-  # Creating a vector containing school assignments for all individuals (i.e. child_school_assignments for children,
-  # 0 for adults and elderly)
-  schools_vector <- vector(mode = "character", length = parameters_list$human_population) # create empty vector to be filled with school assignments
-  schools_vector[index_children] <- child_school_assignments # append school assignment to main schools vector
-  schools_vector[schools_vector == ""] <- "0" # replace blanks with 0s (these are adults/elderly people)
+  # Assign staff to schools
+  staff_sizes <- ceiling(school_sizes / parameters_list$school_student_staff_ratio)
+  staff_school_indices <- unlist(sapply(1:length(staff_sizes), function(i) rep(as.character(i), staff_sizes[i])))
+  index_adults <- age_class_variable$get_index_of("adult")$to_vector()
+  index_staff <- sample(index_adults, size = sum(staff_sizes), replace = FALSE)
+  staff_school_assignments <- sample(staff_school_indices, replace = FALSE)
+
+  # School assignments for all individuals
+  schools_vector <- vector(mode = "character", length = parameters_list$human_population)
+  schools_vector[index_children] <- child_school_assignments
+  schools_vector[schools_vector == ""] <- "0"
+  schools_vector[index_staff] <- staff_school_assignments
 
   return(schools_vector)
 }
