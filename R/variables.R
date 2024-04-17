@@ -249,7 +249,7 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
 
   # Calculating number of children and assigning them to schools
   set.seed(parameters_list$seed)
-  empirical_school_sizes <- schools_england$headcount.of.pupil
+  empirical_school_sizes <- schools_england$`headcount of pupils`
   empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
   num_children <- age_class_variable$get_size_of("child") # get number of children
   index_children <- age_class_variable$get_index_of("child")$to_vector() # get the index of children in age_class_variable

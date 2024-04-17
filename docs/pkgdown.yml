@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   helios: helios.html
   model: model.html
-last_built: 2024-04-15T13:34Z
+last_built: 2024-04-17T13:44Z
 urls:
   reference: https://mrc-ide.github.io/helios/reference
   article: https://mrc-ide.github.io/helios/articles
