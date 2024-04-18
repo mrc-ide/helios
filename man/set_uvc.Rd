@@ -20,5 +20,12 @@ set_uvc(parameters_list, setting, coverage, coverage_type, efficacy, timestep)
 \item{coverage_style}{A character describing the type of coverage (random or targeted)}
 }
 \description{
-set_uvc
+The set_uvc() function is a user-facing function that is used to parameterise far UVC deployment
+for an individual setting class (e.g. workplace). The function takes as arguments a \code{helios}
+parameter list, the \code{setting} for which far UVC deployment is being parameterised, the coverage
+of far UVC within each setting of a setting class (e.g. coverage of individual workplaces within
+the workplace setting class), the \code{coverage_type} (currently supporting random and targeted at the
+most populated settings), the \code{efficacy} of far UVC in the setting class, and the \code{timestep} on
+which far UVC is deployed. The function appends these additional setting-specific parameters to
+the parameter list and returns an updated version of it.
 }
