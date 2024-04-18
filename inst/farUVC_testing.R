@@ -60,12 +60,12 @@ farUVC_output <- run_simulation(farUVC_parameters_list)
 par(mfrow = c(1, 2))
 health_cols <-  c("royalblue3","firebrick3","darkorchid3", "orange2")
 matplot(
-  x = nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, y = nofarUVC_output[-c(1, 2, 5)],
+  x = nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, y = nofarUVC_output[-c(1)],
   type="l",lwd=2,lty = 1,col = adjustcolor(col = health_cols, alpha.f = 0.85),
   xlab = "Time",ylab = "Count"
 )
 matplot(
-  x = farUVC_output[[1]]*farUVC_parameters_list$dt, y = farUVC_output[-c(1, 2, 5)],
+  x = farUVC_output[[1]]*farUVC_parameters_list$dt, y = farUVC_output[-c(1)],
   type="l",lwd=2,lty = 1,col = adjustcolor(col = health_cols, alpha.f = 0.85),
   xlab = "Time",ylab = "Count"
 )
@@ -74,7 +74,8 @@ plot(nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, nofarUVC_output[, 3], typ
 lines(farUVC_output[[1]]*farUVC_parameters_list$dt, farUVC_output[, 3], col = "red")
 
 par(mfrow = c(1, 1))
-plot(nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, nofarUVC_output[, 5], type = "l", xlab = "Time (Days)", ylab = "Total Infected")
+plot(nofarUVC_output[[1]]*nofarUVC_parameters_list$dt, nofarUVC_output[, 5], type = "l", xlim = c(0, 400),
+     xlab = "Time (Days)", ylab = "Total Infected")
 lines(farUVC_output[[1]]*farUVC_parameters_list$dt, farUVC_output[, 5], col = "red")
 
 
