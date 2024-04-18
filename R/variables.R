@@ -51,7 +51,7 @@ create_variables <- function(parameters_list) {
     message("There are less than or equal to 2 schools. Consider the population size may be too small!")
   }
   school_variable <- CategoricalVariable$new(categories = as.character(0:num_schools), initial_values = initial_school_settings)
-  
+
   # Workplace setting variable
   initial_workplace_settings <- generate_initial_workplaces(parameters_list = parameters_list, age_class_variable = age_class_variable, school_variable = school_variable)
   num_workplaces <- max(as.numeric(initial_workplace_settings))
@@ -66,10 +66,11 @@ create_variables <- function(parameters_list) {
                                            prop_max = parameters_list$leisure_prop_max,
                                            mu = parameters_list$leisure_mean_size,
                                            size = parameters_list$leisure_overdispersion_size)
-  initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = leisure_setting_sizes) # returns list to initialise RaggedInteger
+  parameters_list$leisure_setting_sizes <- leisure_setting_sizes
+  initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = parameters_list$leisure_setting_sizes) # returns list to initialise RaggedInteger
   leisure_variable <- RaggedInteger$new(initial_values = initial_leisure_settings)
 
-   possible_leisure_settings <- unique(unlist(initial_leisure_settings))
+  possible_leisure_settings <- unique(unlist(initial_leisure_settings))
   possible_leisure_settings <- possible_leisure_settings[order(possible_leisure_settings)]
   specific_day_leisure_variable <- CategoricalVariable$new(categories = as.character(possible_leisure_settings),
                                                            initial_values = rep(as.character(0), parameters_list$human_population))

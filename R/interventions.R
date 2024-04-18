@@ -182,7 +182,7 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
   if(parameters_list$far_uvc_leisure) {
 
     # Get the number of leisure settings:
-    number_of_leisures <- length(leisure_setting_sizes)
+    number_of_leisures <- length(parameters_list$leisure_setting_sizes)
 
     # Open a vector to store the leisure UVC on/off values:
     uvc_leisure <- rep(0, number_of_leisures)
