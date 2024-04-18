@@ -11,7 +11,9 @@ create_variables <- function(parameters_list) {
   initial_disease_states <- generate_initial_disease_states(parameters_list = parameters_list)
   disease_state_variable <- individual::CategoricalVariable$new(categories = disease_states, initial_values = initial_disease_states)
 
-  # Empirical distribution of households from ONS: generates both the household variable and age class variable
+  # Initialise and populate the age and household variables
+
+  # If user wants to use empirical distribution of households and ages from ONS sample
   if (parameters_list$household_distribution_generation == "empirical") {
     # Bootstrap sampling of households from ONS 2011 Census reference panel of household sizes and age composition
     household_age_list <- generate_initial_households_bootstrap(parameters_list = parameters_list)
@@ -23,6 +25,7 @@ create_variables <- function(parameters_list) {
     # Household variable
     household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(household_age_list$individual_households)),
                                                               initial_values = as.character(household_age_list$individual_households))
+  # If user wants to specify age-class proportions and associated households manually
   } else {
     # Specify age-class proportions manually
 
@@ -57,11 +60,16 @@ create_variables <- function(parameters_list) {
   }
   workplace_variable <- CategoricalVariable$new(categories = as.character(0:num_workplaces), initial_values = initial_workplace_settings)
 
-  # Leisure setting variable that stores all the leisure locations individual COULD go to
-  initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list) # returns list to initialise RaggedInteger
+  # Initialise and populate the leisure setting variable that stores all the leisure locations an individual COULD go to
+  # Generating the number and sizes of each leisure setting
+  leisure_setting_sizes <- sample_negbinom(N = parameters_list$human_population,
+                                           prop_max = parameters_list$leisure_prop_max,
+                                           mu = parameters_list$leisure_mean_size,
+                                           size = parameters_list$leisure_overdispersion_size)
+  parameters_list$leisure_setting_sizes <- leisure_setting_sizes
+  initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = parameters_list$leisure_setting_sizes) # returns list to initialise RaggedInteger
   leisure_variable <- RaggedInteger$new(initial_values = initial_leisure_settings)
 
-  # Leisure setting variable for where individuals go to on a particular day
   possible_leisure_settings <- unique(unlist(initial_leisure_settings))
   possible_leisure_settings <- possible_leisure_settings[order(possible_leisure_settings)]
   specific_day_leisure_variable <- CategoricalVariable$new(categories = as.character(possible_leisure_settings),
@@ -78,7 +86,27 @@ create_variables <- function(parameters_list) {
     specific_leisure = specific_day_leisure_variable
   )
 
-  return(variables_list)
+  # If any setting has UVC installed, retrieve the sizes of all of the settings:
+  if(any(parameters_list$far_uvc_workplace,
+         parameters_list$far_uvc_school,
+         parameters_list$far_uvc_leisure,
+         parameters_list$far_uvc_household)) {
+
+    # Store setting sizes in a list:
+    setting_sizes <- get_setting_sizes(variables_list = variables_list,
+                                       leisure_sizes = leisure_setting_sizes)
+
+    # Append setting sizes to variables_list:
+    parameters_list$setting_sizes <- setting_sizes
+
+    # Generate and append the far UVC switches for settings in which it has been switched on:
+    parameters_list <- generate_far_uvc_switches(parameters_list, variables_list)
+  }
+
+  # Return the list of model variables:
+  return(list(variables_list = variables_list,
+              parameters_list = parameters_list))
+
 }
 
 #' Generate a vector of the initial disease states of all individuals in the population
@@ -343,7 +371,7 @@ generate_initial_workplaces <- function(parameters_list, age_class_variable, sch
 #'
 #' @family variables
 #' @export
-generate_initial_leisure <- function(parameters_list) {
+generate_initial_leisure <- function(parameters_list, leisure_setting_sizes) {
 
   # Check that the requisite parameters are present:
   if (!("human_population" %in% names(parameters_list))) {
@@ -364,12 +392,6 @@ generate_initial_leisure <- function(parameters_list) {
 
   # Setting the seed
   set.seed(parameters_list$seed)
-
-  # Generating the number and sizes of each leisure setting
-  leisure_setting_sizes <- sample_negbinom(N = parameters_list$human_population,
-                                           prop_max = parameters_list$leisure_prop_max,
-                                           mu = parameters_list$leisure_mean_size,
-                                           size = parameters_list$leisure_overdispersion_size)
 
   # Calculating the number of leisure visits that each person makes per week
   leisure_visits_per_person_per_week <- rpois(n = parameters_list$human_population,

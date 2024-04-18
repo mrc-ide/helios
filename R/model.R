@@ -5,16 +5,15 @@
 #'
 #' @family model
 #' @export
-run_simulation <- function(parameters_list, timesteps) {
+run_simulation <- function(parameters_list) {
 
   # Generate the model variables:
   variables_list <- create_variables(parameters_list)
+  parameters_list <- variables_list$parameters_list # note: this could be written more nicely and in a way
+  variables_list <- variables_list$variables_list   #       that doesn't require recursive modification
 
   # Generate the model events:
   events_list <- create_events(variables_list = variables_list, parameters_list = parameters_list)
-
-  # Initialise the model events: (Not currently needed, but may be when we add interventions)
-  #initialise_events(events, variables, parameters)
 
   # Set up the model renderer:
   timesteps <- round(parameters_list$simulation_time/parameters_list$dt)
