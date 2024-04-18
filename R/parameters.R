@@ -145,6 +145,8 @@ get_parameters <- function(overrides = list()) {
     stop("duration_immune must be specified if endemic_or_epidemic is set to endemic")
   }
 
+  ## ADD MORE CHECKS IN HERE FOR PARAMETERS ##
+
   # Return the list of parameters
   parameters
 

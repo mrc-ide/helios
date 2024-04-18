@@ -11,8 +11,9 @@ create_variables <- function(parameters_list) {
   disease_state_variable <- individual::CategoricalVariable$new(categories = disease_states,
                                                                 initial_values = initial_disease_states)
 
-  # If user wants to use empirical distribution of households from ONS - this generates
-  # both the household variable AND the age class variable
+  # Initialise and populate the age and household variables
+
+  # If user wants to use empirical distribution of households and ages from ONS sample
   if (parameters_list$household_distribution_generation == "empirical") {
 
     # Bootstrap sampling of households from ONS 2011 Census reference panel of household sizes and age composition
@@ -27,7 +28,7 @@ create_variables <- function(parameters_list) {
     household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(household_age_list$individual_households)),
                                                               initial_values = as.character(household_age_list$individual_households))
 
-    ## If user wants to specify age-class proportions manually
+  # If user wants to specify age-class proportions and associated households manually
   } else {
 
     # Initialise and populate the age class variable:
@@ -54,7 +55,7 @@ create_variables <- function(parameters_list) {
   school_variable <- CategoricalVariable$new(categories = as.character(0:num_schools),
                                              initial_values = initial_school_settings)
 
-  # Initialise and populate the leisure setting variable that stores all the leisure locations individual COULD go to
+  # Initialise and populate the leisure setting variable that stores all the leisure locations an individual COULD go to
   # Generating the number and sizes of each leisure setting
   leisure_setting_sizes <- sample_negbinom(N = parameters_list$human_population,
                                            prop_max = parameters_list$leisure_prop_max,
@@ -63,7 +64,7 @@ create_variables <- function(parameters_list) {
   initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = leisure_setting_sizes) # returns list to initialise RaggedInteger
   leisure_variable <- RaggedInteger$new(initial_values = initial_leisure_settings)
 
-  # Initialise and populate the leisure setting variable for where individuals go to on a particular day
+  # Initialise and populate the leisure setting variable for where individuals go to on a particular day (this is dynamically updated in the model)
   possible_leisure_settings <- unique(unlist(initial_leisure_settings))
   possible_leisure_settings <- possible_leisure_settings[order(possible_leisure_settings)]
   specific_day_leisure_variable <- CategoricalVariable$new(categories = as.character(possible_leisure_settings),
@@ -80,8 +81,7 @@ create_variables <- function(parameters_list) {
     specific_leisure = specific_day_leisure_variable
   )
 
-  # If any setting has UVC parameterised, retrieve the setting sizes:
-  # Decide whether we want to do this step regardless of UVC and append sizes to variables_list
+  # If any setting has UVC installed, retrieve the sizes of all of the settings:
   if(any(parameters_list$far_uvc_workplace,
          parameters_list$far_uvc_school,
          parameters_list$far_uvc_leisure,
