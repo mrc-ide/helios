@@ -57,31 +57,18 @@
     </div>
 
     <table class="ref-index"><colgroup><col class="alias"><col class="title"></colgroup><tbody><tr><th colspan="2">
-          <h2 id="all-functions">All functions <a href="#all-functions" class="anchor" aria-hidden="true"></a></h2>
+          <h2 id="parameters">Parameters <a href="#parameters" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="create_EI_process.html">create_EI_process()</a></code> </p>
+          <p><code><a href="get_parameters.html">get_parameters()</a></code> </p>
         </td>
-        <td><p>Create the process governing the transition of exposed individuals to the infectious disease state:</p></td>
-      </tr><tr><td>
-          <p><code><a href="create_IR_process.html">create_IR_process()</a></code> </p>
-        </td>
-        <td><p>Create the process governing the transition of infectious individuals to recovered disease state:</p></td>
-      </tr><tr><td>
-          <p><code><a href="create_SE_process.html">create_SE_process()</a></code> </p>
-        </td>
-        <td><p>Create the process governing the transition of susceptible individuals to the exposed disease state:</p></td>
-      </tr><tr><td>
-          <p><code><a href="create_events.html">create_events()</a></code> </p>
-        </td>
-        <td><p>Generate a list of the model events and add listeners. Listeners are arbitrary functions called
-when the event is fired with the current time step, t, as their only arguments.</p></td>
-      </tr><tr><td>
-          <p><code><a href="create_processes.html">create_processes()</a></code> </p>
-        </td>
-        <td><p>Define and create the model processes</p></td>
-      </tr><tr><td>
+        <td><p>Establish the list of model parameters</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="variables">Variables <a href="#variables" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
           <p><code><a href="create_variables.html">create_variables()</a></code> </p>
         </td>
         <td><p>Generate a list of the model variables</p></td>
@@ -98,39 +85,93 @@ when the event is fired with the current time step, t, as their only arguments.<
         </td>
         <td><p>Generates a vector of households for all individuals in the population</p></td>
       </tr><tr><td>
+          <p><code><a href="generate_initial_households_bootstrap.html">generate_initial_households_bootstrap()</a></code> </p>
+        </td>
+        <td><p>Generates a vector of households for all individuals in the population</p></td>
+      </tr><tr><td>
           <p><code><a href="generate_initial_leisure.html">generate_initial_leisure()</a></code> </p>
         </td>
-        <td><p>Generates a list of leisure settings that each individual visits, for all individuals in the population
-Each element of this list indicates which settings each individual visits on which day - a 0 indicates
-that the person stays in on that day.</p></td>
+        <td><p>Generate a list of leisure settings that each individual visits</p></td>
       </tr><tr><td>
           <p><code><a href="generate_initial_schools.html">generate_initial_schools()</a></code> </p>
         </td>
-        <td><p>Gets school assignments for all individuals</p></td>
+        <td><p>Generate a vector of school assignments for all individuals in the population</p></td>
+      </tr><tr><td>
+          <p><code><a href="generate_initial_schools_bootstrap.html">generate_initial_schools_bootstrap()</a></code> </p>
+        </td>
+        <td><p>Generate a vector of school assignments for all individuals in the population</p></td>
       </tr><tr><td>
           <p><code><a href="generate_initial_workplaces.html">generate_initial_workplaces()</a></code> </p>
         </td>
         <td><p>Gets workplace assignments for all individuals in the population</p></td>
-      </tr><tr><td>
-          <p><code><a href="get_parameters.html">get_parameters()</a></code> </p>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="processes">Processes <a href="#processes" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="create_EI_process.html">create_EI_process()</a></code> </p>
         </td>
-        <td><p>Establish the list of model parameters</p></td>
+        <td><p>Create process governing exposed to infectious disease state transition</p></td>
       </tr><tr><td>
+          <p><code><a href="create_IR_process.html">create_IR_process()</a></code> </p>
+        </td>
+        <td><p>Create process governing infectious to recovered disease state transition</p></td>
+      </tr><tr><td>
+          <p><code><a href="create_RS_process.html">create_RS_process()</a></code> </p>
+        </td>
+        <td><p>Create process governing recovered (and immune) back to susceptible disease state transition</p></td>
+      </tr><tr><td>
+          <p><code><a href="create_SE_process.html">create_SE_process()</a></code> </p>
+        </td>
+        <td><p>Create process governing susceptible to exposed disease state transition</p></td>
+      </tr><tr><td>
+          <p><code><a href="create_processes.html">create_processes()</a></code> </p>
+        </td>
+        <td><p>Define and create all model processes</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="events">Events <a href="#events" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="create_events.html">create_events()</a></code> </p>
+        </td>
+        <td><p>Generate a list of model events with listeners</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="model">Model <a href="#model" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
           <p><code><a href="run_simulation.html">run_simulation()</a></code> </p>
         </td>
         <td><p>Run the simulation</p></td>
-      </tr><tr><td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="sampling">Sampling <a href="#sampling" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
           <p><code><a href="sample_log_normal.html">sample_log_normal()</a></code> </p>
         </td>
-        <td><p>Sample from an log-normal distribution</p></td>
+        <td><p>Sample variables from an log-normal distribution with fixed sum</p></td>
       </tr><tr><td>
           <p><code><a href="sample_negbinom.html">sample_negbinom()</a></code> </p>
         </td>
-        <td><p>Sample from a negative binomial distribution</p></td>
+        <td><p>Sample variables from a negative binomial distribution with fixed sum</p></td>
       </tr><tr><td>
           <p><code><a href="sample_offset_truncated_power_distribution.html">sample_offset_truncated_power_distribution()</a></code> </p>
         </td>
-        <td><p>Sample from an offset truncated power distribution</p></td>
+        <td><p>Sample variables from an offset truncated power distribution with fixed sum</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="data">Data <a href="#data" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="baseline_household_demographics.html">baseline_household_demographics</a></code> </p>
+        </td>
+        <td><p>Data from ONS 2011 on baseline household demographics from Hinch et al.</p></td>
+      </tr><tr><td>
+          <p><code><a href="schools_england.html">schools_england</a></code> </p>
+        </td>
+        <td><p>Data on English schools from the 2022/2023 School Census</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

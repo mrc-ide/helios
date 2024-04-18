@@ -18,26 +18,28 @@ knitr::opts_chunk$set(
 
 ## Introduction {#intro}
 
-`helios` is an R package which allows users to simulate the impact of [far UVC](https://www.nature.com/articles/s41598-018-21058-w) interventions in curtailing the spread of infectious disease outbreaks.
-In this vignette, we demonstrate basic use of the package.
+[`helios`](https://mrc-ide.github.io/helios/) is an R package which allows users to simulate the impact of [far UVC](https://www.nature.com/articles/s41598-018-21058-w) interventions in curtailing the spread of infectious disease outbreaks.
+
+This vignette serves to demonstrate basic use of the package.
+We start by loading the package, as well as other packages used in the vignette:
 
 ```{r setup}
 library(helios)
 library(individual)
 library(ggplot2)
-library(dplyr)
+library(dplyr, warn.conflicts = FALSE)
 library(purrr)
 theme_set(theme_minimal())
 ```
 
 ## Parameters {#param}
 
-First, define constant parameters.
-In this vignette, we set the `human_population` to 1000.
-Otherwise, we use the default options:
+First, we define some constant parameters to be used in the model.
+In this vignette we use the default options, aside from the `human_population` variable.
+To facilitate reproducibility, we also set the seed for random number generation:
 
 ```{r}
-parameters_list <- get_parameters(list(human_population = 1000, seed = 1))
+parameters_list <- get_parameters(list(human_population = 5000, seed = 1))
 ```
 
 The names of all parameters are as follows:
@@ -55,23 +57,31 @@ variables_list <- create_variables(parameters_list)
 names(variables_list)
 ```
 
-Aside from `$leisure`, each entry of `variables_list` is of the [`CategoricalVariable`](https://mrc-ide.github.io/individual/reference/CategoricalVariable.html) class:
+Aside from `leisure`, each entry of `variables_list` is of the [`CategoricalVariable`](https://mrc-ide.github.io/individual/reference/CategoricalVariable.html) class:
 
 ```{r}
 map(variables_list, class)
 ```
 
-Some variables change over time, while other remain fixed.
+The `leisure` variable is a [`RagggedInteger`](https://mrc-ide.github.io/individual/reference/RaggedInteger.html) allowing its elements to have different lengths.
+
+Some variables change over time (`disease_state`, `leisure`, `specific_leisure`), while other remain fixed (`age_class`, `workplace`, `school`, `household`).
 
 ### Disease states
 
-Outbreaks are implemented as individual-level SEIR [compartmental models](https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology).
+The outbreak is implemented as individual-level SEIR [compartmental model](https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology).
 
 ```{r}
 (disease_states <- variables_list$disease_state$get_categories())
 ```
 
 The number of individuals initially exposed is controlled by `parameters_list$number_initially_exposed`.
+
+```{r}
+parameters_list$number_initially_exposed
+```
+
+Initially, all other individuals are placed into the susceptible disease state:
 
 ```{r}
 disease_state_counts <- purrr::map_vec(disease_states, function(x) variables_list$disease_state$get_size_of(values = x))
@@ -82,45 +92,52 @@ data.frame("State" = disease_states, "Count" = disease_state_counts) |>
 
 ### Age classes
 
-Age classes remain fixed and are as follows:
+There are three age classes: children, adults, and the elderly.
+The age of each individual remains fixed throughout the simulation.
 
 ```{r}
-(age_classes <- variables_list$age_class$get_categories())
+parameters_list[c("initial_proportion_child", "initial_proportion_adult", "initial_proportion_elderly")]
+
+age_classes <- variables_list$age_class$get_categories()
 age_class_counts <- purrr::map_vec(age_classes, function(x) variables_list$age_class$get_size_of(values = x))
 
 data.frame(age_classes, age_class_counts) |>
+  mutate(age_classes = forcats::fct_relevel(age_classes, "child", "adult", "elderly")) |>
   ggplot(aes(x = age_classes, y = age_class_counts)) +
   geom_col() +
   labs(x = "Age class", y = "Count") +
   coord_flip()
 ```
 
+### Schools
+
+Each child attends a fixed school.
+Additionally, a small number of adults attend schools as staff:
+
+```{r}
+schools <- variables_list$school$get_categories()
+schools <- schools[schools != "0"]
+school_sizes <- purrr::map_vec(schools, function(x) variables_list$school$get_size_of(values = x))
+
+data.frame(school_sizes) |>
+  ggplot(aes(x = school_sizes)) +
+  geom_histogram() +
+  labs(x = "School size", y = "Count")
+```
+
 ### Workplaces
 
-Each adult attends a fixed workplace:
+Each adult (aside from those who are school staff) attends a fixed workplace:
 
 ```{r}
 workplaces <- variables_list$workplace$get_categories()
+workplaces <- workplaces[workplaces != "0"]
 workplace_sizes <- purrr::map_vec(workplaces, function(x) variables_list$workplace$get_size_of(values = x))
 
 data.frame(workplace_sizes) |>
   ggplot(aes(x = log(workplace_sizes))) +
   geom_histogram() +
   labs(x = "log(Workplace size)", y = "Count")
-```
-
-### Schools
-
-Each child attends a fixed school:
-
-```{r}
-schools <- variables_list$school$get_categories()
-school_sizes <- purrr::map_vec(schools, function(x) variables_list$school$get_size_of(values = x))
-
-data.frame(school_sizes) |>
-  ggplot(aes(x = log(school_sizes))) +
-  geom_histogram() +
-  labs(x = "log(School size)", y = "Count")
 ```
 
 ### Households
@@ -138,7 +155,7 @@ table(household_sizes) |>
   labs(x = "Household size", y = "Count")
 ```
 
-What is the age distribution in households?
+The age distribution in households is as follows:
 
 ```{r}
 household_df <- purrr::map_df(households, function(x) {
@@ -187,6 +204,8 @@ table(number_leisure_places) |>
 
 ## Events
 
+Events govern the transition of individuals between disease states:
+
 ```{r}
 events_list <- create_events(variables_list = variables_list, parameters_list = parameters_list)
 names(events_list)
@@ -206,7 +225,7 @@ We use a fixed number of time-steps to simulate over:
 timesteps <- round(parameters_list$simulation_time / parameters_list$dt)
 ```
 
-The object `renderer` is of class [`Render`](https://mrc-ide.github.io/individual/reference/Render.html):
+The object `renderer` is of class [`Render`](https://mrc-ide.github.io/individual/reference/Render.html), and stores output from the model at each timestep:
 
 ```{r}
 renderer <- individual::Render$new(timesteps)
@@ -214,6 +233,8 @@ class(renderer)
 ```
 
 ## Processes
+
+Processes enable queing of events:
 
 ```{r}
 processes_list <- create_processes(

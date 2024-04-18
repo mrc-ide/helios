@@ -89,64 +89,127 @@ interventions</h1>
 
     
     
-<p>This vignette describes the modelling approach used in
-<code>helios</code>. For an introduction to practical use of the
-package, see the <a href="https://mrc-ide.github.io/helios/articles/helios.html" class="external-link">Get
+<p>This vignette describes the modelling approach used in <a href="https://mrc-ide.github.io/helios/"><code>helios</code></a>. For an
+introduction to practical use of the package, see the <a href="https://mrc-ide.github.io/helios/articles/helios.html">Get
 started</a> vignette.</p>
 <div class="section level2">
 <h2 id="population">Population<a class="anchor" aria-label="anchor" href="#population"></a>
 </h2>
-<p>The population consists of a fixed number of individuals. Each
-individual has properties. Some properties remain constant over time,
-and others which change.</p>
+<p>The population consists of a fixed number of individuals <span class="math inline">\(i = 1, \ldots, N\)</span>. Each individual has
+properties. Some properties remain constant during the simulation, and
+others change.</p>
 </div>
 <div class="section level2">
-<h2 id="age-structure">Age structure<a class="anchor" aria-label="anchor" href="#age-structure"></a>
+<h2 id="age">Age structure<a class="anchor" aria-label="anchor" href="#age"></a>
 </h2>
 <p>The age categories included in the model are children, adults, and
 the elderly. Each individual has a fixed age category, assumed not to
-change during the simulation, sampled from a categorical distribution at
-initialisation.</p>
+change during the simulation. The age category is sampled from a
+categorical distribution at initialisation such that <span class="math display">\[
+\mathbb{P}(\text{age}_i = k) = p_k, \\
+k \in \{\text{child}, \text{adult}, \text{elderly}\}.
+\]</span></p>
 </div>
 <div class="section level2">
 <h2 id="households">Households<a class="anchor" aria-label="anchor" href="#households"></a>
 </h2>
 <p>Households are comprised of collections of one or more individuals.
-Household sizes are drawn from a Poisson distribution with rate
-parameter <code>mean_household_size</code>. Individuals are assigned to
-households, ensuring that no household contains only children by pairing
-an adult to each child assigned to a household without any existing
-adults.</p>
+We consider two approaches.</p>
+<div class="section level3">
+<h3 id="parametric">Parametric<a class="anchor" aria-label="anchor" href="#parametric"></a>
+</h3>
+<p>In the parameteric approach, household sizes <span class="math inline">\(N_j^\text{household}\)</span> are drawn from a
+Poisson distribution with rate parameter <span class="math inline">\(\lambda^\text{household}\)</span> <span class="math display">\[
+N_j^\text{household} \sim \text{Poisson}(\lambda^\text{household}).
+\]</span> Individuals are then assigned to households. To ensure that no
+household contains only children, one adult is paired to each child
+assigned to a household without any existing adults.</p>
 </div>
-<div class="section level2">
-<h2 id="workplaces">Workplaces<a class="anchor" aria-label="anchor" href="#workplaces"></a>
-</h2>
-<p>Workplaces are attended by adults. The sizes of workplaces are drawn
-from an offset truncated power distribution. Assignment of adults to
-particular workplaces is done using random sampling without
-replacement.</p>
+<div class="section level3">
+<h3 id="bootstrap">Bootstrap<a class="anchor" aria-label="anchor" href="#bootstrap"></a>
+</h3>
+<p>In the bootstrap approach, households and age distributions are
+sampled with replacement from a reference data set. The reference data
+<code>baseline_household_demographics</code> are derived from the Office
+for National Statistics 2011 survey as used by <span class="citation">Hinch et al. (2021)</span>. If the bootstrap approach
+is used, then its age structure will overwrite the categorical age
+structure above.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="schools">Schools<a class="anchor" aria-label="anchor" href="#schools"></a>
 </h2>
-<p>Schools are attended by children. The sizes of schools are drawn from
-a log-normal distribution. Assignment of children to particular schools
-is done using random sampling without replacement.</p>
+<p>All children attend schools. Two approaches to the number of children
+attending each school are considered.</p>
+<div class="section level3">
+<h3 id="parametric-1">Parametric<a class="anchor" aria-label="anchor" href="#parametric-1"></a>
+</h3>
+<p>In the parametric approach, the sizes of schools are drawn from a
+log-normal distribution with mean <span class="math inline">\(\mu^\text{school}\)</span> and variance <span class="math inline">\({\sigma^\text{school}}^2\)</span> <span class="math display">\[
+N^\text{school}_j \sim \text{Lognormal}(\mu^\text{school},
+{\sigma^\text{school}}^2).
+\]</span> Schools <span class="math inline">\(j\)</span> are drawn until
+<span class="math inline">\(\sum_j N^\text{school}_j \geq
+N^\text{child}\)</span>. Any samples <span class="math inline">\(N^\text{school}_j &gt; N^\text{school}_\text{max}
+\in \mathbb{N}\)</span> are discarded. The final school size is adjusted
+such that the sum of school sizes corresponds to the number of children.
+Assignment of children to particular schools is made using random
+sampling without replacement.</p>
+</div>
+<div class="section level3">
+<h3 id="bootstrap-1">Bootstrap<a class="anchor" aria-label="anchor" href="#bootstrap-1"></a>
+</h3>
+<p>In the bootstrap approach, school sizes are sampled with replacement
+from a reference data set. The reference data
+<code>schools_england</code> are obtained from the 2022/23 census of
+schools in England.</p>
+</div>
+<div class="section level3">
+<h3 id="school-staff">School staff<a class="anchor" aria-label="anchor" href="#school-staff"></a>
+</h3>
+<p>A small number of adults attend schools as staff. Each school has a
+fixed staff to student ratio, with the number of staff rounded up to the
+nearest integer.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="workplaces">Workplaces<a class="anchor" aria-label="anchor" href="#workplaces"></a>
+</h2>
+<p>Workplaces are attended by adults who are not school staff. Following
+<span class="citation">Ferguson et al. (2005)</span>, the sizes of
+workplaces <span class="math inline">\(N^\text{workplace}_j\)</span> are
+drawn from an offset truncated power distribution. The cumulative
+distribution function is <span class="math display">\[
+\mathbb{P}(N^\text{workplace}_j &gt; N) = \frac{\left( \frac{1 +
+N^\text{workplace}_\text{max} / a}{1 + m / a} \right) ^ c - 1}{(1 +
+N^\text{workplace}_\text{max} / a)^c - 1}, \quad \text{for } N \leq
+N^\text{workplace}_\text{max},
+\]</span> where <span class="math inline">\(a &gt; 0, c &gt; 0\)</span>
+and <span class="math inline">\(N^\text{workplace}_\text{max} \in
+\mathbb{N}\)</span>. As with the school sizes, workplace sizes are drawn
+until their sum exceeds the number of adults who are not school staff.
+The final workplace is then adjusted downward. Assignment of adults to
+particular workplaces is done using random sampling without
+replacement.</p>
 </div>
 <div class="section level2">
 <h2 id="leisure">Leisure<a class="anchor" aria-label="anchor" href="#leisure"></a>
 </h2>
 <p>Leisure venues are attended by all individuals. Leisure venue sizes
-are drawn from a negative binomial distribution. The number of leisure
-visits per person per week is drawn from a Poisson distribution,
-truncated at 7 corresponding to one leisure visit every day. The
-locations for each individual’s leisure visits are sampled without
-replacement with probability proportional to leisure venue size.</p>
-</div>
-<div class="section level2">
-<h2 id="community-mixing">Community mixing<a class="anchor" aria-label="anchor" href="#community-mixing"></a>
-</h2>
-<p>Overall community mixing is implemented via some mechanism.</p>
+are drawn from a negative binomial distribution <span class="math display">\[
+N^\text{leisure}_j \sim \text{NB}(\mu^\text{leisure},
+\kappa^\text{leisure}),
+\]</span> with mean <span class="math inline">\(\mu^\text{leisure}\)</span> and overdispersion
+parameter <span class="math inline">\(\kappa^\text{leisure}\)</span>. As
+above, any samples <span class="math inline">\(N^\text{leisure}_j &gt;
+N^\text{leisure}_\text{max} \in \mathbb{N}\)</span> are discarded and
+the final sample is adjusted such that <span class="math inline">\(\sum_j N^\text{leisure}_j = N\)</span>. The number
+of leisure visits per person per week is drawn from a Poisson
+distribution, truncated at 7 corresponding to one leisure visit every
+day. The locations for each individual’s leisure visits are sampled
+without replacement with probability proportional to leisure venue size.
+The day of the week that each individual visits each sampled leisure
+location are also sampled without replacement.</p>
 </div>
 <div class="section level2">
 <h2 id="interventions">Interventions<a class="anchor" aria-label="anchor" href="#interventions"></a>
@@ -165,17 +228,24 @@ states are simulated as follows.</p>
 E\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-s-to-e"></a>
 </h3>
 <p>The total force of infection <span class="math inline">\(\lambda\)</span> for each individual is a sum of
-household, workplace, school, leisure, and community specific force of
-infections <span class="math display">\[
-\lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l + \lambda_c.
+household, workplace, school, and leisure specific force of infections
+<span class="math display">\[
+\lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l.
 \]</span> The location specific force of infection terms are given
 as:</p>
 <ul>
-<li>Household <span class="math inline">\(\lambda_h\)</span>: …</li>
-<li>Workplace <span class="math inline">\(\lambda_w\)</span>: …</li>
-<li>School <span class="math inline">\(\lambda_s\)</span>: …</li>
-<li>Leisure <span class="math inline">\(\lambda_l\)</span>: …</li>
-<li>Community <span class="math inline">\(\lambda_c\)</span>: …</li>
+<li>Household <span class="math inline">\(\lambda_h\)</span>:
+proportional to the number of infectious individuals in the household
+multiplied by <span class="math inline">\(\beta_h\)</span>.</li>
+<li>Workplace <span class="math inline">\(\lambda_w\)</span>:
+proportional to the number of infectious individuals in the workplace
+multiplied by <span class="math inline">\(\beta_w\)</span>.</li>
+<li>School <span class="math inline">\(\lambda_s\)</span>: proportional
+to the number of infectious individuals in the school multiplied by
+<span class="math inline">\(\beta_s\)</span>.</li>
+<li>Leisure <span class="math inline">\(\lambda_l\)</span>: proportional
+to the number of infectious individuals in the leisure setting
+multiplied by <span class="math inline">\(\beta_l\)</span>.</li>
 </ul>
 <p>The probability of infection in a given time step <span class="math inline">\(\delta &gt; 0\)</span> is <span class="math display">\[
 \mathbb{P}(S \to E) = 1 - \exp(\lambda \delta)
@@ -203,6 +273,25 @@ e \sim \text{Gamma}(2\upsilon, 2), \\
 f = \text{round}(e + 1).
 \]</span> where <span class="math inline">\(\upsilon\)</span> is the
 duration of infectiousness which we set to 4. The disease duration <span class="math inline">\(f\)</span> is a number of time steps <span class="math inline">\(\delta\)</span>.</p>
+</div>
+</div>
+<div class="section level2 unnumbered">
+<h2 class="unnumbered" id="bibliography">Bibliography<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-ferguson2005strategies" class="csl-entry">
+Ferguson, Neil M, Derek AT Cummings, Simon Cauchemez, Christophe Fraser,
+Steven Riley, Aronrag Meeyai, Sopon Iamsirithaworn, and Donald S Burke.
+2005. <span>“Strategies for Containing an Emerging Influenza Pandemic in
+Southeast Asia.”</span> <em>Nature</em> 437 (7056): 209–14.
+</div>
+<div id="ref-hinch2021openabm" class="csl-entry">
+Hinch, Robert, William JM Probert, Anel Nurtay, Michelle Kendall, Chris
+Wymant, Matthew Hall, Katrina Lythgoe, et al. 2021.
+<span>“OpenABM-Covid19—an Agent-Based Model for Non-Pharmaceutical
+Interventions Against COVID-19 Including Contact Tracing.”</span>
+<em>PLoS Computational Biology</em> 17 (7): e1009146.
+</div>
 </div>
 </div>
   </div>

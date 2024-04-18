@@ -1,96 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://mrc-ide.github.io/helios/404.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://mrc-ide.github.io/helios/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://mrc-ide.github.io/helios/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/articles/helios.html</loc>
+    <loc>https://mrc-ide.github.io/helios/articles/helios.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://mrc-ide.github.io/helios/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/model.html</loc>
+    <loc>https://mrc-ide.github.io/helios/articles/model.html</loc>
   </url>
   <url>
-    <loc>/articles/quickstart.html</loc>
+    <loc>https://mrc-ide.github.io/helios/authors.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://mrc-ide.github.io/helios/index.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics.html</loc>
   </url>
   <url>
-    <loc>/reference/EI_process.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/create_EI_process.html</loc>
   </url>
   <url>
-    <loc>/reference/IR_process.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/create_IR_process.html</loc>
   </url>
   <url>
-    <loc>/reference/SE_process.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/create_RS_process.html</loc>
   </url>
   <url>
-    <loc>/reference/add_event_listeners.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/create_SE_process.html</loc>
   </url>
   <url>
-    <loc>/reference/create_EI_process.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/create_events.html</loc>
   </url>
   <url>
-    <loc>/reference/create_IR_process.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/create_processes.html</loc>
   </url>
   <url>
-    <loc>/reference/create_SE_process.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/create_variables.html</loc>
   </url>
   <url>
-    <loc>/reference/create_events.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_age_classes.html</loc>
   </url>
   <url>
-    <loc>/reference/create_processes.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_disease_states.html</loc>
   </url>
   <url>
-    <loc>/reference/create_variables.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_households.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_initial_age_classes.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_households_bootstrap.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_initial_disease_states.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_leisure.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_initial_households.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_schools.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_initial_leisure.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_schools_bootstrap.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_initial_schools.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_workplaces.html</loc>
   </url>
   <url>
-    <loc>/reference/generate_initial_workplaces.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/get_parameters.html</loc>
   </url>
   <url>
-    <loc>/reference/get_parameters.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/run_simulation.html</loc>
   </url>
   <url>
-    <loc>/reference/run_simulation.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/sample_log_normal.html</loc>
   </url>
   <url>
-    <loc>/reference/sample_log_normal.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/sample_negbinom.html</loc>
   </url>
   <url>
-    <loc>/reference/sample_negbinom.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/sample_offset_truncated_power_distribution.html</loc>
   </url>
   <url>
-    <loc>/reference/sample_offset_truncated_power_distribution.html</loc>
+    <loc>https://mrc-ide.github.io/helios/reference/schools_england.html</loc>
   </url>
 </urlset>

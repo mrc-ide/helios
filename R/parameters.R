@@ -1,11 +1,13 @@
 #' Establish the list of model parameters
 #'
-#' @description The get_parameters() function creates a named list of model parameters.
+#' This function creates a named list of model parameters which are to be used
+#' in the model. For example, the output of [get_parameters()] provides input to
+#' functions such as [create_variables()] and [create_events()].
 #'
-#' @param overrides a named list of parameters values to be used instead of the defaults.
-#' The parameters are defined below:
+#' @param overrides A named list of parameters values to be used instead of the defaults.
+#' These parameters are:
 #'
-#' * `human_population`: the number of humans to model
+#' * `human_population`: the number of humans to include in the model
 #' * `initial_proportion_child`: proportion of population initially in the 'child' age class
 #' * `initial_proportion_adult`: proportion of population initially in the 'adult' age class
 #' * `initial_proportion_elderly`: proportion of population initially in the 'elderly' age class
@@ -18,6 +20,7 @@
 #' * `school_prop_max`: maximum size of a school as a proporiton of total child population size
 #' * `school_meanlog`: the meanlog parameter for the log-normal distribution on school size
 #' * `school_sdlog`: the sdlog parameter for the log-normal distribution on school size
+#' * `school_student_staff_ratio`: the number of students to each adult staff member
 #' * `leisure_mean_number_settings`: TBD
 #' * `leisure_mean_size`: TBD
 #' * `leisure_overdispersion_size`: TBD
@@ -53,10 +56,11 @@
 #' * `far_uvc_household_coverage`: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
 #' * `far_uvc_household_efficacy`: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_household_timestep`: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
+#' @family parameters
 #' @export
 get_parameters <- function(overrides = list()) {
 
-  # Open a list of parameters to store:
+  # Open a list of parameters to store
   parameters <- list(
     human_population = 10000,
     initial_proportion_child = 0.2,
@@ -71,6 +75,7 @@ get_parameters <- function(overrides = list()) {
     school_prop_max = 0.1,
     school_meanlog = 5.49,
     school_sdlog = 1.02,
+    school_student_staff_ratio = 20,
     leisure_prob_visit = 0.6,
     leisure_mean_number_settings = 3,
     leisure_mean_size = 50,
@@ -86,6 +91,7 @@ get_parameters <- function(overrides = list()) {
     dt = 0.5, # check this as default
     simulation_time = 150,
     household_distribution_generation = "empirical",
+    school_distribution_generation = "empirical",
     endemic_or_epidemic = "epidemic",
     duration_immune = NULL,
 
@@ -116,12 +122,12 @@ get_parameters <- function(overrides = list()) {
 
   )
 
-  # Ensure overridden parameters are passed as a list:
+  # Ensure overridden parameters are passed as a list
   if (!is.list(overrides)) {
     stop('overrides must be a list')
   }
 
-  # Override parameter values in the overrides input:
+  # Override parameter values in the overrides input
   for (name in names(overrides)) {
     if (!(name %in% names(parameters))) {
       stop(paste('unknown parameter', name, sep=' '))

@@ -7,10 +7,10 @@
 get_parameters(overrides = list())
 }
 \arguments{
-\item{overrides}{a named list of parameters values to be used instead of the defaults.
-The parameters are defined below:
+\item{overrides}{A named list of parameters values to be used instead of the defaults.
+These parameters are:
 \itemize{
-\item \code{human_population}: the number of humans to model
+\item \code{human_population}: the number of humans to include in the model
 \item \code{initial_proportion_child}: proportion of population initially in the 'child' age class
 \item \code{initial_proportion_adult}: proportion of population initially in the 'adult' age class
 \item \code{initial_proportion_elderly}: proportion of population initially in the 'elderly' age class
@@ -23,6 +23,7 @@ The parameters are defined below:
 \item \code{school_prop_max}: maximum size of a school as a proporiton of total child population size
 \item \code{school_meanlog}: the meanlog parameter for the log-normal distribution on school size
 \item \code{school_sdlog}: the sdlog parameter for the log-normal distribution on school size
+\item \code{school_student_staff_ratio}: the number of students to each adult staff member
 \item \code{leisure_mean_number_settings}: TBD
 \item \code{leisure_mean_size}: TBD
 \item \code{leisure_overdispersion_size}: TBD
@@ -63,5 +64,8 @@ Far UVC Intervention Parameters:
 }}
 }
 \description{
-The get_parameters() function creates a named list of model parameters.
+This function creates a named list of model parameters which are to be used
+in the model. For example, the output of \code{\link[=get_parameters]{get_parameters()}} provides input to
+functions such as \code{\link[=create_variables]{create_variables()}} and \code{\link[=create_events]{create_events()}}.
 }
+\concept{parameters}

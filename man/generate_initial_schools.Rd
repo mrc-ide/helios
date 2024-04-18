@@ -2,7 +2,7 @@
 % Please edit documentation in R/variables.R
 \name{generate_initial_schools}
 \alias{generate_initial_schools}
-\title{Gets school assignments for all individuals}
+\title{Generate a vector of school assignments for all individuals in the population}
 \usage{
 generate_initial_schools(parameters_list, age_class_variable)
 }
@@ -12,5 +12,17 @@ generate_initial_schools(parameters_list, age_class_variable)
 \item{age_class_variable}{An \code{individual::CategoricalVariable} for the age classes}
 }
 \description{
-Gets school assignments for all individuals
+Generate a vector of school assignments for all individuals in the population
 }
+\seealso{
+Other variables: 
+\code{\link{create_variables}()},
+\code{\link{generate_initial_age_classes}()},
+\code{\link{generate_initial_disease_states}()},
+\code{\link{generate_initial_households}()},
+\code{\link{generate_initial_households_bootstrap}()},
+\code{\link{generate_initial_leisure}()},
+\code{\link{generate_initial_schools_bootstrap}()},
+\code{\link{generate_initial_workplaces}()}
+}
+\concept{variables}
