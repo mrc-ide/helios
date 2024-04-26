@@ -56,3 +56,22 @@ test_that("run_simulations() correctly renders diagnostic outputs when render_di
   expect_identical(object = observed_column_names, expected = expected_columns_names)
 
 })
+
+test_that("Disease state counts sum to parameters$human population", {
+
+  # Get a list of model parameters:
+  parameters <- get_parameters(overrides = list(human_population = 137,
+                                                simulation_time = 10))
+
+  # Run the simulation:
+  output <- run_simulation(parameters_list = parameters)
+
+  # Sum the disease states in each time step:
+  for(i in 1:nrow(output)) {
+    output$total_pop[i] <- sum(output$S_count[i] + output$E_count[i] + output$I_count[i] + output$R_count[i])
+  }
+
+  # Check that all summed disease states sum to the parameterised human population:
+  expect_true(all(output$total_pop == parameters$human_population))
+
+})
