@@ -39,6 +39,11 @@ These parameters are:
 \item \code{simulation_time}: TBD
 }
 
+Rendering Parameters
+\itemize{
+\item \code{render_diagnostics}: FALSE
+}
+
 Far UVC Intervention Parameters:
 \itemize{
 \item \code{far_uvc_workplace}: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using \code{set_ucv()}; default = FALSE

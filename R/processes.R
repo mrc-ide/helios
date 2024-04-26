@@ -280,13 +280,15 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     # individual:
     total_FOI <- household_FOI + workplace_FOI + school_FOI + leisure_FOI + community_FOI
 
-    # Render the setting-specific FOIs:
-    renderer$render('FOI_household', max(household_FOI), t)
-    renderer$render('FOI_workplace', max(workplace_FOI), t)
-    renderer$render('FOI_school', max(school_FOI), t)
-    renderer$render('FOI_leisure', max(leisure_FOI), t)
-    renderer$render('FOI_community', max(community_FOI), t)
-    renderer$render('FOI_total', max(total_FOI), t)
+    # Render the setting-specific FOIs is diagnostic rendering turned on:
+    if(parameters$render_diagnostics) {
+      renderer$render('FOI_household', max(household_FOI), t)
+      renderer$render('FOI_workplace', max(workplace_FOI), t)
+      renderer$render('FOI_school', max(school_FOI), t)
+      renderer$render('FOI_leisure', max(leisure_FOI), t)
+      renderer$render('FOI_community', max(community_FOI), t)
+      renderer$render('FOI_total', max(total_FOI), t)
+    }
 
     # Calculate the probability of getting infected in the current interval for each individual:
     p_inf <- 1 - exp(-total_FOI * parameters_list$dt)
