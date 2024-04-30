@@ -35,6 +35,9 @@
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
 #'
+#' Rendering Parameters
+#' * `render_diagnostics`: FALSE
+#'
 #' Far UVC Intervention Parameters:
 #' * `far_uvc_workplace`: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using `set_ucv()`; default = FALSE
 #' * `far_uvc_workplace_coverage_type`:Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted" for targeting interventions at most populous workplaces
@@ -90,6 +93,7 @@ get_parameters <- function(overrides = list()) {
     beta_community = 0.2, # check this as default
     dt = 0.5, # check this as default
     simulation_time = 150,
+    render_diagnostics = FALSE,
     household_distribution_generation = "empirical",
     school_distribution_generation = "empirical",
     endemic_or_epidemic = "epidemic",

@@ -18,7 +18,8 @@ create_processes <- function(variables_list, events_list, parameters_list, rende
     # ===============================
     SE_process = create_SE_process(variables_list = variables_list,
                                    events_list = events_list,
-                                   parameters_list = parameters_list),
+                                   parameters_list = parameters_list,
+                                   renderer = renderer),
 
     EI_process = create_EI_process(variables_list = variables_list,
                                    events_list = events_list,
@@ -62,7 +63,7 @@ create_processes <- function(variables_list, events_list, parameters_list, rende
 #'
 #' @family processes
 #' @export
-create_SE_process <- function(variables_list, events_list, parameters_list){
+create_SE_process <- function(variables_list, events_list, parameters_list, renderer){
 
   ## Pre-calculating the things that only have to be calculated once
 
@@ -110,9 +111,6 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
 
   ## Process Function
   function(t) {
-
-    ## Timestep printing
-    print(t)
 
     ## Bitset for all infectious individuals
     I <- variables_list$disease_state$get_index_of("I")
@@ -281,7 +279,16 @@ create_SE_process <- function(variables_list, events_list, parameters_list){
     # Sum the household, workplace, school leisure, and community FOIs to get the total FOI for each
     # individual:
     total_FOI <- household_FOI + workplace_FOI + school_FOI + leisure_FOI + community_FOI
-    print(c(max(household_FOI), max(workplace_FOI), max(school_FOI), max(leisure_FOI), max(community_FOI)))
+
+    # Render the setting-specific FOIs is diagnostic rendering turned on:
+    if(parameters$render_diagnostics) {
+      renderer$render('FOI_household', max(household_FOI), t)
+      renderer$render('FOI_workplace', max(workplace_FOI), t)
+      renderer$render('FOI_school', max(school_FOI), t)
+      renderer$render('FOI_leisure', max(leisure_FOI), t)
+      renderer$render('FOI_community', max(community_FOI), t)
+      renderer$render('FOI_total', max(total_FOI), t)
+    }
 
     # Calculate the probability of getting infected in the current interval for each individual:
     p_inf <- 1 - exp(-total_FOI * parameters_list$dt)
