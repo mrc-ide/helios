@@ -14,10 +14,10 @@ create_events <- function(variables_list, parameters_list) {
   events_list <- list(
 
     # Event moving exposed individuals to the infectious state
-    EI_event = TargetedEvent$new(population_size = parameters_list$human_population),
+    EI_event = individual::TargetedEvent$new(population_size = parameters_list$human_population),
 
     # Event moving exposed individuals to the infectious state
-    IR_event = TargetedEvent$new(population_size = parameters_list$human_population)
+    IR_event = individual::TargetedEvent$new(population_size = parameters_list$human_population)
 
   )
 
@@ -38,7 +38,7 @@ create_events <- function(variables_list, parameters_list) {
   # Add RS_event and listener if endemic pathogen is required (i.e. individuals going R->S)
   if (parameters_list$endemic_or_epidemic == "endemic") {
 
-    RS_event <- TargetedEvent$new(population_size = parameters_list$human_population)
+    RS_event <- individual::TargetedEvent$new(population_size = parameters_list$human_population)
     events_list <- c(events_list, list(RS_event = RS_event))
 
     events_list$RS_event$add_listener(

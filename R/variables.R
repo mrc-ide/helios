@@ -36,7 +36,7 @@ create_variables <- function(parameters_list) {
 
     # Household variable
     initial_households <- generate_initial_households(parameters_list = parameters_list, age_class_variable = age_class_variable)
-    household_variable <- CategoricalVariable$new(categories = as.character(1:max(initial_households)),
+    household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(initial_households)),
                                                   initial_values = as.character(initial_households))
   }
 
@@ -50,7 +50,7 @@ create_variables <- function(parameters_list) {
   if(num_schools <= 2) {
     message("There are less than or equal to 2 schools. Consider the population size may be too small!")
   }
-  school_variable <- CategoricalVariable$new(categories = as.character(0:num_schools), initial_values = initial_school_settings)
+  school_variable <- individual::CategoricalVariable$new(categories = as.character(0:num_schools), initial_values = initial_school_settings)
 
   # Workplace setting variable
   initial_workplace_settings <- generate_initial_workplaces(parameters_list = parameters_list, age_class_variable = age_class_variable, school_variable = school_variable)
@@ -58,7 +58,7 @@ create_variables <- function(parameters_list) {
   if(num_workplaces <= 2) {
     message("There are less than or equal to 2 workplaces. Consider the population size may be too small!")
   }
-  workplace_variable <- CategoricalVariable$new(categories = as.character(0:num_workplaces), initial_values = initial_workplace_settings)
+  workplace_variable <- individual::CategoricalVariable$new(categories = as.character(0:num_workplaces), initial_values = initial_workplace_settings)
 
   # Initialise and populate the leisure setting variable that stores all the leisure locations an individual COULD go to
   # Generating the number and sizes of each leisure setting
@@ -68,11 +68,11 @@ create_variables <- function(parameters_list) {
                                            size = parameters_list$leisure_overdispersion_size)
   parameters_list$leisure_setting_sizes <- leisure_setting_sizes
   initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = parameters_list$leisure_setting_sizes) # returns list to initialise RaggedInteger
-  leisure_variable <- RaggedInteger$new(initial_values = initial_leisure_settings)
+  leisure_variable <- individual::RaggedInteger$new(initial_values = initial_leisure_settings)
 
   possible_leisure_settings <- unique(unlist(initial_leisure_settings))
   possible_leisure_settings <- possible_leisure_settings[order(possible_leisure_settings)]
-  specific_day_leisure_variable <- CategoricalVariable$new(categories = as.character(possible_leisure_settings),
+  specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(possible_leisure_settings),
                                                            initial_values = rep(as.character(0), parameters_list$human_population))
 
   # Return the list of model variables
