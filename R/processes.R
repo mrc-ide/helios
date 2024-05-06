@@ -281,7 +281,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     total_FOI <- household_FOI + workplace_FOI + school_FOI + leisure_FOI + community_FOI
 
     # Render the setting-specific FOIs is diagnostic rendering turned on:
-    if(parameters$render_diagnostics) {
+    if(parameters_list$render_diagnostics) {
       renderer$render('FOI_household', max(household_FOI), t)
       renderer$render('FOI_workplace', max(workplace_FOI), t)
       renderer$render('FOI_school', max(school_FOI), t)
