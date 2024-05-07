@@ -121,7 +121,7 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
     if(parameters_list$far_uvc_workplace_coverage_type == "targeted") {
 
       # Get the indices of the indices of workplaces with Far UVC based on their sizes:
-      indices_of_workplaces_with_uvc <- sort(x = variables_list$setting_sizes$workplace,
+      indices_of_workplaces_with_uvc <- sort(x = parameters_list$setting_sizes$workplace,
                                              decreasing = TRUE,
                                              index.return = TRUE)$ix[1:number_of_workplaces_with_uvc]
 
@@ -165,7 +165,7 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
     if(parameters_list$far_uvc_school_coverage_type == "targeted") {
 
       # Get the indices of the indices of schools with Far UVC based on their sizes:
-      indices_of_schools_with_uvc <- sort(x = variables_list$setting_sizes$school,
+      indices_of_schools_with_uvc <- sort(x = parameters_list$setting_sizes$school,
                                           decreasing = TRUE,
                                           index.return = TRUE)$ix[1:number_of_schools_with_uvc]
 
@@ -209,7 +209,7 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
     if(parameters_list$far_uvc_leisure_coverage_type == "targeted") {
 
       # Get the indices of the indices of leisure settings with Far UVC based on their sizes:
-      indices_of_leisures_with_uvc <- sort(x = variables_list$setting_sizes$leisure,
+      indices_of_leisures_with_uvc <- sort(x = parameters_list$setting_sizes$leisure,
                                            decreasing = TRUE,
                                            index.return = TRUE)$ix[1:number_of_leisures_with_uvc]
 
@@ -254,7 +254,7 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
     if(parameters_list$far_uvc_household_coverage_type == "targeted") {
 
       # Get the indices of the indices of households with Far UVC based on their sizes:
-      indices_of_households_with_uvc <- sort(x = variables_list$setting_sizes$household,
+      indices_of_households_with_uvc <- sort(x = parameters_list$setting_sizes$household,
                                              decreasing = TRUE,
                                              index.return = TRUE)$ix[1:number_of_households_with_uvc]
 

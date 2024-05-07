@@ -86,18 +86,18 @@ create_variables <- function(parameters_list) {
     specific_leisure = specific_day_leisure_variable
   )
 
+  # Store setting sizes in a list:
+  setting_sizes <- get_setting_sizes(variables_list = variables_list,
+                                     leisure_sizes = leisure_setting_sizes)
+
+  # Append setting sizes to variables_list:
+  parameters_list$setting_sizes <- setting_sizes
+
   # If any setting has UVC installed, retrieve the sizes of all of the settings:
   if(any(parameters_list$far_uvc_workplace,
          parameters_list$far_uvc_school,
          parameters_list$far_uvc_leisure,
          parameters_list$far_uvc_household)) {
-
-    # Store setting sizes in a list:
-    setting_sizes <- get_setting_sizes(variables_list = variables_list,
-                                       leisure_sizes = leisure_setting_sizes)
-
-    # Append setting sizes to variables_list:
-    parameters_list$setting_sizes <- setting_sizes
 
     # Generate and append the far UVC switches for settings in which it has been switched on:
     parameters_list <- generate_far_uvc_switches(parameters_list, variables_list)
