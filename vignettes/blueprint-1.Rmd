@@ -2,7 +2,10 @@
 title: "Assessing far UVC interventions with an individual based infectious disease model"
 author:
   - Charlie Whittaker^[Imperial College London], Tom Brewer^[Imperial College London], Adam Howes^[Independent]
-output: rmarkdown::html_vignette
+output: 
+  bookdown::html_vignette2:
+    fig_caption: yes
+    number_sections: yes
 vignette: >
   %\VignetteIndexEntry{blueprint}
   %\VignetteEngine{knitr::rmarkdown}
@@ -15,46 +18,94 @@ options(rmarkdown.html_vignette.check_title = FALSE)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
-## Abstract
+```{r}
+library(helios)
+library(individual)
+library(ggplot2)
+library(dplyr, warn.conflicts = FALSE)
+library(purrr)
+theme_set(theme_minimal())
+```
 
-`helios` is an R package implementing a stochastic individual based model of infectious disease transmission.
-The package can be used to quantify the impact of installing far UVC interventions on epidemic outcomes such as infections and deaths.
-The effectiveness of possible intervention implementations may be evaluated in order to guide development of far UVC technologies.
+Ultraviolet (UV) light with wavelength 200-280 nanometers (far UVC light) has germicidal properties against viruses and bacteria.
+With the right technical developments, installation of far UVC light sources could be a promising public health intervention against infectious diseases.
 
-## Background
+`helios` is an R package implementing a stochastic individual-based model of infectious disease transmission.
+The package can be used to quantify the impact of installing far UVC interventions on epidemic outcomes, such as infections and deaths.
+Evaluating the effectiveness of possible far UVC implementations is important to guide technical development.
 
-What is far UVC.
+# Model description
 
-## Model description
+```{r}
+parameters_list <- get_parameters(list(human_population = 5000, seed = 1))
+variables <- create_variables(parameters_list)
+disease_states <- variables$variables_list$disease_state$get_categories()
+age_classes <- variables$variables_list$age_class$get_categories()
+age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
+```
 
-The model consists of a fixed population of individuals.
-Each individual is either a child, an adult or an elderly person.
-During each day, individuals visit particular locations and mix with other individuals.
-Disease transmission occurs stochastically between individuals in the same location.
+(ref:age) Figure caption.
 
-The locations included in the model are households, schools, workplaces, and leisure venues.
-Households compositions are based on...
-Schools are attended by all children, with their sizes based on...
-Workplaces are attended by all adults, with their sizes based on...
-Something about leisure venues.
-Something about how long people spend in each location.
+```{r age, fig.cap="(ref:age)"}
+data.frame(age_classes, age_class_counts) |>
+  mutate(age_classes = dplyr::recode_factor(age_classes, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
+  ggplot(aes(x = age_classes, y = age_class_counts)) +
+  geom_col() +
+  labs(x = "Age group", y = "Number of individuals") +
+  coord_flip()
+```
+
+The model implemented in `helios` has a fixed population of individuals.
+Each individual is either a child, an adult, or an elderly person.
+Figure \@ref(fig:age) shows the proportion in each age group from a population of 5000 individuals.
+It is assumed that no aging occurs during the simulation.
+During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals.
+Disease transmission (Section \@ref(disease)) occurs stochastically, and only between individuals in the same location.
+
+## Locations {#locations}
+
+The locations included in the model are households, schools, workplaces, and leisure venues:
+
+1. **Households**
+The sizes and age compositions of households are based on the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
+2. **Schools**
+All children are assumed to attend school.
+The number of student in each school is sampled from the 2022/2023 census of schools in the UK [@school2023].
+For each 20 students, there is one adult teacher who works at the school.
+3. **Workplaces**
+All adults (who are not teachers) are assumed to attend workplaces.
+The number of employees in each workplace is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies.
+4. **Leisure venues**
+All individuals (children, adults, and elderly people) are eligible to attend leisure venues.
+Leisure venue sizes are sampled from a negative binomial distribution.
+The number of leisure venues per week for each individual is sampled from a Poisson distribution, and capped at seven corresponding to one leisure visit each day.
+
+## Disease states {#disease}
 
 At any time, each individual is either susceptible, exposed, infectious, or recovered.
 Susceptible individuals become exposed after spending time with infectious individuals.
-Time spent by individuals in each location and their level of risk is implemented by setting specific force of infection parameters.
+Time spent by individuals in each location and their level of risk is implemented by setting location-specific force of infection parameters.
 Exposed individuals become infectious after some delay.
 Infectious individuals become recovered after some delay.
 Once recovered, individuals cannot be infected again.
 
-Far UVC interventions can be installed in settings.
-Remains to detail.
+## Far UVC
 
-## Example model outputs
+Far UVC interventions can be installed in each of the four location types.
+Within each location type, the proportion of settings covered by the installation can be specified.
+For example, the proportion of schools where far UVC is to be installed.
+Coverage may be set to either at random or targetted, such far UVC is installed first at the largest locations.
+The efficacy of far UVC, which can be thought of as the expected proportion reduction in transmission, within the particular location may also be set.
 
-## Parameter sensitivity
+# Example model outputs
 
-## Bibliography {-}
+# Parameter sensitivity
+
+# Bibliography {-}
