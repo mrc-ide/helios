@@ -318,22 +318,13 @@ parameters_list$beta_community
 ##' beta_workplace: 0.154
 ##' beta_leisure: 0.154
 ##' beta_community: 0.077
-##'
-##' When the ratios are 3:3:3:3:1, the betas are:
-##'
-##' beta_household: 0.186
-##' beta_school: 0.186
-##' beta_workplace: 0.186
-##' beta_leisure: 0.186
-##' beta_community: 0.062
-##'
 
 # Generate the betas required to achieve the target R0 of 2:
 exemplar_run_betas <- generate_betas(beta_community = c(0.077, 0.062),
-                                     household_ratio = 3,
-                                     school_ratio = 3,
-                                     workplace_ratio = 3,
-                                     leisure_ratio = 3)
+                                     household_ratio = 2,
+                                     school_ratio = 2,
+                                     workplace_ratio = 2,
+                                     leisure_ratio = 1)
 
 # Calculate the simulation_time required to simulate a 2 year period:
 years_to_simulate <- 3
@@ -342,11 +333,11 @@ simulation_timesteps <- (365 * years_to_simulate)
 # Generate the list of model parameters for the baseline, no-intervention run:
 parameters_baseline <- get_parameters(overrides = list(
   human_population = 10000,
-  beta_household = exemplar_run_betas$beta_household[1],
-  beta_school = exemplar_run_betas$beta_school[1],
-  beta_workplace = exemplar_run_betas$beta_workplace[1],
-  beta_leisure = exemplar_run_betas$beta_leisure[1],
-  beta_community = exemplar_run_betas$beta_community[1],
+  beta_household = exemplar_run_betas$beta_household,
+  beta_school = exemplar_run_betas$beta_school,
+  beta_workplace = exemplar_run_betas$beta_workplace,
+  beta_leisure = exemplar_run_betas$beta_leisure,
+  beta_community = exemplar_run_betas$beta_community,
   endemic_or_epidemic = "epidemic",
   simulation_time = simulation_timesteps
 ))
@@ -413,14 +404,35 @@ tictoc::toc()
 
 #----- 5) Exemplar Model Runs: 3:3:3:3:1 -----------------------------------------------------------
 
+##'
+##' When the ratios are 3:3:3:3:1, the betas are:
+##'
+##' beta_household: 0.186
+##' beta_school: 0.186
+##' beta_workplace: 0.186
+##' beta_leisure: 0.186
+##' beta_community: 0.062
+##'
+
+# Generate the betas required to achieve the target R0 of 2:
+exemplar_run_betas <- generate_betas(beta_community = c(0.062),
+                                     household_ratio = 3,
+                                     school_ratio = 3,
+                                     workplace_ratio = 3,
+                                     leisure_ratio = 3)
+
+# Calculate the simulation_time required to simulate a 2 year period:
+years_to_simulate <- 3
+simulation_timesteps <- (365 * years_to_simulate)
+
 # Generate the list of model parameters for the baseline, no-intervention run:
 parameters_baseline_2 <- get_parameters(overrides = list(
   human_population = 10000,
-  beta_household = exemplar_run_betas$beta_household[2],
-  beta_school = exemplar_run_betas$beta_school[2],
-  beta_workplace = exemplar_run_betas$beta_workplace[2],
-  beta_leisure = exemplar_run_betas$beta_leisure[2],
-  beta_community = exemplar_run_betas$beta_community[2],
+  beta_household = exemplar_run_betas$beta_household,
+  beta_school = exemplar_run_betas$beta_school,
+  beta_workplace = exemplar_run_betas$beta_workplace,
+  beta_leisure = exemplar_run_betas$beta_leisure,
+  beta_community = exemplar_run_betas$beta_community,
   endemic_or_epidemic = "epidemic",
   simulation_time = simulation_timesteps
 ))
@@ -683,4 +695,62 @@ grid.arrange(
   nrow = 2
 
 )
+
+#----- 7) Iterating Random Far-UVC Simulations -----------------------------------------------------
+
+# Generate the betas required to achieve the target R0 of 2:
+exemplar_run_betas <- generate_betas(beta_community = c(0.062),
+                                     household_ratio = 3,
+                                     school_ratio = 3,
+                                     workplace_ratio = 3,
+                                     leisure_ratio = 3)
+
+# Calculate the simulation_time required to simulate a 2 year period:
+years_to_simulate <- 3
+simulation_timesteps <- (365 * years_to_simulate)
+
+# Generate the list of model parameters for the baseline, no-intervention run:
+get_parameters(overrides = list(
+  human_population = 10000,
+  beta_household = exemplar_run_betas$beta_household,
+  beta_school = exemplar_run_betas$beta_school,
+  beta_workplace = exemplar_run_betas$beta_workplace,
+  beta_leisure = exemplar_run_betas$beta_leisure,
+  beta_community = exemplar_run_betas$beta_community,
+  endemic_or_epidemic = "epidemic",
+  simulation_time = simulation_timesteps)) %>%
+  set_uvc(setting = "school",
+          coverage = 0.5,
+          coverage_type = "random",
+          efficacy = 0.75,
+          timestep = 1) %>%
+  set_uvc(setting = "workplace",
+          coverage = 0.5,
+          coverage_type = "random",
+          efficacy = 0.75,
+          timestep = 1) %>%
+  set_uvc(setting = "leisure",
+          coverage = 0.5,
+          coverage_type = "random",
+          efficacy = 0.75,
+          timestep = 1) -> parameters_uvc_random_2
+
+# Select a number of iterations to run:
+iterations <- 20
+
+# Open a list to store the simulations:
+uvc_random_outputs <- list()
+
+# Run the simulations:
+for(i in 1:iterations) {
+  tictoc::tic()
+  uvc_random_outputs[[i]] <- run_simulation(parameters_list = parameters_uvc_random_2)
+  tictoc::toc()
+}
+
+
+
+
+
+
 
