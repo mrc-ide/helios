@@ -69,7 +69,7 @@ generate_betas <- function(beta_community, household_ratio, school_ratio, workpl
 
 }
 
-#----- 2) Matching Setting Betas to R0 Using Final Epidemic Size (finalsize package) (V1) ----------
+#----- 2) Matching Setting Betas to R0 Using Final Epidemic Size: 3:2:2:2:1 ------------------------
 
 ##'
 ##' This section mapped to R0s via the final_size() function using the following beta ratios:
@@ -82,7 +82,6 @@ generate_betas <- function(beta_community, household_ratio, school_ratio, workpl
 ##'
 
 # Use generate_betas() to create a dataframe of betas for all settings:
-#betas <- generate_betas(beta_community = seq(0.01, 0.2, by = 0.005))
 betas <- generate_betas(beta_community = 0.123,
                         household_ratio = 3,
                         school_ratio = 2,
@@ -194,7 +193,7 @@ simulation_output %>%
 ##'
 ##'
 
-#----- 3) Matching Setting Betas to R0 Using Final Epidemic Size (finalsize package) (V2) ----------
+#----- 3) Matching Setting Betas to R0 Using Final Epidemic Size: 3:3:3:3:1 ------------------------
 
 ##'
 ##' This section mapped to R0s via the final_size() function using the following beta ratios:
@@ -207,8 +206,7 @@ simulation_output %>%
 ##'
 
 # Use generate_betas() to create a dataframe of betas for all settings:
-#betas <- generate_betas(beta_community = seq(0.01, 0.2, by = 0.005))
-betas <- generate_betas(beta_community = 0.123,
+betas <- generate_betas(beta_community = 0.062,
                         household_ratio = 3,
                         school_ratio = 3,
                         workplace_ratio = 3,
@@ -229,10 +227,66 @@ parameters_list <- get_parameters(overrides = list(
   beta_leisure = betas$beta_leisure[beta_index],
   beta_community = betas$beta_community[beta_index],
   endemic_or_epidemic = "epidemic",
-  simulation_time = 150
+  simulation_time = 200
 ))
 
-#----- 3) Exemplar Model Runs ----------------------------------------------------------------------
+# Run the simulation:
+simulation_output <- run_simulation(parameters_list = parameters_list)
+
+# Calculate the final proportion of individuals in each compartment:
+simulation_output %>%
+  mutate(S_prop = S_count / parameters_list$human_population) %>%
+  mutate(E_prop = E_count / parameters_list$human_population) %>%
+  mutate(I_prop = I_count / parameters_list$human_population) %>%
+  mutate(R_prop = R_count / parameters_list$human_population) -> simulation_output_processed
+
+# Plot the dynamics:
+simulation_output %>%
+  mutate(S_prop = S_count / parameters_list$human_population,
+         E_prop = E_count / parameters_list$human_population,
+         I_prop = I_count / parameters_list$human_population,
+         R_prop = R_count / parameters_list$human_population) %>%
+  pivot_longer(cols = c(S_prop, E_prop, I_prop, R_prop), names_to = "State", values_to = "Proportion") %>%
+  ggplot(aes(x = timestep, y = Proportion, colour = State)) + geom_line(linewidth = 1.2) +
+  theme_bw() +
+  labs(x = "Time", y = "Count", colour = "State") +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0))
+
+# Check the maximum proportion recovered:
+max(simulation_output_processed$R_prop)
+
+# Check the beta_community
+parameters_list$beta_community
+
+##'
+##' Table of beta_community values matched to the final, actual proportion of infected individuals
+##'
+##' beta_community      Actual Prop.
+##' 0.036               0.3565
+##' 0.0365              0.3512
+##' 0.044               0.5691
+##' 0.045               0.5935
+##' 0.05                0.6989
+##' 0.055               0.7251
+##' 0.06                0.7883
+##' 0.07                0.8586
+##' 0.075               0.8686
+##' 0.08                0.887
+##' 0.081               0.9041
+##' 0.085               0.9111
+
+##' Betas that match R0s of interest:
+##'
+##' R0      size      beta_community    Actual Prop.  Approx. time to Eq
+##' 1.25    0.37      0.36              0.3607        t = 700
+##' 1.5     0.58      0.044             0.588         t = 500
+##' 2       0.8       0.062             0.8001        t = 250
+##' 2.5     0.89      0.08              0.893         t = 200
+##' 3       0.94      0.097             0.9415        t = 175
+##'
+
+#----- 4) Exemplar Model Runs: 3:2:2:2:1 -----------------------------------------------------------
 
 #+++ Introduction +++#
 #++++++++++++++++++++#
@@ -257,7 +311,7 @@ parameters_list <- get_parameters(overrides = list(
 ##'
 
 ##' For the exemplar model runs, we want an R0 of 2, for which the corresponding setting-specific
-##' betas are:
+##' betas when the ratios are 3:2:2:2:1 are:
 ##'
 ##' beta_household: 0.231
 ##' beta_school: 0.154
@@ -265,23 +319,34 @@ parameters_list <- get_parameters(overrides = list(
 ##' beta_leisure: 0.154
 ##' beta_community: 0.077
 ##'
+##' When the ratios are 3:3:3:3:1, the betas are:
+##'
+##' beta_household: 0.186
+##' beta_school: 0.186
+##' beta_workplace: 0.186
+##' beta_leisure: 0.186
+##' beta_community: 0.062
+##'
 
 # Generate the betas required to achieve the target R0 of 2:
-exemplar_run_betas <- generate_betas(beta_community = 0.077)
+exemplar_run_betas <- generate_betas(beta_community = c(0.077, 0.062),
+                                     household_ratio = 3,
+                                     school_ratio = 3,
+                                     workplace_ratio = 3,
+                                     leisure_ratio = 3)
 
 # Calculate the simulation_time required to simulate a 2 year period:
 years_to_simulate <- 3
 simulation_timesteps <- (365 * years_to_simulate)
 
 # Generate the list of model parameters for the baseline, no-intervention run:
-# Generate a list of model parameters:
 parameters_baseline <- get_parameters(overrides = list(
   human_population = 10000,
-  beta_household = exemplar_run_betas$beta_household,
-  beta_school = exemplar_run_betas$beta_school,
-  beta_workplace = exemplar_run_betas$beta_workplace,
-  beta_leisure = exemplar_run_betas$beta_leisure,
-  beta_community = exemplar_run_betas$beta_community,
+  beta_household = exemplar_run_betas$beta_household[1],
+  beta_school = exemplar_run_betas$beta_school[1],
+  beta_workplace = exemplar_run_betas$beta_workplace[1],
+  beta_leisure = exemplar_run_betas$beta_leisure[1],
+  beta_community = exemplar_run_betas$beta_community[1],
   endemic_or_epidemic = "epidemic",
   simulation_time = simulation_timesteps
 ))
@@ -336,7 +401,7 @@ random_uvc_output_raw <- run_simulation(parameters_list = parameters_uvc_random)
 tictoc::toc()
 
 # Save the output
-saveRDS(random_uvc_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw.rds")
+#saveRDS(random_uvc_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw.rds")
 
 # Run the targeted far UVC simulation:
 tictoc::tic()
@@ -344,24 +409,109 @@ targeted_uvc_output_raw <- run_simulation(parameters_list = parameters_uvc_targe
 tictoc::toc()
 
 # Set up the parameter list for the far UVC with randomised coverage:
-saveRDS(targeted_uvc_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw.rds")
+#saveRDS(targeted_uvc_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw.rds")
 
-#----- 4) Exemplar Run Visualisation ---------------------------------------------------------------
+#----- 5) Exemplar Model Runs: 3:3:3:3:1 -----------------------------------------------------------
 
-# Load the raw outputs:
-baseline_output_raw <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw.rds")
-random_uvc_output_raw <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw.rds")
-targeted_uvc_output_raw  <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw.rds")
+# Generate the list of model parameters for the baseline, no-intervention run:
+parameters_baseline_2 <- get_parameters(overrides = list(
+  human_population = 10000,
+  beta_household = exemplar_run_betas$beta_household[2],
+  beta_school = exemplar_run_betas$beta_school[2],
+  beta_workplace = exemplar_run_betas$beta_workplace[2],
+  beta_leisure = exemplar_run_betas$beta_leisure[2],
+  beta_community = exemplar_run_betas$beta_community[2],
+  endemic_or_epidemic = "epidemic",
+  simulation_time = simulation_timesteps
+))
+
+# Set up model parameters for random far UVC coverage type
+parameters_baseline_2 %>%
+  set_uvc(setting = "school",
+          coverage = 0.5,
+          coverage_type = "random",
+          efficacy = 0.75,
+          timestep = 1) %>%
+  set_uvc(setting = "workplace",
+          coverage = 0.5,
+          coverage_type = "random",
+          efficacy = 0.75,
+          timestep = 1) %>%
+  set_uvc(setting = "leisure",
+          coverage = 0.5,
+          coverage_type = "random",
+          efficacy = 0.75,
+          timestep = 1) -> parameters_uvc_random_2
+
+# Set up model parameters for targeted far UVC coverage type
+parameters_baseline_2 %>%
+  set_uvc(setting = "school",
+          coverage = 0.5,
+          coverage_type = "targeted",
+          efficacy = 0.75,
+          timestep = 1) %>%
+  set_uvc(setting = "workplace",
+          coverage = 0.5,
+          coverage_type = "targeted",
+          efficacy = 0.75,
+          timestep = 1) %>%
+  set_uvc(setting = "leisure",
+          coverage = 0.5,
+          coverage_type = "targeted",
+          efficacy = 0.75,
+          timestep = 1) -> parameters_uvc_targeted_2
+
+# Run the baseline, no intervention scenario (approx. 599 seconds):
+tictoc::tic()
+baseline_output_raw_2 <- run_simulation(parameters_list = parameters_baseline_2)
+tictoc::toc()
+
+# Save the output:
+saveRDS(baseline_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw_2.rds")
+
+# Run the randomly assigned far UVC simulation:
+tictoc::tic()
+random_uvc_output_raw_2 <- run_simulation(parameters_list = parameters_uvc_random_2)
+tictoc::toc()
+
+# Save the output
+saveRDS(random_uvc_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw_2.rds")
+
+# Run the targeted far UVC simulation:
+tictoc::tic()
+targeted_uvc_output_raw_2 <- run_simulation(parameters_list = parameters_uvc_targeted_2)
+tictoc::toc()
+
+# Set up the parameter list for the far UVC with randomised coverage:
+saveRDS(targeted_uvc_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw_2.rds")
+
+#----- 6) Exemplar Run Visualisation ---------------------------------------------------------------
+
+# Load the raw outputs for the first version:
+# baseline_output_raw <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw.rds")
+# random_uvc_output_raw <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw.rds")
+# targeted_uvc_output_raw  <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw.rds")
+#
+# # Load the outputs for the second version:
+# baseline_output_raw_2 <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw_2.rds")
+# random_uvc_output_raw_2 <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw_2.rds")
+# targeted_uvc_output_raw_2  <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw_2.rds")
+
 
 # Store colours for plotting:
 disease_state_colours <- c("#4cd8ff", "#f8ed5b", "brown2", "#a633ff")
 
+# Set a plotting window for the x-axis:
+plotting_window <- 900
+
 # Multiplot showing the disease state dynamics in each simulation:
 grid.arrange(
 
+  #+++ 3:2:2:2:1 +++#
+
   # Plot the disease state dynamics in the baseline scenario:
   baseline_output_raw %>%
-    filter(timestep <= 730) %>%
+    filter(timestep <= plotting_window) %>%
     rename("S" = S_count,
            "E" = E_count,
            "I" = I_count,
@@ -389,7 +539,7 @@ grid.arrange(
 
   # Plot the disease state dynamics for randomly targeted far UVC:
   random_uvc_output_raw %>%
-    filter(timestep <= 730) %>%
+    filter(timestep <= plotting_window) %>%
     rename("S" = S_count,
            "E" = E_count,
            "I" = I_count,
@@ -417,7 +567,7 @@ grid.arrange(
 
   # Plot the disease state dynamics for randomly targeted far UVC:
   targeted_uvc_output_raw %>%
-    filter(timestep <= 730) %>%
+    filter(timestep <= plotting_window) %>%
     rename("S" = S_count,
            "E" = E_count,
            "I" = I_count,
@@ -444,41 +594,93 @@ grid.arrange(
           axis.title.y = element_text(colour = "white"),
           axis.title.x = element_text(colour = "white")),
 
-  nrow = 1
+  #+++ 3:3:3:3:1 +++#
+
+  baseline_output_raw_2 %>%
+    filter(timestep <= plotting_window) %>%
+    rename("S" = S_count,
+           "E" = E_count,
+           "I" = I_count,
+           "R" = R_count) %>%
+    mutate(Total_count = S + E + I + R) %>%
+    mutate(S = S / Total_count,
+           E = E / Total_count,
+           I = I / Total_count,
+           R = R / Total_count) %>%
+    select(timestep, S, E, I, R) %>%
+    pivot_longer(cols = c(S, E, I, R), names_to = "State", values_to = "Proportion") %>%
+    mutate(State = factor(State, levels = c("S", "E", "I", "R"))) %>%
+    ggplot(aes(x = timestep, y = Proportion, colour = State)) +
+    geom_hline(yintercept = max(baseline_output_raw_2$R_count)/parameters_baseline_2$human_population,
+               linetype = "dashed",
+               linewidth = 1) +
+    geom_line(linewidth = 1.5) +
+    theme_bw() +
+    labs(x = "Time", y = "Proportion of Population", colour = "Disease State") +
+    scale_colour_discrete(type = disease_state_colours) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 1)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    theme(legend.position = "none",
+          axis.title.x = element_text(colour = "white")),
+
+  # Plot the disease state dynamics for randomly targeted far UVC:
+  random_uvc_output_raw_2 %>%
+    filter(timestep <= plotting_window) %>%
+    rename("S" = S_count,
+           "E" = E_count,
+           "I" = I_count,
+           "R" = R_count) %>%
+    mutate(Total_count = S + E + I + R) %>%
+    mutate(S = S / Total_count,
+           E = E / Total_count,
+           I = I / Total_count,
+           R = R / Total_count) %>%
+    select(timestep, S, E, I, R) %>%
+    pivot_longer(cols = c(S, E, I, R), names_to = "State", values_to = "Proportion") %>%
+    mutate(State = factor(State, levels = c("S", "E", "I", "R"))) %>%
+    ggplot(aes(x = timestep, y = Proportion, colour = State)) +
+    geom_hline(yintercept = max(baseline_output_raw_2$R_count)/parameters_baseline_2$human_population,
+               linetype = "dashed",
+               linewidth = 1) +
+    geom_line(linewidth = 1.5) +
+    theme_bw() +
+    labs(x = "Time", y = "Proportion of Population", colour = "Disease State") +
+    scale_colour_discrete(type = disease_state_colours) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 1)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    theme(legend.position = "none",
+          axis.title.y = element_text(colour = "white")),
+
+  # Plot the disease state dynamics for randomly targeted far UVC:
+  targeted_uvc_output_raw_2 %>%
+    filter(timestep <= plotting_window) %>%
+    rename("S" = S_count,
+           "E" = E_count,
+           "I" = I_count,
+           "R" = R_count) %>%
+    mutate(Total_count = S + E + I + R) %>%
+    mutate(S = S / Total_count,
+           E = E / Total_count,
+           I = I / Total_count,
+           R = R / Total_count) %>%
+    select(timestep, S, E, I, R) %>%
+    pivot_longer(cols = c(S, E, I, R), names_to = "State", values_to = "Proportion") %>%
+    mutate(State = factor(State, levels = c("S", "E", "I", "R"))) %>%
+    ggplot(aes(x = timestep, y = Proportion, colour = State)) +
+    geom_hline(yintercept = max(baseline_output_raw_2$R_count)/parameters_baseline_2$human_population,
+               linetype = "dashed",
+               linewidth = 1) +
+    geom_line(linewidth = 1.5) +
+    theme_bw() +
+    labs(x = "Time", y = "Proportion of Population", colour = "Disease State") +
+    scale_colour_discrete(type = disease_state_colours) +
+    scale_y_continuous(expand = c(0, 0), limits = c(0, 1)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    theme(legend.position = "none",
+          axis.title.y = element_text(colour = "white"),
+          axis.title.x = element_text(colour = "white")),
+
+  nrow = 2
 
 )
 
-#----- 5) Parameterisation -------------------------------------------------------------------------
-
-# Transmission Proportions:
-beta_household <- 0.3
-beta_school <- 0.2
-beta_workplace <- 0.2
-beta_leisure <- 0.2
-beta_community <- 0.1
-
-# Set up the R0s to be simulated
-R0s <- c(1.25, 1.5, 2, 2.5, 3)
-
-# Set up the far-UVC coverages to simulate:
-favr_uvc_coverage <- seq(from = 0, to = 1, by = 0.2)
-
-# Set up the far-UVC efficacies to simulate
-favr_uvc_efficacy <- seq(from = 0, to = 1, by = 0.2)
-
-# Set up the coverage types to be simulated
-coverage_type <- c("random", "targeted")
-
-# Number of iterations to simulate for each parameterisation:
-iterations <- 5
-
-# Set up the unique simulations to run
-simulations_to_run <- expand.grid(R0s,
-                                  favr_uvc_coverage,
-                                  favr_uvc_efficacy,
-                                  coverage_type)
-
-# Calculate the number of simulations that will be run:
-nrow(simulations_to_run) * iterations
-
-#----- X) NEXT STEP --------------------------------------------------------------------------------
