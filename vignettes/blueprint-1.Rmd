@@ -51,7 +51,7 @@ age_classes <- variables$variables_list$age_class$get_categories()
 age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
 ```
 
-(ref:age) Figure caption.
+(ref:age) Example age groups for 5000 individuals.
 
 ```{r age, fig.cap="(ref:age)"}
 data.frame(age_classes, age_class_counts) |>
@@ -73,19 +73,80 @@ Disease transmission (Section \@ref(disease)) occurs stochastically, and only be
 
 The locations included in the model are households, schools, workplaces, and leisure venues:
 
+(ref:household-size) The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
+
+```{r household-size, fig.cap="(ref:household-size)"}
+households <- variables$variables_list$household$get_categories()
+household_sizes <- purrr::map_vec(households, function(x) variables$variables_list$household$get_size_of(values = x))
+
+table(household_sizes) |>
+  data.frame() |>
+  ggplot(aes(x = household_sizes, y = Freq)) +
+  geom_col() +
+  labs(x = "Number of individuals in the household", y = "Count")
+```
+
 1. **Households**
-The sizes and age compositions of households are based on the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
+The sizes (Figure \@ref(fig:household-size)) and age compositions of households are based on the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
+
+(ref:school-size) The distribution of school sizes.
+
+```{r school-size, fig.cap="(ref:school-size)"}
+schools <- variables$variables_list$school$get_categories()
+schools <- schools[schools != "0"]
+school_sizes <- purrr::map_vec(schools, function(x) variables$variables_list$school$get_size_of(values = x))
+
+data.frame(school_sizes) |>
+  ggplot(aes(y = school_sizes, x = 1)) +
+  geom_point() +
+  labs(x = "", y = "Number of students per school") +
+  scale_y_continuous(limits = c(0, NA)) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
+  )
+```
+
 2. **Schools**
 All children are assumed to attend school.
-The number of student in each school is sampled from the 2022/2023 census of schools in the UK [@school2023].
+The number of students in each school (Figure \@ref(fig:school-size)) is sampled from the 2022/2023 census of schools in the UK [@school2023].
 For each 20 students, there is one adult teacher who works at the school.
+
+(ref:workplace-size) The distribution of workplace sizes. Here, size is shown on a logarithimic scale.
+
+```{r workplace-size, fig.cap="(ref:workplace-size)"}
+workplaces <- variables$variables_list$workplace$get_categories()
+workplaces <- workplaces[workplaces != "0"]
+workplace_sizes <- purrr::map_vec(workplaces, function(x) variables$variables_list$workplace$get_size_of(values = x))
+
+data.frame(workplace_sizes) |>
+  ggplot(aes(x = log(workplace_sizes, base = 10))) +
+  geom_histogram() +
+  labs(x = "Base 10 logarithm of the workplace size", y = "Count")
+```
+
 3. **Workplaces**
 All adults (who are not teachers) are assumed to attend workplaces.
-The number of employees in each workplace is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies.
+The number of employees in each workplace (Figure \@ref(fig:workplace-size)) is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies.
+
+(ref:leisure-venues) The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
+
+```{r leisure-venues, fig.cap="(ref:leisure-venues)"}
+leisure_places <- variables$variables_list$leisure$get_values()
+number_leisure_places <- sapply(leisure_places, function(x) sum(x > 0))
+
+table(number_leisure_places) |>
+  data.frame() |>
+  ggplot(aes(x = number_leisure_places, y = Freq)) +
+  geom_col() +
+  labs(x = "Number of leisure venues attended in a week", y = "Count")
+```
+
 4. **Leisure venues**
 All individuals (children, adults, and elderly people) are eligible to attend leisure venues.
 Leisure venue sizes are sampled from a negative binomial distribution.
-The number of leisure venues per week for each individual is sampled from a Poisson distribution, and capped at seven corresponding to one leisure visit each day.
+The number of leisure venues attended by each individual per week (Figure \@ref(fig:leisure-venues)) is sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day.
 
 ## Disease states {#disease}
 
