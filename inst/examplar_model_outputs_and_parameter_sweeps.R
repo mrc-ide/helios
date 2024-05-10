@@ -384,7 +384,7 @@ baseline_output_raw <- run_simulation(parameters_list = parameters_baseline)
 tictoc::toc()
 
 # Save the output:
-#saveRDS(baseline_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw.rds")
+#saveRDS(baseline_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw_32221.rds")
 
 # Run the randomly assigned far UVC simulation:
 tictoc::tic()
@@ -392,7 +392,7 @@ random_uvc_output_raw <- run_simulation(parameters_list = parameters_uvc_random)
 tictoc::toc()
 
 # Save the output
-#saveRDS(random_uvc_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw.rds")
+#saveRDS(random_uvc_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw_32221.rds")
 
 # Run the targeted far UVC simulation:
 tictoc::tic()
@@ -400,7 +400,7 @@ targeted_uvc_output_raw <- run_simulation(parameters_list = parameters_uvc_targe
 tictoc::toc()
 
 # Set up the parameter list for the far UVC with randomised coverage:
-#saveRDS(targeted_uvc_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw.rds")
+#saveRDS(targeted_uvc_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw_32221.rds")
 
 #----- 5) Exemplar Model Runs: 3:3:3:3:1 -----------------------------------------------------------
 
@@ -479,7 +479,7 @@ baseline_output_raw_2 <- run_simulation(parameters_list = parameters_baseline_2)
 tictoc::toc()
 
 # Save the output:
-saveRDS(baseline_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw_2.rds")
+saveRDS(baseline_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw_33331.rds")
 
 # Run the randomly assigned far UVC simulation:
 tictoc::tic()
@@ -487,7 +487,7 @@ random_uvc_output_raw_2 <- run_simulation(parameters_list = parameters_uvc_rando
 tictoc::toc()
 
 # Save the output
-saveRDS(random_uvc_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw_2.rds")
+saveRDS(random_uvc_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw_33331.rds")
 
 # Run the targeted far UVC simulation:
 tictoc::tic()
@@ -495,19 +495,19 @@ targeted_uvc_output_raw_2 <- run_simulation(parameters_list = parameters_uvc_tar
 tictoc::toc()
 
 # Set up the parameter list for the far UVC with randomised coverage:
-saveRDS(targeted_uvc_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw_2.rds")
+saveRDS(targeted_uvc_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw_33331.rds")
 
 #----- 6) Exemplar Run Visualisation ---------------------------------------------------------------
 
 # Load the raw outputs for the first version:
-# baseline_output_raw <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw.rds")
-# random_uvc_output_raw <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw.rds")
-# targeted_uvc_output_raw  <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw.rds")
+# baseline_output_raw <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw_32221.rds")
+# random_uvc_output_raw <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw_32221.rds")
+# targeted_uvc_output_raw  <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw_32221.rds")
 #
 # # Load the outputs for the second version:
-# baseline_output_raw_2 <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw_2.rds")
-# random_uvc_output_raw_2 <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw_2.rds")
-# targeted_uvc_output_raw_2  <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw_2.rds")
+# baseline_output_raw_2 <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw_33331.rds")
+# random_uvc_output_raw_2 <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw_33331.rds")
+# targeted_uvc_output_raw_2  <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw_33331.rds")
 
 
 # Store colours for plotting:
@@ -696,7 +696,9 @@ grid.arrange(
 
 )
 
-#----- 7) Iterating Random Far-UVC Simulations -----------------------------------------------------
+#----- 7) Iterating Random Far-UVC Simulations: 3:2:2:2:1 ------------------------------------------
+
+#----- 8) Iterating Random Far-UVC Simulations: 3:3:3:3:1 ------------------------------------------
 
 # Generate the betas required to achieve the target R0 of 2:
 exemplar_run_betas <- generate_betas(beta_community = c(0.062),
@@ -736,17 +738,92 @@ get_parameters(overrides = list(
           timestep = 1) -> parameters_uvc_random_2
 
 # Select a number of iterations to run:
-iterations <- 20
+iterations <- 10
 
 # Open a list to store the simulations:
 uvc_random_outputs <- list()
 
 # Run the simulations:
 for(i in 1:iterations) {
-  tictoc::tic()
   uvc_random_outputs[[i]] <- run_simulation(parameters_list = parameters_uvc_random_2)
-  tictoc::toc()
+  print(paste0(i, "th simulation complete"))
 }
+
+# Append an id column to each simulation
+for(i in 1:iterations) {
+  uvc_random_outputs[[i]]$id <- i
+}
+
+# Save the outputs:
+saveRDS(uvc_random_outputs, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_iterations_33331.rds")
+
+# Create a single data frame to store the simulation results in:
+simulation_output_combined <- data.frame()
+for(i in 1:iterations) {
+  simulation_output_combined <- bind_rows(simulation_output_combined,
+                                          uvc_random_outputs[[i]])
+}
+
+# View the dataframe:
+nrow(simulation_output_combined)
+
+# Convert the dataframe to long form:
+simulation_output_combined %>%
+  mutate(Total = S_count + E_count + I_count + R_count) %>%
+  mutate(S = S_count/Total,
+         E = E_count/Total,
+         I = I_count/Total,
+         R = R_count/Total) %>%
+  select(timestep, id, S, E, I, R, Total) %>%
+  pivot_longer(cols = c(S, E, I, R, Total), names_to = "State", values_to = "Proportion") %>%
+  mutate(State = factor(State, levels = c("S", "E", "I", "R"))) -> simulation_output_combined_long
+
+# Determine the maximum proportion in the recovered compartment in the simulations:
+simulation_output_combined_long %>%
+  filter(State == "R") %>%
+  pull(Proportion) %>%
+  max() -> maximum_recovered_proportion
+
+# Determine the maximum proportion in the recovered compartment in the simulations:
+simulation_output_combined_long %>%
+  filter(State == "R", timestep > 450) %>%
+  pull(Proportion) %>%
+  min() -> minimum_recovered_proportion
+
+# Store colours for plotting:
+disease_state_colours <- c("#4cd8ff", "#f8ed5b", "brown2", "#a633ff")
+
+# Plot the Disease States through time:
+simulation_output_combined_long %>%
+  filter(State != "Total") %>%
+  filter(State == "R", timestep <= 500) %>%
+  ggplot(aes(x = timestep, y = Proportion, colour = as.factor(id))) +
+  geom_hline(yintercept = maximum_recovered_proportion,
+             linetype = "dashed",
+             linewidth = 1) +
+  geom_hline(yintercept = minimum_recovered_proportion,
+             linetype = "dashed",
+             linewidth = 1) +
+  geom_line(linewidth = 1.5) +
+  theme_bw() +
+  ggtitle("Proportion of population in Recovered state through time") +
+  labs(x = "Time", y = "Proportion of Population", colour = "Disease State") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  #facet_grid(~State) +
+  theme(legend.position = "none",
+        axis.title.x = element_text(colour = "white"))
+
+
+
+
+
+
+
+
+
+
+
 
 
 
