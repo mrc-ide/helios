@@ -928,12 +928,58 @@ simulation_output_combined_long %>%
   theme(legend.position = "none",
         axis.title.x = element_text(colour = "white"))
 
+#----- 9) Random UVC Iterations Comparison Plot ----------------------------------------------------
 
+# Load the datasets:
+raw_output_iterations_32221 <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_iterations_32221.rds")
+raw_output_iterations_33331 <- readRDS("C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_iterations_33331.rds")
 
+# Create the individual combined dataframes:
+raw_output_32221_combined <- data.frame()
+for(i in 1:length(raw_output_iterations_32221)) {
+  raw_output_32221_combined <- bind_rows(raw_output_iterations_32221, raw_output_iterations_32221[[i]])
+}
+nrow(raw_output_32221_combined)
 
+raw_output_33331_combined <- data.frame()
+for(i in 1:length(raw_output_iterations_32221)) {
+  raw_output_33331_combined <- bind_rows(raw_output_iterations_33331, raw_output_iterations_33331[[i]])
+}
+nrow(raw_output_32221_combined)
 
+# Add ID columns for the beta ratios:
+raw_output_32221_combined$beta_ratio <- "3:2:2:2:1"
+raw_output_33331_combined$beta_ratio <- "3:3:3:3:1"
 
+# Combine the two dataframes into a single one for plotting:
+raw_outputs_combined <- bind_rows(raw_output_32221_combined, raw_output_33331_combined)
 
+# Convert the data to long form:
+raw_outputs_combined %>%
+  mutate(Total = S_count + E_count + I_count + R_count) %>%
+  mutate(S = S_count/Total,
+         E = E_count/Total,
+         I = I_count/Total,
+         R = R_count/Total) %>%
+  select(timestep, beta_ratio, id, S, E, I, R,) %>%
+  pivot_longer(cols = c(S, E, I, R), names_to = "State", values_to = "Proportion") %>%
+  mutate(State = factor(State, levels = c("S", "E", "I", "R"))) -> raw_outputs_combined_long
+
+raw_outputs_combined_long %>%
+  filter(State == "R", timestep <= 500) %>%
+  ggplot(aes(x = timestep, y = Proportion, group = as.factor(id), colour = as.factor(beta_ratio))) +
+  geom_line(linewidth = 1.5) +
+  theme_bw() +
+  #ggtitle("Proportion of population in Recovered state through time") +
+  labs(x = "Time", y = "Proportion of Population", colour = "Disease State") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 1)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  facet_grid(~beta_ratio) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        strip.background = element_rect(fill = "black"),
+        strip.text = element_text(colour = "white", size = 12))
 
 
 
