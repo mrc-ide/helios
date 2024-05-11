@@ -123,12 +123,19 @@ simulation_outputs <- list()
 # Run through the simulations in simulations_to_run:
 for(i in 1:length(parameter_lists)) {
   simulation_outputs[[i]] <- run_simulation(parameters_list = parameter_lists[[i]])
+  simulation_outputs[[i]]$ID <- simulations_to_run$ID[i]
+  simulation_outputs[[i]]$r0 <- simulations_to_run$r0[i]
+  simulation_outputs[[i]]$coverage <- simulations_to_run$coverage[i]
+  simulation_outputs[[i]]$efficacy <- simulations_to_run$efficacy[i]
+  simulation_outputs[[i]]$coverage_type <- simulations_to_run$coverage_type[i]
+  simulation_outputs[[i]]$beta_community <- simulations_to_run$beta_community[i]
+  simulation_outputs[[i]]$iteration <- simulations_to_run$iteration[i]
   print(paste0(i, "th simulation complete (", (i/length(parameter_lists))*100, "% complete)"))
 }
 
 #----- 4) Simulation Post-Processing ---------------------------------------------------------------
 
-
+head(simulations_to_run)
 
 
 #----- 5) Visualisation ----------------------------------------------------------------------------
