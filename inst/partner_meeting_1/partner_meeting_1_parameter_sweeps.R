@@ -135,8 +135,22 @@ for(i in 1:length(parameter_lists)) {
 
 #----- 4) Simulation Post-Processing ---------------------------------------------------------------
 
-head(simulations_to_run)
+# Combine the simulation outputs into a combined data frame:
+combined_parameter_sweep_outputs <- data.frame()
+for(i in 1:length(simulation_outputs)) {
+  combined_parameter_sweep_outputs <- bind_rows(combined_parameter_sweep_outputs, simulation_outputs[[i]])
+}
 
+# Convert the dataframe to long form
+combined_parameter_sweep_outputs %>%
+  mutate(total_count = S_count + E_count + I_count + R_count) %>%
+  mutate(S = S_count/total_count,
+         E = E_count/total_count,
+         I = I_count/total_count,
+         R = R_count/total_count) %>%
+  pivot_longer(cols = c(S, E, I, R),
+               names_to = "Disease_State",
+               values_to = "Proportion") -> combined_parameter_sweep_outputs_long
 
 #----- 5) Visualisation ----------------------------------------------------------------------------
 
