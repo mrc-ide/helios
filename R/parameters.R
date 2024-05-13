@@ -156,12 +156,12 @@ get_parameters <- function(overrides = list()) {
   }
 
   # Check that all setting-specific betas are of length 1:
-  if(any(length(parameters$beta_household) > 1,
-         length(parameters$beta_school) > 1,
-         length(parameters$beta_workplace) > 1,
-         length(parameters$beta_leisure) > 1,
-         length(parameters$beta_community) > 1)) {
-    stop("ERROR: A setting-specific beta has length greater than 1. All setting-specific betas must be of length 1")
+  if(any(length(parameters$beta_household) != 1,
+         length(parameters$beta_school) != 1,
+         length(parameters$beta_workplace) != 1,
+         length(parameters$beta_leisure) != 1,
+         length(parameters$beta_community) != 1)) {
+    stop("ERROR: A setting-specific beta has length not equal to 1. All setting-specific betas must be of length 1")
   }
 
 
