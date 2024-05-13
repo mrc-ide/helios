@@ -36,7 +36,10 @@ create_processes <- function(variables_list, events_list, parameters_list, rende
     processes_list <- c(processes_list,
                         list(RS_process = create_RS_process(variables_list = variables_list,
                                                             events_list = events_list,
-                                                            parameters_list = parameters_list)))
+                                                            parameters_list = parameters_list)),
+                        list(external_source_process = create_external_source_process(variables_list = variables_list,
+                                                                                      events_list = events_list,
+                                                                                      parameters_list = parameters_list)))
   }
 
   # ===============================
@@ -44,13 +47,13 @@ create_processes <- function(variables_list, events_list, parameters_list, rende
   # ===============================
   # health_render_process
   processes_list <- c(
-      processes_list,
-      individual::categorical_count_renderer_process(
-        renderer,
-        variables_list$disease_state,
-        c('S', 'E', 'I', 'R')
-      )
+    processes_list,
+    individual::categorical_count_renderer_process(
+      renderer,
+      variables_list$disease_state,
+      c('S', 'E', 'I', 'R')
     )
+  )
 
   # Return the model processes:
   return(processes_list)
@@ -389,6 +392,31 @@ create_RS_process <- function(variables_list, events_list, parameters_list) {
 
     # Schedule the recovery events for infectious individuals without transitions scheduled:
     events_list$RS_event$schedule(target = R, delay = S_times)
+
+  }
+}
+
+#' Create process governing exposed to infectious disease state transition
+#'
+#' @inheritParams create_processes
+#'
+#' @family processes
+#' @export
+create_external_source_process <- function(variables_list, events_list, parameters_list){
+
+  function(t) {
+
+    # Get the indices of all susceptible individuals:
+    S <- variables_list$disease_state$get_index_of("S")
+
+    # Calculate the probability of getting infected in the current interval for each individual:
+    p_inf_ext <- 1 - exp(-parameters_list$prob_inf_external * parameters_list$dt)
+
+    # Sample susceptible individuals using their infection probability to determine who gets infected:
+    S$sample(rate = p_inf_ext)
+
+    # Queue an update to the infectious state of the newly infected susceptible individuals to Exposed:
+    variables_list$disease_state$queue_update(value = "E",index = S)
 
   }
 }

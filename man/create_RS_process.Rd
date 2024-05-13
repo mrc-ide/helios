@@ -21,6 +21,7 @@ Other processes:
 \code{\link{create_EI_process}()},
 \code{\link{create_IR_process}()},
 \code{\link{create_SE_process}()},
+\code{\link{create_external_source_process}()},
 \code{\link{create_processes}()}
 }
 \concept{processes}
