@@ -155,6 +155,16 @@ get_parameters <- function(overrides = list()) {
     stop("duration_immune must be specified if endemic_or_epidemic is set to endemic")
   }
 
+  # Check that all setting-specific betas are of length 1:
+  if(any(length(parameters$beta_household) > 1,
+         length(parameters$beta_school) > 1,
+         length(parameters$beta_workplace) > 1,
+         length(parameters$beta_leisure) > 1,
+         length(parameters$beta_community) > 1)) {
+    stop("ERROR: A setting-specific beta has length greater than 1. All setting-specific betas must be of length 1")
+  }
+
+
   ## ADD MORE CHECKS IN HERE FOR PARAMETERS ##
 
   # Return the list of parameters
