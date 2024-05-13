@@ -35,7 +35,7 @@ library(tidyverse)
 library(grid)
 library(gridExtra)
 
-#----- 2) Parameterise the endemic model exemplarruns for the 3:3:3:3:1 beta ratios ----------------
+#----- 2) Parameterise the endemic model exemplar runs for the 3:3:3:3:1 beta ratios ---------------
 
 ##'
 ##' We have previously used the finalsize::final_size() function to work out which beta_community value
@@ -66,12 +66,12 @@ exemplar_run_betas <- generate_betas(beta_community = 0.062,
                                      workplace_ratio = 3,
                                      leisure_ratio = 3)
 
-# Calculate the simulation_time required to simulate a 2 year period:
+# Calculate the simulation_time required to simulate a 2 year period: 5 years took about 19 minutes
 years_to_simulate <- 5
 simulation_timesteps <- (365 * years_to_simulate)
 
 # Specify the duration of immunity:
-duration_of_immunity <- (6 * 30)/0.5
+duration_of_immunity <- (3 * 30)/0.5
 
 # Generate the list of model parameters for the baseline, no-intervention run:
 parameters_endemic_exemplar_baseline <- get_parameters(overrides = list(
@@ -122,13 +122,15 @@ parameters_endemic_exemplar_baseline %>%
           efficacy = 0.75,
           timestep = 1) -> parameters_endemic_exemplar_uvc_targeted
 
+#----- 3) Simulations ------------------------------------------------------------------------------
+
 # Run the baseline, no intervention scenario (approx. 599 seconds):
 tictoc::tic()
 endemic_baseline_output_raw <- run_simulation(parameters_list = parameters_endemic_exemplar_baseline)
 tictoc::toc()
 
 # Save the output:
-saveRDS(endemic_baseline_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_baseline_output_raw_33331.rds")
+saveRDS(endemic_baseline_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Desktop/temp_endemic_results/endemic_baseline_6_month_immunity_5_years.rds")
 
 # Run the randomly assigned far UVC simulation:
 tictoc::tic()
@@ -136,7 +138,7 @@ endemic_random_uvc_output_raw_2 <- run_simulation(parameters_list = parameters_e
 tictoc::toc()
 
 # Save the output
-saveRDS(random_uvc_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_random_output_raw_33331.rds")
+saveRDS(random_uvc_output_raw_2, "")
 
 # Run the targeted far UVC simulation:
 tictoc::tic()
@@ -144,9 +146,10 @@ targeted_uvc_output_raw_2 <- run_simulation(parameters_list = parameters_endemic
 tictoc::toc()
 
 # Set up the parameter list for the far UVC with randomised coverage:
-saveRDS(targeted_uvc_output_raw_2, "C:/Users/trb216/OneDrive - Imperial College London/Documents/Research_Projects/RP4_FarUPV/Code/Blueprint_Milestone_1/Exemplar_data/exemplar_uvc_targeted_output_raw_33331.rds")
+saveRDS(targeted_uvc_output_raw_2, "")
 
 #----- 4) Exemplar Run Visualisation ---------------------------------------------------------------
+
 # Store colours for plotting:
 disease_state_colours <- c("#4cd8ff", "#f8ed5b", "brown2", "#a633ff")
 
