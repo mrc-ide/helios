@@ -150,7 +150,7 @@ endemic_targeted_uvc_output_raw <- run_simulation(parameters_list = parameters_e
 tictoc::toc()
 
 # # Set up the parameter list for the far UVC with randomised coverage:
-# saveRDS(targeted_uvc_output_raw_2, "")
+saveRDS(endemic_targeted_uvc_output_raw, "C:/Users/trb216/OneDrive - Imperial College London/Desktop/temp_endemic_results/endemic_targeted_uvc_2_week_immunity_10_years.rds")
 
 #----- 4) Exemplar Run Visualisation 1: Individual SEIR Plots --------------------------------------
 
