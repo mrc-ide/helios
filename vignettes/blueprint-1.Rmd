@@ -104,15 +104,10 @@ schools <- schools[schools != "0"]
 school_sizes <- purrr::map_vec(schools, function(x) variables$variables_list$school$get_size_of(values = x))
 
 data.frame(school_sizes) |>
-  ggplot(aes(y = school_sizes, x = 1)) +
-  geom_point() +
-  labs(x = "", y = "Number of students per school") +
-  scale_y_continuous(limits = c(0, NA)) +
-  theme(
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()
-  )
+  ggplot(aes(x = school_sizes)) +
+  geom_histogram() +
+  labs(x = "Number of students per school", y = "Count") +
+  scale_y_continuous(limits = c(0, NA))
 ```
 
 3. **Workplaces**
