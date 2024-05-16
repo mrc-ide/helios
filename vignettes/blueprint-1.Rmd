@@ -152,7 +152,8 @@ Susceptible individuals become exposed after spending time with infectious indiv
 Time spent by individuals in each location and their level of risk is implemented by setting location-specific force of infection parameters.
 Exposed individuals become infectious after some delay.
 Infectious individuals become recovered after some delay.
-Once recovered, individuals cannot be infected again.
+After recovering, individuals then return to being susceptible, again after some delay.
+By altering the distribution of this final delay, the time between recovery and susceptibility, the framework has the capacity to simulate both epidemic and endemic diseases.
 
 ## Far UVC
 
