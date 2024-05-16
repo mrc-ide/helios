@@ -51,6 +51,13 @@ age_classes <- variables$variables_list$age_class$get_categories()
 age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
 ```
 
+The model implemented in `helios` has a fixed population of individuals.
+Each individual is either a child, an adult, or an elderly person.
+Figure \@ref(fig:age) shows the proportion in each age group from a population of 5000 individuals.
+It is assumed that no aging occurs during the simulation.
+During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals.
+Disease transmission (Section \@ref(disease)) occurs stochastically, and only between individuals in the same location.
+
 (ref:age) Example age groups for 5000 individuals.
 
 ```{r age, fig.cap="(ref:age)"}
@@ -62,16 +69,12 @@ data.frame(age_classes, age_class_counts) |>
   coord_flip()
 ```
 
-The model implemented in `helios` has a fixed population of individuals.
-Each individual is either a child, an adult, or an elderly person.
-Figure \@ref(fig:age) shows the proportion in each age group from a population of 5000 individuals.
-It is assumed that no aging occurs during the simulation.
-During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals.
-Disease transmission (Section \@ref(disease)) occurs stochastically, and only between individuals in the same location.
-
 ## Locations {#locations}
 
 The locations included in the model are households, schools, workplaces, and leisure venues:
+
+1. **Households**
+The sizes (Figure \@ref(fig:household-size)) and age compositions of households are based on the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
 
 (ref:household-size) The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
 
@@ -86,8 +89,10 @@ table(household_sizes) |>
   labs(x = "Number of individuals in the household", y = "Count")
 ```
 
-1. **Households**
-The sizes (Figure \@ref(fig:household-size)) and age compositions of households are based on the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
+2. **Schools**
+All children are assumed to attend school.
+The number of students in each school (Figure \@ref(fig:school-size)) is sampled from the 2022/2023 census of schools in the UK [@school2023].
+For each 20 students, there is one adult teacher who works at the school.
 
 (ref:school-size) The distribution of school sizes.
 
@@ -108,10 +113,9 @@ data.frame(school_sizes) |>
   )
 ```
 
-2. **Schools**
-All children are assumed to attend school.
-The number of students in each school (Figure \@ref(fig:school-size)) is sampled from the 2022/2023 census of schools in the UK [@school2023].
-For each 20 students, there is one adult teacher who works at the school.
+3. **Workplaces**
+All adults (who are not teachers) are assumed to attend workplaces.
+The number of employees in each workplace (Figure \@ref(fig:workplace-size)) is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies.
 
 (ref:workplace-size) The distribution of workplace sizes. Here, size is shown on a logarithimic scale.
 
@@ -126,9 +130,10 @@ data.frame(workplace_sizes) |>
   labs(x = "Base 10 logarithm of the workplace size", y = "Count")
 ```
 
-3. **Workplaces**
-All adults (who are not teachers) are assumed to attend workplaces.
-The number of employees in each workplace (Figure \@ref(fig:workplace-size)) is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies.
+4. **Leisure venues**
+All individuals (children, adults, and elderly people) are eligible to attend leisure venues.
+Leisure venue sizes are sampled from a negative binomial distribution.
+The number of leisure venues attended by each individual per week (Figure \@ref(fig:leisure-venues)) is sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day.
 
 (ref:leisure-venues) The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
 
@@ -142,11 +147,6 @@ table(number_leisure_places) |>
   geom_col() +
   labs(x = "Number of leisure venues attended in a week", y = "Count")
 ```
-
-4. **Leisure venues**
-All individuals (children, adults, and elderly people) are eligible to attend leisure venues.
-Leisure venue sizes are sampled from a negative binomial distribution.
-The number of leisure venues attended by each individual per week (Figure \@ref(fig:leisure-venues)) is sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day.
 
 ## Disease states {#disease}
 
