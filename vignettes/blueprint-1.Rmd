@@ -61,7 +61,7 @@ Disease transmission (Section \@ref(disease)) occurs stochastically, and only be
 
 ## Locations {#locations}
 
-The locations included in the model are households, schools, workplaces, and leisure venues:
+The location types included in the model are households, schools, workplaces, and leisure venues:
 
 1. **Households**
 The number of individuals in each household (Figure \@ref(fig:household-size)) and their respective ages are sampled with replacement from the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
@@ -156,11 +156,16 @@ Once recovered, individuals cannot be infected again.
 
 ## Far UVC
 
-Far UVC interventions can be installed in each of the four location types.
-Within each location type, the proportion of settings covered by the installation can be specified.
+Far UVC interventions can be installed in each of the four location types, in any combination (i.e. in either one, two, three, or all four location types).
+Within each location type, the proportion of locations covered by the installation can be specified.
 For example, the proportion of schools where far UVC is to be installed.
-Coverage may be set to either at random or targetted, such far UVC is installed first at the largest locations.
-The efficacy of far UVC, which can be thought of as the expected proportion reduction in transmission, within the particular location may also be set.
+
+Coverage may be set to either at random or targetted.
+With random coverage, locations for far UVC to be installed are sampled at random without replacement.
+With targetted coverage, locations are chosen in order of size.
+
+The efficacy of far UVC within the particular location may also be set.
+For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half.
 
 # Example model outputs
 
