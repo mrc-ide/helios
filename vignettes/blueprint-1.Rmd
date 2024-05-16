@@ -44,7 +44,8 @@ Evaluating the effectiveness of possible far UVC implementations is important to
 # Model description
 
 ```{r}
-parameters_list <- get_parameters(list(human_population = 5000, seed = 1))
+human_population <- 50000
+parameters_list <- get_parameters(list(human_population = human_population, seed = 1))
 variables <- create_variables(parameters_list)
 disease_states <- variables$variables_list$disease_state$get_categories()
 age_classes <- variables$variables_list$age_class$get_categories()
@@ -53,28 +54,18 @@ age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_
 
 The model implemented in `helios` has a fixed population of individuals.
 Each individual is either a child, an adult, or an elderly person.
-Figure \@ref(fig:age) shows the proportion in each age group from a population of 5000 individuals.
+Figure \@ref(fig:age) shows the proportion in each age group from a population of `r human_population` individuals.
 It is assumed that no aging occurs during the simulation.
 During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals.
 Disease transmission (Section \@ref(disease)) occurs stochastically, and only between individuals in the same location.
-
-(ref:age) Example age groups for 5000 individuals.
-
-```{r age, fig.cap="(ref:age)"}
-data.frame(age_classes, age_class_counts) |>
-  mutate(age_classes = dplyr::recode_factor(age_classes, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
-  ggplot(aes(x = age_classes, y = age_class_counts)) +
-  geom_col() +
-  labs(x = "Age group", y = "Number of individuals") +
-  coord_flip()
-```
 
 ## Locations {#locations}
 
 The locations included in the model are households, schools, workplaces, and leisure venues:
 
 1. **Households**
-The sizes (Figure \@ref(fig:household-size)) and age compositions of households are based on the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
+The number of individuals in each household (Figure \@ref(fig:household-size)) and their respective ages are sampled with replacement from the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
+This sampling procedure therefore also generates the individual age distribution (Figure \@ref(fig:age)).
 
 (ref:household-size) The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
 
@@ -87,6 +78,17 @@ table(household_sizes) |>
   ggplot(aes(x = household_sizes, y = Freq)) +
   geom_col() +
   labs(x = "Number of individuals in the household", y = "Count")
+```
+
+(ref:age) Age group sizes follow from the household sampling procedure.
+
+```{r age, fig.cap="(ref:age)"}
+data.frame(age_classes, age_class_counts) |>
+  mutate(age_classes = dplyr::recode_factor(age_classes, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
+  ggplot(aes(x = age_classes, y = age_class_counts)) +
+  geom_col() +
+  labs(x = "Age group", y = "Number of individuals") +
+  coord_flip()
 ```
 
 2. **Schools**
