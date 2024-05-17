@@ -36,12 +36,18 @@ library(purrr)
 theme_set(theme_minimal())
 ```
 
-Ultraviolet (UV) light with wavelength 200-280 nanometers (far UVC light) has germicidal properties against viruses and bacteria.
-With the right technical developments, installation of far UVC light sources could be a promising public health intervention against infectious diseases.
+# Overview
 
-`helios` is an R package implementing a stochastic individual-based model of infectious disease transmission.
-The package can be used to quantify the impact of installing far UVC interventions on epidemic outcomes, such as infections and deaths.
-Evaluating the effectiveness of possible far UVC implementations is important to guide technical development.
+The aim of this document is to introduce the `helios` individual-based modelling framework for exploring and evaluating the potential of far UVC for the control of respiratory pathogens. `helios` explicitly represents the built environment and how individuals spend their time in this built environment, as well as modifications to that built environment that reduce the probability of pathogen transmission occurring (such as far UVC). The package can be used to quantify the impact of installing far UVC interventions on public health outcomes, such as infections and deaths.
+
+# Aim of this Document
+
+The aim of this document is to introduce you to the `helios` framework, specifically the modelling framework and the types of results it can currently produce. Our hope is that this document will serve as a jumping off point to discuss:
+
+1.  Any additions to the model that will be required to answer priority questions for Blueprint Biosecurity.
+2.  The types of results that can be generated to answer those priority questions.
+
+We note here that the results presented are purely **examples** of the types of results this framework can produce. Model parameterisation is underway but incomplete, and will require further time and development to get to a point where the results should be trusted/
 
 # Model description
 
@@ -54,20 +60,17 @@ age_classes <- variables$variables_list$age_class$get_categories()
 age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
 ```
 
-The model implemented in `helios` has a fixed population of individuals.
-Each individual is either a child, an adult, or an elderly person.
-Figure \@ref(fig:age) shows the proportion in each age group from a population of `r human_population` individuals.
-It is assumed that no aging occurs during the simulation.
-During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals.
-Disease transmission (Section \@ref(disease)) occurs stochastically, and only between individuals in the same location.
+The model implemented in `helios` has a fixed population of individuals, who are each assigned one of three age-groups (children, adults, elderly). Each individual is therefore either a child, an adult, or an elderly person. Figure \@ref(fig:age) shows the proportion in each age group from a population of `r human_population` individuals. We do not currently explicitly model demographic changes in the model and so we assume that no aging between the age-groups (e.g. child -\> adult) occurs during the simulation.
+
+During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals who are also visiting those same locations at the same time. We model 4 location types: **Households**, **Schools**, **Workplaces**, and **Leisure** **Venues**. Individuals are assigned to each location in a way that depends on their age-group (e.g. children are assigned to schools, adults are assigned to workplaces), with assignment to a **specific** location within a particular type (e.g. School #7) done stochastically (see \@ref(locations) below).
+
+It is during these visits to the same location that pathogen transmission can occur between two individuals - this process is stochastic and occurs only between individuals visiting the same location. See Section \@ref(disease) for further details.
 
 ## Locations {#locations}
 
-The location types included in the model are households, schools, workplaces, and leisure venues:
+Below we provide detail on how individuals are assigned to each location type.
 
-1. **Households**
-The number of individuals in each household (Figure \@ref(fig:household-size)) and their respective ages are sampled with replacement from the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
-This sampling procedure therefore also generates the individual age distribution (Figure \@ref(fig:age)).
+1.  **Households:** The number of individuals in each household (Figure \@ref(fig:household-size)) and the age-composition of individuals (Figure \@ref(fig:age)) within each household are determined using data on household-age composition data from the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm. Specifically, we sample with replacement from this data to generate households and then populate those households with individuals. Household assignment is **static** - for each individual, the specific household they are assigned to is fixed and does not change across the course of a single simulation. They stay in the same household each day.
 
 (ref:household-size) The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
 
@@ -93,10 +96,7 @@ data.frame(age_classes, age_class_counts) |>
   coord_flip()
 ```
 
-2. **Schools**
-All children are assumed to attend school.
-The number of students in each school (Figure \@ref(fig:school-size)) is sampled from the 2022/2023 census of schools in the UK [@school2023].
-For each 20 students, there is one adult teacher who works at the school.
+2.  **Schools** All children are assumed to attend school. The number of students in each school (Figure \@ref(fig:school-size)) is sampled from the 2022/2023 census of schools in the UK [@school2023], with children then assigned randomly to each school. A small number of adults also attend schools (rather than workplaces) to reflect educational staff such as teachers. For each 20 students, there is one adult teacher who works at the school (this is based on UK Office of National Statistics Data). School assignment is **static** - for each individual, the particular school they are assigned to is fixed and does not change across the course of a single simulation. They visit the same school each day.
 
 (ref:school-size) The distribution of school sizes.
 
@@ -112,9 +112,7 @@ data.frame(school_sizes) |>
   scale_y_continuous(limits = c(0, NA))
 ```
 
-3. **Workplaces**
-All adults (who are not teachers) are assumed to attend workplaces.
-The number of employees in each workplace (Figure \@ref(fig:workplace-size)) is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies.
+3.  **Workplaces** All adults (who are not teachers) are assumed to attend workplaces. The number of employees in each workplace (Figure \@ref(fig:workplace-size)) is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies which in turn is based on data from the United States of America. Adults are assigned randomly to each of these workplaces. Workplace assignment is **static** - for each individual, the particular workplace they are assigned to is fixed and does not change across the course of a single simulation. They visit the same workplace each day.
 
 (ref:workplace-size) The distribution of workplace sizes. Here, size is shown on a logarithimic scale.
 
@@ -126,13 +124,12 @@ workplace_sizes <- purrr::map_vec(workplaces, function(x) variables$variables_li
 data.frame(workplace_sizes) |>
   ggplot(aes(x = log(workplace_sizes, base = 10))) +
   geom_histogram() +
-  labs(x = "Base 10 logarithm of the workplace size", y = "Count")
+  scale_x_continuous(breaks = c(0, 1, 2, 3),
+                     labels = c(1, 10, 1000, 10000)) +
+  labs(x = "Workplace Size (Number of Individuals)", y = "Count")
 ```
 
-4. **Leisure venues**
-All individuals (children, adults, and elderly people) are eligible to attend leisure venues.
-Leisure venue sizes are sampled from a negative binomial distribution.
-The number of leisure venues attended by each individual per week (Figure \@ref(fig:leisure-venues)) is sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day.
+4.  **Leisure venues** All individuals (children, adults, and elderly people) are eligible to attend leisure venues. Leisure venue sizes are sampled from a negative binomial distribution, which determines their maximum occupancy. Leisure venue assignment is **dynamic** - for each individual, the particular leisure venue they are assigned to is dynamic and changes across the course of a single simulation. They visit a different leisure venue each day (and sometimes do not visit any leisure venues on a given day), with the number of leisure venues visited by each individual per week (Figure \@ref(fig:leisure-venues)) sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day. The particular leisure venue they visit is drawn from a short individual-specific list of potential leisure venues that is determined randomly.
 
 (ref:leisure-venues) The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
 
@@ -147,24 +144,34 @@ table(number_leisure_places) |>
   labs(x = "Number of leisure venues attended in a week", y = "Count")
 ```
 
-## Disease states {#disease}
+## Disease States & The Infection Process {#disease}
 
-At any time, each individual is either susceptible, exposed, infectious, or recovered.
+Individuals exist in one of four different disease states:
 
-Susceptible individuals may become exposed after spending time in the same location as infectious individuals.
-The probability of infection during one time-step of the model of size $\delta > 0$ is
+-   **Susceptible:** They are susceptible to infection by the pathogen.
+
+-   **Exposed:** They have been infected but are not currently infectious (often known as the pathogen's *"incubation period"*).
+
+-   **Infectious:** They are infectious and can infect other individuals.
+
+-   **Recovered:** They are no longer infectious and are immune to future infection.
+
+At any timepoint, each individual is either susceptible, exposed, infectious, or recovered. Individuals are infected (S -\> E) after spending time in the same location as infectious individuals. For each individual we calculate a location-specific force of infection, which determines the probability they are infected. Specifically, the force of infection experienced by individual $i$ in Location $m$ at time $t$ is calculated as follows:
+
 $$
-1 - \exp(- \lambda \delta).
+\lambda_{i,m}(t) = \frac{\beta_{m} I_m(t)}{N_m}
 $$
-The term $\lambda$ is the force of infection, and given by a sum of location specific force of infections, together with a community level force of infection which represents general mixing among all people.
-The force of infection for each location is given by the proportion of individuals in that location who are infectious, multiplied by a constant term representing the proportion of total transmission which occurs in each setting.
 
-Exposed individuals become infectious after some delay.
-Infectious individuals become recovered after some delay.
-After recovering, individuals then return to being susceptible, again after some delay.
-By altering the distribution of this final delay, the time between recovery and susceptibility, the framework has the capacity to simulate both epidemic and endemic pathogens (Figure \@ref(fig:epidemic-endemic)).
+where $I_m(t)$ are the number of infectious individuals in Location $m$ at time $t$ , $N_m$ are the total number of individuals visiting Location $m$ at time $t$ and $\beta_m$ is a location specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that integrates consideration of both the ***amount of time spent in a location*** and ***the inherent "riskiness"*** **of a location** (i.e. how receptive to onwards transmission it is). Currently within the model, each Location Type (i.e. workplace, school, household, leisure-venue) has a specific $\beta$ (i.e. $\beta_{W}$,$\beta_{S}$ , $\beta_{H}$, $\beta_{L}$ respecitvely) and all individual locations within a location type (e.g. all schools) have the same $\beta$ (though this could be changed in future versions).
 
-(ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
+The total force of infection $\lambda$ for each individual is calculated as a sum of household, workplace, school, leisure. We add an additional force of infection term $\lambda_C$ to represent types of potential infectious contacts not represented by the locations we consider (e.g. during a commute to/from a workplace, grocery shopping etc). and which represents general mixing among all people. The total Force of Infection experienced by individual $i$ is therefore calculated as:
+
+$$ \lambda_{i, T} = \lambda_{i, H} + \lambda_{i, W} + \lambda_{i, S} + \lambda_{i, L} + \lambda_{i, C} $$
+The probability of individual $i$ becoming infected during one time-step $t$ is calculated by summing the Location-specific force of infections they experience and then calculating the following:$$
+P(infection) = 1 - \exp(- \lambda_{i,T}t).
+$$
+
+Exposed individuals become infectious after some delay (the *incubation period*). Infectious individuals recover after some delay (the *duration of infectiousness*). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquiring immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single "epidemic wave" before dying out) and endemic (those which are constantly present in the population) pathogens (Figure \@ref(fig:epidemic-endemic)). (ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
 
 ```{r epidemic-endemic, fig.cap="(ref:epidemic-endemic)"}
 x <- rnorm(100)
@@ -175,17 +182,17 @@ data.frame(x, y) |>
   geom_point()
 ```
 
-## Far UVC
+## Modelling Far UVC
 
-Far UVC interventions can be installed in each of the four location types, in any combination (i.e. in either one, two, three, or all four location types).
-Within each location type, the proportion of locations covered by the installation can be specified.
-For example, the proportion of schools where far UVC is to be installed.
+Far UVC interventions can be installed in each of the four location types, in any combination (i.e. in either one, two, three, or all four location types). Within each location type, the proportion of locations covered by the installation can also be specified. Given a certain level of coverage (e.g. 60%), the settings with far UVC installed can be set according to one of two **coverage strategies**:
 
-Coverage may be set to either at random or targetted (Figure \@ref(fig:uvc)).
-With random coverage, locations for far UVC to be installed are sampled at random without replacement.
-With targetted coverage, locations are chosen in order of size.
+-   **Random:** Locations for far UVC to be installed are sampled at random, with a random 35% of locations of that type selected.
 
-(ref:uvc) Illustration of the targetted and random strategies for the workplace location type.
+-   **Targeted:** Locations for far UVC to be installed are chosen in order of size, with the largest 35% of locations selected to receive far UVC.
+
+Figure \@ref(fig:uvc) provides an example illustrating the difference between these two strategies as applied to the schools location type.
+
+(ref:uvc) Illustration of the targeted and random strategies for the workplace location type.
 
 ```{r uvc, fig.cap="(ref:uvc)"}
 data.frame(workplace_sizes) |>
@@ -199,19 +206,32 @@ data.frame(workplace_sizes) |>
     cols = c("Targetted", "Random"),
     names_to = "type",
     values_to = "chosen"
-  ) |>
-  ggplot(aes(x = rank, y = log10(workplace_sizes) + 1, fill = chosen)) +
-  geom_col() +
+  )|> 
+  mutate(
+    chosen2 = ifelse(chosen, "Yes", "No")
+  )|>
+  ggplot(aes(x = rank, y = log10(workplace_sizes) + 1, 
+             col = chosen2, fill = chosen2)) +
+  geom_bar(stat = "identity", alpha = 1, position = position_dodge()) +
   facet_wrap(~ type) +
-  labs(x = "", y = "Base 10 logarithm of the workplace size plus one", fill = "Far UVC installed?")
+  scale_colour_manual(values = c("white", "#03113E")) + 
+  scale_fill_manual(values = c("white", "#03113E")) +
+  labs(x = "", y = "Base 10 logarithm of the workplace size plus one", 
+       col = "Far UVC Installed?",
+       fill = "Far UVC Installed?") 
   
 ```
 
-The efficacy of far UVC within the particular location may also be set.
-For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half.
+The efficacy of far UVC within the particular Location Type (i.e. schools, workplaces, leisure venues) may also be set. We model the efficacy of far UVC as the reduction in the force of infection an individual experiences in a location where it is installed. Specifically, the force of infection experienced by individual $i$ in Location $m$ at time $t$ where far UVC is installed is calculated as follows:
+
+$$
+\lambda_{i,m}(t) = (1 - E_{UVC})\frac{\beta_{m} I_m(t)}{N_m}
+$$
+
+where $E_{UVC}$ is the efficacy of far UVC. For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half.
 
 # Example model outputs
 
 # Parameter sensitivity
 
-# Bibliography {-}
+# Bibliography {.unnumbered}
