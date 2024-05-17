@@ -29,3 +29,8 @@ most populated settings), the \code{efficacy} of far UVC in the setting class, a
 which far UVC is deployed. The function appends these additional setting-specific parameters to
 the parameter list and returns an updated version of it.
 }
+\seealso{
+Other intervention: 
+\code{\link{generate_far_uvc_switches}()}
+}
+\concept{intervention}

@@ -54,6 +54,7 @@ Next, we define the model variables:
 
 ```{r}
 variables_list <- create_variables(parameters_list)
+variables_list <- variables_list$variables_list
 names(variables_list)
 ```
 

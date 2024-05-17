@@ -20,3 +20,8 @@ populated with 1's and 0's, where a 1 represents the presence of far UVC and a 0
 UVC. The function returns an updated parameter list with these vectors appended for each setting class
 for which far UVC has been parameterised using the \code{set_uvc()} function.
 }
+\seealso{
+Other intervention: 
+\code{\link{set_uvc}()}
+}
+\concept{intervention}

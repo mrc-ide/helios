@@ -9,7 +9,7 @@
 #'
 #' @param variables_list A list of model variables as generated using `create_variables()`
 #' @param leisure_sizes The sizes of the leisure settings as sampled using `sample_negbinom()`
-#'
+#' @family miscellaneous
 #' @export
 get_setting_sizes <- function(variables_list, leisure_sizes) {
 
