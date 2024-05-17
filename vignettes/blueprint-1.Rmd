@@ -1,0 +1,215 @@
+---
+title: "Assessing far UVC interventions with an individual based infectious disease model"
+author:
+  - Charlie Whittaker^[Imperial College London], Tom Brewer^[Imperial College London], Adam Howes^[Independent]
+output: 
+  bookdown::html_vignette2:
+    fig_caption: yes
+    number_sections: yes
+vignette: >
+  %\VignetteIndexEntry{blueprint}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: REFERENCES.bib
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r}
+library(helios)
+library(individual)
+library(ggplot2)
+library(dplyr, warn.conflicts = FALSE)
+library(purrr)
+theme_set(theme_minimal())
+```
+
+Ultraviolet (UV) light with wavelength 200-280 nanometers (far UVC light) has germicidal properties against viruses and bacteria.
+With the right technical developments, installation of far UVC light sources could be a promising public health intervention against infectious diseases.
+
+`helios` is an R package implementing a stochastic individual-based model of infectious disease transmission.
+The package can be used to quantify the impact of installing far UVC interventions on epidemic outcomes, such as infections and deaths.
+Evaluating the effectiveness of possible far UVC implementations is important to guide technical development.
+
+# Model description
+
+```{r}
+human_population <- 50000
+parameters_list <- get_parameters(list(human_population = human_population, seed = 1))
+variables <- create_variables(parameters_list)
+disease_states <- variables$variables_list$disease_state$get_categories()
+age_classes <- variables$variables_list$age_class$get_categories()
+age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
+```
+
+The model implemented in `helios` has a fixed population of individuals.
+Each individual is either a child, an adult, or an elderly person.
+Figure \@ref(fig:age) shows the proportion in each age group from a population of `r human_population` individuals.
+It is assumed that no aging occurs during the simulation.
+During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals.
+Disease transmission (Section \@ref(disease)) occurs stochastically, and only between individuals in the same location.
+
+## Locations {#locations}
+
+The location types included in the model are households, schools, workplaces, and leisure venues:
+
+1. **Households**
+The number of individuals in each household (Figure \@ref(fig:household-size)) and their respective ages are sampled with replacement from the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm.
+This sampling procedure therefore also generates the individual age distribution (Figure \@ref(fig:age)).
+
+(ref:household-size) The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
+
+```{r household-size, fig.cap="(ref:household-size)"}
+households <- variables$variables_list$household$get_categories()
+household_sizes <- purrr::map_vec(households, function(x) variables$variables_list$household$get_size_of(values = x))
+
+table(household_sizes) |>
+  data.frame() |>
+  ggplot(aes(x = household_sizes, y = Freq)) +
+  geom_col() +
+  labs(x = "Number of individuals in the household", y = "Count")
+```
+
+(ref:age) Age group sizes follow from the household sampling procedure.
+
+```{r age, fig.cap="(ref:age)"}
+data.frame(age_classes, age_class_counts) |>
+  mutate(age_classes = dplyr::recode_factor(age_classes, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
+  ggplot(aes(x = age_classes, y = age_class_counts)) +
+  geom_col() +
+  labs(x = "Age group", y = "Number of individuals") +
+  coord_flip()
+```
+
+2. **Schools**
+All children are assumed to attend school.
+The number of students in each school (Figure \@ref(fig:school-size)) is sampled from the 2022/2023 census of schools in the UK [@school2023].
+For each 20 students, there is one adult teacher who works at the school.
+
+(ref:school-size) The distribution of school sizes.
+
+```{r school-size, fig.cap="(ref:school-size)"}
+schools <- variables$variables_list$school$get_categories()
+schools <- schools[schools != "0"]
+school_sizes <- purrr::map_vec(schools, function(x) variables$variables_list$school$get_size_of(values = x))
+
+data.frame(school_sizes) |>
+  ggplot(aes(x = school_sizes)) +
+  geom_histogram() +
+  labs(x = "Number of students per school", y = "Count") +
+  scale_y_continuous(limits = c(0, NA))
+```
+
+3. **Workplaces**
+All adults (who are not teachers) are assumed to attend workplaces.
+The number of employees in each workplace (Figure \@ref(fig:workplace-size)) is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies.
+
+(ref:workplace-size) The distribution of workplace sizes. Here, size is shown on a logarithimic scale.
+
+```{r workplace-size, fig.cap="(ref:workplace-size)"}
+workplaces <- variables$variables_list$workplace$get_categories()
+workplaces <- workplaces[workplaces != "0"]
+workplace_sizes <- purrr::map_vec(workplaces, function(x) variables$variables_list$workplace$get_size_of(values = x))
+
+data.frame(workplace_sizes) |>
+  ggplot(aes(x = log(workplace_sizes, base = 10))) +
+  geom_histogram() +
+  labs(x = "Base 10 logarithm of the workplace size", y = "Count")
+```
+
+4. **Leisure venues**
+All individuals (children, adults, and elderly people) are eligible to attend leisure venues.
+Leisure venue sizes are sampled from a negative binomial distribution.
+The number of leisure venues attended by each individual per week (Figure \@ref(fig:leisure-venues)) is sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day.
+
+(ref:leisure-venues) The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
+
+```{r leisure-venues, fig.cap="(ref:leisure-venues)"}
+leisure_places <- variables$variables_list$leisure$get_values()
+number_leisure_places <- sapply(leisure_places, function(x) sum(x > 0))
+
+table(number_leisure_places) |>
+  data.frame() |>
+  ggplot(aes(x = number_leisure_places, y = Freq)) +
+  geom_col() +
+  labs(x = "Number of leisure venues attended in a week", y = "Count")
+```
+
+## Disease states {#disease}
+
+At any time, each individual is either susceptible, exposed, infectious, or recovered.
+
+Susceptible individuals may become exposed after spending time in the same location as infectious individuals.
+The probability of infection during one time-step of the model of size $\delta > 0$ is
+$$
+1 - \exp(- \lambda \delta).
+$$
+The term $\lambda$ is the force of infection, and given by a sum of location specific force of infections, together with a community level force of infection which represents general mixing among all people.
+The force of infection for each location is given by the proportion of individuals in that location who are infectious, multiplied by a constant term representing the proportion of total transmission which occurs in each setting.
+
+Exposed individuals become infectious after some delay.
+Infectious individuals become recovered after some delay.
+After recovering, individuals then return to being susceptible, again after some delay.
+By altering the distribution of this final delay, the time between recovery and susceptibility, the framework has the capacity to simulate both epidemic and endemic pathogens (Figure \@ref(fig:epidemic-endemic)).
+
+(ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
+
+```{r epidemic-endemic, fig.cap="(ref:epidemic-endemic)"}
+x <- rnorm(100)
+y <- rnorm(100)
+
+data.frame(x, y) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point()
+```
+
+## Far UVC
+
+Far UVC interventions can be installed in each of the four location types, in any combination (i.e. in either one, two, three, or all four location types).
+Within each location type, the proportion of locations covered by the installation can be specified.
+For example, the proportion of schools where far UVC is to be installed.
+
+Coverage may be set to either at random or targetted (Figure \@ref(fig:uvc)).
+With random coverage, locations for far UVC to be installed are sampled at random without replacement.
+With targetted coverage, locations are chosen in order of size.
+
+(ref:uvc) Illustration of the targetted and random strategies for the workplace location type.
+
+```{r uvc, fig.cap="(ref:uvc)"}
+data.frame(workplace_sizes) |>
+  arrange(desc(workplace_sizes)) |>
+  mutate(
+    rank = row_number(),
+    Targetted = rank <= 500,
+    Random = sample(c(rep(TRUE, 500), rep(FALSE, n() - 500)))
+  ) |>
+  tidyr::pivot_longer(
+    cols = c("Targetted", "Random"),
+    names_to = "type",
+    values_to = "chosen"
+  ) |>
+  ggplot(aes(x = rank, y = log10(workplace_sizes) + 1, fill = chosen)) +
+  geom_col() +
+  facet_wrap(~ type) +
+  labs(x = "", y = "Base 10 logarithm of the workplace size plus one", fill = "Far UVC installed?")
+  
+```
+
+The efficacy of far UVC within the particular location may also be set.
+For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half.
+
+# Example model outputs
+
+# Parameter sensitivity
+
+# Bibliography {-}
