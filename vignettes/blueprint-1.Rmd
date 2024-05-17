@@ -6,6 +6,8 @@ output:
   bookdown::html_vignette2:
     fig_caption: yes
     number_sections: yes
+pkgdown:
+  as_is: true
 vignette: >
   %\VignetteIndexEntry{blueprint}
   %\VignetteEngine{knitr::rmarkdown}

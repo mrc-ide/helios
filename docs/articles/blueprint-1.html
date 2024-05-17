@@ -81,10 +81,8 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Assessing far UVC interventions with an
-individual based infectious disease model</h1>
-                        <h4 data-toc-skip class="author">Charlie
-Whittaker<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, Tom Brewer<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, Adam Howes<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>
+      <h1 data-toc-skip>Assessing far UVC interventions with an individual based infectious disease model</h1>
+                        <h4 data-toc-skip class="author">Charlie Whittaker<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, Tom Brewer<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, Adam Howes<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>
 </h4>
             
       
@@ -95,185 +93,151 @@ Whittaker<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, Tom B
 
     
     
-<p>Ultraviolet (UV) light with wavelength 200-280 nanometers (far UVC
-light) has germicidal properties against viruses and bacteria. With the
-right technical developments, installation of far UVC light sources
-could be a promising public health intervention against infectious
-diseases.</p>
-<p><code>helios</code> is an R package implementing a stochastic
-individual-based model of infectious disease transmission. The package
-can be used to quantify the impact of installing far UVC interventions
-on epidemic outcomes, such as infections and deaths. Evaluating the
-effectiveness of possible far UVC implementations is important to guide
-technical development.</p>
-<div class="section level2">
-<h2 id="model-description">Model description<a class="anchor" aria-label="anchor" href="#model-description"></a>
+<p>Ultraviolet (UV) light with wavelength 200-280 nanometers (far UVC light) has germicidal properties against viruses and bacteria.
+With the right technical developments, installation of far UVC light sources could be a promising public health intervention against infectious diseases.</p>
+<p><code>helios</code> is an R package implementing a stochastic individual-based model of infectious disease transmission.
+The package can be used to quantify the impact of installing far UVC interventions on epidemic outcomes, such as infections and deaths.
+Evaluating the effectiveness of possible far UVC implementations is important to guide technical development.</p>
+<div class="section level2" number="1">
+<h2 id="model-description">
+<span class="header-section-number">1</span> Model description<a class="anchor" aria-label="anchor" href="#model-description"></a>
 </h2>
-<p>The model implemented in <code>helios</code> has a fixed population
-of individuals. Each individual is either a child, an adult, or an
-elderly person. Figure @ref(fig:age) shows the proportion in each age
-group from a population of 5^{4} individuals. It is assumed that no
-aging occurs during the simulation. During each day, individuals visit
-particular locations (Section @ref(locations)) and mix with other
-individuals. Disease transmission (Section @ref(disease)) occurs
-stochastically, and only between individuals in the same location.</p>
-<div class="section level3">
-<h3 id="locations">Locations<a class="anchor" aria-label="anchor" href="#locations"></a>
+<p>The model implemented in <code>helios</code> has a fixed population of individuals.
+Each individual is either a child, an adult, or an elderly person.
+Figure <a href="#fig:age">1.2</a> shows the proportion in each age group from a population of 5^{4} individuals.
+It is assumed that no aging occurs during the simulation.
+During each day, individuals visit particular locations (Section <a href="#locations">1.1</a>) and mix with other individuals.
+Disease transmission (Section <a href="#disease">1.2</a>) occurs stochastically, and only between individuals in the same location.</p>
+<div class="section level3" number="1.1">
+<h3 id="locations">
+<span class="header-section-number">1.1</span> Locations<a class="anchor" aria-label="anchor" href="#locations"></a>
 </h3>
-<p>The location types included in the model are households, schools,
-workplaces, and leisure venues:</p>
+<p>The location types included in the model are households, schools, workplaces, and leisure venues:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Households</strong> The number of individuals in each
-household (Figure @ref(fig:household-size)) and their respective ages
-are sampled with replacement from the 2011 Office for National
-Statistics survey in the United Kingdom (UK), following <span class="citation">Hinch et al. (2021)</span>. This sampling procedure
-therefore also generates the individual age distribution (Figure
-@ref(fig:age)).</li>
+<strong>Households</strong>
+The number of individuals in each household (Figure <a href="#fig:household-size">1.1</a>) and their respective ages are sampled with replacement from the 2011 Office for National Statistics survey in the United Kingdom (UK), following <span class="citation">Hinch et al. (2021)</span>.
+This sampling procedure therefore also generates the individual age distribution (Figure <a href="#fig:age">1.2</a>).</li>
 </ol>
-<p>(ref:household-size) The distribution of household sizes. Households
-with two individuals are the most common, followed by single individual
-households.</p>
 <div class="figure">
-<img src="blueprint-1_files/figure-html/household-size-1.png" alt="(ref:household-size)" width="700"><p class="caption">
-(ref:household-size)
+<span style="display:block;" id="fig:household-size"></span>
+<img src="blueprint-1_files/figure-html/household-size-1.png" alt="The distribution of household sizes. Households with two individuals are the most common, followed by single individual households."><p class="caption">
+Figure 1.1: The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
 </p>
 </div>
-<p>(ref:age) Age group sizes follow from the household sampling
-procedure.</p>
+
 <div class="figure">
-<img src="blueprint-1_files/figure-html/age-1.png" alt="(ref:age)" width="700"><p class="caption">
-(ref:age)
+<span style="display:block;" id="fig:age"></span>
+<img src="blueprint-1_files/figure-html/age-1.png" alt="Age group sizes follow from the household sampling procedure."><p class="caption">
+Figure 1.2: Age group sizes follow from the household sampling procedure.
 </p>
 </div>
 <ol start="2" style="list-style-type: decimal">
 <li>
-<strong>Schools</strong> All children are assumed to attend school.
-The number of students in each school (Figure @ref(fig:school-size)) is
-sampled from the 2022/2023 census of schools in the UK <span class="citation">(School Census Statistics Team 2023)</span>. For each
-20 students, there is one adult teacher who works at the school.</li>
+<strong>Schools</strong>
+All children are assumed to attend school.
+The number of students in each school (Figure <a href="#fig:school-size">1.3</a>) is sampled from the 2022/2023 census of schools in the UK <span class="citation">(School Census Statistics Team 2023)</span>.
+For each 20 students, there is one adult teacher who works at the school.</li>
 </ol>
-<p>(ref:school-size) The distribution of school sizes.</p>
 <div class="figure">
-<img src="blueprint-1_files/figure-html/school-size-1.png" alt="(ref:school-size)" width="700"><p class="caption">
-(ref:school-size)
+<span style="display:block;" id="fig:school-size"></span>
+<img src="blueprint-1_files/figure-html/school-size-1.png" alt="The distribution of school sizes."><p class="caption">
+Figure 1.3: The distribution of school sizes.
 </p>
 </div>
 <ol start="3" style="list-style-type: decimal">
 <li>
-<strong>Workplaces</strong> All adults (who are not teachers) are
-assumed to attend workplaces. The number of employees in each workplace
-(Figure @ref(fig:workplace-size)) is sampled from an offset truncated
-power statistical distribution, based on that of <span class="citation">Ferguson et al. (2005)</span>.</li>
+<strong>Workplaces</strong>
+All adults (who are not teachers) are assumed to attend workplaces.
+The number of employees in each workplace (Figure <a href="#fig:workplace-size">1.4</a>) is sampled from an offset truncated power statistical distribution, based on that of <span class="citation">Ferguson et al. (2005)</span>.</li>
 </ol>
-<p>(ref:workplace-size) The distribution of workplace sizes. Here, size
-is shown on a logarithimic scale.</p>
 <div class="figure">
-<img src="blueprint-1_files/figure-html/workplace-size-1.png" alt="(ref:workplace-size)" width="700"><p class="caption">
-(ref:workplace-size)
+<span style="display:block;" id="fig:workplace-size"></span>
+<img src="blueprint-1_files/figure-html/workplace-size-1.png" alt="The distribution of workplace sizes. Here, size is shown on a logarithimic scale."><p class="caption">
+Figure 1.4: The distribution of workplace sizes. Here, size is shown on a logarithimic scale.
 </p>
 </div>
 <ol start="4" style="list-style-type: decimal">
 <li>
-<strong>Leisure venues</strong> All individuals (children, adults,
-and elderly people) are eligible to attend leisure venues. Leisure venue
-sizes are sampled from a negative binomial distribution. The number of
-leisure venues attended by each individual per week (Figure
-@ref(fig:leisure-venues)) is sampled from a Poisson distribution, capped
-at seven corresponding to one leisure visit each day.</li>
+<strong>Leisure venues</strong>
+All individuals (children, adults, and elderly people) are eligible to attend leisure venues.
+Leisure venue sizes are sampled from a negative binomial distribution.
+The number of leisure venues attended by each individual per week (Figure <a href="#fig:leisure-venues">1.5</a>) is sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day.</li>
 </ol>
-<p>(ref:leisure-venues) The number of leisure venues that each indvidual
-attends in a week. The minimum possible number of venues is zero, and
-maximum possible is seven.</p>
 <div class="figure">
-<img src="blueprint-1_files/figure-html/leisure-venues-1.png" alt="(ref:leisure-venues)" width="700"><p class="caption">
-(ref:leisure-venues)
+<span style="display:block;" id="fig:leisure-venues"></span>
+<img src="blueprint-1_files/figure-html/leisure-venues-1.png" alt="The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven."><p class="caption">
+Figure 1.5: The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
 </p>
 </div>
 </div>
-<div class="section level3">
-<h3 id="disease">Disease states<a class="anchor" aria-label="anchor" href="#disease"></a>
+<div class="section level3" number="1.2">
+<h3 id="disease">
+<span class="header-section-number">1.2</span> Disease states<a class="anchor" aria-label="anchor" href="#disease"></a>
 </h3>
-<p>At any time, each individual is either susceptible, exposed,
-infectious, or recovered.</p>
-<p>Susceptible individuals may become exposed after spending time in the
-same location as infectious individuals. The probability of infection
-during one time-step of the model of size <span class="math inline">\(\delta &gt; 0\)</span> is <span class="math display">\[
+<p>At any time, each individual is either susceptible, exposed, infectious, or recovered.</p>
+<p>Susceptible individuals may become exposed after spending time in the same location as infectious individuals.
+The probability of infection during one time-step of the model of size <span class="math inline">\(\delta &gt; 0\)</span> is
+<span class="math display">\[
 1 - \exp(- \lambda \delta).
-\]</span> The term <span class="math inline">\(\lambda\)</span> is the
-force of infection, and given by a sum of location specific force of
-infections, together with a community level force of infection which
-represents general mixing among all people. The force of infection for
-each location is given by the proportion of individuals in that location
-who are infectious, multiplied by a constant term representing the
-proportion of total transmission which occurs in each setting.</p>
-<p>Exposed individuals become infectious after some delay. Infectious
-individuals become recovered after some delay. After recovering,
-individuals then return to being susceptible, again after some delay. By
-altering the distribution of this final delay, the time between recovery
-and susceptibility, the framework has the capacity to simulate both
-epidemic and endemic pathogens (Figure @ref(fig:epidemic-endemic)).</p>
-<p>(ref:epidemic-endemic) Illustration of simulated epidemic and endemic
-pathogens.</p>
+\]</span>
+The term <span class="math inline">\(\lambda\)</span> is the force of infection, and given by a sum of location specific force of infections, together with a community level force of infection which represents general mixing among all people.
+The force of infection for each location is given by the proportion of individuals in that location who are infectious, multiplied by a constant term representing the proportion of total transmission which occurs in each setting.</p>
+<p>Exposed individuals become infectious after some delay.
+Infectious individuals become recovered after some delay.
+After recovering, individuals then return to being susceptible, again after some delay.
+By altering the distribution of this final delay, the time between recovery and susceptibility, the framework has the capacity to simulate both epidemic and endemic pathogens (Figure <a href="#fig:epidemic-endemic">1.6</a>).</p>
+
 <div class="figure">
-<img src="blueprint-1_files/figure-html/epidemic-endemic-1.png" alt="(ref:epidemic-endemic)" width="700"><p class="caption">
-(ref:epidemic-endemic)
+<span style="display:block;" id="fig:epidemic-endemic"></span>
+<img src="blueprint-1_files/figure-html/epidemic-endemic-1.png" alt="Illustration of simulated epidemic and endemic pathogens."><p class="caption">
+Figure 1.6: Illustration of simulated epidemic and endemic pathogens.
 </p>
 </div>
 </div>
-<div class="section level3">
-<h3 id="far-uvc">Far UVC<a class="anchor" aria-label="anchor" href="#far-uvc"></a>
+<div class="section level3" number="1.3">
+<h3 id="far-uvc">
+<span class="header-section-number">1.3</span> Far UVC<a class="anchor" aria-label="anchor" href="#far-uvc"></a>
 </h3>
-<p>Far UVC interventions can be installed in each of the four location
-types, in any combination (i.e. in either one, two, three, or all four
-location types). Within each location type, the proportion of locations
-covered by the installation can be specified. For example, the
-proportion of schools where far UVC is to be installed.</p>
-<p>Coverage may be set to either at random or targetted (Figure
-@ref(fig:uvc)). With random coverage, locations for far UVC to be
-installed are sampled at random without replacement. With targetted
-coverage, locations are chosen in order of size.</p>
-<p>(ref:uvc) Illustration of the targetted and random strategies for the
-workplace location type.</p>
+<p>Far UVC interventions can be installed in each of the four location types, in any combination (i.e. in either one, two, three, or all four location types).
+Within each location type, the proportion of locations covered by the installation can be specified.
+For example, the proportion of schools where far UVC is to be installed.</p>
+<p>Coverage may be set to either at random or targetted (Figure <a href="#fig:uvc">1.7</a>).
+With random coverage, locations for far UVC to be installed are sampled at random without replacement.
+With targetted coverage, locations are chosen in order of size.</p>
+
 <div class="figure">
-<img src="blueprint-1_files/figure-html/uvc-1.png" alt="(ref:uvc)" width="700"><p class="caption">
-(ref:uvc)
+<span style="display:block;" id="fig:uvc"></span>
+<img src="blueprint-1_files/figure-html/uvc-1.png" alt="Illustration of the targetted and random strategies for the workplace location type."><p class="caption">
+Figure 1.7: Illustration of the targetted and random strategies for the workplace location type.
 </p>
 </div>
-<p>The efficacy of far UVC within the particular location may also be
-set. For example, an efficacy of 50% results in a reduction of the force
-of infection an individual experiences in that particular location by a
-half.</p>
+<p>The efficacy of far UVC within the particular location may also be set.
+For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half.</p>
 </div>
 </div>
-<div class="section level2">
-<h2 id="example-model-outputs">Example model outputs<a class="anchor" aria-label="anchor" href="#example-model-outputs"></a>
+<div class="section level2" number="2">
+<h2 id="example-model-outputs">
+<span class="header-section-number">2</span> Example model outputs<a class="anchor" aria-label="anchor" href="#example-model-outputs"></a>
+</h2>
+</div>
+<div class="section level2" number="3">
+<h2 id="parameter-sensitivity">
+<span class="header-section-number">3</span> Parameter sensitivity<a class="anchor" aria-label="anchor" href="#parameter-sensitivity"></a>
 </h2>
 </div>
 <div class="section level2">
-<h2 id="parameter-sensitivity">Parameter sensitivity<a class="anchor" aria-label="anchor" href="#parameter-sensitivity"></a>
-</h2>
-</div>
-<div class="section level2">
-<h2 class="unnumbered" id="bibliography">Bibliography<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+<h2 id="bibliography">Bibliography<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-ferguson2005strategies" class="csl-entry">
-Ferguson, Neil M, Derek AT Cummings, Simon Cauchemez, Christophe Fraser,
-Steven Riley, Aronrag Meeyai, Sopon Iamsirithaworn, and Donald S Burke.
-2005. <span>“Strategies for Containing an Emerging Influenza Pandemic in
-Southeast Asia.”</span> <em>Nature</em> 437 (7056): 209–14.
+Ferguson, Neil M, Derek AT Cummings, Simon Cauchemez, Christophe Fraser, Steven Riley, Aronrag Meeyai, Sopon Iamsirithaworn, and Donald S Burke. 2005. <span>“Strategies for Containing an Emerging Influenza Pandemic in Southeast Asia.”</span> <em>Nature</em> 437 (7056): 209–14.
 </div>
 <div id="ref-hinch2021openabm" class="csl-entry">
-Hinch, Robert, William JM Probert, Anel Nurtay, Michelle Kendall, Chris
-Wymant, Matthew Hall, Katrina Lythgoe, et al. 2021.
-<span>“OpenABM-Covid19—an Agent-Based Model for Non-Pharmaceutical
-Interventions Against COVID-19 Including Contact Tracing.”</span>
-<em>PLoS Computational Biology</em> 17 (7): e1009146.
+Hinch, Robert, William JM Probert, Anel Nurtay, Michelle Kendall, Chris Wymant, Matthew Hall, Katrina Lythgoe, et al. 2021. <span>“OpenABM-Covid19—an Agent-Based Model for Non-Pharmaceutical Interventions Against COVID-19 Including Contact Tracing.”</span> <em>PLoS Computational Biology</em> 17 (7): e1009146.
 </div>
 <div id="ref-school2023" class="csl-entry">
-School Census Statistics Team. 2023. <span>“Schools, Pupils and Their
-Characteristics: Academic Year 2022/23.”</span>
+School Census Statistics Team. 2023. <span>“Schools, Pupils and Their Characteristics: Academic Year 2022/23.”</span>
 </div>
 </div>
 </div>
@@ -289,9 +253,7 @@ Characteristics: Academic Year 2022/23.”</span>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 
