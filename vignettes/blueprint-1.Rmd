@@ -3,7 +3,7 @@ title: "Assessing far UVC interventions with an individual based infectious dise
 author:
   - Charlie Whittaker^[Imperial College London], Tom Brewer^[Imperial College London], Adam Howes^[Independent]
 output: 
-  bookdown::html_vignette2:
+  bookdown::html_document2:
     fig_caption: yes
     number_sections: yes
 pkgdown:
