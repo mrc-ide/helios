@@ -120,7 +120,7 @@ Transitions between states are simulated as follows.
 
 ### Transition from state $S \to E$
 
-The total force of infection $\lambda$ for each individual is a sum of household, workplace, school, and leisure specific force of infections
+The total force of infection $\lambda$ for each individual is a sum of household, workplace, school, leisure, and community specific force of infections
 $$
 \lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l.
 $$
@@ -130,6 +130,7 @@ The location specific force of infection terms are given as:
 * Workplace  $\lambda_w$: proportional to the number of infectious individuals in the workplace multiplied by $\beta_w$.
 * School $\lambda_s$: proportional to the number of infectious individuals in the school multiplied by $\beta_s$.
 * Leisure $\lambda_l$: proportional to the number of infectious individuals in the leisure setting multiplied by $\beta_l$.
+* Community $\lambda_c$: proportional to the total number of infectious individuals multiplied by $\beta_c$.
 
 The probability of infection in a given time step $\delta > 0$ is
 $$
