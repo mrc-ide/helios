@@ -53,7 +53,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/blueprint-1.html">Assessing far UVC interventions with an individual based infectious disease model</a>
+      <a href="../articles/blueprint.html">Assessing far UVC interventions with an individual based infectious disease model</a>
     </li>
     <li>
       <a href="../articles/model.html">An individual-based model for assessing far UVC interventions</a>
@@ -86,8 +86,8 @@
 </h4>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/mrc-ide/helios/blob/HEAD/vignettes/blueprint-1.Rmd" class="external-link"><code>vignettes/blueprint-1.Rmd</code></a></small>
-      <div class="hidden name"><code>blueprint-1.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/mrc-ide/helios/blob/HEAD/vignettes/blueprint.Rmd" class="external-link"><code>vignettes/blueprint.Rmd</code></a></small>
+      <div class="hidden name"><code>blueprint.Rmd</code></div>
 
     </div>
 
@@ -114,7 +114,7 @@
 <h2 id="model-description">
 <span class="header-section-number">3</span> Model description<a class="anchor" aria-label="anchor" href="#model-description"></a>
 </h2>
-<p>The model implemented in <code>helios</code> has a fixed population of individuals, who are each assigned one of three age-groups (children, adults, elderly). Each individual is therefore either a child, an adult, or an elderly person. Figure <a href="#fig:age">3.2</a> shows the proportion in each age group from a population of 5^{4} individuals. We do not currently explicitly model demographic changes in the model and so we assume that no aging between the age-groups (e.g. child -&gt; adult) occurs during the simulation.</p>
+<p>The model implemented in <code>helios</code> has a fixed population of individuals, who are each assigned one of three age-groups (children, adults, elderly). Each individual is therefore either a child, an adult, or an elderly person. Figure <a href="#fig:age">3.2</a> shows the proportion in each age group from a population of 50000 individuals. We do not currently explicitly model demographic changes in the model and so we assume that no aging between the age-groups (e.g. child -&gt; adult) occurs during the simulation.</p>
 <p>During each day, individuals visit particular locations (Section <a href="#locations">3.1</a>) and mix with other individuals who are also visiting those same locations at the same time. We model 4 location types: <strong>Households</strong>, <strong>Schools</strong>, <strong>Workplaces</strong>, and <strong>Leisure</strong> <strong>Venues</strong>. Individuals are assigned to each location in a way that depends on their age-group (e.g. children are assigned to schools, adults are assigned to workplaces), with assignment to a <strong>specific</strong> location within a particular type (e.g. School #7) done stochastically (see <a href="#locations">3.1</a> below).</p>
 <p>It is during these visits to the same location that pathogen transmission can occur between two individuals - this process is stochastic and occurs only between individuals visiting the same location. See Section <a href="#disease">3.2</a> for further details.</p>
 <div class="section level3" number="3.1">
@@ -128,14 +128,14 @@
 </ol>
 <div class="figure">
 <span style="display:block;" id="fig:household-size"></span>
-<img src="blueprint-1_files/figure-html/household-size-1.png" alt="The distribution of household sizes. Households with two individuals are the most common, followed by single individual households."><p class="caption">
+<img src="blueprint_files/figure-html/household-size-1.png" alt="The distribution of household sizes. Households with two individuals are the most common, followed by single individual households." width="90%"><p class="caption">
 Figure 3.1: The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
 </p>
 </div>
 
 <div class="figure">
 <span style="display:block;" id="fig:age"></span>
-<img src="blueprint-1_files/figure-html/age-1.png" alt="Age group sizes follow from the household sampling procedure."><p class="caption">
+<img src="blueprint_files/figure-html/age-1.png" alt="Age group sizes follow from the household sampling procedure." width="90%"><p class="caption">
 Figure 3.2: Age group sizes follow from the household sampling procedure.
 </p>
 </div>
@@ -145,7 +145,7 @@ Figure 3.2: Age group sizes follow from the household sampling procedure.
 </ol>
 <div class="figure">
 <span style="display:block;" id="fig:school-size"></span>
-<img src="blueprint-1_files/figure-html/school-size-1.png" alt="The distribution of school sizes."><p class="caption">
+<img src="blueprint_files/figure-html/school-size-1.png" alt="The distribution of school sizes." width="90%"><p class="caption">
 Figure 3.3: The distribution of school sizes.
 </p>
 </div>
@@ -155,7 +155,7 @@ Figure 3.3: The distribution of school sizes.
 </ol>
 <div class="figure">
 <span style="display:block;" id="fig:workplace-size"></span>
-<img src="blueprint-1_files/figure-html/workplace-size-1.png" alt="The distribution of workplace sizes. Here, size is shown on a logarithimic scale."><p class="caption">
+<img src="blueprint_files/figure-html/workplace-size-1.png" alt="The distribution of workplace sizes. Here, size is shown on a logarithimic scale." width="90%"><p class="caption">
 Figure 3.4: The distribution of workplace sizes. Here, size is shown on a logarithimic scale.
 </p>
 </div>
@@ -165,7 +165,7 @@ Figure 3.4: The distribution of workplace sizes. Here, size is shown on a logari
 </ol>
 <div class="figure">
 <span style="display:block;" id="fig:leisure-venues"></span>
-<img src="blueprint-1_files/figure-html/leisure-venues-1.png" alt="The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven."><p class="caption">
+<img src="blueprint_files/figure-html/leisure-venues-1.png" alt="The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven." width="90%"><p class="caption">
 Figure 3.5: The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
 </p>
 </div>
@@ -188,14 +188,16 @@ Figure 3.5: The number of leisure venues that each indvidual attends in a week. 
 <p>where <span class="math inline">\(I_m(t)\)</span> are the number of infectious individuals in Location <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> , <span class="math inline">\(N_m\)</span> are the total number of individuals visiting Location <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> and <span class="math inline">\(\beta_m\)</span> is a location specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that integrates consideration of both the <strong><em>amount of time spent in a location</em></strong> and <strong><em>the inherent “riskiness”</em></strong> <strong>of a location</strong> (i.e. how receptive to onwards transmission it is). Currently within the model, each Location Type (i.e. workplace, school, household, leisure-venue) has a specific <span class="math inline">\(\beta\)</span> (i.e. <span class="math inline">\(\beta_{W}\)</span>,<span class="math inline">\(\beta_{S}\)</span> , <span class="math inline">\(\beta_{H}\)</span>, <span class="math inline">\(\beta_{L}\)</span> respecitvely) and all individual locations within a location type (e.g. all schools) have the same <span class="math inline">\(\beta\)</span> (though this could be changed in future versions).</p>
 <p>The total force of infection <span class="math inline">\(\lambda\)</span> for each individual is calculated as a sum of household, workplace, school, leisure. We add an additional force of infection term <span class="math inline">\(\lambda_C\)</span> to represent types of potential infectious contacts not represented by the locations we consider (e.g. during a commute to/from a workplace, grocery shopping etc). and which represents general mixing among all people. The total Force of Infection experienced by individual <span class="math inline">\(i\)</span> is therefore calculated as:</p>
 <p><span class="math display">\[ \lambda_{i, T} = \lambda_{i, H} + \lambda_{i, W} + \lambda_{i, S} + \lambda_{i, L} + \lambda_{i, C} \]</span>
-The probability of individual <span class="math inline">\(i\)</span> becoming infected during one time-step <span class="math inline">\(t\)</span> is calculated by summing the Location-specific force of infections they experience and then calculating the following:<span class="math display">\[
+The probability of individual <span class="math inline">\(i\)</span> becoming infected during one time-step <span class="math inline">\(t\)</span> is calculated by summing the Location-specific force of infections they experience and then calculating the following:
+<span class="math display">\[
 P(infection) = 1 - \exp(- \lambda_{i,T}t).
 \]</span></p>
-<p>Exposed individuals become infectious after some delay (the <em>incubation period</em>). Infectious individuals recover after some delay (the <em>duration of infectiousness</em>). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquiring immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single “epidemic wave” before dying out) and endemic (those which are constantly present in the population) pathogens (Figure <a href="#fig:epidemic-endemic">3.6</a>). (ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.</p>
+<p>Exposed individuals become infectious after some delay (the <em>incubation period</em>). Infectious individuals recover after some delay (the <em>duration of infectiousness</em>). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquiring immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single “epidemic wave” before dying out) and endemic (those which are constantly present in the population) pathogens (Figure <a href="#fig:epidemic-endemic">3.6</a>).</p>
+
 <div class="figure">
 <span style="display:block;" id="fig:epidemic-endemic"></span>
-<img src="blueprint-1_files/figure-html/epidemic-endemic-1.png" alt="(ref:epidemic-endemic)"><p class="caption">
-Figure 3.6: (ref:epidemic-endemic)
+<img src="blueprint_files/figure-html/epidemic-endemic-1.png" alt="Illustration of simulated epidemic and endemic pathogens." width="90%"><p class="caption">
+Figure 3.6: Illustration of simulated epidemic and endemic pathogens.
 </p>
 </div>
 </div>
@@ -212,7 +214,7 @@ Figure 3.6: (ref:epidemic-endemic)
 
 <div class="figure">
 <span style="display:block;" id="fig:uvc"></span>
-<img src="blueprint-1_files/figure-html/uvc-1.png" alt="Illustration of the targeted and random strategies for the workplace location type."><p class="caption">
+<img src="blueprint_files/figure-html/uvc-1.png" alt="Illustration of the targeted and random strategies for the workplace location type." width="90%"><p class="caption">
 Figure 3.7: Illustration of the targeted and random strategies for the workplace location type.
 </p>
 </div>
@@ -236,7 +238,7 @@ Figure 3.7: Illustration of the targeted and random strategies for the workplace
 <div class="section level2">
 <h2 id="bibliography">Bibliography<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-ferguson2005strategies" class="csl-entry">
 Ferguson, Neil M, Derek AT Cummings, Simon Cauchemez, Christophe Fraser, Steven Riley, Aronrag Meeyai, Sopon Iamsirithaworn, and Donald S Burke. 2005. <span>“Strategies for Containing an Emerging Influenza Pandemic in Southeast Asia.”</span> <em>Nature</em> 437 (7056): 209–14.
 </div>
