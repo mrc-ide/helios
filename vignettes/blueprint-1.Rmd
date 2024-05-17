@@ -161,9 +161,31 @@ Far UVC interventions can be installed in each of the four location types, in an
 Within each location type, the proportion of locations covered by the installation can be specified.
 For example, the proportion of schools where far UVC is to be installed.
 
-Coverage may be set to either at random or targetted.
+Coverage may be set to either at random or targetted (Figure \@ref(fig:uvc)).
 With random coverage, locations for far UVC to be installed are sampled at random without replacement.
 With targetted coverage, locations are chosen in order of size.
+
+(ref:uvc) Illustration of the targetted and random strategies for the workplace location type.
+
+```{r uvc, fig.cap="(ref:uvc)"}
+data.frame(workplace_sizes) |>
+  arrange(desc(workplace_sizes)) |>
+  mutate(
+    rank = row_number(),
+    Targetted = rank <= 500,
+    Random = sample(c(rep(TRUE, 500), rep(FALSE, n() - 500)))
+  ) |>
+  tidyr::pivot_longer(
+    cols = c("Targetted", "Random"),
+    names_to = "type",
+    values_to = "chosen"
+  ) |>
+  ggplot(aes(x = rank, y = log10(workplace_sizes) + 1, fill = chosen)) +
+  geom_col() +
+  facet_wrap(~ type) +
+  labs(x = "", y = "Base 10 logarithm of the workplace size plus one", fill = "Far UVC installed?")
+  
+```
 
 The efficacy of far UVC within the particular location may also be set.
 For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half.
