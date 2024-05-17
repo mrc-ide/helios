@@ -133,7 +133,7 @@ The location specific force of infection terms are given as:
 
 The probability of infection in a given time step $\delta > 0$ is
 $$
-\mathbb{P}(S \to E) = 1 - \exp(\lambda \delta)
+\mathbb{P}(S \to E) = 1 - \exp(- \lambda \delta)
 $$
 
 ### Transition from state $E \to I$
