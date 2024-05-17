@@ -3,7 +3,7 @@ title: "Assessing far UVC interventions with an individual based infectious dise
 author:
   - Charlie Whittaker^[Imperial College London], Tom Brewer^[Imperial College London], Adam Howes^[Independent]
 output: 
-  bookdown::html_vignette2:
+  bookdown::html_document2:
     fig_caption: yes
     number_sections: yes
 pkgdown:
@@ -23,7 +23,9 @@ knitr::opts_chunk$set(
   comment = "#>",
   echo = FALSE,
   message = FALSE,
-  warning = FALSE
+  warning = FALSE,
+  dpi = 330,
+  out.width = "90%"
 )
 ```
 
@@ -52,7 +54,7 @@ We note here that the results presented are purely **examples** of the types of 
 # Model description
 
 ```{r}
-human_population <- 50000
+human_population <- 50000L
 parameters_list <- get_parameters(list(human_population = human_population, seed = 1))
 variables <- create_variables(parameters_list)
 disease_states <- variables$variables_list$disease_state$get_categories()
@@ -167,11 +169,14 @@ where $I_m(t)$ are the number of infectious individuals in Location $m$ at time 
 The total force of infection $\lambda$ for each individual is calculated as a sum of household, workplace, school, leisure. We add an additional force of infection term $\lambda_C$ to represent types of potential infectious contacts not represented by the locations we consider (e.g. during a commute to/from a workplace, grocery shopping etc). and which represents general mixing among all people. The total Force of Infection experienced by individual $i$ is therefore calculated as:
 
 $$ \lambda_{i, T} = \lambda_{i, H} + \lambda_{i, W} + \lambda_{i, S} + \lambda_{i, L} + \lambda_{i, C} $$
-The probability of individual $i$ becoming infected during one time-step $t$ is calculated by summing the Location-specific force of infections they experience and then calculating the following:$$
+The probability of individual $i$ becoming infected during one time-step $t$ is calculated by summing the Location-specific force of infections they experience and then calculating the following:
+$$
 P(infection) = 1 - \exp(- \lambda_{i,T}t).
 $$
 
-Exposed individuals become infectious after some delay (the *incubation period*). Infectious individuals recover after some delay (the *duration of infectiousness*). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquiring immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single "epidemic wave" before dying out) and endemic (those which are constantly present in the population) pathogens (Figure \@ref(fig:epidemic-endemic)). (ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
+Exposed individuals become infectious after some delay (the *incubation period*). Infectious individuals recover after some delay (the *duration of infectiousness*). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquiring immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single "epidemic wave" before dying out) and endemic (those which are constantly present in the population) pathogens (Figure \@ref(fig:epidemic-endemic)).
+
+(ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
 
 ```{r epidemic-endemic, fig.cap="(ref:epidemic-endemic)"}
 x <- rnorm(100)
@@ -218,8 +223,10 @@ data.frame(workplace_sizes) |>
   scale_fill_manual(values = c("white", "#03113E")) +
   labs(x = "", y = "Base 10 logarithm of the workplace size plus one", 
        col = "Far UVC Installed?",
-       fill = "Far UVC Installed?") 
-  
+       fill = "Far UVC Installed?") +
+  theme(
+    legend.position = "bottom"
+  )
 ```
 
 The efficacy of far UVC within the particular Location Type (i.e. schools, workplaces, leisure venues) may also be set. We model the efficacy of far UVC as the reduction in the force of infection an individual experiences in a location where it is installed. Specifically, the force of infection experienced by individual $i$ in Location $m$ at time $t$ where far UVC is installed is calculated as follows:
