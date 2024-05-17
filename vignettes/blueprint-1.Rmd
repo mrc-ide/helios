@@ -52,7 +52,7 @@ We note here that the results presented are purely **examples** of the types of 
 # Model description
 
 ```{r}
-human_population <- 50000
+human_population <- 50000L
 parameters_list <- get_parameters(list(human_population = human_population, seed = 1))
 variables <- create_variables(parameters_list)
 disease_states <- variables$variables_list$disease_state$get_categories()
