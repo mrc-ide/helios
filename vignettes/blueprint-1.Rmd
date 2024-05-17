@@ -148,12 +148,30 @@ table(number_leisure_places) |>
 ## Disease states {#disease}
 
 At any time, each individual is either susceptible, exposed, infectious, or recovered.
-Susceptible individuals become exposed after spending time with infectious individuals.
-Time spent by individuals in each location and their level of risk is implemented by setting location-specific force of infection parameters.
+
+Susceptible individuals may become exposed after spending time in the same location as infectious individuals.
+The probability of infection during one time-step of the model of size $\delta > 0$ is
+$$
+1 - \exp(- \lambda \delta).
+$$
+The term $\lambda$ is the force of infection, and given by a sum of location specific force of infections, together with a community level force of infection which represents general mixing among all people.
+The force of infection for each location is given by the proportion of individuals in that location who are infectious, multiplied by a constant term representing the proportion of total transmission which occurs in each setting.
+
 Exposed individuals become infectious after some delay.
 Infectious individuals become recovered after some delay.
 After recovering, individuals then return to being susceptible, again after some delay.
-By altering the distribution of this final delay, the time between recovery and susceptibility, the framework has the capacity to simulate both epidemic and endemic diseases.
+By altering the distribution of this final delay, the time between recovery and susceptibility, the framework has the capacity to simulate both epidemic and endemic pathogens (Figure \@ref(fig:epidemic-endemic)).
+
+(ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
+
+```{r epidemic-endemic, fig.cap="(ref:epidemic-endemic)"}
+x <- rnorm(100)
+y <- rnorm(100)
+
+data.frame(x, y) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point()
+```
 
 ## Far UVC
 
