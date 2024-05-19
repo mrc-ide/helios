@@ -37,6 +37,9 @@ functions such as create_variables() and create_events()."><!-- mathjax --><scri
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/blueprint.html">Assessing far UVC interventions with an individual based infectious disease model</a>
+    </li>
+    <li>
       <a href="../articles/model.html">An individual-based model for assessing far UVC interventions</a>
     </li>
   </ul></li>
@@ -101,6 +104,27 @@ These parameters are:</p><ul><li><p><code>human_population</code>: the number of
 <li><p><code>beta_community</code>: TBD</p></li>
 <li><p><code>dt</code>: TBD</p></li>
 <li><p><code>simulation_time</code>: TBD</p></li>
+</ul><p>Rendering Parameters</p><ul><li><p><code>render_diagnostics</code>: FALSE</p></li>
+</ul><p>Far UVC Intervention Parameters:</p><ul><li><p><code>far_uvc_workplace</code>: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using <code>set_ucv()</code>; default = FALSE</p></li>
+<li><p><code>far_uvc_workplace_coverage_type</code>:Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted" for targeting interventions at most populous workplaces</p></li>
+<li><p><code>far_uvc_workplace_coverage</code>: Proportion of workplaces covered with far UVC (must be a numeric value between 0 and 1)</p></li>
+<li><p><code>far_uvc_workplace_efficacy</code>: : Efficacy of far UVC in the workplace setting (must be a numeric value between 0 and 1)</p></li>
+<li><p><code>far_uvc_workplace_timestep</code>: The timestep on which far UVC is implemented in the workplace setting (must be a numeric value greater than or equal to 0)</p></li>
+<li><p><code>far_uvc_school</code>: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using <code>set_ucv()</code>; default = FALSE</p></li>
+<li><p><code>far_uvc_school_coverage_type</code>:Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted" for targeting interventions at most populous schools</p></li>
+<li><p><code>far_uvc_school_coverage</code>: Proportion of schools covered with far UVC (must be a numeric value between 0 and 1)</p></li>
+<li><p><code>far_uvc_school_efficacy</code>: : Efficacy of far UVC in the school setting (must be a numeric value between 0 and 1)</p></li>
+<li><p><code>far_uvc_school_timestep</code>: The timestep on which far UVC is implemented in the school setting (must be a numeric value greater than or equal to 0)</p></li>
+<li><p><code>far_uvc_leisure</code>: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using <code>set_ucv()</code>; default = FALSE</p></li>
+<li><p><code>far_uvc_leisure_coverage_type</code>:Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted" for targeting interventions at most populous leisure settings</p></li>
+<li><p><code>far_uvc_leisure_coverage</code>: Proportion of leisure settings covered with far UVC (must be a numeric value between 0 and 1)</p></li>
+<li><p><code>far_uvc_leisure_efficacy</code>: : Efficacy of far UVC in the leisure setting (must be a numeric value between 0 and 1)</p></li>
+<li><p><code>far_uvc_leisure_timestep</code>: The timestep on which far UVC is implemented in the leisure setting (must be a numeric value greater than or equal to 0)</p></li>
+<li><p><code>far_uvc_household</code>: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using <code>set_ucv()</code>; default = FALSE</p></li>
+<li><p><code>far_uvc_household_coverage_type</code>:Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted" for targeting interventions at most populous households</p></li>
+<li><p><code>far_uvc_household_coverage</code>: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)</p></li>
+<li><p><code>far_uvc_household_efficacy</code>: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)</p></li>
+<li><p><code>far_uvc_household_timestep</code>: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)</p></li>
 </ul></dd>
 
 </dl></div>

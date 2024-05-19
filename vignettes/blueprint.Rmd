@@ -1,0 +1,454 @@
+---
+title: "Assessing far UVC interventions with an individual based infectious disease model"
+author:
+  - Charlie Whittaker^[Imperial College London], Tom Brewer^[Imperial College London], Adam Howes^[Independent]
+output: 
+  bookdown::html_document2:
+    fig_caption: yes
+    number_sections: yes
+pkgdown:
+  as_is: true
+vignette: >
+  %\VignetteIndexEntry{blueprint}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: REFERENCES.bib
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  dpi = 330,
+  out.width = "90%"
+)
+
+```
+
+```{r}
+library(helios)
+library(individual)
+library(ggplot2)
+library(dplyr, warn.conflicts = FALSE)
+library(purrr)
+theme_set(theme_minimal())
+blueprint_colours <- colorRampPalette(c("#00AFFF", "#03113E"))(4)
+exemplar_data <- readRDS("./exemplar_simulations.rds")
+parameter_sweep_data <- readRDS("./parameter_sweep_data.rds")
+```
+
+# Overview
+
+The aim of this document is to introduce the `helios` individual-based modelling framework for exploring and evaluating the potential of far UVC for the control of respiratory pathogens. `helios` explicitly represents the built environment and how individuals spend their time in this built environment, as well as modifications to that built environment that reduce the probability of pathogen transmission occurring (such as far UVC). The package can be used to quantify the impact of installing far UVC interventions on public health outcomes, such as infections and deaths.
+
+# Aim of this Document
+
+The aim of this document is to introduce you to the `helios` framework, specifically the modelling framework and the types of results it can currently produce. Our hope is that this document will serve as a jumping off point to discuss:
+
+1.  Any additions to the model that will be required to answer priority questions for Blueprint Biosecurity.
+2.  The types of results that can be generated to answer those priority questions.
+
+We note here that the results presented are purely **examples** of the types of results this framework can produce. Model parameterisation is underway but incomplete, and will require further time and development to get to a point where the results should be trusted/
+
+# Model description
+
+```{r}
+human_population <- 50000L
+parameters_list <- get_parameters(list(human_population = human_population, seed = 1))
+variables <- create_variables(parameters_list)
+disease_states <- variables$variables_list$disease_state$get_categories()
+age_classes <- variables$variables_list$age_class$get_categories()
+age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
+```
+
+The model implemented in `helios` has a fixed population of individuals, who are each assigned one of three age-groups (children, adults, elderly). Each individual is therefore either a child, an adult, or an elderly person. Figure \@ref(fig:age) shows the proportion in each age group from a population of `r human_population` individuals. We do not currently explicitly model demographic changes in the model and so we assume that no aging between the age-groups (e.g. child -\> adult) occurs during the simulation.
+
+During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals who are also visiting those same locations at the same time. We model 4 location types: **Households**, **Schools**, **Workplaces**, and **Leisure** **Venues**. Individuals are assigned to each location in a way that depends on their age-group (e.g. children are assigned to schools, adults are assigned to workplaces), with assignment to a **specific** location within a particular type (e.g. School #7) done stochastically (see \@ref(locations) below).
+
+It is during these visits to the same location that pathogen transmission can occur between two individuals - this process is stochastic and occurs only between individuals visiting the same location. See Section \@ref(disease) for further details.
+
+## Locations {#locations}
+
+Below we provide detail on how individuals are assigned to each location type.
+
+1.  **Households:** The number of individuals in each household (Figure \@ref(fig:household-size)) and the age-composition of individuals (Figure \@ref(fig:age)) within each household are determined using data on household-age composition data from the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm. Specifically, we sample with replacement from this data to generate households and then populate those households with individuals. Household assignment is **static** - for each individual, the specific household they are assigned to is fixed and does not change across the course of a single simulation. They stay in the same household each day.
+
+(ref:household-size) The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
+
+```{r household-size, fig.cap="(ref:household-size)"}
+households <- variables$variables_list$household$get_categories()
+household_sizes <- purrr::map_vec(households, function(x) variables$variables_list$household$get_size_of(values = x))
+
+table(household_sizes) |>
+  data.frame() |>
+  ggplot(aes(x = household_sizes, y = Freq)) +
+  geom_col() +
+  labs(x = "Number of individuals in the household", y = "Count")
+```
+
+(ref:age) Age group sizes follow from the household sampling procedure.
+
+```{r age, fig.cap="(ref:age)"}
+data.frame(age_classes, age_class_counts) |>
+  mutate(age_classes = dplyr::recode_factor(age_classes, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
+  ggplot(aes(x = age_classes, y = age_class_counts)) +
+  geom_col() +
+  labs(x = "Age group", y = "Number of individuals") +
+  coord_flip()
+```
+
+2.  **Schools** All children are assumed to attend school. The number of students in each school (Figure \@ref(fig:school-size)) is sampled from the 2022/2023 census of schools in the UK [@school2023], with children then assigned randomly to each school. A small number of adults also attend schools (rather than workplaces) to reflect educational staff such as teachers. For each 20 students, there is one adult teacher who works at the school (this is based on UK Office of National Statistics Data). School assignment is **static** - for each individual, the particular school they are assigned to is fixed and does not change across the course of a single simulation. They visit the same school each day.
+
+(ref:school-size) The distribution of school sizes.
+
+```{r school-size, fig.cap="(ref:school-size)"}
+schools <- variables$variables_list$school$get_categories()
+schools <- schools[schools != "0"]
+school_sizes <- purrr::map_vec(schools, function(x) variables$variables_list$school$get_size_of(values = x))
+
+data.frame(school_sizes) |>
+  ggplot(aes(x = school_sizes)) +
+  geom_histogram() +
+  labs(x = "Number of students per school", y = "Count") +
+  scale_y_continuous(limits = c(0, NA))
+```
+
+3.  **Workplaces** All adults (who are not teachers) are assumed to attend workplaces. The number of employees in each workplace (Figure \@ref(fig:workplace-size)) is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies which in turn is based on data from the United States of America. Adults are assigned randomly to each of these workplaces. Workplace assignment is **static** - for each individual, the particular workplace they are assigned to is fixed and does not change across the course of a single simulation. They visit the same workplace each day.
+
+(ref:workplace-size) The distribution of workplace sizes. Here, size is shown on a logarithimic scale.
+
+```{r workplace-size, fig.cap="(ref:workplace-size)"}
+workplaces <- variables$variables_list$workplace$get_categories()
+workplaces <- workplaces[workplaces != "0"]
+workplace_sizes <- purrr::map_vec(workplaces, function(x) variables$variables_list$workplace$get_size_of(values = x))
+
+data.frame(workplace_sizes) |>
+  ggplot(aes(x = log(workplace_sizes, base = 10))) +
+  geom_histogram() +
+  scale_x_continuous(breaks = c(0, 1, 2, 3),
+                     labels = c(1, 10, 1000, 10000)) +
+  labs(x = "Workplace Size (Number of Individuals)", y = "Count")
+```
+
+4.  **Leisure venues** All individuals (children, adults, and elderly people) are eligible to attend leisure venues. Leisure venue sizes are sampled from a negative binomial distribution, which determines their maximum occupancy. Leisure venue assignment is **dynamic** - for each individual, the particular leisure venue they are assigned to is dynamic and changes across the course of a single simulation. They visit a different leisure venue each day (and sometimes do not visit any leisure venues on a given day), with the number of leisure venues visited by each individual per week (Figure \@ref(fig:leisure-venues)) sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day. The particular leisure venue they visit is drawn from a short individual-specific list of potential leisure venues that is determined randomly.
+
+(ref:leisure-venues) The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
+
+```{r leisure-venues, fig.cap="(ref:leisure-venues)"}
+leisure_places <- variables$variables_list$leisure$get_values()
+number_leisure_places <- sapply(leisure_places, function(x) sum(x > 0))
+
+table(number_leisure_places) |>
+  data.frame() |>
+  ggplot(aes(x = number_leisure_places, y = Freq)) +
+  geom_col() +
+  labs(x = "Number of leisure venues attended in a week", y = "Count")
+```
+
+## Disease States & The Infection Process {#disease}
+
+Individuals exist in one of four different disease states:
+
+-   **Susceptible:** They are susceptible to infection by the pathogen.
+
+-   **Exposed:** They have been infected but are not currently infectious (often known as the pathogen's *"incubation period"*).
+
+-   **Infectious:** They are infectious and can infect other individuals.
+
+-   **Recovered:** They are no longer infectious and are immune to future infection.
+
+At any timepoint, each individual is either susceptible, exposed, infectious, or recovered. Individuals are infected (S -\> E) after spending time in the same location as infectious individuals. For each individual we calculate a location-specific force of infection, which determines the probability they are infected. Specifically, the force of infection experienced by individual $i$ in Location $m$ at time $t$ is calculated as follows:
+
+$$
+\lambda_{i,m}(t) = \frac{\beta_{m} I_m(t)}{N_m}
+$$
+
+where $I_m(t)$ are the number of infectious individuals in Location $m$ at time $t$ , $N_m$ are the total number of individuals visiting Location $m$ at time $t$ and $\beta_m$ is a location specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that integrates consideration of both the ***amount of time spent in a location*** and ***the inherent "riskiness"*** **of a location** (i.e. how receptive to onwards transmission it is). Currently within the model, each Location Type (i.e. workplace, school, household, leisure-venue) has a specific $\beta$ (i.e. $\beta_{W}$,$\beta_{S}$ , $\beta_{H}$, $\beta_{L}$ respecitvely) and all individual locations within a location type (e.g. all schools) have the same $\beta$ (though this could be changed in future versions).
+
+The total force of infection $\lambda$ for each individual is calculated as a sum of household, workplace, school, leisure. We add an additional force of infection term $\lambda_C$ to represent types of potential infectious contacts not represented by the locations we consider (e.g. during a commute to/from a workplace, grocery shopping etc). and which represents general mixing among all people. The total Force of Infection experienced by individual $i$ is therefore calculated as:
+
+$$ \lambda_{i, T} = \lambda_{i, H} + \lambda_{i, W} + \lambda_{i, S} + \lambda_{i, L} + \lambda_{i, C} $$
+The probability of individual $i$ becoming infected during one time-step $t$ is calculated by summing the Location-specific force of infections they experience and then calculating the following:
+$$
+P(infection) = 1 - \exp(- \lambda_{i,T}t).
+$$
+
+Exposed individuals become infectious after some delay (the *incubation period*). Infectious individuals recover after some delay (the *duration of infectiousness*). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquiring immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single "epidemic wave" before dying out) and endemic (those which are constantly present in the population) pathogens (Figure \@ref(fig:epidemic-endemic)).
+
+(ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
+
+```{r epidemic-endemic, fig.cap="(ref:epidemic-endemic)"}
+x <- rnorm(100)
+y <- rnorm(100)
+
+data.frame(x, y) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point()
+```
+
+## Modelling Far UVC
+
+Far UVC interventions can be installed in each of the four location types, in any combination (i.e. in either one, two, three, or all four location types). Within each location type, the proportion of locations covered by the installation can also be specified. Given a certain level of coverage (e.g. 60%), the settings with far UVC installed can be set according to one of two **coverage strategies**:
+
+-   **Random:** Locations for far UVC to be installed are sampled at random, with a random 35% of locations of that type selected.
+
+-   **Targeted:** Locations for far UVC to be installed are chosen in order of size, with the largest 35% of locations selected to receive far UVC.
+
+Figure \@ref(fig:uvc) provides an example illustrating the difference between these two strategies as applied to the schools location type.
+
+(ref:uvc) Illustration of the targeted and random strategies for the workplace location type.
+
+```{r uvc, fig.cap="(ref:uvc)"}
+data.frame(workplace_sizes) |>
+  arrange(desc(workplace_sizes)) |>
+  mutate(
+    rank = row_number(),
+    Targetted = rank <= 500,
+    Random = sample(c(rep(TRUE, 500), rep(FALSE, n() - 500)))
+  ) |>
+  tidyr::pivot_longer(
+    cols = c("Targetted", "Random"),
+    names_to = "type",
+    values_to = "chosen"
+  )|> 
+  mutate(
+    chosen2 = ifelse(chosen, "Yes", "No")
+  )|>
+  ggplot(aes(x = rank, y = log10(workplace_sizes) + 1, 
+             col = chosen2, fill = chosen2)) +
+  geom_bar(stat = "identity", alpha = 1, position = position_dodge()) +
+  facet_wrap(~ type) +
+  scale_colour_manual(values = c("white", "#03113E")) + 
+  scale_fill_manual(values = c("white", "#03113E")) +
+  labs(x = "", y = "Base 10 logarithm of the workplace size plus one", 
+       col = "Far UVC Installed?",
+       fill = "Far UVC Installed?") +
+  theme(
+    legend.position = "bottom"
+  )
+```
+
+The efficacy of far UVC within the particular Location Type (i.e. schools, workplaces, leisure venues) may also be set. We model the efficacy of far UVC as the reduction in the force of infection an individual experiences in a location where it is installed. Specifically, the force of infection experienced by individual $i$ in Location $m$ at time $t$ where far UVC is installed is calculated as follows:
+
+$$
+\lambda_{i,m}(t) = (1 - E_{UVC})\frac{\beta_{m} I_m(t)}{N_m}
+$$
+
+where $E_{UVC}$ is the efficacy of far UVC. For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half.
+
+# Example model outputs
+
+(ref:exemplar-epidemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen which confers full and lasting immunity to infected individuals.
+
+```{r exemplar-epidemic, fig.cap="(ref:exemplar-epidemic)"}
+
+# Plot the epidemic exemplar simulations:
+exemplar_data |>
+  filter(Setting == "Epidemic") |>
+  filter(timestep %in% c(1:1000)) |>
+  mutate(Percentage = Proportion * 100) |>
+  ggplot(aes(x = timestep, y = Percentage, colour = State)) +
+  geom_line(linewidth = 1.2) +
+  theme_bw() +
+  labs(x = "Days", y = "Percentage of Population", colour = "Disease State") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_color_discrete(type = blueprint_colours) +
+  facet_grid(~Intervention) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(colour = "#03113E", size = 12),
+        panel.border=element_blank(),
+        legend.title = element_blank(),
+        legend.position = c(0.93, 0.85),
+        legend.background = element_blank(),
+        axis.line = element_line()) 
+
+```
+
+Explanation of epidemic exemplar.
+
+(ref:exemplar-endemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen which confers waning immunity to infected individuals.
+
+```{r exemplar-endemic, fig.cap="(ref:exemplar-endemic)"}
+
+# Plot the epidemic exemplar simulations:
+exemplar_data |>
+  filter(Setting == "Endemic") |>
+  filter(timestep %in% c(1:1000)) |>
+  mutate(Percentage = Proportion * 100) |>
+  ggplot(aes(x = timestep, y = Percentage, colour = State)) +
+  geom_line(linewidth = 1.2) +
+  theme_bw() +
+  labs(x = "Days", y = "Percentage of Population", colour = "Disease State") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_color_discrete(type = blueprint_colours) +
+  facet_grid(~Intervention) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(colour = "#03113E", size = 12),
+        panel.border=element_blank(),
+        legend.title = element_blank(),
+        legend.position = c(0.93, 0.5),
+        legend.background = element_blank(),
+        axis.line = element_line()) 
+
+```
+
+# Parameter sensitivity
+
+(ref:sweep-R0-coverage) The effect of R0 and far UVC coverage, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is conferred on infected individuals.
+
+```{r sweep-R0-coverage, fig.cap="(ref:sweep-R0-coverage)"}
+
+# Plot the epidemic exemplar simulations:
+cowplot::plot_grid(
+  
+  # Plot the coverage through time:
+  parameter_sweep_data |>
+    filter(efficacy == 0.8, coverage <= 0.8) |>
+    ggplot(aes(x = 100 * coverage, y = 100 * final_size, col = factor(R0))) +
+    geom_line() +
+    facet_grid(.~Coverage_Strategy) +
+    theme_bw() +
+    theme(strip.background = element_rect(fill="white", colour = "black")) +
+    labs(x = "Coverage %", y = "Epidemic Final Size", colour = "R0"), 
+  
+  # Plot the heatmap of R0 against coverage for proportion contained:
+  parameter_sweep_data |>
+    filter(efficacy == 0.8, coverage <= 0.8) |>
+    ggplot(aes(y = factor(R0), x = 100 * coverage, fill = 100 * final_size)) +
+    geom_tile(colour = "black") +
+    scale_fill_viridis_c(option = "rocket",
+                         limits = c(0, 100),
+                         begin = 0,
+                         end = 1,
+                         name = "Proportion\nContained",
+                         direction = -1) +
+    scale_x_continuous(breaks = c(0, 20, 40, 60, 80, 100),
+                       labels = c(0, 20, 40, 60, 80, 100)) +
+    facet_grid(.~Coverage_Strategy) +
+    labs(y = "R0",
+         x = "farUVC Coverage (%)") +
+    theme(axis.text = element_text(angle = 0),
+          plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+          legend.title = element_text(size = 12),
+          legend.text = element_text(size = 12),
+          legend.position = "right",
+          strip.background = element_rect(fill="white", colour = "black"),
+          panel.border = element_rect(linetype = "solid", fill = NA, linewidth = 0.5)) +
+    coord_cartesian(expand = FALSE),
+  
+  # Split the two figures across separate rows:
+  nrow = 2,
+  
+  # Align the figures horizontally 
+  align = "hv", 
+  
+  # Not sure
+  axis = "lr",
+  
+  # Specify the relative heights of the two figures:
+  rel_heights = c(1, 2)
+  
+)
+
+```
+
+
+Add some text.
+
+(ref:sweep-R0-efficacy) The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is conferred on infected individuals.
+
+```{r sweep-R0-efficacy, fig.cap="(ref:sweep-R0-efficacy)"}
+
+cowplot::plot_grid(
+  
+  # Plot the coverage through time:
+  parameter_sweep_data |>
+    filter(coverage > 0.7 & coverage < 1) |>
+    ggplot(aes(x = 100 * efficacy, y = 100 * final_size, col = factor(R0))) +
+    geom_line() +
+    facet_grid(.~Coverage_Strategy) +
+    theme_bw() +
+    theme(strip.background = element_rect(fill="white", colour = "black")) +
+    labs(x = "Efficacy %", y = "Epidemic Final Size", colour = "R0"), 
+  
+  # Plot the heatmap of R0 against efficacy for proportion contained:
+  parameter_sweep_data |>
+    filter(coverage > 0.7 & coverage < 1) |>
+    ggplot(aes(y = factor(R0), x = 100 * efficacy, fill = 100 * final_size)) +
+    geom_tile(colour = "black") +
+    scale_fill_viridis_c(option = "mako", 
+                         limits = c(0, 100),
+                         begin = 0, 
+                         end = 1, 
+                         name = "Proportion\nContained",
+                         direction = -1) +
+    scale_x_continuous(breaks = c(0, 20, 40, 60, 80, 100),
+                       labels = c(0, 20, 40, 60, 80, 100)) +
+    facet_grid(.~Coverage_Strategy) +
+    labs(y = "R0",
+         x = "farUVC Efficacy (%)") +
+    theme(axis.text = element_text(angle = 0),
+          plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+          legend.title = element_text(size = 12),
+          legend.text = element_text(size = 12),
+          legend.position = "right",
+          strip.background = element_rect(fill="white", colour = "black"),
+          panel.border = element_rect(linetype = "solid", fill = NA, linewidth = 0.5)) +
+    coord_cartesian(expand = FALSE),
+  
+  # Split the two figures across separate rows:
+  nrow = 2,
+  
+  # Align the figures horizontally 
+  align = "hv", 
+  
+  # Not sure
+  axis = "lr",
+  
+  # Specify the relative heights of the two figures:
+  rel_heights = c(1, 2)
+  
+)
+
+```
+
+Add some text.
+
+(ref:sweep-efficacy-coverage) The effect of far UVC efficacy and coverage, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is conferred on infected individuals.
+
+```{r sweep-efficacy-coverage, fig.cap="(ref:sweep-efficacy-coverage)"}
+
+# Filter the R0 of interest:
+parameter_sweep_data |>
+  filter(R0 == 2) |>
+  ggplot(aes(y = 100 * coverage, x = 100 * efficacy, fill = 100 * final_size)) +
+  geom_tile(colour = "black") +
+  scico::scale_fill_scico(palette = "bamako", limits = c(0, 81)) +
+  scale_x_continuous(breaks = c(0, 20, 40, 60, 80, 100),
+                     labels = c(0, 20, 40, 60, 80, 100)) +
+  scale_y_continuous(breaks = c(0, 20, 40, 60, 80, 100),
+                     labels = c(0, 20, 40, 60, 80, 100)) +
+  facet_grid(.~Coverage_Strategy) +
+  labs(y = "farUVC Coverage (%)",
+       x = "farUVC Efficacy (%)",
+       fill = "Proportion\nContained") +
+  theme(axis.text = element_text(angle = 0),
+        plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 12),
+        legend.position = "right",
+        strip.background = element_rect(fill="white", colour = "black"),
+        panel.border = element_rect(linetype = "solid", fill = NA, linewidth = 0.5)) +
+  coord_cartesian(expand = FALSE)
+
+```
+
+
+# Bibliography {.unnumbered}

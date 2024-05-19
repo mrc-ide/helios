@@ -18,3 +18,4 @@ from the list of model variables for the workplace, school, and household settin
 directly as an input for leisure.The function returns a list with a vector of individual setting
 sizes for each setting type.
 }
+\concept{miscellaneous}

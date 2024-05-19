@@ -226,16 +226,31 @@ for(i in 1:length(results)) {
 
 #----- 5) Visualisation ----------------------------------------------------------------------------
 
+# Create the plotting data frame:
 overall_df <- combined_parameter_sweep_outputs %>%
   group_by(R0, coverage, efficacy, coverage_type) %>%
   summarise(final_size = mean(final_size)) %>%
   mutate(Coverage_Strategy = ifelse(coverage_type == 1, "Random", "Targeted"))
+
+# Save the plotting data frame:
 saveRDS(overall_df,
         file = "inst/partner_meeting_1/parameter_sweep_summarised_results.rds")
 
-## Plotting R0 against farUVC coverage
+# Save the parameter sweep data frame:
+saveRDS(overall_df,
+        file = "./vignettes/parameter_sweep_data.rds")
+
+# read in the overall_df
+overall_df <- readRDS("./inst/partner_meeting_1/parameter_sweep_summarised_results.rds")
+
+#+++ 1) Plotting R0 against farUVC coverage +++#
+#++++++++++++++++++++++++++++++++++++++++++++++#
+
+# Subset the coverage and efficacy of interest:
 R0_coverage_df <- overall_df %>%
   filter(efficacy == 0.8, coverage <= 0.8)
+
+# Generate the heatmap of final size for R0 and coverage:
 R0_coverage_heatmap <- ggplot(R0_coverage_df, aes(y = factor(R0), x = 100 * coverage, fill = 100 * final_size)) +
   geom_tile(colour = "black") +
   scale_fill_viridis_c(option = "rocket", limits = c(0, 100), begin = 0, end = 1, name = "Proportion\nContained",
@@ -253,6 +268,8 @@ R0_coverage_heatmap <- ggplot(R0_coverage_df, aes(y = factor(R0), x = 100 * cove
         strip.background = element_rect(fill="white", colour = "black"),
         panel.border = element_rect(linetype = "solid", fill = NA, linewidth = 0.5)) +  # Add black border
   coord_cartesian(expand = FALSE)
+
+# Create the line plot of final size given R0 and efficacy:
 R0_coverage_line <- ggplot(R0_coverage_df, aes(x = 100 * coverage, y = 100 * final_size, col = factor(R0))) +
   geom_line() +
   facet_grid(.~Coverage_Strategy) +
@@ -260,11 +277,22 @@ R0_coverage_line <- ggplot(R0_coverage_df, aes(x = 100 * coverage, y = 100 * fin
   theme(strip.background = element_rect(fill="white", colour = "black")) +
   labs(x = "Coverage %", y = "Epidemic Final Size", colour = "R0")
 
-R0_coverage_full_plot <- cowplot::plot_grid(R0_coverage_line, R0_coverage_heatmap, nrow = 2, align = "hv", axis = "lr", rel_heights = c(1, 2))
+# Combine the coverage heat map and line graph:
+R0_coverage_full_plot <- cowplot::plot_grid(R0_coverage_line,
+                                            R0_coverage_heatmap,
+                                            nrow = 2,
+                                            align = "hv",
+                                            axis = "lr",
+                                            rel_heights = c(1, 2))
 
-## Plotting R0 against farUVC efficacy
+#+++ 2) Plotting R0 against farUVC efficacy +++#
+#++++++++++++++++++++++++++++++++++++++++++++++#
+
+# Subset the coverages of interest:
 R0_efficacy_df <- overall_df %>%
   filter(coverage > 0.7 & coverage < 1)
+
+# Plot the heatmap for final size given R0 and efficacy:
 R0_efficacy_heatmap <- ggplot(R0_efficacy_df, aes(y = factor(R0), x = 100 * efficacy, fill = 100 * final_size)) +
   geom_tile(colour = "black") +
   scale_fill_viridis_c(option = "mako", limits = c(0, 100), begin = 0, end = 1, name = "Proportion\nContained",
@@ -282,6 +310,8 @@ R0_efficacy_heatmap <- ggplot(R0_efficacy_df, aes(y = factor(R0), x = 100 * effi
         strip.background = element_rect(fill="white", colour = "black"),
         panel.border = element_rect(linetype = "solid", fill = NA, linewidth = 0.5)) +  # Add black border
   coord_cartesian(expand = FALSE)
+
+# Plot the line graph of final size for Efficacy anf R0s:
 R0_efficacy_line <- ggplot(R0_efficacy_df, aes(x = 100 * efficacy, y = 100 * final_size, col = factor(R0))) +
   geom_line() +
   facet_grid(.~Coverage_Strategy) +
@@ -289,12 +319,22 @@ R0_efficacy_line <- ggplot(R0_efficacy_df, aes(x = 100 * efficacy, y = 100 * fin
   theme(strip.background = element_rect(fill="white", colour = "black")) +
   labs(x = "Efficacy %", y = "Epidemic Final Size", colour = "R0")
 
-R0_efficacy_full_plot <- cowplot::plot_grid(R0_efficacy_line, R0_efficacy_heatmap, nrow = 2, align = "hv", axis = "lr", rel_heights = c(1, 2))
+# Combine the efficacy heat map and line graph:
+R0_efficacy_full_plot <- cowplot::plot_grid(R0_efficacy_line,
+                                            R0_efficacy_heatmap,
+                                            nrow = 2,
+                                            align = "hv",
+                                            axis = "lr",
+                                            rel_heights = c(1, 2))
 
+#+++ 3) Plotting farUVC coverage against efficacy +++#
+#++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
-## Plotting farUVC efficacy against farUVC Coverage
+# Filter the R0 of interest:
 coverage_efficacy_df <- overall_df %>%
   filter(R0 == 2)
+
+# Plot the heatmap of final epidemic size for the coverage and efficacy sweep:
 coverage_efficacy_heatmap <- ggplot(coverage_efficacy_df, aes(y = 100 * coverage, x = 100 * efficacy, fill = 100 * final_size)) +
   geom_tile(colour = "black") +
   scico::scale_fill_scico(palette = "bamako", limits = c(0, 81)) +

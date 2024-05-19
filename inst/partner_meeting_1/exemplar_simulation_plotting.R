@@ -5,8 +5,6 @@
 #+++ Introduction +++#
 #++++++++++++++++++++#
 
-
-
 #----- 1) Preamble ---------------------------------------------------------------------------------
 
 # Load the finalsize package:
@@ -244,6 +242,9 @@ endemic_targeted_raw %>%
 #+++ Combined +++#
 exemplar_long <- bind_rows(epidemic_baseline_long, epidemic_random_long, epidemic_targeted_long,
                            endemic_baseline_long, endemic_random_long, endemic_targeted_long)
+
+# Save the combined long-form dataframe:
+#saveRDS(object = exemplar_long, file = "./inst/partner_meeting_1/exemplar_simulations.rds")
 
 
 #----- 4) Figure 1: Disease State Dynamics ---------------------------------------------------------

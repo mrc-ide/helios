@@ -9,7 +9,7 @@
 #'
 #' @param variables_list A list of model variables as generated using `create_variables()`
 #' @param leisure_sizes The sizes of the leisure settings as sampled using `sample_negbinom()`
-#'
+#' @family miscellaneous
 #' @export
 get_setting_sizes <- function(variables_list, leisure_sizes) {
 
@@ -47,6 +47,7 @@ get_setting_sizes <- function(variables_list, leisure_sizes) {
   return(setting_populations)
 
 }
+<<<<<<< HEAD
 
 #' generate_betas
 #'
@@ -93,3 +94,5 @@ generate_betas <- function(beta_community, household_ratio, school_ratio, workpl
   return(betas)
 
 }
+=======
+>>>>>>> 8166a2203fb858b0fdcf7f7c1855068077422add

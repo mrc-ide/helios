@@ -17,6 +17,7 @@
 #' @param efficacy A numeric value describing the efficacy of the Far UVC deployed
 #' @param timestep A numeric value describing the timestep in which Far UVC is deployed
 #'
+#' @family intervention
 #' @export
 set_uvc <- function(parameters_list, setting, coverage, coverage_type, efficacy, timestep) {
 
@@ -86,6 +87,7 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_type, efficacy,
 #' @param parameters_list A list of model parameters as generated using `get_parameters()`
 #' @param variables_list A list of model variables as generated using `create_variables()`
 #'
+#' @family intervention
 #' @export
 generate_far_uvc_switches <- function(parameters_list, variables_list) {
 

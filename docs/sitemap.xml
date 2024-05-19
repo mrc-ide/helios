@@ -10,6 +10,12 @@
     <loc>https://mrc-ide.github.io/helios/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://mrc-ide.github.io/helios/articles/blueprint-1.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/articles/blueprint.html</loc>
+  </url>
+  <url>
     <loc>https://mrc-ide.github.io/helios/articles/helios.html</loc>
   </url>
   <url>
@@ -49,6 +55,9 @@
     <loc>https://mrc-ide.github.io/helios/reference/create_variables.html</loc>
   </url>
   <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_far_uvc_switches.html</loc>
+  </url>
+  <url>
     <loc>https://mrc-ide.github.io/helios/reference/generate_initial_age_classes.html</loc>
   </url>
   <url>
@@ -76,6 +85,9 @@
     <loc>https://mrc-ide.github.io/helios/reference/get_parameters.html</loc>
   </url>
   <url>
+    <loc>https://mrc-ide.github.io/helios/reference/get_setting_sizes.html</loc>
+  </url>
+  <url>
     <loc>https://mrc-ide.github.io/helios/reference/index.html</loc>
   </url>
   <url>
@@ -92,5 +104,8 @@
   </url>
   <url>
     <loc>https://mrc-ide.github.io/helios/reference/schools_england.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/set_uvc.html</loc>
   </url>
 </urlset>
