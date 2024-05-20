@@ -97,7 +97,7 @@
 <h2 id="overview">
 <span class="header-section-number">1</span> Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>The aim of this document is to introduce the <code>helios</code> individual-based modelling framework for exploring and evaluating the potential of far UVC for the control of respiratory pathogens. <code>helios</code> explicitly represents the built environment and how individuals spend their time in this built environment, as well as modifications to that built environment that reduce the probability of pathogen transmission occurring (such as far UVC). The package can be used to quantify the impact of installing far UVC interventions on public health outcomes, such as infections and deaths.</p>
+<p>The aim of this document is to introduce <code>helios</code>, an individual-based modelling framework for exploring and evaluating the potential of far UVC to control respiratory pathogens. <code>helios</code> explicitly represents the built environment and how individuals spend their time in this built environment, as well as modifications to that built environment that reduce the probability of pathogen transmission occurring (such as far UVC). The package can be used to quantify the impact of installing far UVC interventions on public health outcomes, such as infections.</p>
 </div>
 <div class="section level2" number="2">
 <h2 id="aim-of-this-document">
@@ -203,7 +203,12 @@ Figure 3.6: Illustration of simulated epidemic and endemic pathogens.
 <h3 id="modelling-far-uvc">
 <span class="header-section-number">3.3</span> Modelling Far UVC<a class="anchor" aria-label="anchor" href="#modelling-far-uvc"></a>
 </h3>
-<p>Far UVC interventions can be installed in each of the four location types, in any combination (i.e. in either one, two, three, or all four location types). Within each location type, the proportion of locations covered by the installation can also be specified. Given a certain level of coverage (e.g. 60%), the settings with far UVC installed can be set according to one of two <strong>coverage strategies</strong>:</p>
+<p>Far UVC interventions can be installed in each of the four location types, in any combination (i.e. in either one, two, three, or all four location types). We model the efficacy of far UVC as the reduction in the force of infection an individual experiences in a location where it is installed. Specifically, the force of infection experienced by individual <span class="math inline">\(i\)</span> in Location <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> where far UVC is installed is calculated as follows:</p>
+<p><span class="math display">\[
+\lambda_{i,m}(t) = (1 - E_{UVC})\frac{\beta_{m} I_m(t)}{N_m}
+\]</span></p>
+<p>where <span class="math inline">\(E_{UVC}\)</span> is the efficacy of far UVC. For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half. The efficacy of far UVC within each particular Location Type (i.e. schools, workplaces, leisure venues) can be set individually (i.e. to produce a Location-Type specific efficacy.)</p>
+<p>Within each location type, the proportion of locations covered by the installation can also be specified. Given a certain level of coverage (e.g. 60%), the settings with far UVC installed can be set according to one of two <strong>coverage strategies</strong>:</p>
 <ul>
 <li><p><strong>Random:</strong> Locations for far UVC to be installed are sampled at random, with a random 35% of locations of that type selected.</p></li>
 <li><p><strong>Targeted:</strong> Locations for far UVC to be installed are chosen in order of size, with the largest 35% of locations selected to receive far UVC.</p></li>
@@ -216,11 +221,6 @@ Figure 3.6: Illustration of simulated epidemic and endemic pathogens.
 Figure 3.7: Illustration of the targeted and random strategies for the workplace location type.
 </p>
 </div>
-<p>The efficacy of far UVC within the particular Location Type (i.e. schools, workplaces, leisure venues) may also be set. We model the efficacy of far UVC as the reduction in the force of infection an individual experiences in a location where it is installed. Specifically, the force of infection experienced by individual <span class="math inline">\(i\)</span> in Location <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> where far UVC is installed is calculated as follows:</p>
-<p><span class="math display">\[
-\lambda_{i,m}(t) = (1 - E_{UVC})\frac{\beta_{m} I_m(t)}{N_m}
-\]</span></p>
-<p>where <span class="math inline">\(E_{UVC}\)</span> is the efficacy of far UVC. For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half.</p>
 </div>
 </div>
 <div class="section level2" number="4">
@@ -243,28 +243,29 @@ Figure 3.7: Illustration of the targeted and random strategies for the workplace
 <h4 id="epidemic-pathogen-simulation">
 <span class="header-section-number">4.1.1</span> Epidemic Pathogen Simulation<a class="anchor" aria-label="anchor" href="#epidemic-pathogen-simulation"></a>
 </h4>
+<p>Figure <a href="#fig:exemplar-epidemic">4.1</a> shows the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of an epidemic pathogen. This simulation assumes a 30%|30%|30%|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations.</p>
 <p>In the epidemic scenario, having pre-installed far UVC devices in the workplace, school, and leisure settings reduced the number of people who become infected by the pathogen and, when targeted specifically to the most largest settings within a setting type (the “Targeted” strategy), slowed the rate of pathogen spread in the population. Targeted far UVC provided an even greater reduction in the total number of people infected relative to the random deployment, than random far UVC deployment provided relative to the no-intervention baseline.</p>
-
 <div class="figure">
 <span style="display:block;" id="fig:exemplar-epidemic"></span>
-<img src="blueprint_files/figure-html/exemplar-epidemic-1.png" alt="Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen when full and lasting immunity to infection is acquired by infected individuals This simulation assumes a 30%|30%|30%|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations. " width="90%"><p class="caption">
-Figure 4.1: Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen when full and lasting immunity to infection is acquired by infected individuals This simulation assumes a 30%|30%|30%|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations. <!-- ($\beta_{H}$ = 0.186, $\beta_{W}$ = 0.186, $\beta_{S}$ = 0.186, $\beta_{L}$ = 0.186, $\beta_{C}$ = 0.062, far UVC coverage = 0.5, far UVC efficacy = 0.75).  -->
+<img src="blueprint_files/figure-html/exemplar-epidemic-1.png" alt="Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen when full and lasting immunity to infection is acquired by infected individuals (i.e. the pathogen induces a single epidemic)." width="90%"><p class="caption">
+Figure 4.1: Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen when full and lasting immunity to infection is acquired by infected individuals (i.e. the pathogen induces a single epidemic).
 </p>
 </div>
+
 </div>
 <div class="section level4" number="4.1.2">
 <h4 id="endemic-pathogen-simulation">
 <span class="header-section-number">4.1.2</span> Endemic Pathogen Simulation<a class="anchor" aria-label="anchor" href="#endemic-pathogen-simulation"></a>
 </h4>
-<p>In the endemic scenario, where a pathogen is already established in the human population, introducing far UVC decreased the proportion of individuals in the population with infections relative to the no-intervention baseline scenario (Figure <a href="#fig:exemplar-endemic">4.2</a>). These simulations assumes a 30%|30%|30%|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Again, targeting far UVC deployment provided additional benefits to pathogen suppression.</p>
-<p>(Figure <a href="#fig:exemplar-endemic">4.2</a>) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time. This simulation assumes a 30%|30%|30%|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations.</p>
-<!-- ($\beta_{H}$ = 0.186, $\beta_{W}$ = 0.186, $\beta_{S}$ = 0.186, $\beta_{L}$ = 0.186, $\beta_{C}$ = 0.062, far UVC coverage = 0.5, far UVC efficacy = 0.75, duration of immunity = 14 days). -->
+<p>Figure <a href="#fig:exemplar-endemic">4.2</a> shows the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time. This simulation assumes a 30%|30%|30%|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations.</p>
+<p>In the endemic scenario, where a pathogen is already established in the human population, introducing far UVC decreased the proportion of individuals in the population with infections relative to the no-intervention baseline scenario (Figure <a href="#fig:exemplar-endemic">4.2</a>). Again, targeting far UVC deployment provided additional benefits to pathogen suppression.</p>
 <div class="figure">
 <span style="display:block;" id="fig:exemplar-endemic"></span>
-<img src="blueprint_files/figure-html/exemplar-endemic-1.png" alt="(ref:exemplar-endemic)" width="90%"><p class="caption">
-Figure 4.2: (ref:exemplar-endemic)
+<img src="blueprint_files/figure-html/exemplar-endemic-1.png" alt="Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time (i.e. the pathogen exists in an endemic state)." width="90%"><p class="caption">
+Figure 4.2: Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time (i.e. the pathogen exists in an endemic state).
 </p>
 </div>
+
 </div>
 </div>
 <div class="section level3" number="4.2">
@@ -273,18 +274,32 @@ Figure 4.2: (ref:exemplar-endemic)
 </h3>
 <p>In addition to the outputs presented above (which show the results of a single simulation with a single parameter set), we can also use <code>helios</code> framework used to explore how key outputs (the total number of individuals infected) varies with changes to input parameters. This is known as a “sensitivity analysis” and we present illustrative results from an example sensitivity analysis below.</p>
 <p>We simulated an epidemic (infection with the pathogen confers full and lasting immunity) with varying levels of transmission intensity (R0) and assessed the sensitivity of final epidemic size (defined as the total proportion of the population that gets infected during the course of an epidemic) to variation in far UVC coverage, far UVC efficacy, and deployment strategy (Targeted or Random).</p>
-<p>Figures <a href="#fig:sweep-R0-coverage">4.3</a>:<a href="#fig:sweep-efficacy-coverage"><strong>??</strong></a> illustrate how <code>helios</code> model outputs can be graphed, depicting how the final epidemic size changes with R0, far UVC coverage, far UVC efficacy, and far UVC deployment strategy.</p>
-<p>The deployment of far UVC reduced the total percentage/proportion of the population that is infected during an an epidemic (Figures <a href="#fig:sweep-R0-coverage">4.3</a>:<a href="#fig:sweep-efficacy-coverage"><strong>??</strong></a>). For a given transmission intensity (R0), increasing the coverage (Figure <a href="#fig:sweep-R0-coverage">4.3</a>) and/or efficacy (Figures <a href="#fig:sweep-R0-efficacy"><strong>??</strong></a>:<a href="#fig:sweep-efficacy-coverage"><strong>??</strong></a>) of far UVC reduced the final size of the epidemic. For low transmission intensities (R0 <span class="math inline">\(\leq\)</span> 1.5), very high levels of far UVC coverage and/or prevented the epidemic from occurring (final epidemic size ~0%). Across the majority of combinations of R0, far UVC coverage, and far UVC efficacy, targeting the deployment of far UVC to the most populous settings achieved a greater reduction in final epidemic size.</p>
-<p><a href="#fig:sweep-R0-coverage">4.3</a> The effect of R0 and far UVC coverage, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is acquired by infected individuals and far UVC was assumed to be 80% efficacious in reducing transmission across all settings.</p>
+<p>Figures <a href="#fig:sweep-R0-coverage">4.3</a> and <a href="#fig:sweep-R0-efficacy">4.4</a> illustrate how <code>helios</code> model outputs can be graphed, depicting how the final epidemic size changes with R0, far UVC coverage, far UVC efficacy, and far UVC deployment strategy. In general, for a given transmission intensity (R0), increasing the coverage (Figure <a href="#fig:sweep-R0-coverage">4.3</a>) or efficacy (Figures <a href="#fig:sweep-R0-efficacy">4.4</a>) of far UVC reduced the final size of the epidemic.</p>
+<p>For low transmission intensities (R0 <span class="math inline">\(\leq\)</span> 1.5), very high levels of far UVC coverage and/or prevented the epidemic from occurring (final epidemic size ~0%). Across the majority of combinations of R0, far UVC coverage, and far UVC efficacy, targeting the deployment of far UVC to the most populous settings achieved a greater reduction in final epidemic size.</p>
+<div class="section level4" number="4.2.1">
+<h4 id="sensitivity-analysis-of-r0-far-uvc-coverage">
+<span class="header-section-number">4.2.1</span> Sensitivity Analysis of R0 &amp; far UVC Coverage<a class="anchor" aria-label="anchor" href="#sensitivity-analysis-of-r0-far-uvc-coverage"></a>
+</h4>
 <div class="figure">
 <span style="display:block;" id="fig:sweep-R0-coverage"></span>
-<img src="blueprint_files/figure-html/sweep-R0-coverage-1.png" alt="(ref:sweep-R0-coverage)" width="90%"><p class="caption">
-Figure 4.3: (ref:sweep-R0-coverage)
+<img src="blueprint_files/figure-html/sweep-R0-coverage-1.png" alt="The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC efficacy of 80%." width="90%"><p class="caption">
+Figure 4.3: The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC efficacy of 80%.
 </p>
 </div>
 
-<p>Add some text.</p>
+</div>
+<div class="section level4" number="4.2.2">
+<h4 id="sensitivity-analysis-of-r0-far-uvc-efficacy">
+<span class="header-section-number">4.2.2</span> Sensitivity Analysis of R0 &amp; far UVC Efficacy<a class="anchor" aria-label="anchor" href="#sensitivity-analysis-of-r0-far-uvc-efficacy"></a>
+</h4>
+<div class="figure">
+<span style="display:block;" id="fig:sweep-R0-efficacy"></span>
+<img src="blueprint_files/figure-html/sweep-R0-efficacy-1.png" alt="The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC coverage of 80% is achieved." width="90%"><p class="caption">
+Figure 4.4: The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC coverage of 80% is achieved.
+</p>
+</div>
 
+</div>
 </div>
 </div>
 <div class="section level2">
