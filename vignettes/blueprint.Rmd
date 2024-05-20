@@ -137,7 +137,7 @@ data.frame(workplace_sizes) |>
 
 4.  **Leisure venues** All individuals (children, adults, and elderly people) are eligible to attend leisure venues. Leisure venue sizes are sampled from a negative binomial distribution, which determines their maximum occupancy. Leisure venue assignment is **dynamic** - for each individual, the particular leisure venue they are assigned to is dynamic and changes across the course of a single simulation. They visit a different leisure venue each day (and sometimes do not visit any leisure venues on a given day), with the number of leisure venues visited by each individual per week (Figure \@ref(fig:leisure-venues)) sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day. The particular leisure venue they visit is drawn from a short individual-specific list of potential leisure venues that is determined randomly.
 
-(ref:leisure-venues) The number of leisure venues that each indvidual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
+(ref:leisure-venues) The number of leisure venues that each individual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
 
 ```{r leisure-venues, fig.cap="(ref:leisure-venues)"}
 leisure_places <- variables$variables_list$leisure$get_values()
@@ -168,7 +168,7 @@ $$
 \lambda_{i,m}(t) = \frac{\beta_{m} I_m(t)}{N_m}
 $$
 
-where $I_m(t)$ are the number of infectious individuals in Location $m$ at time $t$ , $N_m$ are the total number of individuals visiting Location $m$ at time $t$ and $\beta_m$ is a location specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that integrates consideration of both the ***amount of time spent in a location*** and ***the inherent "riskiness"*** **of a location** (i.e. how receptive to onwards transmission it is). Currently within the model, each Location Type (i.e. workplace, school, household, leisure-venue) has a specific $\beta$ (i.e. $\beta_{W}$,$\beta_{S}$ , $\beta_{H}$, $\beta_{L}$ respecitvely) and all individual locations within a location type (e.g. all schools) have the same $\beta$ (though this could be changed in future versions).
+where $I_m(t)$ are the number of infectious individuals in Location $m$ at time $t$ , $N_m$ are the total number of individuals visiting Location $m$ at time $t$ and $\beta_m$ is a location specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that integrates consideration of both the ***amount of time spent in a location*** and ***the inherent "riskiness"*** **of a location** (i.e. how receptive to onwards transmission it is). Currently within the model, each Location Type (i.e. workplace, school, household, leisure-venue) has a specific $\beta$ (i.e. $\beta_{W}$,$\beta_{S}$ , $\beta_{H}$, $\beta_{L}$ respectively) and all individual locations within a location type (e.g. all schools) have the same $\beta$ (though this could be changed in future versions).
 
 The total force of infection $\lambda$ for each individual is calculated as a sum of household, workplace, school, leisure. We add an additional force of infection term $\lambda_C$ to represent types of potential infectious contacts not represented by the locations we consider (e.g. during a commute to/from a workplace, grocery shopping etc). and which represents general mixing among all people. The total Force of Infection experienced by individual $i$ is therefore calculated as:
 
@@ -256,11 +256,11 @@ data.frame(workplace_sizes) |>
   arrange(desc(workplace_sizes)) |>
   mutate(
     rank = row_number(),
-    Targetted = rank <= 500,
+    Targeted = rank <= 500,
     Random = sample(c(rep(TRUE, 500), rep(FALSE, n() - 500)))
   ) |>
   tidyr::pivot_longer(
-    cols = c("Targetted", "Random"),
+    cols = c("Targeted", "Random"),
     names_to = "type",
     values_to = "chosen"
   )|> 
