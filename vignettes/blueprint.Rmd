@@ -172,21 +172,63 @@ where $I_m(t)$ are the number of infectious individuals in Location $m$ at time 
 
 The total force of infection $\lambda$ for each individual is calculated as a sum of household, workplace, school, leisure. We add an additional force of infection term $\lambda_C$ to represent types of potential infectious contacts not represented by the locations we consider (e.g. during a commute to/from a workplace, grocery shopping etc). and which represents general mixing among all people. The total Force of Infection experienced by individual $i$ is therefore calculated as:
 
-$$ \lambda_{i, T} = \lambda_{i, H} + \lambda_{i, W} + \lambda_{i, S} + \lambda_{i, L} + \lambda_{i, C} $$ The probability of individual $i$ becoming infected during one time-step $t$ is calculated by summing the Location-specific force of infections they experience and then calculating the following: $$
-P(infection) = 1 - \exp(- \lambda_{i,T}t).
-$$
+$$ \lambda_{i, T} = \lambda_{i, H} + \lambda_{i, W} + \lambda_{i, S} + \lambda_{i, L} + \lambda_{i, C} $$ The probability of individual $i$ becoming infected during one time-step $t$ is calculated by summing the Location-specific force of infections they experience and then calculating the following:
 
-Exposed individuals become infectious after some delay (the *incubation period*). Infectious individuals recover after some delay (the *duration of infectiousness*). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquiring immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single "epidemic wave" before dying out) and endemic (those which are constantly present in the population) pathogens (Figure \@ref(fig:epidemic-endemic)).
+$$
+P(infection) = 1 - \exp(- \lambda_{i,T}t).
+$$ Exposed individuals become infectious after some delay (the *incubation period*). Infectious individuals recover after some delay (the *duration of infectiousness*). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquiring immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single "epidemic wave" before dying out) and endemic (those which are constantly present in the population) pathogens (Figure \@ref(fig:epidemic-endemic)).
 
 (ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
 
 ```{r epidemic-endemic, fig.cap="(ref:epidemic-endemic)"}
-x <- rnorm(100)
-y <- rnorm(100)
 
-data.frame(x, y) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_point()
+# Plot the epidemic exemplar simulations:
+epidemic_plot <- exemplar_data |>
+  filter(Setting == "Epidemic" & Intervention == "Baseline") |>
+  filter(timestep %in% c(1:300)) |>
+  mutate(Percentage = Proportion * 100) |>
+  ggplot(aes(x = timestep, y = Percentage, colour = State)) +
+  geom_line(linewidth = 1.2) +
+  theme_bw() +
+  labs(x = "Days", y = "Percentage of Population", colour = "Disease State",
+       title = "Epidemic Pathogen Model Simulation") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_color_discrete(type = blueprint_colours) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(colour = "#03113E", size = 12),
+        panel.border=element_blank(),
+        legend.title = element_blank(),
+        legend.position = "right",
+        legend.background = element_blank(),
+        axis.line = element_line()) 
+
+# Plot the epidemic exemplar simulations:
+endemic_plot <- exemplar_data |>
+  filter(Setting == "Endemic" & Intervention == "Baseline") |>
+  filter(timestep %in% c(400:11000)) |>
+  mutate(Percentage = Proportion * 100) |>
+  ggplot(aes(x = timestep, y = Percentage, colour = State)) +
+  geom_line(linewidth = 1.2) +
+  theme_bw() +
+  labs(x = "Days", y = "Percentage of Population", colour = "Disease State",
+       title = "Endemic Pathogen Model Simulation") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_color_discrete(type = blueprint_colours) +
+  theme(strip.background = element_blank(),
+        strip.text = element_text(colour = "#03113E", size = 12),
+        panel.border=element_blank(),
+        legend.title = element_blank(),
+        legend.position = "right",
+        legend.background = element_blank(),
+        axis.line = element_line()) 
+
+plot_legend <- cowplot::get_legend(endemic_plot)
+cowplot::plot_grid(epidemic_plot + theme(legend.position = "none"), 
+                   endemic_plot + theme(legend.position = "none"),
+                   plot_legend, nrow = 1, rel_widths = c(1, 1, 0.4))
+
 ```
 
 ## Modelling Far UVC
@@ -221,8 +263,8 @@ data.frame(workplace_sizes) |>
              col = chosen2, fill = chosen2)) +
   geom_bar(stat = "identity", alpha = 1, position = position_dodge()) +
   facet_wrap(~ type) +
-  scale_colour_manual(values = c("white", "#03113E")) + 
-  scale_fill_manual(values = c("white", "#03113E")) +
+  scale_colour_manual(values = c("grey", "#03113E")) + 
+  scale_fill_manual(values = c("grey", "#03113E")) +
   labs(x = "", y = "Base 10 logarithm of the workplace size plus one", 
        col = "Far UVC Installed?",
        fill = "Far UVC Installed?") +
@@ -241,20 +283,24 @@ where $E_{UVC}$ is the efficacy of far UVC. For example, an efficacy of 50% resu
 
 # Illustrative Simulations of Far UVC
 
-To demonstrate both the types of simulations and model outputs that `helios` can generate, and how these outputs can be presented graphically, we ran two sets of simulations to investigate the following:
+What follows is a demonstration of the types of model outputs that `helios` can generate, and how these outputs can be presented graphically. To do this, we have carried out two sets of analyses using the modelling framework to investigate the following:
 
-1. Comparison of random and targeted far UVC deployment under different pathogen outbreak scenarios
-2. The impact of far UVC efficacy, coverage and deployment strategy on epidemic
+1.  Comparison of random and targeted far UVC deployment under different epidemic pathogen outbreak scenarios
+2.  The impact of far UVC efficacy, coverage and deployment strategy on epidemic final size (i.e. total number of individuals infected) during epidemic pathogen outbreak scenarios
 
-The results presented in these figures are illustrative and subject to change through the model development phase.
+**The results presented in these figures are illustrative and primarily meant to demonstrate the types of result that the framework can currently produce. They should not be over-interpreted at this early stage, and we note that they will be subject to substantial change following your input, and throughout the model development phase.**
 
-## Simulating the impact of far UVC disease dynamics with helios
+## #1 Exploring the impact of far UVC deployment strategies on disease dynamics with `helios`
 
-To assess the potential of far UVC deployment to curtail the transmission of a theoretical pathogen, we fixed the model's pathogen and far UVC parameters and compared the transmission dynamics under an no-intervention baseline, random far UVC deployment, and far UVC deployment targeted at the most populous 50% of places within each setting. These comparisons were performed for both epidemic, where it is assumed infection by the pathogen confers full and lasting immunity, and endemic, where immunity to the pathogen acquired during an infection wanes after 14 days. We assumed far UVC reduced transmission intensity by 75% and that the transmission intensity experienced by individuals in their household, workplace or school, and leisure setting was three times greater than that experienced in their community setting, tuning the relative, setting-specific transmissibility parameters ($\beta_{m}$) to approximate a basic pathogen reproductive number (R0) of 2. The pathogen was seeded at an initial proportion of 0.05.
+To assess the potential of far UVC deployment to mitigate transmission, we carried out a number of simulations for a pathogen with characteristics similar to SARS-CoV-2 (R0 of 2), and explored the impact of far UVC on transmission dynamics. Specifically, we compared the transmission dynamics under a no-intervention baseline, random far UVC deployment, and far UVC deployment targeted at the most populous 50% of places within each setting type.
 
-In the epidemic scenario, where a pathogen outbreak occurs from an initially low proportion of infected, having pre-installed far UVC devices in the workplace, school, and leisure settings reduced the number of people who become infected by the pathogen and, when targeted to the most populous settings, slowed the rate of pathogen spread in the population. Targeted far UVC provided an even greater reduction in the total number of people infected relative to the random deployment, than random far UVC deployment provided relative to the no-intervention baseline.  
+These comparisons were performed for both epidemic and endemic pathogens. For epidemic pathogens, we assume that infection by the pathogen confers full and lasting immunity. For endemic pathogens, we assume that immunity following infection with the pathogen is short lived, and wanes. We assumed far UVC efficacy was sufficient to reduce transmission intensity by 75%, and that coverage of far UVC (i.e. the proportion of locations with far UVC installed) was 50%. Further, we assume a 30%\|30%\|30%\|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively).
 
-(ref:exemplar-epidemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen when full and lasting immunity to infection is acquired by infected individuals ($\beta_{H}$ = 0.186, $\beta_{W}$ = 0.186, $\beta_{S}$ = 0.186, $\beta_{L}$ = 0.186, $\beta_{C}$ = 0.062, far UVC coverage = 0.5, far UVC efficacy = 0.75).
+### Epidemic Pathogen Simulation
+
+In the epidemic scenario, having pre-installed far UVC devices in the workplace, school, and leisure settings reduced the number of people who become infected by the pathogen and, when targeted specifically to the most largest settings within a setting type (the "Targeted" strategy), slowed the rate of pathogen spread in the population. Targeted far UVC provided an even greater reduction in the total number of people infected relative to the random deployment, than random far UVC deployment provided relative to the no-intervention baseline.
+
+(ref:exemplar-epidemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen when full and lasting immunity to infection is acquired by infected individuals This simulation assumes a 30%\|30%\|30%\|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations. <!-- ($\beta_{H}$ = 0.186, $\beta_{W}$ = 0.186, $\beta_{S}$ = 0.186, $\beta_{L}$ = 0.186, $\beta_{C}$ = 0.062, far UVC coverage = 0.5, far UVC efficacy = 0.75).  -->
 
 ```{r exemplar-epidemic, fig.cap="(ref:exemplar-epidemic)"}
 
@@ -281,23 +327,27 @@ exemplar_data |>
 
 ```
 
-In the endemic scenario, where a pathogen has established itself in the human population, introducing far UVC decreased the proportion of individuals in the population with infections relative to the no-intervention baseline scenario (Figure \@ref(fig:exemplar-endemic)). Again, targeting far UVC deloyment provided additional benefits to pathogen suppression
+### Endemic Pathogen Simulation
 
-(ref:exemplar-endemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time ($\beta_{H}$ = 0.186, $\beta_{W}$ = 0.186, $\beta_{S}$ = 0.186, $\beta_{L}$ = 0.186, $\beta_{C}$ = 0.062, far UVC coverage = 0.5, far UVC efficacy = 0.75, duration of immunity = 14 days).
+In the endemic scenario, where a pathogen is already established in the human population, introducing far UVC decreased the proportion of individuals in the population with infections relative to the no-intervention baseline scenario (Figure \@ref(fig:exemplar-endemic)). These simulations assumes a 30%\|30%\|30%\|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Again, targeting far UVC deployment provided additional benefits to pathogen suppression.
+
+(Figure \@ref(fig:exemplar-endemic)) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time. This simulation assumes a 30%\|30%\|30%\|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations.
+
+<!-- ($\beta_{H}$ = 0.186, $\beta_{W}$ = 0.186, $\beta_{S}$ = 0.186, $\beta_{L}$ = 0.186, $\beta_{C}$ = 0.062, far UVC coverage = 0.5, far UVC efficacy = 0.75, duration of immunity = 14 days). -->
 
 ```{r exemplar-endemic, fig.cap="(ref:exemplar-endemic)"}
 
 # Plot the epidemic exemplar simulations:
 exemplar_data |>
   filter(Setting == "Endemic") |>
-  filter(timestep %in% c(250:1000)) |>
+  filter(timestep %in% c(400:1000)) |>
   mutate(Percentage = Proportion * 100) |>
   ggplot(aes(x = timestep, y = Percentage, colour = State)) +
   geom_line(linewidth = 1.2) +
   theme_bw() +
   labs(x = "Days", y = "Percentage of Population", colour = "Disease State") +
   scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
-  scale_x_continuous(expand = c(0, 0)) +
+  scale_x_continuous(expand = c(0, 0), breaks = c(400, 600, 800, 100), labels = c(0, 200, 400, 600)) +
   scale_color_discrete(type = blueprint_colours) +
   facet_grid(~Intervention) +
   theme(strip.background = element_blank(),
@@ -310,15 +360,17 @@ exemplar_data |>
 
 ```
 
+## #2 Assessing how various far UVC parameters shape epidemic final size
 
-\textbf{INSERT CASES AVERTED FIGURE(S)}
+In addition to the outputs presented above (which show the results of a single simulation with a single parameter set), we can also use `helios` framework used to explore how key outputs (the total number of individuals infected) varies with changes to input parameters. This is known as a "sensitivity analysis" and we present illustrative results from an example sensitivity analysis below.
 
-## Assessing the sensitivty of `helios` to far UVC parameters
-The `helios` framework can also be used to assess the sensitivity of the individual-based model to pathogen (e.g. duration of immunity), human population (e.g. setting-specific transmission intensity), and operational (e.g. far UVC) parameters on measures of interest. To illustrate, we simulated an epidemic (infection with the pathogen confers full and lasting immunity) with varying levels of transmission intensity (R0) and assessed the sensitivity of final epidemic size, defined as the total proportion of the population that gets infected during the course of an epidemic, to far UVC coverage, efficacy, and deployment strategy. We again assume that the transmission intensity experienced in the household, workplace, school and leisure settings is three times that experienced in the community setting. Figures \@ref(fig:sweep-R0-coverage):\@ref(fig:sweep-efficacy-coverage) illustrate how `helios` model outputs can be graphed, depicting how the final epidemic size changes with R0, far UVC coverage, far UVC efficacy, and far UVC deployment strategy.
+We simulated an epidemic (infection with the pathogen confers full and lasting immunity) with varying levels of transmission intensity (R0) and assessed the sensitivity of final epidemic size (defined as the total proportion of the population that gets infected during the course of an epidemic) to variation in far UVC coverage, far UVC efficacy, and deployment strategy (Targeted or Random).
 
-The deployment of far UVC reduced the total percentage/proportion of the population that is infected during an an epidemic (Figures \@ref(fig:sweep-R0-coverage):\@ref(fig:sweep-efficacy-coverage)). For a given transmission intensity (R0), increasing the coverage (Figure \@ref(fig:sweep-R0-coverage)) and/or efficacy (Figures \@ref(fig:sweep-R0-efficacy):\@ref(fig:sweep-efficacy-coverage)) of far UVC reduced the final size of the epidemic. For low transmission intensities (R0 $\leq$ 1.5), very high levels of far UVC coverage and/or prevented the epidemic from occurring (final epidemic size ~0%). Across the majority of combinations of R0, far UVC coverage, and far UVC efficacy, targeting the deployment of far UVC to the most populous settings achieved a greater reduction in final epidemic size.
+Figures \@ref(fig:sweep-R0-coverage):\@ref(fig:sweep-efficacy-coverage) illustrate how `helios` model outputs can be graphed, depicting how the final epidemic size changes with R0, far UVC coverage, far UVC efficacy, and far UVC deployment strategy.
 
-(ref:sweep-R0-coverage) The effect of R0 and far UVC coverage, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is acquired by infected individuals and far UVC was assumed to be 80% efficacious in reducing transmission across all settings.
+The deployment of far UVC reduced the total percentage/proportion of the population that is infected during an an epidemic (Figures \@ref(fig:sweep-R0-coverage):\@ref(fig:sweep-efficacy-coverage)). For a given transmission intensity (R0), increasing the coverage (Figure \@ref(fig:sweep-R0-coverage)) and/or efficacy (Figures \@ref(fig:sweep-R0-efficacy):\@ref(fig:sweep-efficacy-coverage)) of far UVC reduced the final size of the epidemic. For low transmission intensities (R0 $\leq$ 1.5), very high levels of far UVC coverage and/or prevented the epidemic from occurring (final epidemic size \~0%). Across the majority of combinations of R0, far UVC coverage, and far UVC efficacy, targeting the deployment of far UVC to the most populous settings achieved a greater reduction in final epidemic size.
+
+\@ref(fig:sweep-R0-coverage) The effect of R0 and far UVC coverage, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is acquired by infected individuals and far UVC was assumed to be 80% efficacious in reducing transmission across all settings.
 
 ```{r sweep-R0-coverage, fig.cap="(ref:sweep-R0-coverage)"}
 
