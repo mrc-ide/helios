@@ -250,11 +250,9 @@ The results presented in these figures are illustrative and subject to change th
 
 ## Simulating the impact of far UVC disease dynamics with helios
 
-To assess the potential of far UVC deployment to curtail the transmission of a theoretical pathogen fixed the model's pathogen and far UVC parameters and compared the  
+To assess the potential of far UVC deployment to curtail the transmission of a theoretical pathogen, we fixed the model's pathogen and far UVC parameters and compared the transmission dynamics under an no-intervention baseline, random far UVC deployment, and far UVC deployment targeted at the most populous 50% of places within each setting. These comparisons were performed for both epidemic, where it is assumed infection by the pathogen confers full and lasting immunity, and endemic, where immunity to the pathogen acquired during an infection wanes after 14 days. We assumed far UVC reduced transmission intensity by 75% and that the transmission intensity experienced by individuals in their household, workplace or school, and leisure setting was three times greater than that experienced in their community setting, tuning the relative, setting-specific transmissibility parameters ($\beta_{m}$) to approximate a basic pathogen reproductive number (R0) of 2. The pathogen was seeded at an initial proportion of 0.05.
 
-We assumed that the transmission intensity experienced by individuals in their household, workplace or school, and leisure setting was three times greater than that experienced in their community setting, and tuned the relative, setting-specific transmissibility parameters ($\beta_{m}$) to approximate a basic pathogen reproductive number ($R0$) of 2.
-
-
+In the epidemic scenario, where a pathogen outbreak occurs from an initially low proportion of infected, having pre-installed far UVC devices in the workplace, school, and leisure settings reduced the number of people who become infected by the pathogen and, when targeted to the most populous settings, slowed the rate of pathogen spread in the population. Targeted far UVC provided an even greater reduction in the total number of people infected relative to the random deployment, than random far UVC deployment provided relative to the no-intervention baseline.  
 
 (ref:exemplar-epidemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen when full and lasting immunity to infection is acquired by infected individuals ($\beta_{H}$ = 0.186, $\beta_{W}$ = 0.186, $\beta_{S}$ = 0.186, $\beta_{L}$ = 0.186, $\beta_{C}$ = 0.062, far UVC coverage = 0.5, far UVC efficacy = 0.75).
 
@@ -283,7 +281,7 @@ exemplar_data |>
 
 ```
 
-Explanation of epidemic exemplar.
+In the endemic scenario, where a pathogen has established itself in the human population, introducing far UVC decreased the proportion of individuals in the population with infections relative to the no-intervention baseline scenario (Figure \@ref(fig:exemplar-endemic)). Again, targeting far UVC deloyment provided additional benefits to pathogen suppression
 
 (ref:exemplar-endemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time ($\beta_{H}$ = 0.186, $\beta_{W}$ = 0.186, $\beta_{S}$ = 0.186, $\beta_{L}$ = 0.186, $\beta_{C}$ = 0.062, far UVC coverage = 0.5, far UVC efficacy = 0.75, duration of immunity = 14 days).
 
@@ -312,12 +310,15 @@ exemplar_data |>
 
 ```
 
+
+\textbf{INSERT CASES AVERTED FIGURE(S)}
+
 ## Assessing the sensitivty of `helios` to far UVC parameters
-The `helios` framework can also be used to assess the sensitivity of the individual-based model to pathogen (e.g. duration of immunity), human population (e.g. setting-specific transmission intensity), and operational (e.g. far UVC) parameters on measures of interest. To illustrate, we simulated an epidemic with varying levels of transmission intensity ($R0$) and assessed the sensitivity of final epidemic size, defined as the total proportion of the population that gets infected during the course of an epidemic, to far UVC coverage, efficacy, and deployment strategy. Figures \@ref(fig:sweep-R0-coverage):\@ref(fig:sweep-efficacy-coverage) depict how the final epidemic size changes with $R0$, far UVC coverage, far UVC efficacy, and far UVC deployment strategy, and illustrate how `helios` model outputs can be graphed.  
+The `helios` framework can also be used to assess the sensitivity of the individual-based model to pathogen (e.g. duration of immunity), human population (e.g. setting-specific transmission intensity), and operational (e.g. far UVC) parameters on measures of interest. To illustrate, we simulated an epidemic (infection with the pathogen confers full and lasting immunity) with varying levels of transmission intensity (R0) and assessed the sensitivity of final epidemic size, defined as the total proportion of the population that gets infected during the course of an epidemic, to far UVC coverage, efficacy, and deployment strategy. We again assume that the transmission intensity experienced in the household, workplace, school and leisure settings is three times that experienced in the community setting. Figures \@ref(fig:sweep-R0-coverage):\@ref(fig:sweep-efficacy-coverage) illustrate how `helios` model outputs can be graphed, depicting how the final epidemic size changes with R0, far UVC coverage, far UVC efficacy, and far UVC deployment strategy.
 
-The deployment of far UVC could reduce the total percentage/proportion of the population that is infected during an outbreak of pathogen to which full and lasting immunity is acquired (Figures \@ref(fig:sweep-R0-coverage):\@ref(fig:sweep-efficacy-coverage)). For a given transmission intensity ($R0$), increasing the coverage (Figure \@ref(fig:sweep-R0-coverage)) and/or efficacy (Figure \@ref(fig:sweep-R0-efficacy), Figure \@ref(fig:sweep-efficacy-coverage)) of far UVC reduced the final size of an epidemic outbreak of a theoretical pathogen, defined as the total proportion of the population that the pathogen infects during the outbreak
+The deployment of far UVC reduced the total percentage/proportion of the population that is infected during an an epidemic (Figures \@ref(fig:sweep-R0-coverage):\@ref(fig:sweep-efficacy-coverage)). For a given transmission intensity (R0), increasing the coverage (Figure \@ref(fig:sweep-R0-coverage)) and/or efficacy (Figures \@ref(fig:sweep-R0-efficacy):\@ref(fig:sweep-efficacy-coverage)) of far UVC reduced the final size of the epidemic. For low transmission intensities (R0 $\leq$ 1.5), very high levels of far UVC coverage and/or prevented the epidemic from occurring (final epidemic size ~0%). Across the majority of combinations of R0, far UVC coverage, and far UVC efficacy, targeting the deployment of far UVC to the most populous settings achieved a greater reduction in final epidemic size.
 
-(ref:sweep-R0-coverage) The effect of R0 and far UVC coverage, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is acquired by infected individuals.
+(ref:sweep-R0-coverage) The effect of R0 and far UVC coverage, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is acquired by infected individuals and far UVC was assumed to be 80% efficacious in reducing transmission across all settings.
 
 ```{r sweep-R0-coverage, fig.cap="(ref:sweep-R0-coverage)"}
 
@@ -375,7 +376,7 @@ cowplot::plot_grid(
 
 ```
 
-(ref:sweep-R0-efficacy) The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is conferred on infected individuals.
+(ref:sweep-R0-efficacy) The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is conferred on infected individuals and a far UVC coverage of 80% is achieved.
 
 ```{r sweep-R0-efficacy, fig.cap="(ref:sweep-R0-efficacy)"}
 
@@ -434,7 +435,7 @@ cowplot::plot_grid(
 
 Add some text.
 
-(ref:sweep-efficacy-coverage) The effect of far UVC efficacy and coverage, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects when full and lasting immunity is conferred on infected individuals.
+(ref:sweep-efficacy-coverage) The effect of far UVC efficacy and coverage, under random and targeted far UVC deployment, on the proportion of the population that a pathogen with an R0 of approximately 2 infects when full and lasting immunity is conferred on infected individuals.
 
 ```{r sweep-efficacy-coverage, fig.cap="(ref:sweep-efficacy-coverage)"}
 
