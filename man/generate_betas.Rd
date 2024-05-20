@@ -27,5 +27,11 @@ generate_betas(
 generate_betas() takes a beta_community and returns beta_household, beta_school, beta_workplace,
 and beta_leisure given user-defined ratios. The function also calculates the total beta value and
 returns the proportion of the total corresponding to each setting. The beta values are key inputs
-in the parameters_list as generated using the \code{get_parameters()} function. The function returns
+in the parameters_list as generated using the \code{get_parameters()} function. The function returns a
+dataframe containing the beta values and their proportions of the total betas.
 }
+\seealso{
+Other miscellaneous: 
+\code{\link{get_setting_sizes}()}
+}
+\concept{miscellaneous}

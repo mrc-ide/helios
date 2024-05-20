@@ -50,12 +50,6 @@ get_setting_sizes <- function(variables_list, leisure_sizes) {
 
 #' generate_betas
 #'
-#' @param beta_community The beta value, or values, for the community setting for which the user wants to generate corresponding household, school, workplace, and leisure settings.
-#' @param household_ratio The household beta as a ratio to the community beta
-#' @param school_ratio  The school beta as a ratio to the community beta
-#' @param workplace_ratio The workplace beta as a ratio to the community beta
-#' @param leisure_ratio The leisure beta as a ratio to the community beta
-#'
 #' @description
 #' generate_betas() takes a beta_community and returns beta_household, beta_school, beta_workplace,
 #' and beta_leisure given user-defined ratios. The function also calculates the total beta value and
@@ -63,6 +57,12 @@ get_setting_sizes <- function(variables_list, leisure_sizes) {
 #' in the parameters_list as generated using the `get_parameters()` function. The function returns a
 #' dataframe containing the beta values and their proportions of the total betas.
 #'
+#' @param beta_community The beta value, or values, for the community setting for which the user wants to generate corresponding household, school, workplace, and leisure settings.
+#' @param household_ratio The household beta as a ratio to the community beta
+#' @param school_ratio  The school beta as a ratio to the community beta
+#' @param workplace_ratio The workplace beta as a ratio to the community beta
+#' @param leisure_ratio The leisure beta as a ratio to the community beta
+#' @family miscellaneous
 #' @export
 generate_betas <- function(beta_community, household_ratio, school_ratio, workplace_ratio, leisure_ratio) {
 
