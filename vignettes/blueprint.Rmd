@@ -48,7 +48,7 @@ The aim of this document is to introduce `helios`, an individual-based modelling
 
 # Aim of this Document
 
-The aim of this document is to introduce you to the `helios` framework, specifically the modelling framework and the types of results it can currently produce. Our hope is that this document will serve as a jumping off point to discuss:
+The aim of this document is to introduce you to the `helios` modelling framework and the types of results it can currently produce. Our hope is that this document will serve as a jumping off point to discuss:
 
 1.  Any additions to the model that will be required to answer priority questions for Blueprint Biosecurity.
 2.  The types of results that can be generated to answer those priority questions.
@@ -66,7 +66,7 @@ age_classes <- variables$variables_list$age_class$get_categories()
 age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
 ```
 
-The model implemented in `helios` has a fixed population of individuals, who are each assigned one of three age-groups (children, adults, elderly). Each individual is therefore either a child, an adult, or an elderly person. Figure \@ref(fig:age) shows the proportion in each age group from a population of `r human_population` individuals. We do not currently explicitly model demographic changes in the model and so we assume that no aging between the age-groups (e.g. child -\> adult) occurs during the simulation.
+The model implemented in `helios` has a fixed population of individuals, who are each assigned one of three age-groups (children, adults, elderly). Each individual is therefore either a child, an adult, or an elderly person. Figure \@ref(fig:age) shows the proportion in each age group from an example population of size `r human_population` individuals. We do not currently explicitly model demographic changes in the model and so we assume that no aging between the age-groups (e.g. child -\> adult) occurs during the simulation.
 
 During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals who are also visiting those same locations at the same time. We model 4 location types: **Households**, **Schools**, **Workplaces**, and **Leisure** **Venues**. Individuals are assigned to each location in a way that depends on their age-group (e.g. children are assigned to schools, adults are assigned to workplaces), with assignment to a **specific** location within a particular type (e.g. School #7) performed stochastically (see \@ref(locations) below).
 
@@ -74,7 +74,7 @@ It is during these visits to the same location that pathogen transmission can oc
 
 ## Locations {#locations}
 
-Below we provide detail on how individuals are assigned to each location type.
+Below we provide detail on how individuals are assigned to each Location Type.
 
 1.  **Households:** The number of individuals in each household (Figure \@ref(fig:household-size)) and the age-composition of individuals (Figure \@ref(fig:age)) within each household are determined using data on household-age composition data from the 2011 Office for National Statistics survey in the United Kingdom (UK), following @hinch2021openabm. Specifically, we sample with replacement from this data to generate households and then populate those households with individuals. Household assignment is **static** - for each individual, the specific household they are assigned to is fixed and does not change across the course of a single simulation. They stay in the same household each day.
 
@@ -162,21 +162,25 @@ Individuals exist in one of four different disease states:
 
 -   **Recovered:** They are no longer infectious and are immune to future infection.
 
-At any timepoint, each individual is either susceptible, exposed, infectious, or recovered. Individuals are infected (S -\> E) after spending time in the same location as infectious individuals. For each individual we calculate a location-specific force of infection, which determines the probability they are infected. Specifically, the force of infection experienced by individual $i$ in Location $m$ at time $t$ is calculated as follows:
+At any timepoint, each individual is either susceptible, exposed, infectious, or recovered. Individuals are infected (S -\> E) after spending time in the same location as infectious individuals. For each individual we calculate a location-specific force of infection, which determines the probability they are infected in a given timestep. Specifically, the force of infection experienced by individual $i$ in Location $m$ at time $t$ is calculated as follows:
 
 $$
 \lambda_{i,m}(t) = \frac{\beta_{m} I_m(t)}{N_m}
 $$
 
-where $I_m(t)$ are the number of infectious individuals in Location $m$ at time $t$ , $N_m$ are the total number of individuals visiting Location $m$ at time $t$ and $\beta_m$ is a location specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that integrates consideration of both the ***amount of time spent in a location*** and ***the inherent "riskiness"*** **of a location** (i.e. how receptive to onwards transmission it is). Currently within the model, each Location Type (i.e. workplace, school, household, leisure-venue) has a specific $\beta$ (i.e. $\beta_{W}$,$\beta_{S}$ , $\beta_{H}$, $\beta_{L}$ respectively) and all individual locations within a location type (e.g. all schools) have the same $\beta$ (though this could be changed in future versions).
+where $I_m(t)$ are the number of infectious individuals in Location $m$ at time $t$ , $N_m$ are the total number of individuals visiting Location $m$ at time $t$ and $\beta_m$ is a location specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that integrates consideration of both the ***amount of time spent in a location*** and ***the inherent "riskiness"*** **of a location** (i.e. how receptive to onwards transmission it is). Currently within the model, each Location Type (i.e. workplace, school, household, leisure-venue) has a specific $\beta$ (i.e. $\beta_{W}$,$\beta_{S}$ , $\beta_{H}$, $\beta_{L}$ respectively) and all individual locations within a Location Type (e.g. all schools) have the same $\beta$ (though this could be changed in future versions).
 
-The total force of infection $\lambda$ for each individual is calculated as a sum of household, workplace, school, leisure. We add an additional force of infection term $\lambda_C$ to represent types of potential infectious contacts not represented by the locations we consider (e.g. during a commute to/from a workplace, grocery shopping etc). and which represents general mixing among all people. The total Force of Infection experienced by individual $i$ is therefore calculated as:
+The total force of infection $\lambda_T$ for each individual is calculated as a sum of household, workplace, school and leisure force of infections. We add an additional force of infection term $\lambda_C$ to represent types of potential infectious contacts not represented by the locations we consider (e.g. during a commute to/from a workplace, grocery shopping etc). and which represents general mixing among all people. The total Force of Infection experienced by individual $i$ is therefore calculated as:
 
-$$ \lambda_{i, T} = \lambda_{i, H} + \lambda_{i, W} + \lambda_{i, S} + \lambda_{i, L} + \lambda_{i, C} $$ The probability of individual $i$ becoming infected during one time-step $t$ is calculated by summing the Location-specific force of infections they experience and then calculating the following:
+$$ \lambda_{i, T} = \lambda_{i, H} + \lambda_{i, W} + \lambda_{i, S} + \lambda_{i, L} + \lambda_{i, C} $$
+
+The probability of individual $i$ becoming infected during one time-step $t$ is calculated by summing the Location-specific force of infections they experience and then calculating the following:
 
 $$
 P(infection) = 1 - \exp(- \lambda_{i,T}t).
-$$ Exposed individuals become infectious after some delay (the *incubation period*). Infectious individuals recover after some delay (the *duration of infectiousness*). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquiring immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single "epidemic wave" before dying out) and endemic (those which are constantly present in the population) pathogens (Figure \@ref(fig:epidemic-endemic)).
+$$
+
+Exposed individuals become infectious after some delay (the *incubation period*). Infectious individuals recover after some delay (the *duration of infectiousness*). After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay. By altering the duration of acquired immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single "epidemic wave" before dying out) and endemic (those which are constantly present in the population) pathogens (Figure \@ref(fig:epidemic-endemic)).
 
 (ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
 
@@ -198,6 +202,7 @@ epidemic_plot <- exemplar_data |>
   theme(strip.background = element_blank(),
         strip.text = element_text(colour = "#03113E", size = 12),
         panel.border=element_blank(),
+        plot.title = element_text(size = 10),
         legend.title = element_blank(),
         legend.position = "right",
         legend.background = element_blank(),
@@ -218,6 +223,7 @@ endemic_plot <- exemplar_data |>
   scale_color_discrete(type = blueprint_colours) +
   theme(strip.background = element_blank(),
         strip.text = element_text(colour = "#03113E", size = 12),
+        plot.title = element_text(size = 10),
         panel.border=element_blank(),
         legend.title = element_blank(),
         legend.position = "right",
@@ -241,15 +247,15 @@ $$
 
 where $E_{UVC}$ is the efficacy of far UVC. For example, an efficacy of 50% results in a reduction of the force of infection an individual experiences in that particular location by a half. The efficacy of far UVC within each particular Location Type (i.e. schools, workplaces, leisure venues) can be set individually (i.e. to produce a Location-Type specific efficacy.)
 
-Within each location type, the proportion of locations covered by the installation can also be specified. Given a certain level of coverage (e.g. 60%), the settings with far UVC installed can be set according to one of two **coverage strategies**:
+Within each Location Type, the proportion of locations covered by the installation can also be specified. Given a certain level of coverage (e.g. 20%), the settings with far UVC installed can be set according to one of two **coverage strategies**:
 
--   **Random:** Locations for far UVC to be installed are sampled at random, with a random 35% of locations of that type selected.
+-   **Random:** Locations for far UVC to be installed are sampled at random, with a random 20% of locations of that type selected.
 
--   **Targeted:** Locations for far UVC to be installed are chosen in order of size, with the largest 35% of locations selected to receive far UVC.
+-   **Targeted:** Locations for far UVC to be installed are chosen in order of size, with the largest 20% of locations selected to receive far UVC.
 
-Figure \@ref(fig:uvc) provides an example illustrating the difference between these two strategies as applied to the schools location type.
+Figure \@ref(fig:uvc) provides an example illustrating the difference between these two strategies as applied to the schools Location Type.
 
-(ref:uvc) Illustration of the targeted and random strategies for the workplace location type.
+(ref:uvc) Illustration of the targeted and random strategies for the workplace Location Type.
 
 ```{r uvc, fig.cap="(ref:uvc)"}
 data.frame(workplace_sizes) |>
@@ -292,15 +298,15 @@ What follows is a demonstration of the types of model outputs that `helios` can 
 
 ## Exploring the impact of far UVC deployment strategies on disease dynamics with `helios`
 
-To assess the potential of far UVC deployment to mitigate transmission, we carried out a number of simulations for a pathogen with characteristics similar to SARS-CoV-2 (R0 of 2), and explored the impact of far UVC on transmission dynamics. Specifically, we compared the transmission dynamics under a no-intervention baseline, random far UVC deployment, and far UVC deployment targeted at the most populous 50% of places within each setting type.
+To assess the potential of far UVC deployment to mitigate transmission, we carried out a number of simulations for a pathogen with characteristics approximately similar to SARS-CoV-2 (R0 of 2), and explored the impact of far UVC on transmission dynamics. Specifically, we compared the transmission dynamics under a no-intervention baseline, random far UVC deployment, and far UVC deployment targeted at the most populous 50% of places within each setting type.
 
 These comparisons were performed for both epidemic and endemic pathogens. For epidemic pathogens, we assume that infection by the pathogen confers full and lasting immunity. For endemic pathogens, we assume that immunity following infection with the pathogen is short lived, and wanes. We assumed far UVC efficacy was sufficient to reduce transmission intensity by 75%, and that coverage of far UVC (i.e. the proportion of locations with far UVC installed) was 50%. Further, we assume a 30%\|30%\|30%\|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively).
 
 ### Epidemic Pathogen Simulation
 
-Figure \@ref(fig:exemplar-epidemic) shows the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of an epidemic pathogen. This simulation assumes a 30%\|30%\|30%\|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations.
+Figure \@ref(fig:exemplar-epidemic) shows the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of an epidemic pathogen. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations.
 
-In the epidemic scenario, having pre-installed far UVC devices in the workplace, school, and leisure settings reduced the number of people who become infected by the pathogen and, when targeted specifically to the most largest settings within a setting type (the "Targeted" strategy), slowed the rate of pathogen spread in the population. Targeted far UVC provided an even greater reduction in the total number of people infected relative to the random deployment, than random far UVC deployment provided relative to the no-intervention baseline.
+In the epidemic scenario, having pre-installed far UVC devices in the workplace, school, and leisure settings reduced the number of people who become infected by the pathogen and, when targeted specifically to the most largest settings within a setting type (the "Targeted" strategy), slowed the rate of pathogen spread in the population. Targeted far UVC provided an even greater reduction in the total number of people infected relative to the random deployment than random far UVC deployment provided relative to the no-intervention baseline.
 
 ```{r exemplar-epidemic, fig.cap="(ref:exemplar-epidemic)"}
 
@@ -326,11 +332,12 @@ exemplar_data |>
         axis.line = element_line()) 
 
 ```
+
 (ref:exemplar-epidemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen when full and lasting immunity to infection is acquired by infected individuals (i.e. the pathogen induces a single epidemic).
 
 ### Endemic Pathogen Simulation
 
-Figure \@ref(fig:exemplar-endemic) shows the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time. This simulation assumes a 30%\|30%\|30%\|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively), an R0 of 2, a farUVC efficacy of 75%, and far UVC coverage of 50%. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations.
+Figure \@ref(fig:exemplar-endemic) shows the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time. Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations. Targeted indicates that far UVC was assigned to the largest 50% of school, workplace and leisure locations.
 
 In the endemic scenario, where a pathogen is already established in the human population, introducing far UVC decreased the proportion of individuals in the population with infections relative to the no-intervention baseline scenario (Figure \@ref(fig:exemplar-endemic)). Again, targeting far UVC deployment provided additional benefits to pathogen suppression.
 
@@ -358,11 +365,12 @@ exemplar_data |>
         axis.line = element_line()) 
 
 ```
+
 (ref:exemplar-endemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time (i.e. the pathogen exists in an endemic state).
 
 ## Assessing how various far UVC parameters shape epidemic final size
 
-In addition to the outputs presented above (which show the results of a single simulation with a single parameter set), we can also use `helios` framework used to explore how key outputs (the total number of individuals infected) varies with changes to input parameters. This is known as a "sensitivity analysis" and we present illustrative results from an example sensitivity analysis below.
+In addition to the outputs presented above (which show the results of a single simulation with a single parameter set), we can also use `helios` framework to explore how key outputs (the total number of individuals infected) varies with changes to input parameters. This is known as a "sensitivity analysis" and we present illustrative results from an example sensitivity analysis below.
 
 We simulated an epidemic (infection with the pathogen confers full and lasting immunity) with varying levels of transmission intensity (R0) and assessed the sensitivity of final epidemic size (defined as the total proportion of the population that gets infected during the course of an epidemic) to variation in far UVC coverage, far UVC efficacy, and deployment strategy (Targeted or Random).
 
@@ -430,6 +438,7 @@ a <- cowplot::plot_grid(
 a
 
 ```
+
 (ref:sweep-R0-coverage) The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC efficacy of 80%.
 
 ### Sensitivity Analysis of R0 & far UVC Efficacy
@@ -490,6 +499,7 @@ b <- cowplot::plot_grid(
 b
 
 ```
+
 (ref:sweep-R0-efficacy) The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC coverage of 80% is achieved.
 
 # Bibliography {.unnumbered}
