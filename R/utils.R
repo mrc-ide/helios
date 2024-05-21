@@ -47,3 +47,49 @@ get_setting_sizes <- function(variables_list, leisure_sizes) {
   return(setting_populations)
 
 }
+
+#' generate_betas
+#'
+#' @description
+#' generate_betas() takes a beta_community and returns beta_household, beta_school, beta_workplace,
+#' and beta_leisure given user-defined ratios. The function also calculates the total beta value and
+#' returns the proportion of the total corresponding to each setting. The beta values are key inputs
+#' in the parameters_list as generated using the `get_parameters()` function. The function returns a
+#' dataframe containing the beta values and their proportions of the total betas.
+#'
+#' @param beta_community The beta value, or values, for the community setting for which the user wants to generate corresponding household, school, workplace, and leisure settings.
+#' @param household_ratio The household beta as a ratio to the community beta
+#' @param school_ratio  The school beta as a ratio to the community beta
+#' @param workplace_ratio The workplace beta as a ratio to the community beta
+#' @param leisure_ratio The leisure beta as a ratio to the community beta
+#' @family miscellaneous
+#' @export
+generate_betas <- function(beta_community, household_ratio, school_ratio, workplace_ratio, leisure_ratio) {
+
+  # Use the community betas to generate the household, school, workplace, and leisure betas:
+  beta_household = household_ratio * beta_community
+  beta_school = school_ratio * beta_community
+  beta_workplace = workplace_ratio * beta_community
+  beta_leisure = leisure_ratio * beta_community
+
+  # Combine the betas into a dataframe:
+  betas <- data.frame(
+    beta_household = beta_household,
+    beta_school = beta_school,
+    beta_workplace = beta_workplace,
+    beta_leisure = beta_leisure,
+    beta_community = beta_community)
+
+  # Append columns giving the proportion of the total beta accounted for in each setting:
+  betas %>%
+    mutate(beta_total = beta_household + beta_school + beta_workplace + beta_leisure + beta_community) %>%
+    mutate(prop_household = beta_household / beta_total,
+           prop_school = beta_school / beta_total,
+           prop_workplace = beta_workplace / beta_total,
+           prop_leisure = beta_leisure / beta_total,
+           prop_community = beta_community / beta_total) -> betas
+
+  # Return the data frame of betas:
+  return(betas)
+
+}
