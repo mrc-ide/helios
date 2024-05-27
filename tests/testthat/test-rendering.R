@@ -76,6 +76,33 @@ test_that("Disease state counts sum to parameters$human population", {
 
 })
 
-#test_that("Renderer renders the number of externall sourced infections when endemic switched on", {
+test_that("Renderer renders the number of externally sourced infections when endemic switched on", {
+
+  # Generate the model variables:
+  parameters_list <- get_parameters(overrides = list(human_population = 1000,
+                                                     endemic_or_epidemic = 'endemic',
+                                                     duration_immune = 14,
+                                                     prob_inf_external = 0.05,
+                                                     simulation_time = 10))
+
+  # Run the simulation:
+  simulation_render_test <- run_simulation(parameters_list = parameters_list)
+
+  # Check that run_simulation() has rendered a data frame with a column for n_external_infections:
+  expect_true("n_external_infections" %in% names(simulation_render_test))
+
+})
+
+test_that("Renderer does not render the number of externally sourced infections when endemic switched off", {
+
+  # Generate the model variables:
+  parameters_list <- get_parameters(overrides = list(human_population = 1000,
+                                                     simulation_time = 10))
+
+  # Run the simulation:
+  simulation_render_test <- run_simulation(parameters_list = parameters_list)
+
+  # Check that run_simulation() has rendered a data frame with a column for n_external_infections:
+  expect_false("n_external_infections" %in% names(simulation_render_test))
 
 })
