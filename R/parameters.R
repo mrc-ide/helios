@@ -27,6 +27,7 @@
 #' * `leisure_prop_max`: TBD
 #' * `duration_exposed`: TBD
 #' * `duration_infectious`: TBD
+#' * `prob_inf_external`: The probability a susceptible individual is infected from an external source
 #' * `beta_household`: TBD
 #' * `beta_workplace`: TBD
 #' * `beta_school`: TBD

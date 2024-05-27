@@ -30,6 +30,7 @@ These parameters are:
 \item \code{leisure_prop_max}: TBD
 \item \code{duration_exposed}: TBD
 \item \code{duration_infectious}: TBD
+\item \code{prob_inf_external}: The probability a susceptible individual is infected from an external source
 \item \code{beta_household}: TBD
 \item \code{beta_workplace}: TBD
 \item \code{beta_school}: TBD
