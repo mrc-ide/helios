@@ -31,7 +31,9 @@ create_processes <- function(variables_list, events_list, parameters_list, rende
 
   )
 
-  ## Adding RS_process in if endemic pathogen is required
+  # ===============================
+  # ENDEMIC DISEASE MODE
+  # ===============================
   if (parameters_list$endemic_or_epidemic == "endemic") {
     processes_list <- c(processes_list,
                         list(RS_process = create_RS_process(variables_list = variables_list,
@@ -39,7 +41,8 @@ create_processes <- function(variables_list, events_list, parameters_list, rende
                                                             parameters_list = parameters_list)),
                         list(external_source_process = create_external_source_process(variables_list = variables_list,
                                                                                       events_list = events_list,
-                                                                                      parameters_list = parameters_list)))
+                                                                                      parameters_list = parameters_list,
+                                                                                      renderer = renderer)))
   }
 
   # ===============================
@@ -402,7 +405,7 @@ create_RS_process <- function(variables_list, events_list, parameters_list) {
 #'
 #' @family processes
 #' @export
-create_external_source_process <- function(variables_list, events_list, parameters_list){
+create_external_source_process <- function(variables_list, events_list, parameters_list, renderer){
 
   function(t) {
 
@@ -417,6 +420,9 @@ create_external_source_process <- function(variables_list, events_list, paramete
 
     # Queue an update to the infectious state of the newly infected susceptible individuals to Exposed:
     variables_list$disease_state$queue_update(value = "E",index = S)
+
+    # Render the number of individuals infected through the external mechanism
+    renderer$render('n_external_infections', S$size(), t)
 
   }
 }

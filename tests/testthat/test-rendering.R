@@ -75,3 +75,7 @@ test_that("Disease state counts sum to parameters$human population", {
   expect_true(all(output$total_pop == parameters$human_population))
 
 })
+
+#test_that("Renderer renders the number of externall sourced infections when endemic switched on", {
+
+})

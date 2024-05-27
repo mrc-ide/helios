@@ -29,3 +29,19 @@ test_that("get_parameters() errors when the endemic setting is switched on witho
 
 })
 
+test_that("get_parameters() successfully creates parameter list for endemic setting when all required parameters are parsed", {
+
+  expect_no_error(parameters_list <- get_parameters(overrides = list(
+    endemic_or_epidemic = 'endemic',
+    duration_immune = 14,
+    prob_inf_external = 0.1)
+    )
+  )
+
+})
+
+
+
+
+
+
