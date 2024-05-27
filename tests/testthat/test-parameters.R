@@ -8,3 +8,24 @@ test_that("get_parameters() errors when a setting-specific beta has length great
                regexp = "ERROR: A setting-specific beta has length not equal to 1. All setting-specific betas must be of length 1")
 
 })
+
+test_that("get_parameters() errors when the endemic setting is switched on without parameterising duration_immune", {
+
+  expect_error(object = get_parameters(overrides = list(
+    endemic_or_epidemic = 'endemic',
+    prob_inf_external = 0.01)
+  ),
+  regexp = "duration_immune must be specified if endemic_or_epidemic is set to endemic")
+
+})
+
+test_that("get_parameters() errors when the endemic setting is switched on without parameterising duration_immune", {
+
+  expect_error(object = get_parameters(overrides = list(
+    endemic_or_epidemic = 'endemic',
+    duration_immune = 14)
+  ),
+  regexp = "prob_inf_external must be specified if endemic_or_epidemic is set to endemic")
+
+})
+
