@@ -34,3 +34,27 @@ run_simulation <- function(parameters_list) {
   )
   renderer$to_dataframe()
 }
+
+
+#' Run helios simulations using table of parameter values
+#'
+#' @param parameters_table A data frame in which each row contains parameter values for helios model parameters
+#'
+#' @export
+#'
+run_simulations_from_table <- function(parameters_table) {
+
+  # Open a list to store the parameter lists:
+  parameters_lists <- list()
+
+
+  # Open a list to store the simulation outputs:
+  simulation_outputs <- list()
+
+
+  # TODO: Add lines to outputs that append the parameters varied to the dataframe:
+  for(i in 1:nrow(parameters_table)) {
+
+  }
+
+}
