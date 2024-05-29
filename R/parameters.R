@@ -27,6 +27,7 @@
 #' * `leisure_prop_max`: TBD
 #' * `duration_exposed`: TBD
 #' * `duration_infectious`: TBD
+#' * `prob_inf_external`: The probability a susceptible individual is infected from an external source
 #' * `beta_household`: TBD
 #' * `beta_workplace`: TBD
 #' * `beta_school`: TBD
@@ -98,6 +99,7 @@ get_parameters <- function(overrides = list()) {
     school_distribution_generation = "empirical",
     endemic_or_epidemic = "epidemic",
     duration_immune = NULL,
+    prob_inf_external = NULL,
 
     # Far UVC Parameters: Workplace
     far_uvc_workplace = FALSE,
@@ -153,6 +155,9 @@ get_parameters <- function(overrides = list()) {
   }
   if (parameters$endemic_or_epidemic == "endemic" & is.null(parameters$duration_immune)) {
     stop("duration_immune must be specified if endemic_or_epidemic is set to endemic")
+  }
+  if (parameters$endemic_or_epidemic == "endemic" & is.null(parameters$prob_inf_external)) {
+    stop("prob_inf_external must be specified if endemic_or_epidemic is set to endemic")
   }
 
   # Check that all setting-specific betas are of length 1:
