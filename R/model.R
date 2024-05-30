@@ -36,6 +36,8 @@ run_simulation <- function(parameters_list) {
 }
 
 
+
+
 #' Run helios simulations using table of parameter values
 #'
 #' @param parameters_table A data frame in which each row contains parameter values for helios model parameters
@@ -44,17 +46,21 @@ run_simulation <- function(parameters_list) {
 #'
 run_simulations_from_table <- function(parameters_table) {
 
+  # Check that all parameters in the parameter_table are present in the get_parameters() parameters_list:
+  if(!all(names(parameters_table) %in% names(get_parameters()))) {
+    stop("Error: Parameter name in parameter_table not a recognised helios parameter")
+  }
+
   # Open a list to store the parameter lists:
   parameters_lists <- list()
-
 
   # Open a list to store the simulation outputs:
   simulation_outputs <- list()
 
-
   # TODO: Add lines to outputs that append the parameters varied to the dataframe:
   for(i in 1:nrow(parameters_table)) {
 
-  }
+    parameters_lists[[i]] <- get_parameters()
 
+  }
 }
