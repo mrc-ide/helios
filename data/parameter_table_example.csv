@@ -1,5 +1,5 @@
 human_population,number_initially_exposed,simulation_time,render_diagnostics,far_uvc_workplace,far_uvc_workplace_coverage_type,far_uvc_workplace_coverage,far_uvc_workplace_efficacy,far_uvc_workplace_timestep
-1000,5,100,TRUE,FALSE,random,0,0,1
-1000,10,50,FALSE,FALSE,random,0,0,1
-10000,5,100,TRUE,TRUE,random,0.5,0.75,1
-10000,10,50,FALSE,TRUE,targeted,0.5,0.75,1
+1000,5,20,TRUE,FALSE,random,0,0,1
+1000,10,40,FALSE,FALSE,random,0,0,1
+10000,5,20,TRUE,TRUE,random,0.5,0.75,1
+10000,10,40,FALSE,TRUE,targeted,0.5,0.75,1

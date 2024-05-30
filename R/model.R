@@ -35,16 +35,14 @@ run_simulation <- function(parameters_list) {
   renderer$to_dataframe()
 }
 
-
-
-
 #' Run helios simulations using table of parameter values
 #'
 #' @param parameters_table A data frame in which each row contains parameter values for helios model parameters
+#' @param output_type A character string instructing the function to output the parameters, simulations, or both (default = simulations)
 #'
 #' @export
 #'
-run_simulations_from_table <- function(parameters_table) {
+run_simulations_from_table <- function(parameters_table, output_type = "simulations") {
 
   # Check that all parameters in the parameter_table are present in the get_parameters() parameters_list:
   if(!all(names(parameters_table) %in% names(get_parameters()))) {
@@ -60,7 +58,31 @@ run_simulations_from_table <- function(parameters_table) {
   # TODO: Add lines to outputs that append the parameters varied to the dataframe:
   for(i in 1:nrow(parameters_table)) {
 
+    # Open a new parameter list for the i-th row of the parameter table:
     parameters_lists[[i]] <- get_parameters()
 
+    # For each column in the parameter table, overwrite the corresponding parameter in the list:
+    for(j in 1:ncol(parameters_table)) {
+      parameters_lists[[i]][[names(parameters_table[j])]] <- parameters_table[i,j]
+    }
+
+    # Run the simulation i-th simulation:
+    simulation_outputs[[i]] <- run_simulation(parameters_list = parameters_lists[[i]])
+
+    # Append the varied parameters as columns:
+    simulation_outputs[[i]] <- bind_cols(simulation_outputs[[i]], as_tibble(parameters_table[i,]))
+
+    # Print the simulation progress:
+    print(paste0((i), "th simulation complete (", (i/nrow(parameters_table) * 100), "% of simulations complete)"))
+
+  }
+
+  # Determine which objects to return:
+  if(output_type == "parameters") {
+    return(parameters_lists)
+  } else if(output_type == "simulations") {
+    return(simulation_outputs)
+  } else if(output_type == "both") {
+    return(list(parameters_lists, simulation_outputs))
   }
 }
