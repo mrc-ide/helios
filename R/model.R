@@ -37,17 +37,25 @@ run_simulation <- function(parameters_list) {
 
 #' Run helios simulations using table of parameter values
 #'
-#' @param parameters_table A data frame in which each row contains parameter values for helios model parameters
+#' @param parameters_table A data frame in which each row contains parameter values for helios model parameters (preferably in data.frame() format)
 #' @param output_type A character string instructing the function to output the parameters, simulations, or both (default = simulations)
 #'
 #' @export
 #'
 run_simulations_from_table <- function(parameters_table, output_type = "simulations") {
 
+  # Check that the parameters_table is a data.frame object:
+  if(!is.data.frame(parameters_table)) {
+    stop("Error: parameters_table is not a data.frame - please reformat")
+  }
+
   # Check that all parameters in the parameter_table are present in the get_parameters() parameters_list:
   if(!all(names(parameters_table) %in% names(get_parameters()))) {
     stop("Error: Parameter name in parameter_table not a recognised helios parameter")
   }
+
+  # Convert the parameters_table to data.frame format:
+  parameters_table <- as.data.frame(parameters_table)
 
   # Open a list to store the parameter lists:
   parameters_lists <- list()
@@ -73,7 +81,7 @@ run_simulations_from_table <- function(parameters_table, output_type = "simulati
     simulation_outputs[[i]] <- bind_cols(simulation_outputs[[i]], as_tibble(parameters_table[i,]))
 
     # Print the simulation progress:
-    print(paste0((i), "th simulation complete (", (i/nrow(parameters_table) * 100), "% of simulations complete)"))
+    print(paste0("Simulation ", i, " complete (", (i/nrow(parameters_table) * 100), "% of simulations complete)"))
 
   }
 
