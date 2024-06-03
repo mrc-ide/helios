@@ -74,15 +74,19 @@ run_simulations_from_table <- function(parameters_table, output_type = "simulati
       parameters_lists[[i]][[names(parameters_table[j])]] <- parameters_table[i,j]
     }
 
-    # Run the simulation i-th simulation:
-    simulation_outputs[[i]] <- run_simulation(parameters_list = parameters_lists[[i]])
+    # Run the simulations if output_type is simulations or both:
+    if(output_type %in% c("simulations", "both")) {
 
-    # Append the varied parameters as columns:
-    simulation_outputs[[i]] <- bind_cols(simulation_outputs[[i]], as_tibble(parameters_table[i,]))
+      # Run the simulation i-th simulation:
+      simulation_outputs[[i]] <- run_simulation(parameters_list = parameters_lists[[i]])
 
-    # Print the simulation progress:
-    print(paste0("Simulation ", i, " complete (", (i/nrow(parameters_table) * 100), "% of simulations complete)"))
+      # Append the varied parameters as columns:
+      simulation_outputs[[i]] <- bind_cols(simulation_outputs[[i]], as_tibble(parameters_table[i,]))
 
+      # Print the simulation progress:
+      print(paste0("Simulation ", i, " complete (", (i/nrow(parameters_table) * 100), "% of simulations complete)"))
+
+    }
   }
 
   # Determine which objects to return:
