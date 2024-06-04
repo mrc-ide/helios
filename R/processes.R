@@ -309,7 +309,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     S$sample(rate = p_inf_currently_S)
 
     # Render the number of people going from susceptible to infected:
-    renderer$render('n_new_exposed', S$size(), t)
+    renderer$render('E_new', S$size(), t)
 
     # Queue an update to the infectious state of the newly infected susceptible individuals to Exposed:
     variables_list$disease_state$queue_update(value = "E",index = S)
