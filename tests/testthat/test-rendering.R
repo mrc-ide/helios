@@ -11,6 +11,7 @@ test_that("run_simulations() correctly fails to render diagnostic outputs when r
 
   # Set up a vector of expected column names:
   expected_columns_names <- c("timestep",
+                              "E_new",
                               "S_count",
                               "E_count",
                               "I_count",
@@ -44,6 +45,7 @@ test_that("run_simulations() correctly renders diagnostic outputs when render_di
                               "FOI_leisure",
                               "FOI_community",
                               "FOI_total",
+                              "E_new",
                               "S_count",
                               "E_count",
                               "I_count",
