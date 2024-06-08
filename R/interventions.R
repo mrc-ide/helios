@@ -10,12 +10,12 @@
 #' which far UVC is deployed. The function appends these additional setting-specific parameters to
 #' the parameter list and returns an updated version of it.
 #'
-#' @param parameters_list A list of parameters as generated using `get_parameters`
-#' @param setting A character string describing the setting in which Far UVC is being deployed
-#' @param coverage A numeric value describing the proportion of the settings in which Far UVC is deployed
-#' @param coverage_style A character describing the type of coverage (random or targeted)
-#' @param efficacy A numeric value describing the efficacy of the Far UVC deployed
-#' @param timestep A numeric value describing the timestep in which Far UVC is deployed
+#' @param parameters_list A list of parameters as generated using `get_parameters()`
+#' @param setting A character string describing the setting in which far UVC is being deployed
+#' @param coverage A numeric value describing the proportion of the settings in which far UVC is deployed
+#' @param coverage_style A character describing the type of coverage ("random" or "targeted")
+#' @param efficacy A numeric value describing the efficacy of the far UVC deployed
+#' @param timestep A numeric value describing the timestep in which far UVC is deployed
 #'
 #' @family intervention
 #' @export
@@ -24,20 +24,20 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_type, efficacy,
     stop("Error: Number of settings input greater than 1, parameterise for one setting at a time")
   }
 
-  if(length(coverage_type) > 1) {
-    stop("Error: Number of coverage types input greater than 1, parameterise for one coverage type at a time")
-  }
-
   if(!(setting %in% c("workplace", "school", "leisure", "household"))) {
     stop("Error: Input setting invalid - far UVC only deployable in workplace, school, leisure, or household settings")
   }
 
-  if(coverage_type != "random" & coverage_type != "targeted") {
-    stop("Error: Input setting invalid - far UvC only deployable in random or targeted coverage types")
-  }
-
   if(coverage < 0 | coverage > 1) {
     stop("Error: coverage must take a value between 0 and 1")
+  }
+
+  if(length(coverage_type) > 1) {
+    stop("Error: Number of coverage types input greater than 1, parameterise for one coverage type at a time")
+  }
+
+  if(coverage_type != "random" & coverage_type != "targeted") {
+    stop("Error: Input setting invalid - far UVC only deployable in random or targeted coverage types")
   }
 
   if(efficacy < 0 | efficacy > 1) {
