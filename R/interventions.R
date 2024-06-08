@@ -54,8 +54,9 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverag
   }
 
   parameters_list[[paste0("far_uvc_", setting)]] <- TRUE
-  parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]] <- coverage_type
   parameters_list[[paste0("far_uvc_", setting, "_coverage")]] <- coverage
+  parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]] <- coverage_target
+  parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]] <- coverage_type
   parameters_list[[paste0("far_uvc_", setting, "_efficacy")]] <- efficacy
   parameters_list[[paste0("far_uvc_", setting, "_timestep")]] <- timestep
 
