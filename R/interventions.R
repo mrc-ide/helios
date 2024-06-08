@@ -89,152 +89,25 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_type, efficacy,
 #' @family intervention
 #' @export
 generate_far_uvc_switches <- function(parameters_list, variables_list) {
-  if(parameters_list$far_uvc_workplace) {
-    parameters_list <- generate_setting_far_uvc_switches(
-      parameters_list, variables_list, setting = "workplace"
-    )
-  }
-
-  # Parameterise Far UVC in the school setting:
-  if(parameters_list$far_uvc_school) {
-
-    # Get the number of schools:
-    number_of_schools <- length(variables_list$school$get_categories())
-
-    # Open a vector to store the school UVC on/off values:
-    uvc_school <- rep(0, number_of_schools)
-
-    # Calculate the number of schools that will have Far UVC:
-    number_of_schools_with_uvc <- floor(parameters_list$far_uvc_school_coverage * number_of_schools)
-
-    # If coverage type is random, assign schools at random:
-    if(parameters_list$far_uvc_school_coverage_type == "random") {
-
-      # Sample the indices of schools to have Far UVC at random:
-      indices_of_schools_with_uvc <- sample.int(n = number_of_schools,
-                                                size = number_of_schools_with_uvc,
-                                                replace = FALSE)
-
-      # Insert 1's at the indices of schools selected to have Far-UVC:
-      uvc_school[indices_of_schools_with_uvc] <- 1
-
-      # Append the vector of school UVC on/off values to the variables_list:
-      parameters_list$uvc_school <- uvc_school
-
-    }
-    # If coverage type is targeted, assign UVC to the most populous schools:
-    if(parameters_list$far_uvc_school_coverage_type == "targeted") {
-
-      # Get the indices of the indices of schools with Far UVC based on their sizes:
-      indices_of_schools_with_uvc <- sort(x = parameters_list$setting_sizes$school,
-                                          decreasing = TRUE,
-                                          index.return = TRUE)$ix[1:number_of_schools_with_uvc]
-
-      # Insert 1's at the indices of schools selected to have Far-UVC:
-      uvc_school[indices_of_schools_with_uvc] <- 1
-
-      # Append the vector of school UVC on/off values to the variables_list:
-      parameters_list$uvc_school <- uvc_school
-
+  for(setting in c("workplace", "school", "leisure", "household")) {
+    if(parameters_list[[paste0("far_uvc_", setting)]]) {
+      parameters_list <- generate_setting_far_uvc_switches(
+        parameters_list, variables_list, setting = setting
+      )
     }
   }
 
-  # Parameterise Far UVC in the leisure setting:
-  if(parameters_list$far_uvc_leisure) {
-
-    # Get the number of leisure settings:
-    number_of_leisures <- length(parameters_list$leisure_setting_sizes)
-
-    # Open a vector to store the leisure UVC on/off values:
-    uvc_leisure <- rep(0, number_of_leisures)
-
-    # Calculate the number of leisure settings that will have Far UVC:
-    number_of_leisures_with_uvc <- floor(parameters_list$far_uvc_leisure_coverage * number_of_leisures)
-
-    # If coverage type is random, assign leisure settings at random:
-    if(parameters_list$far_uvc_leisure_coverage_type == "random") {
-
-      # Sample the indices of leisure settings to have Far UVC at random:
-      indices_of_leisures_with_uvc <- sample.int(n = number_of_leisures,
-                                                 size = number_of_leisures_with_uvc,
-                                                 replace = FALSE)
-
-      # Insert 1's at the indices of leisure settings selected to have Far-UVC:
-      uvc_leisure[indices_of_leisures_with_uvc] <- 1
-
-      # Append the vector of leisure UVC on/off values to the variables_list:
-      parameters_list$uvc_leisure <- uvc_leisure
-
-    }
-    # If coverage type is targeted, assign UVC to the most populous leisure settings:
-    if(parameters_list$far_uvc_leisure_coverage_type == "targeted") {
-
-      # Get the indices of the indices of leisure settings with Far UVC based on their sizes:
-      indices_of_leisures_with_uvc <- sort(x = parameters_list$setting_sizes$leisure,
-                                           decreasing = TRUE,
-                                           index.return = TRUE)$ix[1:number_of_leisures_with_uvc]
-
-      # Insert 1's at the indices of leisure settings selected to have Far-UVC:
-      uvc_leisure[indices_of_leisures_with_uvc] <- 1
-
-      # Append the vector of leisure setting UVC on/off values to the variables_list:
-      parameters_list$uvc_leisure <- uvc_leisure
-
-    }
-  }
-
-  # Parameterise Far UVC in the household setting:
-  if(parameters_list$far_uvc_household) {
-
-    # Get the number of households:
-    number_of_households <- length(variables_list$household$get_categories())
-
-    # Open a vector to store the household UVC on/off values:
-    uvc_household <- rep(0, number_of_households)
-
-    # Calculate the number of households that will have Far UVC:
-    number_of_households_with_uvc <- floor(parameters_list$far_uvc_household_coverage * number_of_households)
-
-    # If coverage type is random, assign households at random:
-    if(parameters_list$far_uvc_household_coverage_type == "random") {
-
-      # Sample the indices of households to have Far UVC at random:
-      indices_of_households_with_uvc <- sample.int(n = number_of_households,
-                                                   size = number_of_households_with_uvc,
-                                                   replace = FALSE)
-
-      # Insert 1's at the indices of households selected to have Far-UVC:
-      uvc_household[indices_of_households_with_uvc] <- 1
-
-      # Append the vector of household UVC on/off values to the variables_list:
-      parameters_list$uvc_household <- uvc_household
-
-    }
-
-    # If coverage type is targeted, assign UVC to the most populous households:
-    if(parameters_list$far_uvc_household_coverage_type == "targeted") {
-
-      # Get the indices of the indices of households with Far UVC based on their sizes:
-      indices_of_households_with_uvc <- sort(x = parameters_list$setting_sizes$household,
-                                             decreasing = TRUE,
-                                             index.return = TRUE)$ix[1:number_of_households_with_uvc]
-
-      # Insert 1's at the indices of households selected to have Far-UVC:
-      uvc_household[indices_of_households_with_uvc] <- 1
-
-      # Append the vector of leisure setting UVC on/off values to the variables_list:
-      parameters_list$uvc_household <- uvc_household
-
-    }
-  }
-
-  # Return the update list of model parameters:
-  parameters_list
-
+  return(parameters_list)
 }
 
 generate_setting_far_uvc_switches <- function(parameters_list, variables_list, setting) {
-  number <- length(variables_list[[setting]]$get_categories())
+
+  if(setting == "leisure") {
+    number <- length(parameters_list$leisure_setting_sizes)
+  } else {
+    number <- length(variables_list[[setting]]$get_categories())
+  }
+
   uvc <- rep(0, number)
   number_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * number)
 
