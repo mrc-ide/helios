@@ -89,50 +89,10 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_type, efficacy,
 #' @family intervention
 #' @export
 generate_far_uvc_switches <- function(parameters_list, variables_list) {
-
-  # Parameterise Far UVC in the workplace setting:
   if(parameters_list$far_uvc_workplace) {
-
-    # Get the number of workplaces:
-    number_of_workplaces <- length(variables_list$workplace$get_categories())
-
-    # Open a vector to store the workplace UVC on/off values:
-    uvc_workplace <- rep(0, number_of_workplaces)
-
-    # Calculate the number of workplaces that will have Far UVC:
-    number_of_workplaces_with_uvc <- floor(parameters_list$far_uvc_workplace_coverage * number_of_workplaces)
-
-    # If coverage type is random, assign workplaces at random:
-    if(parameters_list$far_uvc_workplace_coverage_type == "random") {
-
-      # Sample the indices of workplaces to have Far UVC at random:
-      indices_of_workplaces_with_uvc <- sample.int(n = number_of_workplaces,
-                                                   size = number_of_workplaces_with_uvc,
-                                                   replace = FALSE)
-
-      # Insert 1's at the indices of workplaces selected to have Far-UVC:
-      uvc_workplace[indices_of_workplaces_with_uvc] <- 1
-
-      # Append the vector of workplace UVC on/off values to the variables_list:
-      parameters_list$uvc_workplace <- uvc_workplace
-
-    }
-
-    # If coverage type is targeted, assign UVC to the most populous workplaces:
-    if(parameters_list$far_uvc_workplace_coverage_type == "targeted") {
-
-      # Get the indices of the indices of workplaces with Far UVC based on their sizes:
-      indices_of_workplaces_with_uvc <- sort(x = parameters_list$setting_sizes$workplace,
-                                             decreasing = TRUE,
-                                             index.return = TRUE)$ix[1:number_of_workplaces_with_uvc]
-
-      # Insert 1's at the indices of workplaces selected to have Far-UVC:
-      uvc_workplace[indices_of_workplaces_with_uvc] <- 1
-
-      # Append the vector of workplace UVC on/off values to the variables_list:
-      parameters_list$uvc_workplace <- uvc_workplace
-
-    }
+    parameters_list <- generate_setting_far_uvc_switches(
+      parameters_list, variables_list, setting = "workplace"
+    )
   }
 
   # Parameterise Far UVC in the school setting:
@@ -271,4 +231,30 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
   # Return the update list of model parameters:
   parameters_list
 
+}
+
+generate_setting_far_uvc_switches <- function(parameters_list, variables_list, setting) {
+  number <- length(variables_list[[setting]]$get_categories())
+  uvc <- rep(0, number)
+  number_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * number)
+
+  coverage_type <- parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]]
+
+  if(coverage_type == "random") {
+    indices_with_uvc <- sample.int(n = number, size = number_with_uvc, replace = FALSE)
+    uvc[indices_with_uvc] <- 1
+    parameters_list[[paste0("uvc_", setting)]] <- uvc
+  }
+
+  if(coverage_type == "targeted") {
+    indices_with_uvc <- sort(
+      x = parameters_list$setting_sizes[[setting]],
+      decreasing = TRUE,
+      index.return = TRUE
+    )$ix[1:number_with_uvc]
+    uvc[indices_with_uvc] <- 1
+    parameters_list[[paste0("uvc_", setting)]] <- uvc
+  }
+
+  return(parameters_list)
 }
