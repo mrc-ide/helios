@@ -1,9 +1,9 @@
-#' set_uvc
+#' Update model parameters with far UVC settings
 #'
 #' @description
-#' The set_uvc() function is a user-facing function that is used to parameterise far UVC deployment
+#' The `set_uvc()` function is a user-facing function that is used to parameterise far UVC deployment
 #' for an individual setting class (e.g. workplace). The function takes as arguments a `helios`
-#' parameter list, the `setting` for which far UVC deployment is being parameterised, the coverage
+#' parameter list, the `setting` for which far UVC deployment is being parameterised, the `coverage`
 #' of far UVC within each setting of a setting class (e.g. coverage of individual workplaces within
 #' the workplace setting class), the `coverage_type` (currently supporting random and targeted at the
 #' most populated settings), the `efficacy` of far UVC in the setting class, and the `timestep` on
@@ -72,17 +72,16 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_type, efficacy,
 
 }
 
-#' generate_far_uvc_switches
+#' Update model parameters with far UVC switches
 #'
 #' @description
-#' generate_far_uvc_switches() determines which individual settings will deploy far UVC given the settings
-#' switched on, the setting-specific coverages, and the setting-specific coverage types. The function returns
-#' generates, for each the workplace, school, leisure, and household settings, a vector of length equal to the
+#' `generate_far_uvc_switches()` determines which individual settings will deploy far UVC given the settings
+#' switched on, the setting-specific coverages, and the setting-specific coverage types. The function returns,
+#' for each the workplace, school, leisure, and household settings, a vector of length equal to the
 #' the number of settings within in setting type (e.g. number of schools within the school setting class)
 #' populated with 1's and 0's, where a 1 represents the presence of far UVC and a 0 the absence of far
 #' UVC. The function returns an updated parameter list with these vectors appended for each setting class
 #' for which far UVC has been parameterised using the `set_uvc()` function.
-#'
 #'
 #' @param parameters_list A list of model parameters as generated using `get_parameters()`
 #' @param variables_list A list of model variables as generated using `create_variables()`
