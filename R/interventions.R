@@ -13,13 +13,14 @@
 #' @param parameters_list A list of parameters as generated using `get_parameters()`
 #' @param setting A character string describing the setting in which far UVC is being deployed
 #' @param coverage A numeric value describing the proportion of the settings in which far UVC is deployed
-#' @param coverage_style A character describing the type of coverage ("random" or "targeted")
+#' @param coverage_target A character describing the target of the coverage (")
+#' @param coverage_type A character describing the type of coverage ("random" or "targeted")
 #' @param efficacy A numeric value describing the efficacy of the far UVC deployed
 #' @param timestep A numeric value describing the timestep in which far UVC is deployed
 #'
 #' @family intervention
 #' @export
-set_uvc <- function(parameters_list, setting, coverage, coverage_type, efficacy, timestep) {
+set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverage_type, efficacy, timestep) {
   if(length(setting) > 1) {
     stop("Error: Number of settings input greater than 1, parameterise for one setting at a time")
   }
@@ -30,6 +31,14 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_type, efficacy,
 
   if(coverage < 0 | coverage > 1) {
     stop("Error: coverage must take a value between 0 and 1")
+  }
+
+  if(length(coverage_target) > 1) {
+    stop("Error: Number of coverage targets input greater than 1, parameterise for one coverage target at a time")
+  }
+
+  if(coverage_target != "individuals" & coverage_target != "individuals") {
+    stop("Error: Input setting invalid - far UVC coverage only applicable to individuals or buildings")
   }
 
   if(length(coverage_type) > 1) {
