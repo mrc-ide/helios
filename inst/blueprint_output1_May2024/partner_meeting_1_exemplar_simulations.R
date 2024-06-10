@@ -39,35 +39,35 @@ library(gridExtra)
 # single value, or a vector of values for beta_community and will return the remaining setting-specific
 # beta values in the ratio
 
-generate_betas <- function(beta_community, household_ratio, school_ratio, workplace_ratio, leisure_ratio) {
-
-  # Use the community betas to generate the household, school, workplace, and leisure betas:
-  beta_household = household_ratio * beta_community
-  beta_school = school_ratio * beta_community
-  beta_workplace = workplace_ratio * beta_community
-  beta_leisure = leisure_ratio * beta_community
-
-  # Combine the betas into a dataframe:
-  betas <- data.frame(
-    beta_household = beta_household,
-    beta_school = beta_school,
-    beta_workplace = beta_workplace,
-    beta_leisure = beta_leisure,
-    beta_community = beta_community)
-
-  # Append columns giving the proportion of the total beta accounted for in each setting:
-  betas %>%
-    mutate(beta_total = beta_household + beta_school + beta_workplace + beta_leisure + beta_community) %>%
-    mutate(prop_household = beta_household / beta_total,
-           prop_school = beta_school / beta_total,
-           prop_workplace = beta_workplace / beta_total,
-           prop_leisure = beta_leisure / beta_total,
-           prop_community = beta_community / beta_total) -> betas
-
-  # Return the data frame of betas:
-  return(betas)
-
-}
+# generate_betas <- function(beta_community, household_ratio, school_ratio, workplace_ratio, leisure_ratio) {
+#
+#   # Use the community betas to generate the household, school, workplace, and leisure betas:
+#   beta_household = household_ratio * beta_community
+#   beta_school = school_ratio * beta_community
+#   beta_workplace = workplace_ratio * beta_community
+#   beta_leisure = leisure_ratio * beta_community
+#
+#   # Combine the betas into a dataframe:
+#   betas <- data.frame(
+#     beta_household = beta_household,
+#     beta_school = beta_school,
+#     beta_workplace = beta_workplace,
+#     beta_leisure = beta_leisure,
+#     beta_community = beta_community)
+#
+#   # Append columns giving the proportion of the total beta accounted for in each setting:
+#   betas %>%
+#     mutate(beta_total = beta_household + beta_school + beta_workplace + beta_leisure + beta_community) %>%
+#     mutate(prop_household = beta_household / beta_total,
+#            prop_school = beta_school / beta_total,
+#            prop_workplace = beta_workplace / beta_total,
+#            prop_leisure = beta_leisure / beta_total,
+#            prop_community = beta_community / beta_total) -> betas
+#
+#   # Return the data frame of betas:
+#   return(betas)
+#
+# }
 
 #----- 2) Matching Setting Betas to R0 Using Final Epidemic Size: 3:2:2:2:1 ------------------------
 
@@ -205,8 +205,10 @@ simulation_output %>%
 ##' beta_community = 0.1
 ##'
 
+rm(list = ls()); dev.off()
+
 # Use generate_betas() to create a dataframe of betas for all settings:
-betas <- generate_betas(beta_community = 0.062,
+betas <- generate_betas(beta_community = 0.42,
                         household_ratio = 3,
                         school_ratio = 3,
                         workplace_ratio = 3,
@@ -275,6 +277,8 @@ parameters_list$beta_community
 ##' 0.08                0.887
 ##' 0.081               0.9041
 ##' 0.085               0.9111
+##' 0.019               0.99
+##' 0.42(ish)           0.999
 
 ##' Betas that match R0s of interest:
 ##'
@@ -284,7 +288,7 @@ parameters_list$beta_community
 ##' 2       0.8       0.062             0.8001        t = 250
 ##' 2.5     0.89      0.08              0.893         t = 200
 ##' 3       0.94      0.097             0.9415        t = 175
-##'
+##' 9       0.9998    0.42(ish)         0.9984        t = 100
 
 #----- 4) Exemplar Model Runs: 3:2:2:2:1 -----------------------------------------------------------
 

@@ -4,7 +4,7 @@
 \alias{get_parameters}
 \title{Establish the list of model parameters}
 \usage{
-get_parameters(overrides = list())
+get_parameters(overrides = list(), archetype = "none")
 }
 \arguments{
 \item{overrides}{A named list of parameters values to be used instead of the defaults.
@@ -68,6 +68,8 @@ Far UVC Intervention Parameters:
 \item \code{far_uvc_household_efficacy}: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
 \item \code{far_uvc_household_timestep}: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
 }}
+
+\item{archetype}{A text string indicating the pathogen archetype parameter set to load (default = "none", current options are flu, sars_cov_2, and measles)}
 }
 \description{
 This function creates a named list of model parameters which are to be used
