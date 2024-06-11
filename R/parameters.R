@@ -60,9 +60,10 @@
 #' * `far_uvc_household_coverage`: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
 #' * `far_uvc_household_efficacy`: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_household_timestep`: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
+#' @param archetype A text string indicating the pathogen archetype parameter set to load (default = "none", current options are flu, sars_cov_2, and measles)
 #' @family parameters
 #' @export
-get_parameters <- function(overrides = list()) {
+get_parameters <- function(overrides = list(), archetype = "none") {
 
   # Open a list of parameters to store
   parameters <- list(
@@ -85,6 +86,7 @@ get_parameters <- function(overrides = list()) {
     leisure_mean_size = 50,
     leisure_overdispersion_size = 2,
     leisure_prop_max = 0.1,
+
     duration_exposed = 2,
     duration_infectious = 4,
     beta_household = 0.5, # check this as default
@@ -141,6 +143,11 @@ get_parameters <- function(overrides = list()) {
     parameters[[name]] <- overrides[[name]]
   }
 
+  # Ensure archetype input from recognised options:
+  if(!(archetype %in% c("none", "flu", "measles", "sars_cov_2"))) {
+    stop('archetype not recognised')
+  }
+
   # Check if dt is < 1 and whether it can evenly divide 1 (i.e. 1/x should return an integer)
   if (parameters$dt > 1 | parameters$dt == 0) {
     stop("dt must be less than 1 and greater than 0")
@@ -158,6 +165,40 @@ get_parameters <- function(overrides = list()) {
   }
   if (parameters$endemic_or_epidemic == "endemic" & is.null(parameters$prob_inf_external)) {
     stop("prob_inf_external must be specified if endemic_or_epidemic is set to endemic")
+  }
+
+  # Overwrite parameters if archetype specified:
+  # Flu (R0 ~ 1.5)
+  if(archetype == "flu") {
+    parameters$duration_exposed = 1
+    parameters$duration_infectious = 2
+    parameters$beta_household = 0.132
+    parameters$beta_workplace = 0.132
+    parameters$beta_school = 0.132
+    parameters$beta_leisure = 0.132
+    parameters$beta_community = 0.044
+  }
+
+  # SARS-CoV-2 (R0 ~ 2.5)
+  if(archetype == "sars_cov_2") {
+    parameters$duration_exposed = 2
+    parameters$duration_infectious = 4
+    parameters$beta_household = 0.24
+    parameters$beta_workplace = 0.24
+    parameters$beta_school = 0.24
+    parameters$beta_leisure = 0.24
+    parameters$beta_community = 0.08
+  }
+
+  # Measles (R0 ~ 9)
+  if(archetype == "measles") {
+    parameters$duration_exposed = 8
+    parameters$duration_infectious = 5
+    parameters$beta_household = 1.26
+    parameters$beta_workplace = 1.26
+    parameters$beta_school = 1.26
+    parameters$beta_leisure = 1.26
+    parameters$beta_community = 0.42
   }
 
   # Check that all setting-specific betas are of length 1:
