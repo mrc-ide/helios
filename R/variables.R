@@ -88,8 +88,12 @@ create_variables <- function(parameters_list) {
   )
 
   # Store setting sizes in a list:
-  setting_sizes <- get_setting_sizes(variables_list = variables_list,
-                                     leisure_sizes = leisure_setting_sizes)
+  setting_sizes <- list(
+    workplace = get_setting_size(variables_list, setting = "workplace"),
+    school = get_setting_size(variables_list, setting = "school"),
+    leisure = leisure_setting_sizes,
+    household = get_setting_size(variables_list, setting = "household"),
+  )
 
   # Append setting sizes to variables_list:
   parameters_list$setting_sizes <- setting_sizes
