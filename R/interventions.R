@@ -101,38 +101,38 @@ generate_setting_far_uvc_switches <- function(parameters_list, variables_list, s
   coverage_target <- parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]]
   coverage_type <- parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]]
 
-  if (coverage_type == "random" && coverage_target == "buildings") {
+  if (coverage_target == "buildings") {
     total <- length(setting_size)
     uvc_switches <- rep(0, total)
     total_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * total)
-    indices_with_uvc <- sample.int(n = total, size = total_with_uvc, replace = FALSE)
-    uvc_switches[indices_with_uvc] <- 1
-    parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
+
+    if (coverage_type == "random") {
+      indices_with_uvc <- sample.int(n = total, size = total_with_uvc, replace = FALSE)
+      uvc_switches[indices_with_uvc] <- 1
+      parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
+    } else if (coverage_type == "targeted") {
+      indices_with_uvc <- sort(
+        x = setting_size,
+        decreasing = TRUE,
+        index.return = TRUE
+      )$ix[1:total_with_uvc]
+      uvc_switches[indices_with_uvc] <- 1
+      parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
+    }
   }
 
-  if (coverage_type == "targeted" && coverage_target == "buildings") {
-    total <- length(setting_size)
-    uvc_switches <- rep(0, total)
-    total_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * total)
-    indices_with_uvc <- sort(
-      x = setting_size,
-      decreasing = TRUE,
-      index.return = TRUE
-    )$ix[1:total_with_uvc]
-    uvc_switches[indices_with_uvc] <- 1
-    parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
-  }
-
-  if (coverage_type == "random" && coverage_target == "individuals") {
-    # Need to sample individual locations until a set proportion of total individuals are covered with far UVC
-    stop("Not implemented!")
-  }
-
-  if (coverage_type == "targeted" && coverage_target == "individuals") {
+  if (coverage_target == "individuals") {
     total <- sum(setting_size)
+    uvc_switches <- rep(0, length(setting_size))
     total_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * total)
-    # Need to order locations and match a set proportion of total individuals are covered with far UVC
-    stop("Not implemented!")
+
+    if (coverage_type == "random") {
+      # Need to sample individual locations until a set proportion of total individuals are covered with far UVC
+      stop("Not implemented!")
+    } else if (coverage_type == "targeted") {
+      # Need to order locations and match a set proportion of total individuals are covered with far UVC
+      stop("Not implemented!")
+    }
   }
 
   return(parameters_list)
