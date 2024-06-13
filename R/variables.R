@@ -92,7 +92,7 @@ create_variables <- function(parameters_list) {
     workplace = get_setting_size(variables_list, setting = "workplace"),
     school = get_setting_size(variables_list, setting = "school"),
     leisure = leisure_setting_sizes,
-    household = get_setting_size(variables_list, setting = "household"),
+    household = get_setting_size(variables_list, setting = "household")
   )
 
   # Append setting sizes to variables_list:
