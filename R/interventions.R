@@ -92,26 +92,21 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
 }
 
 generate_setting_far_uvc_switches <- function(parameters_list, variables_list, setting) {
+  if(setting == "leisure") {
+    total <- length(parameters_list$leisure_setting_sizes)
+  } else {
+    total <- length(variables_list[[setting]]$get_categories())
+  }
+
+  uvc <- rep(0, total)
 
   coverage_target <- parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]]
 
   if(coverage_target == "buildings") {
-    if(setting == "leisure") {
-      total <- length(parameters_list$leisure_setting_sizes)
-    } else {
-      total <- length(variables_list[[setting]]$get_categories())
-    }
-  }
-
-  if(coverage_target == "individuals") {
-    # total <- parameters_list
-    # Needs to be the total of people in a particular setting
-    # Will need to output with indices attached too (i.e. far UVC off for anyone not in the particular setting)
+    number_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * total)
+  } else if(coverage_target == "individuals") {
     stop("Not implemented yet!")
   }
-
-  uvc <- rep(0, total)
-  number_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * total)
 
   coverage_type <- parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]]
 
