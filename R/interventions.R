@@ -130,8 +130,11 @@ generate_setting_far_uvc_switches <- function(parameters_list, variables_list, s
       # Need to sample individual locations until a set proportion of total individuals are covered with far UVC
       stop("Not implemented!")
     } else if (coverage_type == "targeted") {
-      # Need to order locations and match a set proportion of total individuals are covered with far UVC
-      stop("Not implemented!")
+      setting_size_sorted <- sort(x = setting_size, decreasing = TRUE, index.return = TRUE)
+      # Note here that the cumulative sum is likely going to be bigger than the required total_with_uvc
+      final_index <- min(which(cumsum(setting_size_sorted$x) >= total_with_uvc))
+      uvc_switches[1:final_index] <- 1
+      parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
     }
   }
 
