@@ -128,6 +128,13 @@ generate_setting_far_uvc_switches <- function(parameters_list, variables_list, s
 
     if (coverage_type == "random") {
       # Need to sample individual locations until a set proportion of total individuals are covered with far UVC
+      sum <- 0
+      indices <- c()
+      while(sum < total_with_uvc) {
+        # Draw a random index, add that to the indices, increment sum
+      }
+      # uvc_switches[indices] <- 1
+      # parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
       stop("Not implemented!")
     } else if (coverage_type == "targeted") {
       setting_size_sorted <- sort(x = setting_size, decreasing = TRUE, index.return = TRUE)
