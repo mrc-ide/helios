@@ -91,6 +91,23 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
   return(parameters_list)
 }
 
+
+#' Generate far UVC switches for particular setting
+#'
+#' This is a helper function to generate the far UVC switches for each given
+#' location, as used in `generate_far_uvc_switches()`. With buildings as the
+#' target, then a specified number of buildings have far UVC installed (either
+#' randomly selected, or in decreasing order of size). Alternatively, with
+#' individuals as the target, buildings are chosen (again either at random or
+#' in decreasing order of size) until a specified number of individuals recieve
+#' the far UVC intervention.
+#'
+#' @param parameters_list A list of model parameters as generated using `get_parameters()`
+#' @param variables_list A list of model variables as generated using `create_variables()`
+#' @param setting One of `"workplace"`, `"school"`, `"household"`, or `"leisure"`
+#'
+#' @family intervention
+#' @export
 generate_setting_far_uvc_switches <- function(parameters_list, variables_list, setting) {
   if (setting == "leisure") {
     setting_size <- parameters_list$leisure_setting_sizes
@@ -121,24 +138,32 @@ generate_setting_far_uvc_switches <- function(parameters_list, variables_list, s
     }
   }
 
+  # Note here that the cumulative sum is likely going to be bigger than the required total_with_uvc
   if (coverage_target == "individuals") {
     total <- sum(setting_size)
     uvc_switches <- rep(0, length(setting_size))
     total_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * total)
 
     if (coverage_type == "random") {
-      # Need to sample individual locations until a set proportion of total individuals are covered with far UVC
       sum <- 0
       indices <- c()
-      while(sum < total_with_uvc) {
-        # Draw a random index, add that to the indices, increment sum
+      household_indices <- 1:length(setting_size)
+
+      while (sum < total_with_uvc) {
+        i <- sample(household_indices, 1)
+        sum <- sum + setting_size[i]
+        indices <- c(indices, i)
+        household_indices <- setdiff(household_indices, i)
+        if (length(household_indices) == 0) {
+          stop("Insufficient individuals to meet far UVC coverage")
+        }
       }
-      # uvc_switches[indices] <- 1
-      # parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
-      stop("Not implemented!")
+
+      uvc_switches[indices] <- 1
+      parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
+
     } else if (coverage_type == "targeted") {
       setting_size_sorted <- sort(x = setting_size, decreasing = TRUE, index.return = TRUE)
-      # Note here that the cumulative sum is likely going to be bigger than the required total_with_uvc
       final_index <- min(which(cumsum(setting_size_sorted$x) >= total_with_uvc))
       uvc_switches[1:final_index] <- 1
       parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
