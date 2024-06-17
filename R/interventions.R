@@ -13,7 +13,7 @@
 #' @param parameters_list A list of parameters as generated using `get_parameters()`
 #' @param setting A character string describing the setting in which far UVC is being deployed
 #' @param coverage A numeric value describing the proportion of the settings in which far UVC is deployed
-#' @param coverage_target A character describing the target of the coverage (")
+#' @param coverage_target A character describing the target of the coverage ("buildings" or "individuals")
 #' @param coverage_type A character describing the type of coverage ("random" or "targeted")
 #' @param efficacy A numeric value describing the efficacy of the far UVC deployed
 #' @param timestep A numeric value describing the timestep in which far UVC is deployed

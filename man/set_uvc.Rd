@@ -21,7 +21,7 @@ set_uvc(
 
 \item{coverage}{A numeric value describing the proportion of the settings in which far UVC is deployed}
 
-\item{coverage_target}{A character describing the target of the coverage (")}
+\item{coverage_target}{A character describing the target of the coverage ("buildings" or "individuals")}
 
 \item{coverage_type}{A character describing the type of coverage ("random" or "targeted")}
 
