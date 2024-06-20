@@ -553,7 +553,7 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
 generate_initial_households_bootstrap <- function(parameters_list) {
 
   ## Checking country is either "UK" or "USA"
-  country <- parameters_list$country
+  country <- parameters_list$household_distribution_country
   if (!(country %in% c("USA", "UK"))) {
     stop("Country specified must be either USA or UK")
   }
