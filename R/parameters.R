@@ -99,6 +99,8 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     render_diagnostics = FALSE,
     household_distribution_country = "USA",
     school_distribution_generation = "empirical",
+    workplace_distribution_generation = "empirical",
+    workplace_distribution_country = "USA",
     endemic_or_epidemic = "epidemic",
     duration_immune = NULL,
     prob_inf_external = NULL,
@@ -170,7 +172,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   # Checking distribution generation is either empirical or synthetic
   if (!(parameters$household_distribution_country %in% c("UK", "USA", "custom"))) {
     stop("household_distribution_country must be set to either UK, USA or custom")
-  }
+ }
 
   # Overwrite parameters if archetype specified:
   # Flu (R0 ~ 1.5)

@@ -54,10 +54,14 @@ create_variables <- function(parameters_list) {
   school_variable <- individual::CategoricalVariable$new(categories = as.character(0:num_schools), initial_values = initial_school_settings)
 
   # Workplace setting variable
-  initial_workplace_settings <- generate_initial_workplaces(parameters_list = parameters_list, age_class_variable = age_class_variable, school_variable = school_variable)
-  num_workplaces <- max(as.numeric(initial_workplace_settings))
-  if(num_workplaces <= 2) {
-    message("There are less than or equal to 2 workplaces. Consider the population size may be too small!")
+  if (parameters_list$workplace_distribution_generation == "empirical") {
+    initial_workplace_settings <- generate_initial_workplaces(parameters_list = parameters_list, age_class_variable = age_class_variable, school_variable = school_variable)
+    num_workplaces <- max(as.numeric(initial_workplace_settings))
+    if(num_workplaces <= 2) {
+      message("There are less than or equal to 2 workplaces. Consider the population size may be too small!")
+    }
+  } else {
+    stop("workplace_distribution_generation must be set to empirical currently")
   }
   workplace_variable <- individual::CategoricalVariable$new(categories = as.character(0:num_workplaces), initial_values = initial_workplace_settings)
 
@@ -342,16 +346,23 @@ generate_initial_workplaces <- function(parameters_list, age_class_variable, sch
   if (!("workplace_c" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called workplace_c")
   }
+  if (!("USA" %in% parameters_list$workplace_distribution_country)) {
+    stop("workplace_distribution_country must be set to  the USA")
+  }
 
   # Calculating number of unassigned adults and assigning them to workplaces
   set.seed(parameters_list$seed)
   index_not_school <- school_variable$get_index_of(values = c("0"))$to_vector()
   index_adults <- age_class_variable$get_index_of("adult")$to_vector()
   index_unassigned_adults <- intersect(index_not_school, index_adults)
-  workplace_sizes <- sample_offset_truncated_power_distribution(N = length(index_unassigned_adults),
-                                                                prop_max = parameters_list$workplace_prop_max,
-                                                                a = parameters_list$workplace_a,
-                                                                c = parameters_list$workplace_c)
+  if (parameters_list$workplace_distribution_country == "USA") {
+    workplace_sizes <- sample_offset_truncated_power_distribution(N = length(index_unassigned_adults),
+                                                                  prop_max = parameters_list$workplace_prop_max,
+                                                                  a = parameters_list$workplace_a,
+                                                                  c = parameters_list$workplace_c)
+  } else {
+    stop("workplace_distribution_country must be set to USA - other countries not implemented yet")
+  }
   workplace_indices <- unlist(sapply(1:length(workplace_sizes), function(i) rep(as.character(i), workplace_sizes[i])))
   adult_workplace_assignments <- sample(workplace_indices, replace = FALSE)
 
