@@ -13,9 +13,10 @@ create_variables <- function(parameters_list) {
 
   # Initialise and populate the age and household variables
 
-  # If user wants to use empirical distribution of households and ages from ONS sample
+  # If user wants to use empirical distribution of households and ages from ONS (UK) or RTI synth pop (USA)
   if (parameters_list$household_distribution_generation == "empirical") {
-    # Bootstrap sampling of households from ONS 2011 Census reference panel of household sizes and age composition
+    # Bootstrap sampling of households from either ONS 2011 Census reference panel of household sizes and age composition
+    # or RTI synthetic population of household sizes and age composition for San Francisco
     household_age_list <- generate_initial_households_bootstrap(parameters_list = parameters_list)
 
     # Age class variable
