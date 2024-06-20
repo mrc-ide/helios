@@ -169,7 +169,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   }
 
   # Checking distribution generation is either empirical or synthetic
-  if (!(household_distribution_generation %in% c("empirical", "synthetic"))) {
+  if (!(parameters$household_distribution_generation %in% c("empirical", "synthetic"))) {
     stop("household_distribution_generation must be set to either empirical or synthetic")
   }
 
