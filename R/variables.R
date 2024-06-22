@@ -223,6 +223,12 @@ generate_initial_schools <- function(parameters_list, age_class_variable) {
   if (!("school_student_staff_ratio" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called school_student_staff_ratio")
   }
+  if (!("school_distribution_generation" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called school_distribution_generation")
+  }
+  if (!("school_distribution_country" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called school_distribution_country")
+  }
 
   set.seed(parameters_list$seed)
 
@@ -274,11 +280,23 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
   if (!("school_student_staff_ratio" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called school_student_staff_ratio")
   }
+  if (!("school_distribution_generation" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called school_distribution_generation")
+  }
+  if (!("school_distribution_country" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called school_distribution_country")
+  }
 
   # Calculating number of children and assigning them to schools
   set.seed(parameters_list$seed)
-  empirical_school_sizes <- schools_england$`headcount of pupils`
-  empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
+
+  if (parameters_list$school_distribution_country == "UK") {
+    empirical_school_sizes <- schools_england$`headcount of pupils`
+    empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
+  } else {
+    stop("school_distribution_country must be set to UK - other countries not implemented yet")
+  }
+
   num_children <- age_class_variable$get_size_of("child") # get number of children
   index_children <- age_class_variable$get_index_of("child")$to_vector() # get the index of children in age_class_variable
   school_sizes <- c()

@@ -99,6 +99,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     render_diagnostics = FALSE,
     household_distribution_generation = "empirical",
     school_distribution_generation = "empirical",
+    school_distribution_country = "USA",
     endemic_or_epidemic = "epidemic",
     duration_immune = NULL,
     prob_inf_external = NULL,
@@ -165,6 +166,14 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   }
   if (parameters$endemic_or_epidemic == "endemic" & is.null(parameters$prob_inf_external)) {
     stop("prob_inf_external must be specified if endemic_or_epidemic is set to endemic")
+  }
+
+  if (!(parameters$school_distribution_generation %in% c("empirical", "synthetic"))) {
+    stop("school_distribution_generation must be set to either empirical or synthetic")
+  }
+
+  if (!(parameters$school_distribution_country %in% c("UK", "USA"))) {
+    stop("school_distribution_country must be set to either UK or USA")
   }
 
   # Overwrite parameters if archetype specified:
