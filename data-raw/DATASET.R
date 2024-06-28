@@ -11,18 +11,16 @@ usethis::use_data(baseline_household_demographics)
 schools_england <- read_csv("data-raw/spc_school_level_underlying_data_23112023.csv")
 usethis::use_data(schools_england)
 
-schools_usa <- readxl::read_xls("data-raw/tabn216.40.xls")
-
 # Just the most recent years data (2019 / 2020)
-schools_usa_latest <- schools_usa |>
+schools_usa <- readxl::read_xls("data-raw/tabn216.40.xls") |>
   tibble::rowid_to_column("rowid") |>
   filter(rowid %in% c(2, 3, 39:53))
 
 # Generate appropriate column names
-schools_usa_latest[is.na(schools_usa_latest)] <- ""
-names(schools_usa_latest) <- mapply(paste0, schools_usa_latest[1, ], schools_usa_latest[2, ])
+schools_usa[is.na(schools_usa)] <- ""
+names(schools_usa) <- mapply(paste0, schools_usa[1, ], schools_usa[2, ])
 
-schools_usa_latest <- schools_usa_latest |>
+schools_usa <- schools_usa |>
   janitor::clean_names() |>
   dplyr::filter(!x23 %in% c(2, 3)) |>
   select(2:9) |>
@@ -38,10 +36,10 @@ schools_usa_latest <- schools_usa_latest |>
     )
   )
 
-df <- schools_usa_latest |>
+schools_usa <- schools_usa |>
   filter(x != "Total") |>
   left_join(
-    filter(schools_usa_latest, x == "Total") |>
+    filter(schools_usa, x == "Total") |>
       select(type, total = percent),
     by = c("type")
   ) |>
@@ -64,9 +62,10 @@ df <- schools_usa_latest |>
     ),
     percent = as.numeric(percent),
     total = as.numeric(total),
-    count = percent / 100 * total
+    count = percent / 100 * total,
+    year = 2019
   ) |>
-  arrange(type)
+  arrange(type) |>
+  select(type, size, size_midpoint, percent, total, count)
 
-df
-names(schools_usa_latest)
+usethis::use_data(schools_usa, overwrite = TRUE)
