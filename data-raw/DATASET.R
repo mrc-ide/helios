@@ -66,6 +66,6 @@ schools_usa <- schools_usa |>
     year = 2019
   ) |>
   arrange(type) |>
-  select(type, size, size_midpoint, percent, total, count)
+  select(year, type, size, size_midpoint, percent, total, count)
 
 usethis::use_data(schools_usa, overwrite = TRUE)
