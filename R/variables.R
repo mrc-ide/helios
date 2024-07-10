@@ -61,39 +61,32 @@ create_variables <- function(parameters_list) {
   }
   workplace_variable <- individual::CategoricalVariable$new(categories = as.character(0:num_workplaces), initial_values = initial_workplace_settings)
 
-  # Initialise and populate the leisure setting variable that stores all the leisure locations an individual COULD go to
   # Generating the number and sizes of each leisure setting
   leisure_setting_sizes <- sample_negbinom(N = parameters_list$human_population,
                                            prop_max = parameters_list$leisure_prop_max,
                                            mu = parameters_list$leisure_mean_size,
                                            size = parameters_list$leisure_overdispersion_size)
+
+  # Initialise and populate the leisure setting variable that stores all the leisure locations an individual COULD go to
   initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = leisure_setting_sizes) # returns list to initialise RaggedInteger
   leisure_variable <- individual::RaggedInteger$new(initial_values = initial_leisure_settings)
 
   ## Due to sampling method, not all leisure settings with a leisure_setting_size are included - here we identify and remove the leisure settings which no individual has been assigned to visit
   hypothetical_number_leisure_settings <- 1:length(leisure_setting_sizes)
   actual_assigned_leisure_settings <- unique(unlist(initial_leisure_settings))
-  leisure_not_assigned <- hypothetical_number_leisure_settings[!(hypothetical_number_leisure_settings %in% actual_assigned_leisure_settings)]
+  actual_assigned_leisure_settings <- actual_assigned_leisure_settings[order(actual_assigned_leisure_settings)]
+  leisure_setting_not_assigned_to_anyone <- hypothetical_number_leisure_settings[!(hypothetical_number_leisure_settings %in% actual_assigned_leisure_settings)]
+  if (!identical(integer(0), leisure_setting_not_assigned_to_anyone)) {
+    leisure_setting_sizes <- leisure_setting_sizes[-leisure_setting_not_assigned_to_anyone]
+  }
+  parameters_list$leisure_indices <- actual_assigned_leisure_settings # these are required in processes.R because some of the initially created leisure settings
+                                                                      # don't get included, which messes with the indexing
+  ## This means that leisure_setting_sizes is the same LENGTH as actual_assigned_leisure_settings
+  ## BUT max(actual_assigned_leisure_settings) is > than length(parameters_list$leisure_setting_sizes) because the indices in actual_assigned_leisure_settings are missing
+  ## the values from leisure_setting_not_assigned_to_anyone
 
-
-  actual_assigned_leisure_settings[!(actual_assigned_leisure_settings %in% hypothetical_number_leisure_settings)]
-
-  parameters_list$leisure_setting_sizes <- _______
-
-  leisure_not_included <- unique(unlist(initial_leisure_settings))
-
-  x <- unique(unlist(initial_leisure_settings))
-  y <- x[order(x)]
-
-  max(y)
-  which(!(1:max(y) %in% y))
-
-  parameters_list$leisure_setting_sizes <- leisure_setting_sizes
-
-
-  possible_leisure_settings <- unique(unlist(initial_leisure_settings))
-  possible_leisure_settings <- possible_leisure_settings[order(possible_leisure_settings)]
-  specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(possible_leisure_settings),
+  ## Creating initial CategoricalVariable tracking leisure location an individiual goes to on a given day, which we will dynamically update
+  specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(actual_assigned_leisure_settings[order(actual_assigned_leisure_settings)]),
                                                                        initial_values = rep(as.character(0), parameters_list$human_population))
 
   # Return the list of model variables
