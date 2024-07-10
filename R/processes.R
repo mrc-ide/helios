@@ -87,6 +87,17 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     household_size_list[[i]] <- length(household_index_list[[i]])
   }
 
+  # Creating vector of setting-specific riskinesses for households
+  if (parameters_list$setting_specific_riskiness_household) {
+    household_specific_riskiness <- EnvStats::rlnormTrunc(n = num_households,
+                                                          meanlog = parameters_list$setting_specific_riskiness_household_meanlog,
+                                                          sdlog = parameters_list$setting_specific_riskiness_household_sdlog,
+                                                          min = parameters_list$setting_specific_riskiness_household_min,
+                                                          max = parameters_list$setting_specific_riskiness_household_max)
+  } else {
+    household_specific_riskiness <- rep(1, num_households)
+  }
+
   ##### WORKPLACES #####
   # Calculate the number of workplaces:
   num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
@@ -101,6 +112,17 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     workplace_size_list[[i]] <- length(workplace_index_list[[i]])
   }
 
+  # Creating vector of setting-specific riskinesses for workplaces
+  if (parameters_list$setting_specific_riskiness_workplace) {
+    workplace_specific_riskiness <- EnvStats::rlnormTrunc(n = num_workplaces,
+                                                          meanlog = parameters_list$setting_specific_riskiness_workplace_meanlog,
+                                                          sdlog = parameters_list$setting_specific_riskiness_workplace_sdlog,
+                                                          min = parameters_list$setting_specific_riskiness_workplace_min,
+                                                          max = parameters_list$setting_specific_riskiness_workplace_max)
+  } else {
+    workplace_specific_riskiness <- rep(1, num_workplaces)
+  }
+
   ##### SCHOOLS #####
   # Calculate the number of schools:
   num_schools <- max(as.numeric(variables_list$school$get_categories()))
@@ -113,6 +135,35 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     school_bitset_list[[i]] <- variables_list$school$get_index_of(as.character(i))
     school_index_list[[i]] <- school_bitset_list[[i]]$to_vector()
     school_size_list[[i]] <- length(school_index_list[[i]])
+  }
+
+  # Creating vector of setting-specific riskinesses for schools
+  if (parameters_list$setting_specific_riskiness_school) {
+    school_specific_riskiness <- EnvStats::rlnormTrunc(n = num_schools,
+                                                          meanlog = parameters_list$setting_specific_riskiness_school_meanlog,
+                                                          sdlog = parameters_list$setting_specific_riskiness_school_sdlog,
+                                                          min = parameters_list$setting_specific_riskiness_school_min,
+                                                          max = parameters_list$setting_specific_riskiness_school_max)
+  } else {
+    school_specific_riskiness <- rep(1, num_schools)
+  }
+
+  ##### LEISURE #####
+  # Leisure occupancy is dynamically updated each day, so we don't calculate that here.
+  # Still need to calculate setting-specific riskiness, which we do calculate here.
+
+  # Calculate the number of leisure:
+  num_leisure <- length(unique(as.numeric(variables_list$specific_leisure$get_categories()))) ## need to double check this actually gives us all leisure settings
+
+  # Creating vector of setting-specific riskinesses for leisure settings
+  if (parameters_list$setting_specific_riskiness_leisure) {
+    leisure_specific_riskiness <- EnvStats::rlnormTrunc(n = num_leisure,
+                                                       meanlog = parameters_list$setting_specific_riskiness_leisure_meanlog,
+                                                       sdlog = parameters_list$setting_specific_riskiness_leisure_sdlog,
+                                                       min = parameters_list$setting_specific_riskiness_leisure_min,
+                                                       max = parameters_list$setting_specific_riskiness_leisure_max)
+  } else {
+    leisure_specific_riskiness <- rep(1, num_leisure)
   }
 
   ## Process Function
@@ -138,12 +189,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       #  Calculate the FOI for the i-th household - with and without farUVC installed
       if (parameters_list$far_uvc_household) {
         if ((parameters_list$uvc_household[i] == 1) & (t > parameters_list$far_uvc_household_timestep)) {
-          spec_household_FOI <- (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]) ## this calculation needs more in it
+          spec_household_FOI <- household_specific_riskiness[i] * (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]) ## this calculation needs more in it
         } else {
-          spec_household_FOI <- parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]] ## this calculation needs more in it
+          spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]] ## this calculation needs more in it
         }
       } else {
-        spec_household_FOI <- parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]] ## this calculation needs more in it
+        spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]] ## this calculation needs more in it
       }
 
       # Assign the i-th households FOI to the indices of the individuals residing in that household
@@ -168,12 +219,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
       if (parameters_list$far_uvc_workplace) {
         if ((parameters_list$uvc_workplace[i] == 1) & (t > parameters_list$far_uvc_workplace_timestep)) {
-          spec_workplace_FOI <- (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]) ## this calculation needs more in it
+          spec_workplace_FOI <- workplace_specific_riskiness[i] * (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]) ## this calculation needs more in it
         } else {
-          spec_workplace_FOI <- parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]] ## this calculation needs more in it
+          spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]] ## this calculation needs more in it
         }
       } else {
-        spec_workplace_FOI <- parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]] ## this calculation needs more in it
+        spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]] ## this calculation needs more in it
       }
 
       # Store the workplace-specific FOR in the indices of all individuals that work there:
@@ -198,12 +249,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
       if (parameters_list$far_uvc_school) {
         if ((parameters_list$uvc_school[i] == 1) & (t > parameters_list$far_uvc_school_timestep)) {
-          spec_school_FOI <- (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]) ## this calculation needs more in it
+          spec_school_FOI <- school_specific_riskiness[i] * (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]) ## this calculation needs more in it
         } else {
-          spec_school_FOI <- parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]] ## this calculation needs more in it
+          spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]] ## this calculation needs more in it
         }
       } else {
-        spec_school_FOI <- parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]] ## this calculation needs more in it
+        spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]] ## this calculation needs more in it
       }
 
       # Store the school-specific FOI at the indices of all children that attend it:
@@ -215,16 +266,16 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
 
     if ((t * parameters_list$dt) == floor((t * parameters_list$dt))) {
 
-      # Creating vector to store which leisure setting individuals visit on a given timestep (NOTE we need to change this so that it's day)
+      # Creating vector to store which leisure setting individuals visit on a given day
       leisure_visit <- vector(mode = "numeric", length = parameters_list$human_population)
 
-      # For each individual, work out which leisure setting they go to that particular night - 0 = they don't go to any
+      # For each individual, work out which leisure setting they go to that particular day. 0 = they don't go to any
       for (i in seq(parameters_list$human_population)) {
 
         # Which leisure settings do individuals have associated with them (and could visit)
         potential_leisure_visits <- variables_list$leisure$get_values(i)
 
-        # Sampling wich leisure setting actually visited (0 = visit none and staying home)
+        # Sampling which leisure setting actually visited (0 = visit none and staying home)
         leisure_visit[i] <- sample(x = unlist(potential_leisure_visits), size = 1)
       }
 
@@ -257,14 +308,17 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
         spec_leisure_I <- I$copy()$and(spec_leisure)
 
         # Calculate the leisure-specific FOI for the i-th leisure setting - with and without farUVC installed
+        ## Note that we index leisure_specific_riskiness using spec_leisure. This is because leisure_settings_visited can be smaller
+        ## than all_leisure_settings (i.e. some leisure settings might not be visited on a given day).
+        ## I THINK this means also far uvc_leisure[i] is WRONG - will need to check.
         if (parameters_list$far_uvc_leisure) {
           if ((parameters_list$uvc_leisure[i] == 1) & (t > parameters_list$far_uvc_leisure_timestep)) {
-            spec_leisure_FOI <- (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
+            spec_leisure_FOI <- leisure_specific_riskiness[spec_leisure] * (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
           } else {
-            spec_leisure_FOI <- parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+            spec_leisure_FOI <- leisure_specific_riskiness[spec_leisure] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
           }
         } else {
-          spec_leisure_FOI <- parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+          spec_leisure_FOI <- leisure_specific_riskiness[spec_leisure] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
         }
 
         # Store the leisure setting-specific FOI at the indices of all individuals that attend it:

@@ -23,8 +23,9 @@ create_variables <- function(parameters_list) {
     age_class_variable <- individual::CategoricalVariable$new(categories = age_classes, initial_values = household_age_list$age_class_vector)
 
     # Household variable
-    household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(household_age_list$individual_households)),
-                                                              initial_values = as.character(household_age_list$individual_households))
+    household_variable <- individual::CategoricalVariable$new(categories = sprintf("%d", 1:max(household_age_list$individual_households)),
+                                                              initial_values = sprintf("%d", household_age_list$individual_households))
+
   # If user wants to specify age-class proportions and associated households manually
   } else {
     # Specify age-class proportions manually
@@ -37,7 +38,7 @@ create_variables <- function(parameters_list) {
     # Household variable
     initial_households <- generate_initial_households(parameters_list = parameters_list, age_class_variable = age_class_variable)
     household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(initial_households)),
-                                                  initial_values = as.character(initial_households))
+                                                              initial_values = as.character(initial_households))
   }
 
   # School setting variable
@@ -66,14 +67,34 @@ create_variables <- function(parameters_list) {
                                            prop_max = parameters_list$leisure_prop_max,
                                            mu = parameters_list$leisure_mean_size,
                                            size = parameters_list$leisure_overdispersion_size)
-  parameters_list$leisure_setting_sizes <- leisure_setting_sizes
-  initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = parameters_list$leisure_setting_sizes) # returns list to initialise RaggedInteger
+  initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = leisure_setting_sizes) # returns list to initialise RaggedInteger
   leisure_variable <- individual::RaggedInteger$new(initial_values = initial_leisure_settings)
+
+  ## Due to sampling method, not all leisure settings with a leisure_setting_size are included - here we identify and remove the leisure settings which no individual has been assigned to visit
+  hypothetical_number_leisure_settings <- 1:length(leisure_setting_sizes)
+  actual_assigned_leisure_settings <- unique(unlist(initial_leisure_settings))
+  leisure_not_assigned <- hypothetical_number_leisure_settings[!(hypothetical_number_leisure_settings %in% actual_assigned_leisure_settings)]
+
+
+  actual_assigned_leisure_settings[!(actual_assigned_leisure_settings %in% hypothetical_number_leisure_settings)]
+
+  parameters_list$leisure_setting_sizes <- _______
+
+  leisure_not_included <- unique(unlist(initial_leisure_settings))
+
+  x <- unique(unlist(initial_leisure_settings))
+  y <- x[order(x)]
+
+  max(y)
+  which(!(1:max(y) %in% y))
+
+  parameters_list$leisure_setting_sizes <- leisure_setting_sizes
+
 
   possible_leisure_settings <- unique(unlist(initial_leisure_settings))
   possible_leisure_settings <- possible_leisure_settings[order(possible_leisure_settings)]
   specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(possible_leisure_settings),
-                                                           initial_values = rep(as.character(0), parameters_list$human_population))
+                                                                       initial_values = rep(as.character(0), parameters_list$human_population))
 
   # Return the list of model variables
   variables_list <- list(
