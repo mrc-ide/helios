@@ -325,7 +325,6 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
         } else {
           spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
         }
-        print(c(i, spec_leisure_FOI))
 
         # Store the leisure setting-specific FOI at the indices of all individuals that attend it:
         leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
