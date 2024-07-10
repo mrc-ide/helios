@@ -312,18 +312,20 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
         spec_leisure_I <- I$copy()$and(spec_leisure)
 
         # Calculate the leisure-specific FOI for the i-th leisure setting - with and without farUVC installed
-        ## WILL NEED TO CHECK far_uvc_leisure[i] is correct once Adam's PR is in - NEED to CHECK
-        ## FOR REFERENCE - FAR_UVC_LEISURE SHOULD BE SAME LENGTH AS NUM_LEISURE, WHICH CAN BE SMALLER
-        ## THAN THE ORIGINAL NUMBER OF LEISURE SETTINGS PRODUCED - SEE LINES 75-81 IN VARIABLES.R
+        ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure settings
+        ## (this is in contrast to leisure_indices, which uses the original indices from their generation,
+        ##  and which span 1 to max(leisure_indices) with some gaps)
+        ## WILL NEED TO CHECK far_uvc_leisure[i] is correct once Adam's PR is in for the same reason
         if (parameters_list$far_uvc_leisure) {
           if ((parameters_list$uvc_leisure[i] == 1) & (t > parameters_list$far_uvc_leisure_timestep)) {
-            spec_leisure_FOI <- leisure_specific_riskiness[spec_leisure_setting] * (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
+            spec_leisure_FOI <- leisure_specific_riskiness[i] * (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
           } else {
-            spec_leisure_FOI <- leisure_specific_riskiness[spec_leisure_setting] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+            spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
           }
         } else {
-          spec_leisure_FOI <- leisure_specific_riskiness[spec_leisure_setting] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+          spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
         }
+        print(c(i, spec_leisure_FOI))
 
         # Store the leisure setting-specific FOI at the indices of all individuals that attend it:
         leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
