@@ -37,8 +37,8 @@ create_variables <- function(parameters_list) {
 
     # Household variable
     initial_households <- generate_initial_households(parameters_list = parameters_list, age_class_variable = age_class_variable)
-    household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(initial_households)),
-                                                              initial_values = as.character(initial_households))
+    household_variable <- individual::CategoricalVariable$new(categories = sprintf("%d", 1:max(initial_households)),
+                                                              initial_values = sprintf("%d", initial_households))
   }
 
   # School setting variable
