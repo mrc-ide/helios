@@ -37,7 +37,7 @@ infection_prevalence <- c(0.0001, 0.0005, 0.001, 0.0025)
 setting_sizes <- 100
 
 schools_density <- 100 / 30 # number of m2 per classroom child
-schools_range <- seq(0.1, 3, 0.1)
+schools_range <- seq(0.1, 3, length.out = 30)
 schools_matrix <- array(dim = c(length(schools_range), length(infection_prevalence), 4))
 for (i in 1:length(schools_range)) {
   for (j in 1:length(infection_prevalence)) {
@@ -66,16 +66,6 @@ for (i in 1:length(schools_range)) {
 }
 
 colours <- c("blue4", "red4", "green4", "orange4")
-for (i in 1:30) {
-  for (j in 1:4) {
-    if (i == 1 & j == 1) {
-      plot(c(2, 4, 6, 8), schools_matrix[i, j, ], type = "l", xlab = "time", ylab = "p_inf",
-           ylim = c(1e-8, 5e-4), col = colours[j])
-    } else {
-      lines(c(2, 4, 6, 8), schools_matrix[i, j, ], type = "l", col  = colours[j])
-    }
-  }
-}
 par(mfrow = c(3, 4))
 for (i in 1:4) {
   for (j in 1:30) {
@@ -99,17 +89,10 @@ for (i in 1:4) {
 }
 for (i in 1:4) {
   plot(c(2, 4, 6, 8), schools_matrix[1, i, ] / schools_matrix[30, i, ], type = "l", xlab = "time", ylab = "p_inf",
-       ylim = c(0, 10), col = colours[i])
+       ylim = c(0, max(schools_matrix[1, i, ] / schools_matrix[30, i, ])), col = colours[i])
 }
 
-for (i in 1:30) {
-  if (i == 1) {
-    plot(c(2, 4, 6, 8), schools_matrix[i, 2, ], type = "l", xlab = "time", ylab = "p_inf",
-         ylim = c(1e-7, 2e-5))
-  } else {
-    lines(c(2, 4, 6, 8), schools_matrix[i, 2, ], type = "l")
-  }
-}
+
 
 # ventilation rate * setting size * infection prevalence * time spent
 ratios <- apply(schools_matrix, c(2, 3), function(x) {
