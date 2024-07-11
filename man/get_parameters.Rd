@@ -39,7 +39,7 @@ These parameters are:
 \item \code{dt}: TBD
 \item \code{simulation_time}: TBD
 \item \code{household_distribution_country}: TBD
-\item \code{school_distribution_generation}: TBD
+\item \code{school_distribution_country}: TBD
 \item \code{workplace_distribution_country}: TBD
 \item \code{endemic_or_epidemic}: TBD
 \item \code{duration_immune}: TBD
