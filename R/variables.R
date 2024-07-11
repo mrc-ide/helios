@@ -257,7 +257,7 @@ generate_initial_schools <- function(parameters_list, age_class_variable) {
 #'
 #' Alternative to `generate_initial_schools`. Rather than using a parametric
 #' distribution, this function uses sampling with replacement from a reference
-#' dataset. This is known as bootstrapping. The dataset used is [`schools_england`].
+#' dataset. This is known as bootstrapping. The dataset used is [`schools_uk`].
 #'
 #' @inheritParams generate_initial_schools
 #'

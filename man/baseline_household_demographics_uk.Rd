@@ -19,7 +19,7 @@ A data frame with 10,000 rows and 9 columns.
 \seealso{
 Other data: 
 \code{\link{baseline_household_demographics_usa}},
-\code{\link{schools_england}},
+\code{\link{schools_uk}},
 \code{\link{schools_usa}}
 }
 \concept{data}

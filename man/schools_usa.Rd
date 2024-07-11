@@ -5,7 +5,7 @@
 \alias{schools_usa}
 \title{Data on US schools from 2019/2020 from the National Center for Education Statistics}
 \format{
-An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 91 rows and 7 columns.
+An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 78 rows and 7 columns.
 }
 \source{
 \url{https://nces.ed.gov/programs/digest/d21/tables/dt21_216.40.asp}
@@ -20,7 +20,7 @@ A data frame with 91 rows and 6 columns.
 Other data: 
 \code{\link{baseline_household_demographics_uk}},
 \code{\link{baseline_household_demographics_usa}},
-\code{\link{schools_england}}
+\code{\link{schools_uk}}
 }
 \concept{data}
 \keyword{datasets}
