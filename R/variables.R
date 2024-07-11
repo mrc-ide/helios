@@ -42,7 +42,7 @@ create_variables <- function(parameters_list) {
   }
 
   # School setting variable
-  if (parameters_list$school_distribution_generation == "empirical") {
+  if (parameters_list$household_distribution_country %in% c("UK", "USA")) {
     initial_school_settings <- generate_initial_schools_bootstrap(parameters_list = parameters_list, age_class_variable = age_class_variable)
   } else {
     initial_school_settings <- generate_initial_schools(parameters_list = parameters_list, age_class_variable = age_class_variable)
@@ -257,7 +257,7 @@ generate_initial_schools <- function(parameters_list, age_class_variable) {
 #'
 #' Alternative to `generate_initial_schools`. Rather than using a parametric
 #' distribution, this function uses sampling with replacement from a reference
-#' dataset. This is known as bootstrapping. The dataset used is [`schools_england`].
+#' dataset. This is known as bootstrapping. The dataset used is [`schools_uk`].
 #'
 #' @inheritParams generate_initial_schools
 #'
@@ -275,11 +275,23 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
   if (!("school_student_staff_ratio" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called school_student_staff_ratio")
   }
+  if (!("school_distribution_country" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called school_distribution_country")
+  }
 
   # Calculating number of children and assigning them to schools
   set.seed(parameters_list$seed)
-  empirical_school_sizes <- schools_england$`headcount of pupils`
-  empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
+
+  if (parameters_list$school_distribution_country == "UK") {
+    empirical_school_sizes <- schools_uk$`headcount of pupils`
+    empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
+  } else if (parameters_list$school_distribution_country == "USA") {
+    schools_usa_total <- dplyr::filter(schools_usa, type == "total")
+    empirical_school_sizes <- rep(schools_usa_total$size_midpoint, schools_usa_total$count)
+  } else {
+    stop("school_distribution_country must be set to either UK or USA - other countries not implemented yet")
+  }
+
   num_children <- age_class_variable$get_size_of("child") # get number of children
   index_children <- age_class_variable$get_index_of("child")$to_vector() # get the index of children in age_class_variable
   school_sizes <- c()
