@@ -18,7 +18,8 @@ A data frame with 24,442 rows and 268 columns.
 }
 \seealso{
 Other data: 
-\code{\link{baseline_household_demographics}}
+\code{\link{baseline_household_demographics_uk}},
+\code{\link{baseline_household_demographics_usa}}
 }
 \concept{data}
 \keyword{datasets}
