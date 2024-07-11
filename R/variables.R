@@ -286,7 +286,7 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
     empirical_school_sizes <- schools_uk$`headcount of pupils`
     empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
   } else if (parameters_list$school_distribution_country == "USA") {
-    schools_usa_total <- filter(schools_usa, type == "total")
+    schools_usa_total <- dplyr::filter(schools_usa, type == "total")
     empirical_school_sizes <- rep(schools_usa_total$size_midpoint, schools_usa_total$count)
   } else {
     stop("school_distribution_country must be set to either UK or USA - other countries not implemented yet")
