@@ -38,6 +38,12 @@ These parameters are:
 \item \code{beta_community}: TBD
 \item \code{dt}: TBD
 \item \code{simulation_time}: TBD
+\item \code{household_distribution_country}: TBD
+\item \code{school_distribution_generation}: TBD
+\item \code{workplace_distribution_country}: TBD
+\item \code{endemic_or_epidemic}: TBD
+\item \code{duration_immune}: TBD
+\item \code{prob_inf_external}: TBD
 }
 
 Rendering Parameters
