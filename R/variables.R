@@ -348,11 +348,11 @@ generate_initial_workplaces <- function(parameters_list, age_class_variable, sch
     prop_max <- 0.1
     a <- 5.36
     c <- 1.34
-  } else if (parameter_list$workplace_distribution_country == "custom") {
+  } else if (parameters_list $workplace_distribution_country == "custom") {
     prop_max <- parameters_list$workplace_prop_max
     a <- parameters_list$workplace_a
     c <-  parameters_list$workplace_c
-  } else if (parameter_list$workplace_distribution_country == "UK") {
+  } else if (parameters_list $workplace_distribution_country == "UK") {
     stop("workplace_distribution_country can currently only be set to the USA or custom - we don't have data for the UK")
   } else {
     stop("incorrectly specified workplace_distribution_country")
