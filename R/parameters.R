@@ -35,6 +35,12 @@
 #' * `beta_community`: TBD
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
+#' * `household_distribution_country`: TBD
+#' * `school_distribution_generation`: TBD
+#' * `workplace_distribution_country`: TBD
+#' * `endemic_or_epidemic`: TBD
+#' * `duration_immune`: TBD
+#' * `prob_inf_external`: TBD
 #'
 #' Rendering Parameters
 #' * `render_diagnostics`: FALSE
@@ -99,7 +105,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     render_diagnostics = FALSE,
     household_distribution_country = "USA",
     school_distribution_generation = "empirical",
-    workplace_distribution_generation = "empirical",
     workplace_distribution_country = "USA",
     endemic_or_epidemic = "epidemic",
     duration_immune = NULL,
@@ -169,10 +174,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     stop("prob_inf_external must be specified if endemic_or_epidemic is set to endemic")
   }
 
-  # Checking distribution generation is either empirical or synthetic
+  # Checking distribution country is either UK, USA or custom
   if (!(parameters$household_distribution_country %in% c("UK", "USA", "custom"))) {
     stop("household_distribution_country must be set to either UK, USA or custom")
- }
+  }
+  if (!(parameters$workplace_distribution_country %in% c("UK", "USA", "custom"))) {
+    stop("workplace_distribution_country must be set to either UK, USA or custom")
+  }
 
   # Overwrite parameters if archetype specified:
   # Flu (R0 ~ 1.5)
