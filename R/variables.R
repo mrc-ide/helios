@@ -54,14 +54,10 @@ create_variables <- function(parameters_list) {
   school_variable <- individual::CategoricalVariable$new(categories = as.character(0:num_schools), initial_values = initial_school_settings)
 
   # Workplace setting variable
-  if (parameters_list$workplace_distribution_generation == "empirical") {
-    initial_workplace_settings <- generate_initial_workplaces(parameters_list = parameters_list, age_class_variable = age_class_variable, school_variable = school_variable)
-    num_workplaces <- max(as.numeric(initial_workplace_settings))
-    if(num_workplaces <= 2) {
-      message("There are less than or equal to 2 workplaces. Consider the population size may be too small!")
-    }
-  } else {
-    stop("workplace_distribution_generation must be set to empirical currently")
+  initial_workplace_settings <- generate_initial_workplaces(parameters_list = parameters_list, age_class_variable = age_class_variable, school_variable = school_variable)
+  num_workplaces <- max(as.numeric(initial_workplace_settings))
+  if(num_workplaces <= 2) {
+    message("There are less than or equal to 2 workplaces. Consider the population size may be too small!")
   }
   workplace_variable <- individual::CategoricalVariable$new(categories = as.character(0:num_workplaces), initial_values = initial_workplace_settings)
 
@@ -346,8 +342,20 @@ generate_initial_workplaces <- function(parameters_list, age_class_variable, sch
   if (!("workplace_c" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called workplace_c")
   }
-  if (!("USA" %in% parameters_list$workplace_distribution_country)) {
-    stop("workplace_distribution_country must be set to  the USA")
+
+  ## Setting the parameters depending on which country has been specified by the user
+  if (parameters_list$workplace_distribution_country == "USA") {
+    prop_max <- 0.1
+    a <- 5.36
+    c <- 1.34
+  } else if (parameter_list$workplace_distribution_country == "custom") {
+    prop_max <- parameters_list$workplace_prop_max
+    a <- parameters_list$workplace_a
+    c <-  parameters_list$workplace_c
+  } else if (parameter_list$workplace_distribution_country == "UK") {
+    stop("workplace_distribution_country can currently only be set to the USA or custom - we don't have data for the UK")
+  } else {
+    stop("incorrectly specified workplace_distribution_country")
   }
 
   # Calculating number of unassigned adults and assigning them to workplaces
@@ -357,9 +365,9 @@ generate_initial_workplaces <- function(parameters_list, age_class_variable, sch
   index_unassigned_adults <- intersect(index_not_school, index_adults)
   if (parameters_list$workplace_distribution_country == "USA") {
     workplace_sizes <- sample_offset_truncated_power_distribution(N = length(index_unassigned_adults),
-                                                                  prop_max = parameters_list$workplace_prop_max,
-                                                                  a = parameters_list$workplace_a,
-                                                                  c = parameters_list$workplace_c)
+                                                                  prop_max = prop_max,
+                                                                  a = a,
+                                                                  c = c)
   } else {
     stop("workplace_distribution_country must be set to USA - other countries not implemented yet")
   }
