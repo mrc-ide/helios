@@ -104,7 +104,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     simulation_time = 150,
     render_diagnostics = FALSE,
     household_distribution_country = "USA",
-    school_distribution_generation = "empirical",
     school_distribution_country = "USA",
     workplace_distribution_country = "USA",
     endemic_or_epidemic = "epidemic",
@@ -185,7 +184,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   if (!(parameters$school_distribution_country %in% c("UK", "USA", "custom"))) {
     stop("school_distribution_country must be set to either UK, USA or custom")
   }
-  
+
   # Overwrite parameters if archetype specified:
   # Flu (R0 ~ 1.5)
   if(archetype == "flu") {
