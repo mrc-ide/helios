@@ -168,8 +168,8 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   }
 
   # Checking distribution generation is either empirical or synthetic
-  if (!(parameters$household_distribution_generation %in% c("empirical", "synthetic"))) {
-    stop("household_distribution_generation must be set to either empirical or synthetic")
+  if (!(parameters$household_distribution_country %in% c("UK", "USA", "custom"))) {
+    stop("household_distribution_country must be set to either UK, USA or custom")
   }
 
   # Overwrite parameters if archetype specified:
