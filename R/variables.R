@@ -343,15 +343,34 @@ generate_initial_workplaces <- function(parameters_list, age_class_variable, sch
     stop("parameters list must contain a variable called workplace_c")
   }
 
+  ## Setting the parameters depending on which country has been specified by the user
+  if (parameters_list$workplace_distribution_country == "USA") {
+    prop_max <- 0.1
+    a <- 5.36
+    c <- 1.34
+  } else if (parameters_list $workplace_distribution_country == "custom") {
+    prop_max <- parameters_list$workplace_prop_max
+    a <- parameters_list$workplace_a
+    c <-  parameters_list$workplace_c
+  } else if (parameters_list $workplace_distribution_country == "UK") {
+    stop("workplace_distribution_country can currently only be set to the USA or custom - we don't have data for the UK")
+  } else {
+    stop("incorrectly specified workplace_distribution_country")
+  }
+
   # Calculating number of unassigned adults and assigning them to workplaces
   set.seed(parameters_list$seed)
   index_not_school <- school_variable$get_index_of(values = c("0"))$to_vector()
   index_adults <- age_class_variable$get_index_of("adult")$to_vector()
   index_unassigned_adults <- intersect(index_not_school, index_adults)
-  workplace_sizes <- sample_offset_truncated_power_distribution(N = length(index_unassigned_adults),
-                                                                prop_max = parameters_list$workplace_prop_max,
-                                                                a = parameters_list$workplace_a,
-                                                                c = parameters_list$workplace_c)
+  if (parameters_list$workplace_distribution_country == "USA") {
+    workplace_sizes <- sample_offset_truncated_power_distribution(N = length(index_unassigned_adults),
+                                                                  prop_max = prop_max,
+                                                                  a = a,
+                                                                  c = c)
+  } else {
+    stop("workplace_distribution_country must be set to USA - other countries not implemented yet")
+  }
   workplace_indices <- unlist(sapply(1:length(workplace_sizes), function(i) rep(as.character(i), workplace_sizes[i])))
   adult_workplace_assignments <- sample(workplace_indices, replace = FALSE)
 
