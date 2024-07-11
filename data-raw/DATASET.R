@@ -13,8 +13,8 @@ baseline_household_demographics_uk$elderly <- baseline_household_demographics_uk
 baseline_household_demographics_uk <- baseline_household_demographics_uk[, c("child", "adult", "elderly")]
 usethis::use_data(baseline_household_demographics_uk, overwrite = TRUE)
 
-schools_england <- read_csv("data-raw/spc_school_level_underlying_data_23112023.csv")
-usethis::use_data(schools_uk)
+schools_uk <- read_csv("data-raw/spc_school_level_underlying_data_23112023.csv")
+usethis::use_data(schools_uk, overwrite = TRUE)
 
 # Just the most recent years data (2019 / 2020)
 schools_usa <- readxl::read_xls("data-raw/tabn216.40.xls") |>
@@ -70,6 +70,7 @@ schools_usa <- schools_usa |>
     count = percent / 100 * total,
     year = 2019
   ) |>
+  filter(type != "secondary_and_high_regular") |> # category "secondary_and_high_regular" is a subset of "secondary_and_high_all"
   arrange(type) |>
   select(year, type, size, size_midpoint, percent, total, count)
 usethis::use_data(schools_usa, overwrite = TRUE)
