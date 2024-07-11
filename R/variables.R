@@ -42,7 +42,7 @@ create_variables <- function(parameters_list) {
   }
 
   # School setting variable
-  if (parameters_list$school_distribution_generation == "empirical") {
+  if (parameters_list$household_distribution_country %in% c("UK", "USA")) {
     initial_school_settings <- generate_initial_schools_bootstrap(parameters_list = parameters_list, age_class_variable = age_class_variable)
   } else {
     initial_school_settings <- generate_initial_schools(parameters_list = parameters_list, age_class_variable = age_class_variable)
@@ -224,12 +224,6 @@ generate_initial_schools <- function(parameters_list, age_class_variable) {
   if (!("school_student_staff_ratio" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called school_student_staff_ratio")
   }
-  if (!("school_distribution_generation" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called school_distribution_generation")
-  }
-  if (!("school_distribution_country" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called school_distribution_country")
-  }
 
   set.seed(parameters_list$seed)
 
@@ -292,7 +286,7 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
   set.seed(parameters_list$seed)
 
   if (parameters_list$school_distribution_country == "UK") {
-    empirical_school_sizes <- schools_england$`headcount of pupils`
+    empirical_school_sizes <- schools_uk$`headcount of pupils`
     empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
   } else if (parameters_list$school_distribution_country == "USA") {
     schools_usa_total <- filter(schools_usa, type == "total")
