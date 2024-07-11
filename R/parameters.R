@@ -97,7 +97,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     dt = 0.5, # check this as default
     simulation_time = 150,
     render_diagnostics = FALSE,
-    household_distribution_generation = "empirical",
     household_distribution_country = "USA",
     school_distribution_generation = "empirical",
     endemic_or_epidemic = "epidemic",
