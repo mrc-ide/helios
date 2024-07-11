@@ -215,5 +215,20 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
 
 })
 
+test_that("set_uvc errors coverage_target not from allowed options", {
 
+  # Establish the list of model parameters:
+  parameters <- get_parameters()
 
+  # Check that set_uvc() errors when the setting input not either "workplace",
+  # "school", or "leisure"
+  expect_error(object = set_uvc(parameters_list = parameters,
+                                setting = "workplace",
+                                coverage = c(0.8),
+                                coverage_target = "individual",
+                                coverage_type = "targeted",
+                                efficacy = c(0.5),
+                                timestep = c(1)),
+               regexp = "Error: Input setting invalid - far UVC coverage only applicable to individuals or buildings")
+
+})
