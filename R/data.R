@@ -12,7 +12,7 @@
 #'
 #' @source <https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1009146>
 #' @family data
-"baseline_household_demographics"
+"baseline_household_demographics_uk"
 
 #' Data from RTI Synthetic population of USA containing information on household size and
 #' age distribution. Selected for the county of San Francisco.
