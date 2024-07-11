@@ -293,11 +293,11 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
   if (parameters_list$school_distribution_country == "UK") {
     empirical_school_sizes <- schools_england$`headcount of pupils`
     empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
-  } if (parameters_list$school_distribution_country == "US") {
+  } else if (parameters_list$school_distribution_country == "USA") {
     schools_usa_total <- filter(schools_usa, type == "total")
     empirical_school_sizes <- rep(schools_usa_total$size_midpoint, schools_usa_total$count)
   } else {
-    stop("school_distribution_country must be set to either UK or US - other countries not implemented yet")
+    stop("school_distribution_country must be set to either UK or USA - other countries not implemented yet")
   }
 
   num_children <- age_class_variable$get_size_of("child") # get number of children
