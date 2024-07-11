@@ -275,9 +275,6 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
   if (!("school_student_staff_ratio" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called school_student_staff_ratio")
   }
-  if (!("school_distribution_generation" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called school_distribution_generation")
-  }
   if (!("school_distribution_country" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called school_distribution_country")
   }
