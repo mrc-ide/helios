@@ -232,3 +232,40 @@ test_that("set_uvc() errors coverage_target not from allowed options", {
                regexp = "Error: Input setting invalid - far UVC coverage only applicable to individuals or buildings")
 
 })
+
+test_generate_far_uvc_switches <- function(setting, target, type, tol = 1) {
+  coverage <- 0.7
+  parameters_list <- get_parameters()
+
+  parameters_list <- set_uvc(
+    parameters_list = parameters_list,
+    setting = setting,
+    coverage = coverage,
+    coverage_target = target,
+    coverage_type = type,
+    efficacy = 0.6,
+    timestep = 100
+  )
+
+  x <- create_variables(parameters_list)
+  x <- generate_far_uvc_switches(x$parameters_list, x$variables_list)
+
+  testthat::expect_vector(x[[paste0("uvc_", setting)]], ptype = double(), size = length(x$setting_sizes[[setting]]))
+  testthat::expect_equal(x$human_population * coverage, sum(x$setting_sizes[[setting]] * x[[paste0("uvc_", setting)]]), tolerance = tol)
+}
+
+test_that("generate_far_uvc_switches() with coverage_target as individuals and coverage_type as random can be used to set UVC switches for households, and the total coverage sums to the expected input", {
+  test_generate_far_uvc_switches(setting = "household", target = "individuals", type = "random")
+})
+
+test_that("generate_far_uvc_switches() with coverage_target as buildings and coverage_type as random can be used to set UVC switches for households, and the total coverage sums to the expected input", {
+  test_generate_far_uvc_switches(setting = "household", target = "buildings", type = "random")
+})
+
+test_that("generate_far_uvc_switches() with coverage_target as individuals and coverage_type as targeted can be used to set UVC switches for households, and the total coverage sums to the expected input", {
+  test_generate_far_uvc_switches(setting = "household", target = "buildings", type = "targeted", tol = 10)
+})
+
+test_that("generate_far_uvc_switches() with coverage_target as individuals and coverage_type as targeted can be used to set UVC switches for households, and the total coverage sums to the expected input", {
+  test_generate_far_uvc_switches(setting = "household", target = "buildings", type = "targeted")
+})
