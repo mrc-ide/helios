@@ -2,17 +2,17 @@
 #'
 #' @description
 #' The `set_uvc()` function is a user-facing function that is used to parameterise far UVC deployment
-#' for an individual setting class (e.g. workplace). The function takes as arguments a `helios`
-#' parameter list, the `setting` for which far UVC deployment is being parameterised, the `coverage`
-#' of far UVC within each setting of a setting class (e.g. coverage of individual workplaces within
+#' for an individual setting type (e.g. workplace). The function takes as arguments a `helios`
+#' parameter list, the `setting` type for which far UVC deployment is being parameterised, the `coverage`
+#' of far UVC within each location of a setting type (e.g. coverage of individual workplaces within
 #' the workplace setting class), the `coverage_type` (currently supporting random and targeted at the
-#' most populated settings), the `efficacy` of far UVC in the setting class, and the `timestep` on
+#' most populated settings), the `efficacy` of far UVC in the setting type, and the `timestep` on
 #' which far UVC is deployed. The function appends these additional setting-specific parameters to
 #' the parameter list and returns an updated version of it.
 #'
 #' @param parameters_list A list of parameters as generated using `get_parameters()`
-#' @param setting A character string describing the setting in which far UVC is being deployed
-#' @param coverage A numeric value describing the proportion of the settings in which far UVC is deployed
+#' @param setting A character string describing the setting type in which far UVC is being deployed
+#' @param coverage A numeric value describing the coverage of far UVC within the setting class for which which far UVC is deployed
 #' @param coverage_target A character describing the target of the coverage ("buildings" or "individuals")
 #' @param coverage_type A character describing the type of coverage ("random" or "targeted")
 #' @param efficacy A numeric value describing the efficacy of the far UVC deployed
@@ -66,12 +66,12 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverag
 #' Update model parameters with far UVC switches
 #'
 #' @description
-#' `generate_far_uvc_switches()` determines which individual settings will deploy far UVC given the settings
+#' `generate_far_uvc_switches()` determines which locations will deploy far UVC given the setting type is
 #' switched on, the setting-specific coverages, and the setting-specific coverage types. The function returns,
 #' for each the workplace, school, leisure, and household settings, a vector of length equal to the
-#' the number of settings within the setting type (e.g. number of schools within the school setting class)
+#' the number of locations within the setting type (e.g. number of schools within the school setting type)
 #' populated with 1's and 0's, where a 1 represents the presence of far UVC and a 0 the absence of far
-#' UVC. The function returns an updated parameter list with these vectors appended for each setting class
+#' UVC. The function returns an updated parameter list with these vectors appended for each setting type
 #' for which far UVC has been parameterised using the `set_uvc()` function.
 #'
 #' @param parameters_list A list of model parameters as generated using `get_parameters()`
