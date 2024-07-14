@@ -146,14 +146,14 @@ generate_setting_far_uvc_switches <- function(parameters_list, variables_list, s
     if (coverage_type == "random") {
       sum <- 0
       indices <- c()
-      household_indices <- 1:length(setting_size)
+      location_indices <- 1:length(setting_size)
 
       while (sum < total_with_uvc) {
-        i <- sample(household_indices, 1)
+        i <- sample(location_indices, 1)
         sum <- sum + setting_size[i]
         indices <- c(indices, i)
-        household_indices <- setdiff(household_indices, i)
-        if (length(household_indices) == 0) {
+        location_indices <- setdiff(location_indices, i)
+        if (length(location_indices) == 0) {
           stop("Insufficient individuals to meet far UVC coverage")
         }
       }
