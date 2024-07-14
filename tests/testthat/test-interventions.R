@@ -1,4 +1,4 @@
-test_that("set_uvc errors if function given multiple settings in a single call", {
+test_that("set_uvc() errors if function given multiple settings in a single call", {
 
   # Establish the list of model parameters:
   parameters <- get_parameters()
@@ -17,7 +17,7 @@ test_that("set_uvc errors if function given multiple settings in a single call",
 
 })
 
-test_that("set_uvc errors if function given multiple coverage types in a single call", {
+test_that("set_uvc() errors if function given multiple coverage types in a single call", {
 
   # Establish the list of model parameters:
   parameters <- get_parameters()
@@ -69,7 +69,7 @@ test_that("set_uvc() errors when coverage_type input not from allowed list of Fa
                regexp = "Error: Input setting invalid - far UVC only deployable in random or targeted coverage types")
 })
 
-test_that("set_uvc errors if coverage not between 0 and 1", {
+test_that("set_uvc() errors if coverage not between 0 and 1", {
 
   # Establish the list of model parameters:
   parameters <- get_parameters()
@@ -88,7 +88,7 @@ test_that("set_uvc errors if coverage not between 0 and 1", {
 
 })
 
-test_that("set_uvc errors if efficacy not between 0 and 1", {
+test_that("set_uvc() errors if efficacy not between 0 and 1", {
 
   # Establish the list of model parameters:
   parameters <- get_parameters()
@@ -215,7 +215,7 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
 
 })
 
-test_that("set_uvc errors coverage_target not from allowed options", {
+test_that("set_uvc() errors coverage_target not from allowed options", {
 
   # Establish the list of model parameters:
   parameters <- get_parameters()
