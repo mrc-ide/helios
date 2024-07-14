@@ -81,6 +81,8 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverag
 #' @export
 generate_far_uvc_switches <- function(parameters_list, variables_list) {
   for (setting in c("workplace", "school", "leisure", "household")) {
+    # If the setting is set to be switched on then generate the switches using
+    # the helper function generate_setting_far_uvc_swtiches
     if (parameters_list[[paste0("far_uvc_", setting)]]) {
       parameters_list <- generate_setting_far_uvc_switches(
         parameters_list, variables_list, setting = setting
@@ -116,6 +118,9 @@ generate_setting_far_uvc_switches <- function(parameters_list, variables_list, s
 
   coverage_target <- parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]]
   coverage_type <- parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]]
+
+  # coverage_target can be either buildings or individual, and coverage_type can
+  # be either random or targetted. Here we go through these four possible cases
 
   if (coverage_target == "buildings") {
     total <- length(setting_size)
