@@ -15,7 +15,9 @@
 #' @family miscellaneous
 #' @export
 get_setting_size <- function(variables_list, setting) {
-  stopifnot(setting %in% c("workplace", "school", "household"))
+  if (!setting %in% c("workplace", "school", "household")) {
+    stop('setting must be either "workplace", "school" or "household"')
+  }
 
   location_sizes <- vector()
 
