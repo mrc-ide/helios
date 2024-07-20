@@ -48,7 +48,7 @@ The aim of this document is to introduce `helios`, an individual-based modelling
 `helios` explicitly represents the built environment and how individuals spend their time in this built environment, as well as modifications to that built environment that reduce the probability of pathogen transmission occurring (such as far UVC).
 The package can be used to quantify the impact of installing far UVC interventions on public health outcomes, such as infections.
 
-# Aim of this Document
+# Aim of this document
 
 The aim of this document is to introduce you to the `helios` modelling framework and the types of results it can currently produce.
 Our hope is that this document will serve as a jumping off point to discuss:
@@ -180,7 +180,7 @@ table(number_leisure_places) |>
   labs(x = "Number of leisure venues attended in a week", y = "Count")
 ```
 
-## Disease States & The Infection Process {#disease}
+## Disease states and the infection process {#disease}
 
 Individuals exist in one of four different disease states:
 
@@ -270,7 +270,7 @@ cowplot::plot_grid(epidemic_plot + theme(legend.position = "none"),
                    plot_legend, nrow = 1, rel_widths = c(1, 1, 0.4))
 ```
 
-## Modelling Far UVC
+## Modelling far UVC
 
 Far UVC interventions can be installed in each of the four setting types, in any combination (i.e. in either one, two, three, or all four setting types).
 We model the efficacy of far UVC as the reduction in the force of infection an individual experiences in a location where it is installed. Specifically, the force of infection experienced by individual $i$ in location $m$ at time $t$ where far UVC is installed is calculated as follows:
@@ -320,7 +320,7 @@ data.frame(workplace_sizes) |>
   )
 ```
 
-# Illustrative Simulations of Far UVC
+# Illustrative simulations of far UVC
 
 What follows is a demonstration of the types of model outputs that `helios` can generate, and how these outputs can be presented graphically.
 To do this, we have carried out two sets of analyses using the modelling framework to investigate the following:
@@ -365,7 +365,7 @@ exemplar_data |>
   facet_grid(~Intervention) +
   theme(strip.background = element_blank(),
         strip.text = element_text(colour = "#03113E", size = 12),
-        panel.border=element_blank(),
+        panel.border = element_blank(),
         legend.title = element_blank(),
         legend.position = c(0.93, 0.85),
         legend.background = element_blank(),
@@ -403,8 +403,7 @@ exemplar_data |>
         legend.title = element_blank(),
         legend.position = c(0.93, 0.5),
         legend.background = element_blank(),
-        axis.line = element_line()) 
-
+        axis.line = element_line())
 ```
 
 (ref:exemplar-endemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time (i.e. the pathogen exists in an endemic state).
@@ -420,7 +419,7 @@ Figures \@ref(fig:sweep-R0-coverage) and \@ref(fig:sweep-R0-efficacy) illustrate
 
 For low transmission intensities ($R_0 \leq 1.5$), very high levels of far UVC coverage and/or prevented the epidemic from occurring (final epidemic size \~0%). Across the majority of combinations of $R_0$, far UVC coverage, and far UVC efficacy, targeting the deployment of far UVC to the most populous settings achieved a greater reduction in final epidemic size.
 
-### Sensitivity Analysis of $R_0$ and far UVC Coverage
+### Sensitivity analysis of $R_0$ and far UVC coverage
 
 ```{r sweep-R0-coverage, fig.cap="(ref:sweep-R0-coverage)"}
 coverage_over_time <- parameter_sweep_data |>
@@ -458,7 +457,7 @@ cowplot::plot_grid(coverage_over_time, heatmap_contained, nrow = 2,
 
 (ref:sweep-R0-coverage) The effect of $R_0$ and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC efficacy of 80%.
 
-### Sensitivity Analysis of $R_0$ and far UVC Efficacy
+### Sensitivity analysis of $R_0$ and far UVC efficacy
 
 ```{r sweep-R0-efficacy, fig.cap="(ref:sweep-R0-efficacy)"}
 coverage_over_time <- parameter_sweep_data |>
