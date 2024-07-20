@@ -92,9 +92,6 @@ Specifically, we sample with replacement from this data to generate households a
 Household assignment is **static** - for each individual, the specific household they are assigned to is fixed and does not change across the course of a single simulation.
 They stay in the same household each day.
 
-(ref:household-size) The distribution of household sizes.
-Households with two individuals are the most common, followed by single individual households.
-
 ```{r household-size, fig.cap="(ref:household-size)"}
 households <- variables$variables_list$household$get_categories()
 household_sizes <- purrr::map_vec(households, function(x) variables$variables_list$household$get_size_of(values = x))
@@ -106,7 +103,7 @@ table(household_sizes) |>
   labs(x = "Number of individuals in the household", y = "Count")
 ```
 
-(ref:age) Age group sizes follow from the household sampling procedure.
+(ref:household-size) The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
 
 ```{r age, fig.cap="(ref:age)"}
 data.frame(age_classes, age_class_counts) |>
@@ -117,14 +114,14 @@ data.frame(age_classes, age_class_counts) |>
   coord_flip()
 ```
 
+(ref:age) Age group sizes follow from the household sampling procedure.
+
 2.  **Schools** All children are assumed to attend school.
 The number of students in each school (Figure \@ref(fig:school-size)) is sampled from the 2022/2023 census of schools in the UK [@school2023], with children then assigned randomly to each school.
 A small number of adults also attend schools (rather than workplaces) to reflect educational staff such as teachers.
 For each 20 students, there is one adult teacher who works at the school (this is based on UK Office of National Statistics Data).
 School assignment is **static**: for each individual, the particular school they are assigned to is fixed and does not change across the course of a single simulation.
 They visit the same school each day.
-
-(ref:school-size) The distribution of school sizes.
 
 ```{r school-size, fig.cap="(ref:school-size)"}
 schools <- variables$variables_list$school$get_categories()
@@ -138,14 +135,13 @@ data.frame(school_sizes) |>
   scale_y_continuous(limits = c(0, NA))
 ```
 
+(ref:school-size) The distribution of school sizes.
+
 3.  **Workplaces** All adults (who are not teachers) are assumed to attend workplaces.
 The number of employees in each workplace (Figure \@ref(fig:workplace-size)) is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies which in turn is based on data from the United States of America.
 Adults are assigned randomly to each of these workplaces.
 Workplace assignment is **static**: for each individual, the particular workplace they are assigned to is fixed and does not change across the course of a single simulation.
 They visit the same workplace each day.
-
-(ref:workplace-size) The distribution of workplace sizes.
-Here, size is shown on a logarithmic scale.
 
 ```{r workplace-size, fig.cap="(ref:workplace-size)"}
 workplaces <- variables$variables_list$workplace$get_categories()
@@ -160,14 +156,13 @@ data.frame(workplace_sizes) |>
   labs(x = "Workplace Size (Number of Individuals)", y = "Count")
 ```
 
+(ref:workplace-size) The distribution of workplace sizes. Here, size is shown on a logarithmic scale.
+
 4.  **Leisure venues** All individuals (children, adults, and elderly people) are eligible to attend leisure venues.
 Leisure venue sizes are sampled from a negative binomial distribution, which determines their maximum occupancy.
 Leisure venue assignment is **dynamic**: for each individual, the particular leisure venue they are assigned to is dynamic and changes across the course of a single simulation.
 They visit a different leisure venue each day (and sometimes do not visit any leisure venues on a given day), with the number of leisure venues visited by each individual per week (Figure \@ref(fig:leisure-venues)) sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day.
 The particular leisure venue they visit is drawn from a short individual-specific list of potential leisure venues that is determined randomly.
-
-(ref:leisure-venues) The number of leisure venues that each individual attends in a week.
-The minimum possible number of venues is zero, and maximum possible is seven.
 
 ```{r leisure-venues, fig.cap="(ref:leisure-venues)"}
 leisure_places <- variables$variables_list$leisure$get_values()
@@ -179,6 +174,9 @@ table(number_leisure_places) |>
   geom_col() +
   labs(x = "Number of leisure venues attended in a week", y = "Count")
 ```
+
+(ref:leisure-venues) The number of leisure venues that each individual attends in a week.
+The minimum possible number of venues is zero, and maximum possible is seven.
 
 ## Disease states and the infection process {#disease}
 
@@ -192,11 +190,9 @@ Individuals exist in one of four different disease states:
 At any timepoint, each individual is either susceptible, exposed, infectious, or recovered.
 Individuals are infected (S -\> E) after spending time in the same location as infectious individuals.
 For each individual we calculate a location-specific force of infection, which determines the probability they are infected in a given timestep. Specifically, the force of infection experienced by individual $i$ in location $m$ at time $t$ is calculated as follows:
-
 $$
 \lambda_{i,m}(t) = \frac{\beta_{m} I_m(t)}{N_m}
 $$
-
 where $I_m(t)$ are the number of infectious individuals in location $m$ at time $t$, $N_m$ are the total number of individuals visiting location $m$ at time $t$ and $\beta_m$ is a location specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that integrates consideration of both the ***amount of time spent in a location*** and ***the inherent "riskiness"*** **of a location** (i.e. how receptive to onwards transmission it is).
 Currently within the model, each setting type has a specific $\beta$ (i.e. $\beta_{W}$,$\beta_{S}$ , $\beta_{H}$, $\beta_{L}$ respectively) and all individual locations within a setting type (e.g. all schools) have the same $\beta$ (though this could be changed in future versions).
 
@@ -216,10 +212,7 @@ Infectious individuals recover after some delay (the *duration of infectiousness
 After recovering, individuals can then return to being susceptible (reflecting the loss of acquired immunity to infection), again after some delay.
 By altering the duration of acquired immunity to infection, the framework has the capacity to simulate both epidemic (those producing a single "epidemic wave" before dying out) and endemic (those which are constantly present in the population) pathogens (Figure \@ref(fig:epidemic-endemic)).
 
-(ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
-
 ```{r epidemic-endemic, fig.cap="(ref:epidemic-endemic)"}
-
 # Plot the epidemic exemplar simulations:
 epidemic_plot <- exemplar_data |>
   filter(Setting == "Epidemic" & Intervention == "Baseline") |>
@@ -270,6 +263,8 @@ cowplot::plot_grid(epidemic_plot + theme(legend.position = "none"),
                    plot_legend, nrow = 1, rel_widths = c(1, 1, 0.4))
 ```
 
+(ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
+
 ## Modelling far UVC
 
 Far UVC interventions can be installed in each of the four setting types, in any combination (i.e. in either one, two, three, or all four setting types).
@@ -287,8 +282,6 @@ Given a certain level of coverage (e.g. 20%), the settings with far UVC installe
 - **Targeted:** Locations for far UVC to be installed are chosen in order of size, with the largest 20% of locations selected to receive far UVC.
 
 Figure \@ref(fig:uvc) provides an example illustrating the difference between these two strategies as applied to the schools setting type.
-
-(ref:uvc) Illustration of the targeted and random strategies for the workplace setting type.
 
 ```{r uvc, fig.cap="(ref:uvc)"}
 data.frame(workplace_sizes) |>
@@ -320,6 +313,8 @@ data.frame(workplace_sizes) |>
   )
 ```
 
+(ref:uvc) Illustration of the targeted and random strategies for the workplace setting type.
+
 # Illustrative simulations of far UVC
 
 What follows is a demonstration of the types of model outputs that `helios` can generate, and how these outputs can be presented graphically.
@@ -340,7 +335,7 @@ These comparisons were performed for both epidemic and endemic pathogens. For ep
 We assumed far UVC efficacy was sufficient to reduce transmission intensity by 75%, and that coverage of far UVC (i.e. the proportion of locations with far UVC installed) was 50%.
 Further, we assume a 30%\|30%\|30%\|10% split in where transmission takes place (households, workplace/school, leisure venue and in the community, respectively).
 
-### Epidemic Pathogen Simulation
+### Epidemic pathogen simulation
 
 Figure \@ref(fig:exemplar-epidemic) shows the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of an epidemic pathogen.
 Random indicates that far UVC was assigned to a random 50% of school, workplace and leisure locations.
@@ -494,5 +489,33 @@ cowplot::plot_grid(coverage_over_time, heatmap_contained, nrow = 2,
 ```
 
 (ref:sweep-R0-efficacy) The effect of $R_0$ and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC coverage of 80% is achieved.
+
+## Assessing how various far UVC parameters shape another outcome
+
+We considered two pathogen archetypes, SARS-CoV-2 and influenza.
+The properties of SARS-CoV-2 were as follows.
+The properties of influenze were as follows.
+For each pathogen archetype, we considered the effect of far UVC efficacy and far UVC coverage on another outcome.
+We varied far UVC efficacy in the following range.
+We varied far UVC coverage in the following range with the following settings.
+The results are presented in Figure \@ref(fig:placeholder-1) and Figure \@ref(fig:placeholder-2).
+
+```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
+data.frame(x = 1:5, y = 1:5) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal()
+```
+
+(ref:placeholder-1) Placeholder one.
+
+```{r placeholder-2, fig.cap="(ref:placeholder-2)"}
+data.frame(x = 1:5, y = 1:5) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal()
+```
+
+(ref:placeholder-2) Placeholder two.
 
 # Bibliography {.unnumbered}
