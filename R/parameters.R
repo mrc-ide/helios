@@ -60,6 +60,28 @@
 #' * `far_uvc_household_coverage`: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
 #' * `far_uvc_household_efficacy`: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_household_timestep`: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
+#'
+#' Setting-Specific Riskiness Parameters:
+#' * `setting_specific_riskiness_workplace`: boolean switch set to TRUE if setting-specific riskiness parameterised in the workplace setting using `set_setting_specific_riskiness()`; default = FALSE
+#' * `setting_specific_riskiness_workplace_meanlog`: The mean of the log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn
+#' * `setting_specific_riskiness_workplace_sdlog`: The standard deviation of the log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn
+#' * `setting_specific_riskiness_workplace_min`: The minimum value for truncation on the left tail of the log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn
+#' * `setting_specific_riskiness_workplace_max`: The maximum value for truncation on the right tail of the log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn
+#' * `setting_specific_riskiness_school`: boolean switch set to TRUE if setting-specific riskiness parameterised in the school setting using `set_setting_specific_riskiness()`; default = FALSE
+#' * `setting_specific_riskiness_school_meanlog`: mean of the log-normal distribution from which the setting-specific riskiness of individual schools is drawn
+#' * `setting_specific_riskiness_school_sdlog`: The standard deviation of the log-normal distribution from which the setting-specific riskiness of individual schools is drawn
+#' * `setting_specific_riskiness_school_min`: The minimum value for truncation on the left tail of the log-normal distribution from which the setting-specific riskiness of individual schools is drawn
+#' * `setting_specific_riskiness_school_max`: The maximum value for truncation on the right tail of the log-normal distribution from which the setting-specific riskiness of individual schools is drawn
+#' * `setting_specific_riskiness_leisure`: boolean switch set to TRUE if setting-specific riskiness parameterised in the leisure setting using `set_setting_specific_riskiness()`; default = FALSE
+#' * `setting_specific_riskiness_leisure_meanlog`: The mean of the log-normal distribution from which the setting-specific riskiness of individual leisure locations is drawn
+#' * `setting_specific_riskiness_leisure_sdlog`: The standard deviation of the log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn
+#' * `setting_specific_riskiness_leisure_min`: The minimum value for truncation on the left tail of the log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn
+#' * `setting_specific_riskiness_leisure_max`:The maximum value for truncation on the right tail of the log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn
+#' * `setting_specific_riskiness_household`: boolean switch set to TRUE if setting-specific riskiness parameterised in the household setting using `set_setting_specific_riskiness()`; default = FALSE
+#' * `setting_specific_riskiness_household_meanlog`: The mean of the log-normal distribution from which the setting-specific riskiness of individual households is drawn
+#' * `setting_specific_riskiness_household_sdlog`: The standard deviation of the log-normal distribution from which the setting-specific riskiness of individual households is drawn
+#' * `setting_specific_riskiness_household_min`: The minimum value for truncation on the left tail of the log-normal distribution from which the setting-specific riskiness of individual households is drawn
+#' * `setting_specific_riskiness_household_max`: The maximum value for truncation on the right tail of the log-normal distribution from which the setting-specific riskiness of individual households is drawn
 #' @param archetype A text string indicating the pathogen archetype parameter set to load (default = "none", current options are flu, sars_cov_2, and measles)
 #' @family parameters
 #' @export
