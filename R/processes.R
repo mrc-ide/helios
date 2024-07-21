@@ -137,7 +137,8 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     school_size_list[[i]] <- length(school_index_list[[i]])
   }
 
-  # Creating vector of setting-specific riskinesses for schools
+  # Generate vector of setting-specific riskinesses for schools
+  school_specific_riskiness <- generate_setting_specific_riskinesses()
   if (parameters_list$setting_specific_riskiness_school) {
     school_specific_riskiness <- EnvStats::rlnormTrunc(n = num_schools,
                                                        meanlog = parameters_list$setting_specific_riskiness_school_meanlog,

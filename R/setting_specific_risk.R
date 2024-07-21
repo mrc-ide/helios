@@ -35,7 +35,7 @@ set_setting_specific_risk <- function(parameter_list, setting, mean, sd, min, ma
 
 }
 
-#' calculate_setting_specific_riskiness
+#' generate_setting_specific_riskinesses
 #'
 #' @param parameters_list A list of parameters as generated using `get_parameters`
 #' @param setting A character string describing the setting in which Far UVC is being deployed
@@ -43,7 +43,7 @@ set_setting_specific_risk <- function(parameter_list, setting, mean, sd, min, ma
 #'
 #' @family setting-specific riskiness
 #' @export
-calculate_setting_specific_riskiness <- function(parameters_list, setting, number_of_locations) {
+generate_setting_specific_riskinesses <- function(parameters_list, setting, number_of_locations) {
 
   # Ensure only a single setting passed to the function:
   if(length(setting) > 1) {

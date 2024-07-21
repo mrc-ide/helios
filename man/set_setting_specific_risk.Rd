@@ -22,4 +22,8 @@ set_setting_specific_risk(parameter_list, setting, mean, sd, min, max)
 \description{
 set_setting_specific_riskiness
 }
+\seealso{
+Other setting-specific riskiness: 
+\code{\link{generate_setting_specific_riskinesses}()}
+}
 \concept{setting-specific riskiness}
