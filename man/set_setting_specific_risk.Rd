@@ -4,10 +4,10 @@
 \alias{set_setting_specific_risk}
 \title{set_setting_specific_riskiness}
 \usage{
-set_setting_specific_risk(parameter_list, setting, mean, sd, min, max)
+set_setting_specific_risk(parameters_list, setting, mean, sd, min, max)
 }
 \arguments{
-\item{parameter_list}{A list of parameters as generated using \code{get_parameters}}
+\item{parameters_list}{A list of parameters as generated using \code{get_parameters}}
 
 \item{setting}{A character string describing the setting in which Far UVC is being deployed}
 
