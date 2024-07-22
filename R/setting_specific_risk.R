@@ -22,7 +22,7 @@ set_setting_specific_riskiness <- function(parameters_list, setting, mean, sd, m
   }
 
   # Switch on setting-specific riskiness for the specified setting:
-  parameter_list[[paste0(setting, "_specific_riskiness_workplace")]] <- TRUE
+  parameters_list[[paste0(setting, "_specific_riskiness_workplace")]] <- TRUE
 
   # Overwrite the log-normal distribution parameters for the specified setting:
   parameters_list[[paste0(setting, "_specific_riskiness_workplace_meanlog")]] <- mean
