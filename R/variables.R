@@ -100,7 +100,7 @@ create_variables <- function(parameters_list) {
   # are missing the values from leisure_setting_not_assigned_to_anyone.
 
   ## Creating initial CategoricalVariable tracking leisure location an individiual goes to on a given day, which we will dynamically update
-  specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(actual_assigned_leisure_settings[order(actual_assigned_leisure_settings)]),
+  specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(assigned_leisure_locations[order(assigned_leisure_locations)]),
                                                                        initial_values = rep(as.character(0), parameters_list$human_population))
 
   # Return the list of model variables
