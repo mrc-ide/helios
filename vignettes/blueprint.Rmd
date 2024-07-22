@@ -488,32 +488,4 @@ cowplot::plot_grid(efficacy_over_time, efficacy_heatmap_contained, nrow = 2,
 
 (ref:sweep-R0-efficacy) The effect of $R_0$ and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC coverage of 80% is achieved.
 
-## Assessing how various far UVC parameters shape another outcome
-
-We considered two pathogen archetypes, SARS-CoV-2 and influenza.
-The properties of SARS-CoV-2 were as follows.
-The properties of influenze were as follows.
-For each pathogen archetype, we considered the effect of far UVC efficacy and far UVC coverage on another outcome.
-We varied far UVC efficacy in the following range.
-We varied far UVC coverage in the following range with the following settings.
-The results are presented in Figure \@ref(fig:placeholder-1) and Figure \@ref(fig:placeholder-2).
-
-```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
-data.frame(x = 1:5, y = 1:5) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_point() +
-  theme_minimal()
-```
-
-(ref:placeholder-1) Placeholder one.
-
-```{r placeholder-2, fig.cap="(ref:placeholder-2)"}
-data.frame(x = 1:5, y = 1:5) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_point() +
-  theme_minimal()
-```
-
-(ref:placeholder-2) Placeholder two.
-
 # Bibliography {.unnumbered}
