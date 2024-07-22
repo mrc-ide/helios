@@ -226,7 +226,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       if (parameters_list$far_uvc_school) {
         if (parameters_list$uvc_school[i] == 1 & t > parameters_list$far_uvc_school_timestep) {
           spec_school_FOI <- school_specific_riskiness[i] * (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]])
-        else {
+        } else {
           spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]
         }
       } else {
