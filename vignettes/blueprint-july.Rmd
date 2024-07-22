@@ -165,6 +165,10 @@ We used the above equations in tandem with estimates of variation in the ventila
 
 Code and analyses to go here
 
+Write something that because of our parameterisation using infection prevalence, that both the I term and the room vol term have setting sizes in them, which cancel out and so it's really density and the air changes per hour that drives things.
+
+As we can see, the ratio is
+
 | Parameter       | Value Used                      | Description                                                                                                                                                                         | Source                                                                                                                                                                                                                                                                                                                                                                                                                               |
 |---------|-----------|--------------------------------|-------------------|
 | $\pi$           | 27 viruses per person per hour  | Rates of (infective) virus emission from infected individuals.                                                                                                                      | [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#) & [Buonanno et al, 2020](https://www.sciencedirect.com/science/article/pii/S0160412020320675#f0020)                                                                                                                                                                                                                                                  |
