@@ -9,7 +9,7 @@
 #'
 #' @family setting-specific riskiness
 #' @export
-set_setting_specific_risk <- function(parameters_list, setting, mean, sd, min, max) {
+set_setting_specific_riskiness <- function(parameters_list, setting, mean, sd, min, max) {
 
   # Ensure only a single setting passed to the function:
   if(length(setting) > 1) {

@@ -22,6 +22,6 @@ generate_setting_specific_riskinesses
 }
 \seealso{
 Other setting-specific riskiness: 
-\code{\link{set_setting_specific_risk}()}
+\code{\link{set_setting_specific_riskiness}()}
 }
 \concept{setting-specific riskiness}
