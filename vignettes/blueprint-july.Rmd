@@ -155,7 +155,15 @@ where $P_i$ is the probability a person becomes infected conditional on them spe
 
 #### Estimating Variation in Riskiness Across Different Locations Belonging to the Same Setting Type
 
-We carried out a sensitivity analysis to understand how the ; and derive reasonable bounds for the $\gamma$ parameter described above.
+We carried out a sensitivity analysis to derive reasonable bounds for the $\gamma$ parameter described above.
+We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces and parameter estimates for SARS-CoV-2 from Blatchley et al (see Table \@ref(tab:1)) to explore how Location riskiness varied whilst varying:
+
+1.  Infection Prevalence (i.e. the number of infectious individuals in the space).
+2.  Air Changes Per Hour
+3.  The Density of Individuals in the Space
+4.  The Time Spent in the Space
+
+Code and analyses to go here
 
 | Parameter       | Value Used                      | Description                                                                                                                                                                         | Source                                                                                                                                                                                                                                                                                                                                                                                                                               |
 |---------|-----------|--------------------------------|-------------------|
