@@ -10,9 +10,12 @@ pkgdown:
   as_is: true
 vignette: >
   %\VignetteIndexEntry{blueprint}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 bibliography: REFERENCES.bib
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 ```{r, include = FALSE}
@@ -42,9 +45,55 @@ exemplar_data <- readRDS("./exemplar_simulations.rds")
 parameter_sweep_data <- readRDS("./parameter_sweep_data.rds")
 ```
 
-# Background
+# Overview
 
-Include relevant details about the model here, and changes from the first report: [Assessing far UVC interventions with an individual based infectious disease model](https://mrc-ide.github.io/helios/articles/blueprint.html).
+This document builds on [previous work](https://mrc-ide.github.io/helios/articles/blueprint.html) that introduced `helios`, an individual-based modelling framework for exploring the impact that installation of far UVC could have on the transmission and burden of respiratory infections.
+In this document, we present a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden....
+
+# Major Model Changes
+
+Include relevant details about the model here, and changes from the first report:
+
+## The Consistent Use of Data from the United States of America {#locations}
+
+Add some subsections here about the data we now use. Can basically copy the structure of the first report.
+
+## Location-Specific Variability in "Riskiness"
+
+The concentration of pathogen in the air is modelled via the ODE:
+
+$$
+\nu \frac{dC(t)}{dt} =  - QC - k_DC \nu + I\pi 
+$$
+
+where $v$ is the room volume, $C$ is the infective virus concentration, $t$ is time, $Q$ is the flow rate of air into and out of the room, $k_D$ is the natural decay constant, $I$ is the number of infectious individuals in the room, and $\pi$ is the per capita (infective) virus emission rate.
+The closed-form solution to this equation is:
+
+$$
+C =  \frac{I\pi}{\alpha \nu}(1 - e^{-\alpha t}) 
+$$
+
+where:
+
+$$
+\alpha = \frac{Q}{\nu} + k_D
+$$
+
+is the number of equivalent air changes per hour.
+As $t \rightarrow\infty$, we get the steady state solution, which is the following:
+
+$$
+C_{ss} =  \frac{I\pi}{\alpha \nu}
+$$
+
+We integrate this estimate of the concentration of infective virus in the room with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
+The Wells-Riley model takes the following form:
+
+$$
+P_{i}(t) =  1 - e^{-r C_{ss}Bt}
+$$
+
+where $P_i$ is the probability a person becomes infected conditional on them spending time $t$ in a room with $C_{ss}$ concentration of infective virus, $B$ is the volume rate at which air is breathed in, and $r$ is risk parameter, the probability that a single inhaled infective virus will initiate an infection.
 
 # Assessing how various far UVC parameters shape another outcome
 
