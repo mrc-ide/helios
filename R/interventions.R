@@ -111,7 +111,7 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
 #' @export
 generate_setting_far_uvc_switches <- function(parameters_list, variables_list, setting) {
   if (setting == "leisure") {
-    setting_size <- parameters_list$leisure_setting_sizes
+    setting_size <- parameters_list$setting_sizes$leisure
   } else {
     setting_size <- get_setting_size(variables_list, setting = setting)
   }
