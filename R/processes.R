@@ -163,8 +163,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       spec_household_I <- I$copy()$and(spec_household)
 
       #  Calculate the FOI for the i-th household - with and without farUVC installed
-      if (parameters_list$far_uvc_household & parameters_list$uvc_household[i] == 1 & t > parameters_list$far_uvc_household_timestep) {
-        spec_household_FOI <- household_specific_riskiness[i] * (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]])
+      if (parameters_list$far_uvc_household) {
+        if (parameters_list$uvc_household[i] == 1 & t > parameters_list$far_uvc_household_timestep) {
+          spec_household_FOI <- household_specific_riskiness[i] * (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]])
+        } else {
+          spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]
+        }
       } else {
         spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]
       }
@@ -189,8 +193,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       spec_workplace_I <- I$copy()$and(spec_workplace)
 
       # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
-      if (parameters_list$far_uvc_workplace & parameters_list$uvc_workplace[i] == 1 & t > parameters_list$far_uvc_workplace_timestep) {
-        spec_workplace_FOI <- workplace_specific_riskiness[i] * (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]])
+      if (parameters_list$far_uvc_workplace) {
+        if (parameters_list$uvc_workplace[i] == 1 & t > parameters_list$far_uvc_workplace_timestep) {
+          spec_workplace_FOI <- workplace_specific_riskiness[i] * (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]])
+        } else {
+          spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]
+        }
       } else {
         spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]
       }
@@ -215,8 +223,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       spec_school_I <- I$copy()$and(spec_school)
 
       # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
-      if (parameters_list$far_uvc_school & parameters_list$uvc_school[i] == 1 & t > parameters_list$far_uvc_school_timestep) {
-        spec_school_FOI <- school_specific_riskiness[i] * (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]])
+      if (parameters_list$far_uvc_school) {
+        if (parameters_list$uvc_school[i] == 1 & t > parameters_list$far_uvc_school_timestep) {
+          spec_school_FOI <- school_specific_riskiness[i] * (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]])
+        else {
+          spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]
+        }
       } else {
         spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]
       }
@@ -280,8 +292,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
         ## (this is in contrast to leisure_indices, which uses the original indices from their generation,
         ##  and which span 1 to max(leisure_indices) with some gaps)
         ## WILL NEED TO CHECK far_uvc_leisure[i] is correct once Adam's PR is in for the same reason
-        if (parameters_list$far_uvc_leisure & parameters_list$uvc_leisure[i] == 1 & t > parameters_list$far_uvc_leisure_timestep) {
-          spec_leisure_FOI <- leisure_specific_riskiness[i] * (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
+        if (parameters_list$far_uvc_leisure) {
+          if (parameters_list$uvc_leisure[i] == 1 & t > parameters_list$far_uvc_leisure_timestep) {
+            spec_leisure_FOI <- leisure_specific_riskiness[i] * (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
+          } else {
+            spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+          }
         } else {
           spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
         }
