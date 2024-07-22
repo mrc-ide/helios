@@ -60,7 +60,7 @@ generate_setting_specific_riskinesses <- function(parameters_list, setting, numb
   if(parameters_list[[paste0("setting_specific_riskiness_", setting)]]) {
     setting_specific_riskiness <- EnvStats::rlnormTrunc(n = number_of_locations,
                                                         meanlog = parameters_list[[paste0("setting_specific_riskiness_", setting, "_meanlog")]],
-                                                        sdlog = parameters_list[[paste0("setting_specific_riskiness_", setting, "sdlog")]],
+                                                        sdlog = parameters_list[[paste0("setting_specific_riskiness_", setting, "_sdlog")]],
                                                         min = parameters_list[[paste0("setting_specific_riskiness_", setting, "_min")]],
                                                         max = parameters_list[[paste0("setting_specific_riskiness_", setting, "_max")]])
   } else {
