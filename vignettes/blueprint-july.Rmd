@@ -56,9 +56,47 @@ Include relevant details about the model here, and changes from the first report
 
 ## The Consistent Use of Data from the United States of America {#locations}
 
-Add some subsections here about the data we now use. Can basically copy the structure of the first report.
+Add some subsections here about the data we now use.
+Can basically copy the structure of the first report.
 
 ## Location-Specific Variability in "Riskiness"
+
+Previously, we modelled differences in "riskiness" (i.e. how receptive to onwards transmission it is) between different Setting Types (schools, workplaces, leisure settings and households).
+However, we made the simplifying assumption that all Locations with a particular Setting Type (e.g. all schools) had the same "riskiness", which is unrealistic.
+We have now updated thte model to explicitly incorporate variation in "riskiness" between Locations belonging to the same Setting Type.
+What follows below is a mathematical description of how this addition to the model works, how it was derived, and how we have parameterised this for the purposes of the new results presented in this report.
+
+### Updating the Force of Infection to Include Location-Specific Variation in Riskiness/Receptivity to Transmission 
+
+As a reminder, the previous version of the force of infection experienced by individual $i$ in Location $m$ at time $t$ was calculated as follows:
+
+$$ \lambda_{i,j,m}(t) = \frac{\beta_{m} I_{j,m}(t)}{N_{j,m}} $$
+
+where $I_m(t)$ are the number of infectious individuals in Location $j$ of Setting Type $m$ at time $t$ , $N_{j,m}$ are the total number of individuals visiting Location $j$ of Setting Type $m$ at time $t$ and $\beta_m$ is a Setting Type-specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that models **on average** how much transmission happens in a particular Setting Type (e.g. workplaces) compared to other Settings Types (e.g. schools).
+The total force of infection $\lambda_T$ experienced across all Setting Types is then summed and forms the basis for calculating an individual's probability of infection during one time-step $t$:
+
+$$ P(infection) = 1 - e^{- \lambda_{i,T}t}. $$
+
+Previously, $\beta$ was specific to the Setting Type (i.e. it was different for schools, workplaces, households and leisure settings) but assumed to be the same same for every location belonging to a particular setting type - that is, all individual locations of a particular Setting Type (e.g. all schools) had the same $\beta$.
+We have now relaxed this assumption.
+The updated force of infection term is now the following:
+
+$$ \lambda_{i,j,m}(t) = \frac{\beta_{j,m} I_{j,m}(t)}{N_{j,m}} $$
+
+where:\
+$$ \beta_{j,m} = \gamma\beta_{m} $$
+
+and:
+
+$$
+\gamma \sim Lognormal(\mu_{log}, sd_{log})
+$$
+
+i.e. a draw from a Lognormal distribution.
+$\gamma$ controls how much more or less risky a particular Location of a specific Setting Type is relative to the **average** for that Setting Type.
+For example, $\gamma = 1$ is a setting which is as "risky" (or conducive to transmission) as the average location of that Setting Type.
+$\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
+Parameterisation and estimation of this parameter $\gamma$ is described further below.
 
 The concentration of pathogen in the air is modelled via the ODE:
 
