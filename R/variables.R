@@ -71,19 +71,32 @@ create_variables <- function(parameters_list) {
   initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = leisure_setting_sizes) # returns list to initialise RaggedInteger
   leisure_variable <- individual::RaggedInteger$new(initial_values = initial_leisure_settings)
 
-  ## Due to sampling method, not all leisure settings with a leisure_setting_size are included - here we identify and remove the leisure settings which no individual has been assigned to visit
-  hypothetical_number_leisure_settings <- 1:length(leisure_setting_sizes)
-  actual_assigned_leisure_settings <- unique(unlist(initial_leisure_settings))
-  actual_assigned_leisure_settings <- actual_assigned_leisure_settings[order(actual_assigned_leisure_settings)]
-  leisure_setting_not_assigned_to_anyone <- hypothetical_number_leisure_settings[!(hypothetical_number_leisure_settings %in% actual_assigned_leisure_settings)]
-  if (!identical(integer(0), leisure_setting_not_assigned_to_anyone)) {
-    leisure_setting_sizes <- leisure_setting_sizes[-leisure_setting_not_assigned_to_anyone]
+  ##' Due to the sampling method used, the leisure settings for which sizes have been drawn (leisure_setting_sizes)
+  ##' are not always assigned individuals (leisure_variable). To avoid indexing errors, we need to determine
+  ##' whether there are any unassigned leisure settings and remove them from leisure_setting_sizes:
+
+  # Generate a vector of indices for the leisure locations for which sizes have been drawn:
+  hypothetical_leisure_locations <- 0:length(leisure_setting_sizes)
+
+  # Generate a vector of the indices of leisure locations which individuals have been assigned to:
+  assigned_leisure_locations <- sort(unique(unlist(initial_leisure_settings)))
+
+  # Determine which, if any, of the potential leisure locations no individuals have been assigned to visit:
+  unassigned_leisure_locations <- setdiff(hypothetical_leisure_locations, assigned_leisure_locations)
+
+  # If there are unvisited leisure locations, remove them from the leisure_setting_sizes object:
+  if (!identical(integer(0), unassigned_leisure_locations)) {
+    leisure_setting_sizes <- leisure_setting_sizes[-unassigned_leisure_locations]
   }
-  parameters_list$leisure_indices <- actual_assigned_leisure_settings # these are required in processes.R because some of the initially created leisure settings
-                                                                      # don't get included, which messes with the indexing
-  ## This means that leisure_setting_sizes is the same LENGTH as actual_assigned_leisure_settings
-  ## BUT max(actual_assigned_leisure_settings) is > than length(parameters_list$leisure_setting_sizes) because the indices in actual_assigned_leisure_settings are missing
-  ## the values from leisure_setting_not_assigned_to_anyone
+
+  # Add the assigned leisure locations as a parameter:
+  parameters_list$leisure_indices <- assigned_leisure_locations
+
+  ##' The above are required in processes.R because some of the initially created leisure settings don't get
+  ##' included, which messes with the indexing. This means that leisure_setting_sizes is the same LENGTH
+  ##' as actual_assigned_leisure_settings BUT max(actual_assigned_leisure_settings) is > than
+  ##' length(parameters_list$leisure_setting_sizes) because the indices in actual_assigned_leisure_settings
+  ##' are missing the values from leisure_setting_not_assigned_to_anyone.
 
   ## Creating initial CategoricalVariable tracking leisure location an individiual goes to on a given day, which we will dynamically update
   specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(actual_assigned_leisure_settings[order(actual_assigned_leisure_settings)]),
