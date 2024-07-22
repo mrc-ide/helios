@@ -14,7 +14,7 @@ generate_initial_schools_bootstrap(parameters_list, age_class_variable)
 \description{
 Alternative to \code{generate_initial_schools}. Rather than using a parametric
 distribution, this function uses sampling with replacement from a reference
-dataset. This is known as bootstrapping. The dataset used is \code{\link{schools_england}}.
+dataset. This is known as bootstrapping. The dataset used is \code{\link{schools_uk}}.
 }
 \seealso{
 Other variables: 

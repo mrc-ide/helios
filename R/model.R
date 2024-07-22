@@ -81,7 +81,7 @@ run_simulations_from_table <- function(parameters_table, output_type = "simulati
       simulation_outputs[[i]] <- run_simulation(parameters_list = parameters_lists[[i]])
 
       # Append the varied parameters as columns:
-      simulation_outputs[[i]] <- dplyr::bind_cols(simulation_outputs[[i]], as_tibble(parameters_table[i,]))
+      simulation_outputs[[i]] <- dplyr::bind_cols(simulation_outputs[[i]], dplyr::as_tibble(parameters_table[i,]))
 
       # Print the simulation progress:
       print(paste0("Simulation ", i, " complete (", (i/nrow(parameters_table) * 100), "% of simulations complete)"))

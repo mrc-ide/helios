@@ -38,6 +38,12 @@ These parameters are:
 \item \code{beta_community}: TBD
 \item \code{dt}: TBD
 \item \code{simulation_time}: TBD
+\item \code{household_distribution_country}: TBD
+\item \code{school_distribution_country}: TBD
+\item \code{workplace_distribution_country}: TBD
+\item \code{endemic_or_epidemic}: TBD
+\item \code{duration_immune}: TBD
+\item \code{prob_inf_external}: TBD
 }
 
 Rendering Parameters
@@ -48,23 +54,27 @@ Rendering Parameters
 Far UVC Intervention Parameters:
 \itemize{
 \item \code{far_uvc_workplace}: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using \code{set_ucv()}; default = FALSE
-\item \code{far_uvc_workplace_coverage_type}:Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted" for targeting interventions at most populous workplaces
-\item \code{far_uvc_workplace_coverage}: Proportion of workplaces covered with far UVC (must be a numeric value between 0 and 1)
+\item \code{far_uvc_workplace_coverage}: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
+\item \code{far_uvc_workplace_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "buildings"
+\item \code{far_uvc_workplace_coverage_type}: Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted" for targeting interventions at most populous workplaces
 \item \code{far_uvc_workplace_efficacy}: : Efficacy of far UVC in the workplace setting (must be a numeric value between 0 and 1)
 \item \code{far_uvc_workplace_timestep}: The timestep on which far UVC is implemented in the workplace setting (must be a numeric value greater than or equal to 0)
 \item \code{far_uvc_school}: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using \code{set_ucv()}; default = FALSE
-\item \code{far_uvc_school_coverage_type}:Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted" for targeting interventions at most populous schools
 \item \code{far_uvc_school_coverage}: Proportion of schools covered with far UVC (must be a numeric value between 0 and 1)
+\item \code{far_uvc_school_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "buildings"
+\item \code{far_uvc_school_coverage_type}: Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted" for targeting interventions at most populous schools
 \item \code{far_uvc_school_efficacy}: : Efficacy of far UVC in the school setting (must be a numeric value between 0 and 1)
 \item \code{far_uvc_school_timestep}: The timestep on which far UVC is implemented in the school setting (must be a numeric value greater than or equal to 0)
 \item \code{far_uvc_leisure}: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using \code{set_ucv()}; default = FALSE
-\item \code{far_uvc_leisure_coverage_type}:Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted" for targeting interventions at most populous leisure settings
 \item \code{far_uvc_leisure_coverage}: Proportion of leisure settings covered with far UVC (must be a numeric value between 0 and 1)
+\item \code{far_uvc_leisure_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "buildings"
+\item \code{far_uvc_leisure_coverage_type}: Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted" for targeting interventions at most populous leisure settings
 \item \code{far_uvc_leisure_efficacy}: : Efficacy of far UVC in the leisure setting (must be a numeric value between 0 and 1)
 \item \code{far_uvc_leisure_timestep}: The timestep on which far UVC is implemented in the leisure setting (must be a numeric value greater than or equal to 0)
 \item \code{far_uvc_household}: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using \code{set_ucv()}; default = FALSE
-\item \code{far_uvc_household_coverage_type}:Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted" for targeting interventions at most populous households
 \item \code{far_uvc_household_coverage}: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
+\item \code{far_uvc_household_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "buildings"
+\item \code{far_uvc_household_coverage_type}: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted" for targeting interventions at most populous households
 \item \code{far_uvc_household_efficacy}: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
 \item \code{far_uvc_household_timestep}: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
 }

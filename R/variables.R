@@ -13,9 +13,10 @@ create_variables <- function(parameters_list) {
 
   # Initialise and populate the age and household variables
 
-  # If user wants to use empirical distribution of households and ages from ONS sample
-  if (parameters_list$household_distribution_generation == "empirical") {
-    # Bootstrap sampling of households from ONS 2011 Census reference panel of household sizes and age composition
+  # If user wants to use empirical distribution of households and ages from ONS (UK) or RTI synth pop (USA)
+  if (parameters_list$household_distribution_country %in% c("UK", "USA")) {
+    # Bootstrap sampling of households from either ONS 2011 Census reference panel of household sizes and age composition
+    # or RTI synthetic population of household sizes and age composition for San Francisco
     household_age_list <- generate_initial_households_bootstrap(parameters_list = parameters_list)
 
     # Age class variable
@@ -42,7 +43,7 @@ create_variables <- function(parameters_list) {
   }
 
   # School setting variable
-  if (parameters_list$school_distribution_generation == "empirical") {
+  if (parameters_list$household_distribution_country %in% c("UK", "USA")) {
     initial_school_settings <- generate_initial_schools_bootstrap(parameters_list = parameters_list, age_class_variable = age_class_variable)
   } else {
     initial_school_settings <- generate_initial_schools(parameters_list = parameters_list, age_class_variable = age_class_variable)
@@ -114,8 +115,12 @@ create_variables <- function(parameters_list) {
   )
 
   # Store setting sizes in a list:
-  setting_sizes <- get_setting_sizes(variables_list = variables_list,
-                                     leisure_sizes = leisure_setting_sizes)
+  setting_sizes <- list(
+    workplace = get_setting_size(variables_list, setting = "workplace"),
+    school = get_setting_size(variables_list, setting = "school"),
+    leisure = leisure_setting_sizes,
+    household = get_setting_size(variables_list, setting = "household")
+  )
 
   # Append setting sizes to variables_list:
   parameters_list$setting_sizes <- setting_sizes
@@ -283,7 +288,7 @@ generate_initial_schools <- function(parameters_list, age_class_variable) {
 #'
 #' Alternative to `generate_initial_schools`. Rather than using a parametric
 #' distribution, this function uses sampling with replacement from a reference
-#' dataset. This is known as bootstrapping. The dataset used is [`schools_england`].
+#' dataset. This is known as bootstrapping. The dataset used is [`schools_uk`].
 #'
 #' @inheritParams generate_initial_schools
 #'
@@ -301,11 +306,23 @@ generate_initial_schools_bootstrap <- function(parameters_list, age_class_variab
   if (!("school_student_staff_ratio" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called school_student_staff_ratio")
   }
+  if (!("school_distribution_country" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called school_distribution_country")
+  }
 
   # Calculating number of children and assigning them to schools
   set.seed(parameters_list$seed)
-  empirical_school_sizes <- schools_england$`headcount of pupils`
-  empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
+
+  if (parameters_list$school_distribution_country == "UK") {
+    empirical_school_sizes <- schools_uk$`headcount of pupils`
+    empirical_school_sizes <- empirical_school_sizes[empirical_school_sizes > 0]
+  } else if (parameters_list$school_distribution_country == "USA") {
+    schools_usa_total <- dplyr::filter(schools_usa, type == "total")
+    empirical_school_sizes <- rep(schools_usa_total$size_midpoint, schools_usa_total$count)
+  } else {
+    stop("school_distribution_country must be set to either UK or USA - other countries not implemented yet")
+  }
+
   num_children <- age_class_variable$get_size_of("child") # get number of children
   index_children <- age_class_variable$get_index_of("child")$to_vector() # get the index of children in age_class_variable
   school_sizes <- c()
@@ -369,15 +386,34 @@ generate_initial_workplaces <- function(parameters_list, age_class_variable, sch
     stop("parameters list must contain a variable called workplace_c")
   }
 
+  ## Setting the parameters depending on which country has been specified by the user
+  if (parameters_list$workplace_distribution_country == "USA") {
+    prop_max <- 0.1
+    a <- 5.36
+    c <- 1.34
+  } else if (parameters_list $workplace_distribution_country == "custom") {
+    prop_max <- parameters_list$workplace_prop_max
+    a <- parameters_list$workplace_a
+    c <-  parameters_list$workplace_c
+  } else if (parameters_list $workplace_distribution_country == "UK") {
+    stop("workplace_distribution_country can currently only be set to the USA or custom - we don't have data for the UK")
+  } else {
+    stop("incorrectly specified workplace_distribution_country")
+  }
+
   # Calculating number of unassigned adults and assigning them to workplaces
   set.seed(parameters_list$seed)
   index_not_school <- school_variable$get_index_of(values = c("0"))$to_vector()
   index_adults <- age_class_variable$get_index_of("adult")$to_vector()
   index_unassigned_adults <- intersect(index_not_school, index_adults)
-  workplace_sizes <- sample_offset_truncated_power_distribution(N = length(index_unassigned_adults),
-                                                                prop_max = parameters_list$workplace_prop_max,
-                                                                a = parameters_list$workplace_a,
-                                                                c = parameters_list$workplace_c)
+  if (parameters_list$workplace_distribution_country == "USA") {
+    workplace_sizes <- sample_offset_truncated_power_distribution(N = length(index_unassigned_adults),
+                                                                  prop_max = prop_max,
+                                                                  a = a,
+                                                                  c = c)
+  } else {
+    stop("workplace_distribution_country must be set to USA - other countries not implemented yet")
+  }
   workplace_indices <- unlist(sapply(1:length(workplace_sizes), function(i) rep(as.character(i), workplace_sizes[i])))
   adult_workplace_assignments <- sample(workplace_indices, replace = FALSE)
 
@@ -578,12 +614,18 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
 #' @export
 generate_initial_households_bootstrap <- function(parameters_list) {
 
-  ## Processing Hinch et al to match our age-classes
-  ref_panel <- baseline_household_demographics
-  ref_panel$child <- ref_panel$a_0_9 + ref_panel$a_10_19
-  ref_panel$adult <- ref_panel$a_20_29 + ref_panel$a_30_39 + ref_panel$a_40_49 + ref_panel$a_50_59 + ref_panel$a_60_69
-  ref_panel$elderly <- ref_panel$a_70_79 + ref_panel$a_80
-  ref_panel <- ref_panel[, c("child", "adult", "elderly")]
+  ## Checking country is either "UK" or "USA"
+  country <- parameters_list$household_distribution_country
+  if (!(country %in% c("UK", "USA"))) {
+    stop("Country specified must be either USA or UK")
+  }
+
+  ## Using data from RTI's synthetic population for San Francisco to bootstrap https://fred.publichealth.pitt.edu/syn_pops
+  if (country == "USA") {
+    ref_panel <- baseline_household_demographics_usa
+  } else if (country == "UK") {   ## Using Hinch et al's synthetic population from ONS
+    ref_panel <- baseline_household_demographics_uk
+  }
 
   # Creating blank age-class vectors and household assignment vectors to populate
   age_class_vector <- rep("", parameters_list$human_population)

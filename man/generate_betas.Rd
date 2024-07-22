@@ -32,6 +32,6 @@ dataframe containing the beta values and their proportions of the total betas.
 }
 \seealso{
 Other miscellaneous: 
-\code{\link{get_setting_sizes}()}
+\code{\link{get_setting_size}()}
 }
 \concept{miscellaneous}
