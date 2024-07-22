@@ -1,0 +1,77 @@
+---
+title: 'Update to "assessing far UVC interventions with an individual based infectious disease model"'
+author:
+  - Charlie Whittaker^[Imperial College London], Tom Brewer^[Imperial College London], Adam Howes^[Independent]
+output: 
+  bookdown::html_document2:
+    fig_caption: yes
+    number_sections: yes
+pkgdown:
+  as_is: true
+vignette: >
+  %\VignetteIndexEntry{blueprint}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: REFERENCES.bib
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  dpi = 330,
+  out.width = "90%"
+)
+
+```
+
+```{r}
+library(helios)
+library(individual)
+library(ggplot2)
+library(dplyr, warn.conflicts = FALSE)
+library(purrr)
+theme_set(theme_minimal())
+blueprint_colours <- colorRampPalette(c("#00AFFF", "#03113E"))(4)
+exemplar_data <- readRDS("./exemplar_simulations.rds")
+parameter_sweep_data <- readRDS("./parameter_sweep_data.rds")
+```
+
+# Background
+
+Include relevant details about the model here, and changes from the first report: [Assessing far UVC interventions with an individual based infectious disease model](https://mrc-ide.github.io/helios/articles/blueprint.html).
+
+# Assessing how various far UVC parameters shape another outcome
+
+We considered two pathogen archetypes, SARS-CoV-2 and influenza.
+The properties of SARS-CoV-2 were as follows.
+The properties of influenze were as follows.
+For each pathogen archetype, we considered the effect of far UVC efficacy and far UVC coverage on another outcome.
+We varied far UVC efficacy in the following range.
+We varied far UVC coverage in the following range with the following settings.
+The results are presented in Figure \@ref(fig:placeholder-1) and Figure \@ref(fig:placeholder-2).
+
+```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
+data.frame(x = 1:5, y = 1:5) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal()
+```
+
+(ref:placeholder-1) Placeholder one.
+
+```{r placeholder-2, fig.cap="(ref:placeholder-2)"}
+data.frame(x = 1:5, y = 1:5) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_point() +
+  theme_minimal()
+```
+
+(ref:placeholder-2) Placeholder two.
+
+# Bibliography {.unnumbered}
