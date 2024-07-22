@@ -71,9 +71,9 @@ create_variables <- function(parameters_list) {
   initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = leisure_setting_sizes) # returns list to initialise RaggedInteger
   leisure_variable <- individual::RaggedInteger$new(initial_values = initial_leisure_settings)
 
-  ##' Due to the sampling method used, the leisure settings for which sizes have been drawn (leisure_setting_sizes)
-  ##' are not always assigned individuals (leisure_variable). To avoid indexing errors, we need to determine
-  ##' whether there are any unassigned leisure settings and remove them from leisure_setting_sizes:
+  # Due to the sampling method used, the leisure settings for which sizes have been drawn (leisure_setting_sizes)
+  # are not always assigned individuals (leisure_variable). To avoid indexing errors, we need to determine
+  # whether there are any unassigned leisure settings and remove them from leisure_setting_sizes:
 
   # Generate a vector of indices for the leisure locations for which sizes have been drawn:
   hypothetical_leisure_locations <- 0:length(leisure_setting_sizes)
@@ -92,11 +92,11 @@ create_variables <- function(parameters_list) {
   # Add the assigned leisure locations as a parameter:
   parameters_list$leisure_indices <- assigned_leisure_locations
 
-  ##' The above are required in processes.R because some of the initially created leisure settings don't get
-  ##' included, which messes with the indexing. This means that leisure_setting_sizes is the same LENGTH
-  ##' as actual_assigned_leisure_settings BUT max(actual_assigned_leisure_settings) is > than
-  ##' length(parameters_list$leisure_setting_sizes) because the indices in actual_assigned_leisure_settings
-  ##' are missing the values from leisure_setting_not_assigned_to_anyone.
+  # The above are required in processes.R because some of the initially created leisure settings don't get
+  # included, which messes with the indexing. This means that leisure_setting_sizes is the same LENGTH
+  # as actual_assigned_leisure_settings BUT max(actual_assigned_leisure_settings) is > than
+  # length(parameters_list$leisure_setting_sizes) because the indices in actual_assigned_leisure_settings
+  # are missing the values from leisure_setting_not_assigned_to_anyone.
 
   ## Creating initial CategoricalVariable tracking leisure location an individiual goes to on a given day, which we will dynamically update
   specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(actual_assigned_leisure_settings[order(actual_assigned_leisure_settings)]),
