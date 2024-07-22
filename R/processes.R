@@ -88,15 +88,9 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
   }
 
   # Creating vector of setting-specific riskinesses for households
-  if (parameters_list$setting_specific_riskiness_household) {
-    household_specific_riskiness <- EnvStats::rlnormTrunc(n = num_households,
-                                                          meanlog = parameters_list$setting_specific_riskiness_household_meanlog,
-                                                          sdlog = parameters_list$setting_specific_riskiness_household_sdlog,
-                                                          min = parameters_list$setting_specific_riskiness_household_min,
-                                                          max = parameters_list$setting_specific_riskiness_household_max)
-  } else {
-    household_specific_riskiness <- rep(1, num_households)
-  }
+  household_specific_riskiness <- generate_setting_specific_riskinesses(parameters_list = parameters_list,
+                                                                        setting = "household",
+                                                                        number_of_locations = num_households)
 
   ##### WORKPLACES #####
   # Calculate the number of workplaces:
@@ -112,16 +106,10 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     workplace_size_list[[i]] <- length(workplace_index_list[[i]])
   }
 
-  # Creating vector of setting-specific riskinesses for workplaces
-  if (parameters_list$setting_specific_riskiness_workplace) {
-    workplace_specific_riskiness <- EnvStats::rlnormTrunc(n = num_workplaces,
-                                                          meanlog = parameters_list$setting_specific_riskiness_workplace_meanlog,
-                                                          sdlog = parameters_list$setting_specific_riskiness_workplace_sdlog,
-                                                          min = parameters_list$setting_specific_riskiness_workplace_min,
-                                                          max = parameters_list$setting_specific_riskiness_workplace_max)
-  } else {
-    workplace_specific_riskiness <- rep(1, num_workplaces)
-  }
+  # Creating vector of setting-specific riskinesses for households
+  workplace_specific_riskiness <- generate_setting_specific_riskinesses(parameters_list = parameters_list,
+                                                                        setting = "workplace",
+                                                                        number_of_locations = num_workplaces)
 
   ##### SCHOOLS #####
   # Calculate the number of schools:
@@ -137,16 +125,10 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     school_size_list[[i]] <- length(school_index_list[[i]])
   }
 
-  # Creating vector of setting-specific riskinesses for schools
-  if (parameters_list$setting_specific_riskiness_school) {
-    school_specific_riskiness <- EnvStats::rlnormTrunc(n = num_schools,
-                                                       meanlog = parameters_list$setting_specific_riskiness_school_meanlog,
-                                                       sdlog = parameters_list$setting_specific_riskiness_school_sdlog,
-                                                       min = parameters_list$setting_specific_riskiness_school_min,
-                                                       max = parameters_list$setting_specific_riskiness_school_max)
-  } else {
-    school_specific_riskiness <- rep(1, num_schools)
-  }
+  # Generate vector of setting-specific riskinesses for schools
+  school_specific_riskiness <- generate_setting_specific_riskinesses(parameters_list = parameters_list,
+                                                                     setting = "school",
+                                                                     number_of_locations = num_schools)
 
   ##### LEISURE #####
   # Leisure occupancy is dynamically updated each day, so we don't calculate that here.
@@ -156,15 +138,9 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
   num_leisure <- length(parameters_list$setting_sizes$leisure)
 
   # Creating vector of setting-specific riskinesses for leisure settings
-  if (parameters_list$setting_specific_riskiness_leisure) {
-    leisure_specific_riskiness <- EnvStats::rlnormTrunc(n = num_leisure,
-                                                       meanlog = parameters_list$setting_specific_riskiness_leisure_meanlog,
-                                                       sdlog = parameters_list$setting_specific_riskiness_leisure_sdlog,
-                                                       min = parameters_list$setting_specific_riskiness_leisure_min,
-                                                       max = parameters_list$setting_specific_riskiness_leisure_max)
-  } else {
-    leisure_specific_riskiness <- rep(1, num_leisure)
-  }
+  leisure_specific_riskiness <- generate_setting_specific_riskinesses(parameters_list = parameters_list,
+                                                                     setting = "leisure",
+                                                                     number_of_locations = num_leisure)
 
   ## Process Function
   function(t) {
