@@ -66,7 +66,7 @@ However, we made the simplifying assumption that all Locations with a particular
 We have now updated thte model to explicitly incorporate variation in "riskiness" between Locations belonging to the same Setting Type.
 What follows below is a mathematical description of how this addition to the model works, how it was derived, and how we have parameterised this for the purposes of the new results presented in this report.
 
-### Updating the Force of Infection to Include Location-Specific Variation in Riskiness/Receptivity to Transmission 
+### Updating the Force of Infection to Include Location-Specific Variation in Riskiness/Receptivity to Transmission
 
 As a reminder, the previous version of the force of infection experienced by individual $i$ in Location $m$ at time $t$ was calculated as follows:
 
@@ -84,12 +84,12 @@ The updated force of infection term is now the following:
 $$ \lambda_{i,j,m}(t) = \frac{\beta_{j,m} I_{j,m}(t)}{N_{j,m}} $$
 
 where:\
-$$ \beta_{j,m} = \gamma\beta_{m} $$
+$$ \beta_{j,m} = \gamma_{j,m}\beta_{m} $$
 
 and:
 
 $$
-\gamma \sim Lognormal(\mu_{log}, sd_{log})
+\gamma_{j,m} \sim Lognormal(\mu_{m}, \sigma_{m})
 $$
 
 i.e. a draw from a Lognormal distribution.
@@ -98,7 +98,16 @@ For example, $\gamma = 1$ is a setting which is as "risky" (or conducive to tran
 $\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
 Parameterisation and estimation of this parameter $\gamma$ is described further below.
 
-The concentration of pathogen in the air is modelled via the ODE:
+### Estimating $\gamma$
+
+In order to generate reasonable estimates of $\gamma$, we integrated a mathematical model of indoor air quality (as applied to infective virus concentrations) with a well-studied airborne infectious risk model (the Wells-Riley equation).
+We then parameterised these models with estimates from the literature of 1) virus-specific parameters (with SARS-CoV-2 chosen as a case study) and 2) variation in ventilation rates across Locations belonging to the same Setting Type.
+Together, these components enable us to produce estimates of the variation in riskiness for SARS-CoV-2 transmission between different Locations belonging to the same Setting Type.
+Below we describe each of these components in turn.
+
+#### Modelling the Concentration of Infective Virus in a Room
+
+Following the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#), we model the concentration of pathogen in the air via the following ODE:
 
 $$
 \nu \frac{dC(t)}{dt} =  - QC - k_DC \nu + I\pi 
@@ -124,8 +133,10 @@ $$
 C_{ss} =  \frac{I\pi}{\alpha \nu}
 $$
 
-We integrate this estimate of the concentration of infective virus in the room with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
-The Wells-Riley model takes the following form:
+#### Linking this Concentration of Infective Virus to an Infection Risk
+
+We integrate this estimate of the concentration of infective virus in the room from the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#) with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
+The Wells-Riley equation takes the following form:
 
 $$
 P_{i}(t) =  1 - e^{-r C_{ss}Bt}
