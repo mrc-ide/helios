@@ -229,25 +229,25 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     #=====================#
     if ((t * parameters_list$dt) == floor((t * parameters_list$dt))) {
 
-      # Creating vector to store which leisure setting individuals visit on a given day
+      # Creating vector to store which leisure location individuals visit on a given day
       leisure_visit <- vector(mode = "numeric", length = parameters_list$human_population)
 
-      # For each individual, work out which leisure setting they go to that particular day. 0 = they don't go to any
+      # For each individual, work out which leisure location they go to that particular day. 0 = they don't go to any
       for (i in seq(parameters_list$human_population)) {
 
-        # Which leisure settings do individuals have associated with them (and could visit)
+        # Which leisure locations do individuals have associated with them (and could visit)
         potential_leisure_visits <- variables_list$leisure$get_values(i)
 
-        # Sampling which leisure setting actually visited (0 = visit none and staying home)
+        # Sampling which leisure location actually visited (0 = visit none and staying home)
         leisure_visit[i] <- sample(x = unlist(potential_leisure_visits), size = 1)
       }
 
       # Updating the leisure setting visited that day
-      ## Note that we include all leisure settings as categories irrespective of whether they're visited on a particular day
+      ## Note that we include all leisure locations as categories irrespective of whether they're visited on a particular day
       ## Doesn't affect the FOI calculation, as places with no visits on a day don't update the FOI vector
       ## Also note that parameters_list$leisure_indices aren't 1:num_leisure as i) it includes 0 (no leisure visited); and
-      ## 2) as part of the leisure variable creation in variables.R, some initially created leisure settings
-      ##    don't feature in the RaggedInteger vector, and so these setting #s are removed as indices.
+      ## 2) as part of the leisure variable creation in variables.R, some initially created leisure locations
+      ##    don't feature in the RaggedInteger vector, and so these locations are removed as indices.
       variables_list$specific_leisure$initialize(categories = as.character(parameters_list$leisure_indices),
                                                  initial_values = as.character(leisure_visit)) #  update the states with leisure_visit for that day
     }
@@ -256,27 +256,27 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     leisure_FOI <- vector(mode = "numeric", length = parameters_list$human_population)
 
     # Calculating leisure-specific FOI for each individual
-    ## Note that we include all possible leisure settings as categories irrespective of whether they're visited on a particular day
+    ## Note that we include all possible leisure locations as categories irrespective of whether they're visited on a particular day
     ## Doesn't affect the FOI calculation, as places with no visits on a day don't update the FOI vector (FOI is NaN which doesn't index in a vector)
-    ## And note that we're specifically looping through the indices of each leisure setting (for reasons described above)
-    leisure_settings <-  variables_list$specific_leisure$get_categories()
-    leisure_settings <- leisure_settings[leisure_settings != "0"] # removing the "0" category which is not visited
-    for (i in 1:length(leisure_settings)) {
+    ## And note that we're specifically looping through the indices of each leisure locations (for reasons described above)
+    leisure_locations <-  variables_list$specific_leisure$get_categories()
+    leisure_locations <- leisure_locations[leisure_locations != "0"] # removing the "0" category which is not visited
+    for (i in 1:length(leisure_locations)) {
 
-      # Access the index of the specific leisure setting being considered
-      spec_leisure_setting <- as.numeric(leisure_settings[i])
+      # Access the index of the specific leisure locations being considered
+      spec_leisure_location <- as.numeric(leisure_locations[i])
 
-      # Only going through below steps if leisure setting actually visited (i.e. != 0)
-      if (spec_leisure_setting != 0) {
+      # Only going through below steps if a leisure location is actually visited (i.e. != 0)
+      if (spec_leisure_location != 0) {
 
-        # Retrieve the indices of individuals visiting the specific leisure setting
-        spec_leisure <- variables_list$specific_leisure$get_index_of(as.character(spec_leisure_setting))
+        # Retrieve the indices of individuals visiting the specific leisure location
+        spec_leisure <- variables_list$specific_leisure$get_index_of(as.character(spec_leisure_location))
 
-        # Retrieve the indices of all infectious individuals in the particular leisure setting being considered
+        # Retrieve the indices of all infectious individuals in the particular leisure location being considered
         spec_leisure_I <- I$copy()$and(spec_leisure)
 
-        # Calculate the leisure-specific FOI for the i-th leisure setting - with and without farUVC installed
-        ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure settings
+        # Calculate the leisure-specific FOI for the i-th leisure location - with and without farUVC installed
+        ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure locations
         ## (this is in contrast to leisure_indices, which uses the original indices from their generation,
         ##  and which span 1 to max(leisure_indices) with some gaps)
         ## WILL NEED TO CHECK far_uvc_leisure[i] is correct once Adam's PR is in for the same reason
@@ -286,7 +286,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
           spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
         }
 
-        # Store the leisure setting-specific FOI at the indices of all individuals that attend it:
+        # Store the leisure location-specific FOI at the indices of all individuals that attend it:
         leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
       }
 
