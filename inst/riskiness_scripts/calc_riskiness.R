@@ -32,6 +32,11 @@ RRtv <- 0.45
 p_inf <- 1 - exp(-r * Css * RRtv * time)
 plot(time, log10(p_inf), ylim = c(-5, 0))
 
+
+### Sensitivity Analysis examining how variation in air-changes per hour
+### influences riskiness of a room
+
+
 ## do this for 0.1%, 0.5%, 1% and 2.5% infection prevalence
 infection_prevalence <- c(0.0001, 0.0005, 0.001, 0.0025)
 setting_sizes <- 100
