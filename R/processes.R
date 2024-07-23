@@ -373,7 +373,7 @@ create_EI_process <- function(variables_list, events_list, parameters_list){
     E$and(EI_already_scheduled$not(inplace = TRUE))
 
     # Calculate the delay until each exposed individual without a delay transitions to infected:
-    I_times <- round((rgamma(E$size(), 2 * parameters_list$duration_exposed, 2) + 1) / parameters_list$dt)
+    I_times <- round((rgamma(n = E$size(), shape = 2, rate = 2 / parameters_list$duration_exposed) + 1) / parameters_list$dt)
 
     # Schedule the new transitions from exposed to infected:
     events_list$EI_event$schedule(target = E, delay = I_times)
@@ -401,7 +401,7 @@ create_IR_process <- function(variables_list, events_list, parameters_list) {
     I$and(IR_already_scheduled$not(inplace = TRUE))
 
     # Calculate recovery times for infectious individuals without transitions scheduled:
-    R_times <- round((rgamma(I$size(), 2 * parameters_list$duration_infectious, 2) + 1) / parameters_list$dt)
+    R_times <- round((rgamma(n = I$size(), shape = 2, rate = 2 / parameters_list$duration_infectious) + 1) / parameters_list$dt)
 
     # Schedule the recovery events for infectious individuals without transitions scheduled:
     events_list$IR_event$schedule(target = I, delay = R_times)
@@ -429,7 +429,7 @@ create_RS_process <- function(variables_list, events_list, parameters_list) {
     R$and(RS_already_scheduled$not(inplace = TRUE))
 
     # Calculate recovery times for infectious individuals without transitions scheduled:
-    S_times <- round((rgamma(R$size(), 2 * parameters_list$duration_immune, 2) + 1) / parameters_list$dt)
+    S_times <- round(rgamma(n = R$size(), shape = 2, rate = 2 / parameters_list$duration_immune) / parameters_list$dt)
 
     # Schedule the recovery events for infectious individuals without transitions scheduled:
     events_list$RS_event$schedule(target = R, delay = S_times)
