@@ -299,7 +299,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   }
 
   # Check that initial numbers in each state sum to the human population size
-  number_initial <- parameters$number_initial_S + parameters$number_initial_E + parameters$number_initial_I + parameters$number_initial_S + parameters$number_initial_E + parameters$number_initial_R
+  number_initial <- parameters$number_initial_S + parameters$number_initial_E + parameters$number_initial_I + parameters$number_initial_R
   if (number_initial != parameters$human_population) {
     stop("total of number_initial_S, number_initial_E, number_initial_I and number_initial_R should sum to human_population")
   }
