@@ -291,7 +291,6 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
         ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure locations
         ## (this is in contrast to leisure_indices, which uses the original indices from their generation,
         ##  and which span 1 to max(leisure_indices) with some gaps)
-        ## WILL NEED TO CHECK far_uvc_leisure[i] is correct once Adam's PR is in for the same reason
         if (parameters_list$far_uvc_leisure) {
           if (parameters_list$uvc_leisure[i] == 1 & t > parameters_list$far_uvc_leisure_timestep) {
             spec_leisure_FOI <- leisure_specific_riskiness[i] * (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
