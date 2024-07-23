@@ -24,8 +24,9 @@ create_variables <- function(parameters_list) {
     age_class_variable <- individual::CategoricalVariable$new(categories = age_classes, initial_values = household_age_list$age_class_vector)
 
     # Household variable
-    household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(household_age_list$individual_households)),
-                                                              initial_values = as.character(household_age_list$individual_households))
+    household_variable <- individual::CategoricalVariable$new(categories = sprintf("%d", 1:max(household_age_list$individual_households)),
+                                                              initial_values = sprintf("%d", household_age_list$individual_households))
+
   # If user wants to specify age-class proportions and associated households manually
   } else {
     # Specify age-class proportions manually
@@ -37,8 +38,8 @@ create_variables <- function(parameters_list) {
 
     # Household variable
     initial_households <- generate_initial_households(parameters_list = parameters_list, age_class_variable = age_class_variable)
-    household_variable <- individual::CategoricalVariable$new(categories = as.character(1:max(initial_households)),
-                                                  initial_values = as.character(initial_households))
+    household_variable <- individual::CategoricalVariable$new(categories = sprintf("%d", 1:max(initial_households)),
+                                                              initial_values = sprintf("%d", initial_households))
   }
 
   # School setting variable
@@ -61,20 +62,46 @@ create_variables <- function(parameters_list) {
   }
   workplace_variable <- individual::CategoricalVariable$new(categories = as.character(0:num_workplaces), initial_values = initial_workplace_settings)
 
-  # Initialise and populate the leisure setting variable that stores all the leisure locations an individual COULD go to
   # Generating the number and sizes of each leisure setting
   leisure_setting_sizes <- sample_negbinom(N = parameters_list$human_population,
                                            prop_max = parameters_list$leisure_prop_max,
                                            mu = parameters_list$leisure_mean_size,
                                            size = parameters_list$leisure_overdispersion_size)
-  parameters_list$leisure_setting_sizes <- leisure_setting_sizes
-  initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = parameters_list$leisure_setting_sizes) # returns list to initialise RaggedInteger
+
+  # Initialise and populate the leisure setting variable that stores all the leisure locations an individual COULD go to
+  initial_leisure_settings <- generate_initial_leisure(parameters_list = parameters_list, leisure_setting_sizes = leisure_setting_sizes) # returns list to initialise RaggedInteger
   leisure_variable <- individual::RaggedInteger$new(initial_values = initial_leisure_settings)
 
-  possible_leisure_settings <- unique(unlist(initial_leisure_settings))
-  possible_leisure_settings <- possible_leisure_settings[order(possible_leisure_settings)]
-  specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(possible_leisure_settings),
-                                                           initial_values = rep(as.character(0), parameters_list$human_population))
+  # Due to the sampling method used, the leisure settings for which sizes have been drawn (leisure_setting_sizes)
+  # are not always assigned individuals (leisure_variable). To avoid indexing errors, we need to determine
+  # whether there are any unassigned leisure settings and remove them from leisure_setting_sizes:
+
+  # Generate a vector of indices for the leisure locations for which sizes have been drawn:
+  hypothetical_leisure_locations <- 0:length(leisure_setting_sizes)
+
+  # Generate a vector of the indices of leisure locations which individuals have been assigned to:
+  assigned_leisure_locations <- sort(unique(unlist(initial_leisure_settings)))
+
+  # Determine which, if any, of the potential leisure locations no individuals have been assigned to visit:
+  unassigned_leisure_locations <- setdiff(hypothetical_leisure_locations, assigned_leisure_locations)
+
+  # If there are unvisited leisure locations, remove them from the leisure_setting_sizes object:
+  if (!identical(integer(0), unassigned_leisure_locations)) {
+    leisure_setting_sizes <- leisure_setting_sizes[-unassigned_leisure_locations]
+  }
+
+  # Add the assigned leisure locations as a parameter:
+  parameters_list$leisure_indices <- assigned_leisure_locations
+
+  # The above are required in processes.R because some of the initially created leisure settings don't get
+  # included, which messes with the indexing. This means that leisure_setting_sizes is the same LENGTH
+  # as actual_assigned_leisure_settings BUT max(actual_assigned_leisure_settings) is > than
+  # length(parameters_list$leisure_setting_sizes) because the indices in actual_assigned_leisure_settings
+  # are missing the values from leisure_setting_not_assigned_to_anyone.
+
+  ## Creating initial CategoricalVariable tracking leisure location an individiual goes to on a given day, which we will dynamically update
+  specific_day_leisure_variable <- individual::CategoricalVariable$new(categories = as.character(assigned_leisure_locations[order(assigned_leisure_locations)]),
+                                                                       initial_values = rep(as.character(0), parameters_list$human_population))
 
   # Return the list of model variables
   variables_list <- list(

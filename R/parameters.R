@@ -73,6 +73,28 @@
 #' * `far_uvc_household_coverage_type`: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted" for targeting interventions at most populous households
 #' * `far_uvc_household_efficacy`: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_household_timestep`: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
+#'
+#' Setting-Specific Riskiness Parameters:
+#' * `setting_specific_riskiness_workplace`: boolean switch set to TRUE if setting-specific riskiness parameterised in the workplace setting using `set_setting_specific_riskiness()`; default = FALSE
+#' * `setting_specific_riskiness_workplace_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0
+#' * `setting_specific_riskiness_workplace_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0.37
+#' * `setting_specific_riskiness_workplace_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0.4472
+#' * `setting_specific_riskiness_workplace_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 2.236
+#' * `setting_specific_riskiness_school`: boolean switch set to TRUE if setting-specific riskiness parameterised in the school setting using `set_setting_specific_riskiness()`; default = FALSE
+#' * `setting_specific_riskiness_school_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0
+#' * `setting_specific_riskiness_school_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0.37
+#' * `setting_specific_riskiness_school_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0.4472
+#' * `setting_specific_riskiness_school_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 2.236
+#' * `setting_specific_riskiness_leisure`: boolean switch set to TRUE if setting-specific riskiness parameterised in the leisure setting using `set_setting_specific_riskiness()`; default = FALSE
+#' * `setting_specific_riskiness_leisure_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure locations is drawn; default = 0
+#' * `setting_specific_riskiness_leisure_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 0.37
+#' * `setting_specific_riskiness_leisure_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 0.4472
+#' * `setting_specific_riskiness_leisure_max`:The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 2.236
+#' * `setting_specific_riskiness_household`: boolean switch set to TRUE if setting-specific riskiness parameterised in the household setting using `set_setting_specific_riskiness()`; default = FALSE
+#' * `setting_specific_riskiness_household_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0
+#' * `setting_specific_riskiness_household_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.37
+#' * `setting_specific_riskiness_household_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.4472
+#' * `setting_specific_riskiness_household_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
 #' @param archetype A text string indicating the pathogen archetype parameter set to load (default = "none", current options are flu, sars_cov_2, and measles)
 #' @family parameters
 #' @export
@@ -117,6 +139,34 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     duration_immune = NULL,
     prob_inf_external = NULL,
 
+    # Setting-Specific Riskiness Parameters: Workplace
+    setting_specific_riskiness_workplace = FALSE,
+    setting_specific_riskiness_workplace_meanlog = NULL,
+    setting_specific_riskiness_workplace_sdlog = NULL,
+    setting_specific_riskiness_workplace_min = NULL,
+    setting_specific_riskiness_workplace_max = NULL,
+
+    # Setting-Specific Riskiness Parameters: School
+    setting_specific_riskiness_school = FALSE,
+    setting_specific_riskiness_school_meanlog = NULL,
+    setting_specific_riskiness_school_sdlog = NULL,
+    setting_specific_riskiness_school_min = NULL,
+    setting_specific_riskiness_school_max = NULL,
+
+    # Setting-Specific Riskiness Parameters: Leisure
+    setting_specific_riskiness_leisure = FALSE,
+    setting_specific_riskiness_leisure_meanlog = NULL,
+    setting_specific_riskiness_leisure_sdlog = NULL,
+    setting_specific_riskiness_leisure_min = NULL,
+    setting_specific_riskiness_leisure_max = NULL,
+
+    # Setting-Specific Riskiness Parameters: Household
+    setting_specific_riskiness_household = FALSE,
+    setting_specific_riskiness_household_meanlog = NULL,
+    setting_specific_riskiness_household_sdlog = NULL,
+    setting_specific_riskiness_household_min = NULL,
+    setting_specific_riskiness_household_max = NULL,
+
     # Far UVC Parameters: Workplace
     far_uvc_workplace = FALSE,
     far_uvc_workplace_coverage = NULL,
@@ -124,6 +174,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_workplace_coverage_type = NULL,
     far_uvc_workplace_efficacy = NULL,
     far_uvc_workplace_timestep = NULL,
+
     # Far UVC Parameters: School
     far_uvc_school = FALSE,
     far_uvc_school_coverage = NULL,
@@ -131,6 +182,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_school_coverage_type = NULL,
     far_uvc_school_efficacy = NULL,
     far_uvc_school_timestep = NULL,
+
     # Far UVC Parameters: Leisure:
     far_uvc_leisure = FALSE,
     far_uvc_leisure_coverage = NULL,
@@ -138,6 +190,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_leisure_coverage_type = NULL,
     far_uvc_leisure_efficacy = NULL,
     far_uvc_leisure_timestep = NULL,
+
     # Far UVC Parameters: Household:
     far_uvc_household = FALSE,
     far_uvc_household_coverage = NULL,
@@ -239,10 +292,10 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     stop("ERROR: A setting-specific beta has length not equal to 1. All setting-specific betas must be of length 1")
   }
 
-
   ## ADD MORE CHECKS IN HERE FOR PARAMETERS ##
 
   # Return the list of parameters
   parameters
 
 }
+
