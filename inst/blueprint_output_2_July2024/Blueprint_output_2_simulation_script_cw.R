@@ -184,7 +184,7 @@ toc()
 # Combine the simulation outputs into a combined data frame:
 combined_parameter_sweep_outputs <- data.frame()
 for(i in 1:length(simulation_outputs)) {
-  combined_parameter_sweep_outputs <- dplyr::bind_rows(combined_parameter_sweep_outputs, simulation_outputs[[i]])
+  combined_parameter_sweep_outputs <- dplyr::bind_rows(combined_parameter_sweep_outputs, results[[i]])
 }
 
 # Convert the dataframe to long form
