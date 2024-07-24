@@ -6,7 +6,7 @@
 
 ##' In this script, we check that the beta values estimated to produce R0's reflective of the pathogen
 ##' archetypes we calculated prior to the USA data integration development. Specifically, we check that
-##' the beta values for influenza and SARS-CoV-2 (measles will be done later)
+##' the beta values for influenza, SARS-CoV-2 and measles.
 
 #' The original parameter sets for the archetypes are as follows:
 #'
