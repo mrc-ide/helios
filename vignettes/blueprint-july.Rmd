@@ -54,12 +54,12 @@ In this document, we present a series of analyses evaluating the impact that ins
 
 Include relevant details about the model here, and changes from the first report:
 
-## Major Update #1: Consistent Use of Data from the United States of America {#locations}
+## Consistent Use of Data from the United States of America {#locations}
 
 Add some subsections here about the data we now use.
 Can basically copy the structure of the first report.
 
-## Major Update #2: Location-Specific Variability in "Riskiness"
+## Location-Specific Variability in "Riskiness"
 
 Previously, we modelled differences in "riskiness" (i.e. how receptive to onwards transmission it is) between different Setting Types (schools, workplaces, leisure settings and households).
 However, we made the simplifying assumption that all Locations with a particular Setting Type (e.g. individual schools) had the same "riskiness".
