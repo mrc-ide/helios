@@ -85,7 +85,7 @@ $$ P(infection) = 1 - e^{- \lambda_{i,T}t}. $$
 Previously, $\beta$ was specific to the Setting Type (i.e. it was different for schools, workplaces, households and leisure settings) but assumed to be the same same for every location of that setting type e.g. all schools had the same $\beta$.
 
 We have now relaxed this assumption.
-The updated force of infection term is now the following:
+The updated force of infection term is:
 
 $$ \lambda_{i,j,m}(t) = \frac{\beta_{j,m} I_{j,m}(t)}{N_{j,m}} $$
 
