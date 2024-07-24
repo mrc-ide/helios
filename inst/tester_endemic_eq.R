@@ -13,16 +13,16 @@ library(helios); library(tictoc)
 # }
 
 # Checking the new get parameters works
-human_pop <- 5000
-simulation_time <- 500
+human_pop <- 10000
+simulation_time <- 1000
 parameters_list <- get_parameters(overrides = list(human_population = human_pop,
-                                                   number_initial_S = 1500,
-                                                   number_initial_E = 100,
-                                                   number_initial_I = 200,
-                                                   number_initial_R = 3200,
+                                                   number_initial_S = 2 * 1500,
+                                                   number_initial_E = 2 * 100,
+                                                   number_initial_I = 2 * 200,
+                                                   number_initial_R = 2 * 3200,
                                                    endemic_or_epidemic = "endemic",
                                                    duration_immune = 365,
-                                                   prob_inf_external = 0.000025,
+                                                   prob_inf_external = 0.00025,
                                                    simulation_time = simulation_time),
                                   archetype = "sars_cov_2")
 
