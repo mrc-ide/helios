@@ -66,7 +66,7 @@ However, we made the simplifying assumption that all Locations with a particular
 We have updated this and now explicitly incorporate variation in "riskiness" between Locations belonging to the same Setting Type.
 Below is a mathematical description of this addition and the parameterisation used for the results presented in this report.
 
-### 2.1: Modelling Variation in Transmission "Riskiness" Across Locations Belonging to the Same Setting Type
+### Modelling Variation in Transmission "Riskiness" Across Locations Belonging to the Same Setting Type
 
 As a reminder, the previous version of the force of infection experienced by individual $i$ in Location $m$ at time $t$ was calculated as follows:
 
@@ -99,7 +99,7 @@ For example, $\gamma = 1$ is a setting which is as "risky" as the average locati
 $\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
 Parameterisation and estimation of this parameter $\gamma$ is described further below.
 
-### 2.2: Parameterising $\gamma$ - Estimating Empirical Variation in Transmission "Riskiness" Across Locations Belonging to the Same Setting Type
+### Parameterising $\gamma$ - Estimating Empirical Variation in Transmission "Riskiness" Across Locations Belonging to the Same Setting Type
 
 To generate estimates of $\gamma$, we integrated a mathematical model of indoor air quality (as applied to infective virus concentrations) with a well-studied airborne infectious risk model (the Wells-Riley equation).
 We then parameterised these models with literature-derived estimates of:
@@ -111,7 +111,7 @@ We then parameterised these models with literature-derived estimates of:
 Together, these components enable us to produce estimates of the variation in riskiness for SARS-CoV-2 transmission between different Locations belonging to the same Setting Type.
 Below we describe this process.
 
-#### 2.2.1: Modelling the Concentration of Infective Virus in an Enclosed Space and Associated Infection Risk
+#### Modelling the Concentration of Infective Virus in an Enclosed Space and Associated Infection Risk
 
 Following the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#), we model the concentration of pathogen in the air in an enclosed space via the following ODE:
 
@@ -153,7 +153,7 @@ $$
 
 where $P_i$ is the probability a person becomes infected conditional on them spending time $t$ in a room with $C_{ss}$ concentration of infective virus, $B$ is the volume rate at which air is breathed in, and $r$ is the risk parameter, the probability that a single inhaled infective virus will initiate an infection.
 
-#### 2.2.2 Estimating Variation in "Riskiness" Across Locations of the Same Setting Type
+#### Estimating Variation in "Riskiness" Across Locations of the Same Setting Type
 
 With the modelling framework to assess risk in place, we carried out a sensitivity analysis to derive reasonable bounds for $\gamma$.
 We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces and parameter estimates for SARS-CoV-2 from Blatchley et al (see Table \@ref(tab:1)) to explore how Location riskiness varied whilst varying:
@@ -161,6 +161,9 @@ We used the above equations in tandem with estimates of variation in the ventila
 1.  Infection Prevalence (i.e. the number of infectious individuals in the space).
 2.  Air Changes Per Hour (considering the minimum and maximum of the ranges provided in Table \@ref(tab:1))
 3.  The Time Spent in the Space (ranging from 0 to 8 hours).
+
+Our results show that the ratio of "riskiness" for the most and least risky locations for each Setting Type are invariant across different infection prevalences and assumptions about the time spent in the space.
+We use these ratios as the basis for the Setting Type and Location specific $\gamma_{j,m}$ values used in the modelling analyses presented in the next section.
 
 ```{r wells-riley-1, fig.cap="(ref:wells-riley-1)"}
 
@@ -171,9 +174,9 @@ a <- ggplot(subset(overall_df, infection_prevalence == "1% Prev."),
   geom_point() +
   facet_grid(. ~ setting_type, scales = "free_y") +
   theme_bw() +
-  labs(x = "Time (Hours)", y = "Prob. Infected (Wells Riley)",
+  labs(x = "Time (Hours)", y = "Prob. Infected\n(Wells Riley)",
        col = "Air Changes\nPer Hour",
-       title = "Infection Risk Over Time for Each Setting Type Across ACPH Range")
+       title = "Infection Risk Over Time for Each Setting Type Across\nACPH Range")
 
 overall_df2 <- overall_df %>%
   filter(time != 0) %>%
@@ -187,17 +190,13 @@ b <- ggplot(overall_df2, aes(x = as.numeric(time), y = ratio, col = setting_type
   facet_grid(. ~ infection_prevalence) +
   lims(y = c(0, 10)) +
   theme_bw() +
-  labs(x = "Time (Hours)", y = "Prob. Infected (Wells Riley)",
+  labs(x = "Time (Hours)", y = "Ratio of\nInfection Risk",
        col = "Air Changes\nPer Hour",
        title = "Ratio of Infection Risk in Most vs Least Ventilated Locations\nof Each Setting Type")
 
 c <- cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
 c
 ```
-
-Code and analyses to go here
-
-Write something that because of our parameterisation using infection prevalence, that both the I term and the room vol term have setting sizes in them, which cancel out and so it's really density and the air changes per hour that drives things.
 
 +-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                                                              |
