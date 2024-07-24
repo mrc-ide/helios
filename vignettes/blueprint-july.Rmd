@@ -61,8 +61,14 @@ These are:
 
 ## Consistent Use of Data from the USA {#usa-data}
 
-Add some subsections here about the data we now use.
-Can basically copy the structure of the first report.
+Previously, we had used a mixture of data from the United Kingdom (UK) and the USA.
+In particular, we used data from the UK to parameterise the household and school Setting Types and data from the USA to parameterise the workplace Setting Type.
+<!-- Note: what data is the leisure Setting Type based on? -->
+In this update to the model, we alter the household and school Setting Types to be parameterised using data from the USA as follows.
+
+### Household Setting Type
+
+### School Setting Type
 
 ## Location-Specific Variability in "Riskiness" {#location}
 
