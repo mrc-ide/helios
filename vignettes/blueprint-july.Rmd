@@ -68,7 +68,7 @@ Can basically copy the structure of the first report.
 
 Previously, we modelled differences in "riskiness" (i.e. how receptive to onwards transmission it is) between different Setting Types (schools, workplaces, leisure settings and households).
 However, we made the simplifying assumption that all Locations with a particular Setting Type (e.g. individual schools) had the same riskiness.
-We have updated this and now explicitly incorporate variation in riskiness between Locations belonging to the same Setting Type.
+We now explicitly incorporate variation in riskiness between Locations belonging to the same Setting Type.
 Below is a mathematical description of this addition and the parameterisation used for the results presented in this report.
 
 ### Modelling Variation in Transmission Riskiness Across Locations Belonging to the Same Setting Type
