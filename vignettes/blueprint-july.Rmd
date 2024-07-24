@@ -54,30 +54,31 @@ In this document, we present a series of analyses evaluating the impact that ins
 
 Include relevant details about the model here, and changes from the first report:
 
-## The Consistent Use of Data from the United States of America {#locations}
+## Major Update #1: Consistent Use of Data from the United States of America {#locations}
 
 Add some subsections here about the data we now use.
 Can basically copy the structure of the first report.
 
-## Location-Specific Variability in "Riskiness"
+## Major Update #2: Location-Specific Variability in "Riskiness"
 
 Previously, we modelled differences in "riskiness" (i.e. how receptive to onwards transmission it is) between different Setting Types (schools, workplaces, leisure settings and households).
-However, we made the simplifying assumption that all Locations with a particular Setting Type (e.g. all schools) had the same "riskiness", which is unrealistic.
-We have now updated thte model to explicitly incorporate variation in "riskiness" between Locations belonging to the same Setting Type.
-What follows below is a mathematical description of how this addition to the model works, how it was derived, and how we have parameterised this for the purposes of the new results presented in this report.
+However, we made the simplifying assumption that all Locations with a particular Setting Type (e.g. individual schools) had the same "riskiness".
+We have updated this and now explicitly incorporate variation in "riskiness" between Locations belonging to the same Setting Type.
+Below is a mathematical description of this addition and the parameterisation used for the results presented in this report.
 
-### Updating the Force of Infection to Include Location-Specific Variation in Riskiness/Receptivity to Transmission
+### Modelling Variation in Transmission "Riskiness" Across Locations Belonging to the Same Setting Type
 
 As a reminder, the previous version of the force of infection experienced by individual $i$ in Location $m$ at time $t$ was calculated as follows:
 
 $$ \lambda_{i,j,m}(t) = \frac{\beta_{m} I_{j,m}(t)}{N_{j,m}} $$
 
-where $I_m(t)$ are the number of infectious individuals in Location $j$ of Setting Type $m$ at time $t$ , $N_{j,m}$ are the total number of individuals visiting Location $j$ of Setting Type $m$ at time $t$ and $\beta_m$ is a Setting Type-specific (i.e. workplace, school, household, leisure-venue) transmissibility parameter that models **on average** how much transmission happens in a particular Setting Type (e.g. workplaces) compared to other Settings Types (e.g. schools).
+where $I_m(t)$ are the number of infectious individuals in Location $j$ of Setting Type $m$ at time $t$ , $N_{j,m}$ are the total number of individuals visiting Location $j$ of Setting Type $m$ at time $t$ and $\beta_m$ is a Setting Type-specific (i.e. workplace, school, household, leisure-venue specific) transmissibility parameter that models **on average** how much transmission happens in a particular Setting Type (e.g. workplaces) compared to other Settings Types (e.g. schools).
 The total force of infection $\lambda_T$ experienced across all Setting Types is then summed and forms the basis for calculating an individual's probability of infection during one time-step $t$:
 
 $$ P(infection) = 1 - e^{- \lambda_{i,T}t}. $$
 
-Previously, $\beta$ was specific to the Setting Type (i.e. it was different for schools, workplaces, households and leisure settings) but assumed to be the same same for every location belonging to a particular setting type - that is, all individual locations of a particular Setting Type (e.g. all schools) had the same $\beta$.
+Previously, $\beta$ was specific to the Setting Type (i.e. it was different for schools, workplaces, households and leisure settings) but assumed to be the same same for every location of that setting type e.g. all schools had the same $\beta$.
+
 We have now relaxed this assumption.
 The updated force of infection term is now the following:
 
@@ -94,18 +95,23 @@ $$
 
 i.e. a draw from a Lognormal distribution.
 $\gamma$ controls how much more or less risky a particular Location of a specific Setting Type is relative to the **average** for that Setting Type.
-For example, $\gamma = 1$ is a setting which is as "risky" (or conducive to transmission) as the average location of that Setting Type.
+For example, $\gamma = 1$ is a setting which is as "risky" as the average location of that Setting Type.
 $\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
 Parameterisation and estimation of this parameter $\gamma$ is described further below.
 
-### Estimating $\gamma$
+### Parameterising $\gamma$ - Estimating Empirical Variation in Transmission "Riskiness" Across Locations Belonging to the Same Setting Type
 
-In order to generate reasonable estimates of $\gamma$, we integrated a mathematical model of indoor air quality (as applied to infective virus concentrations) with a well-studied airborne infectious risk model (the Wells-Riley equation).
-We then parameterised these models with estimates from the literature of 1) virus-specific parameters (with SARS-CoV-2 chosen as a case study) and 2) variation in ventilation rates across Locations belonging to the same Setting Type.
+To generate estimates of $\gamma$, we integrated a mathematical model of indoor air quality (as applied to infective virus concentrations) with a well-studied airborne infectious risk model (the Wells-Riley equation).
+We then parameterised these models with literature-derived estimates of:
+
+1.  Virus-specific parameters (with SARS-CoV-2 chosen as a case study)
+
+2.  Variation in ventilation rates across Locations belonging to the same Setting Type.
+
 Together, these components enable us to produce estimates of the variation in riskiness for SARS-CoV-2 transmission between different Locations belonging to the same Setting Type.
-Below we describe each of these components in turn.
+Below we describe this process.
 
-#### Modelling the Concentration of Infective Virus in an Enclosed Space
+#### Modelling the Concentration of Infective Virus in an Enclosed Space and Associated Infection Risk
 
 Following the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#), we model the concentration of pathogen in the air in an enclosed space via the following ODE:
 
@@ -128,23 +134,17 @@ $$
 
 $\frac{Q}{\nu}$ is sometimes referred to as $A$ or the number of hair changes per hour.
 $\alpha$ is therefore the number of equivalent air changes per hour taking into account both natural decay of the virus and ventilation driven removal of infective virus.
-
 As $t \rightarrow\infty$, we get the steady state solution, which is the following:
 
 $$
 C_{ss} =  \frac{I\pi}{\alpha \nu}
 $$
 
-We note here also that for the purposes of the analyses presented here, we calculate the volume of the space as follows:
-$$
+For the purposes of the analyses presented here, we assume the volume of the space is the following: $$
 \nu = N D_mH
-$$
+$$ where $N$ is the number of people occupying the space, $D_m$ is the density of people in the space (i.e. the number of people per m\^2) and $H$ is the height of the space.
 
-where $N$ is the number of people occupying the space, $D_m$ is the density of people in the space (i.e. the number of people per m\^2) and $H$ is the height of the space.
-
-#### Linking this Concentration of Infective Virus to an Infection Risk
-
-We integrate this estimate of the concentration of infective virus in the room from the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#) with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
+We then integrate this estimate of the concentration of infective virus in the room with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
 The Wells-Riley equation takes the following form:
 
 $$
@@ -153,37 +153,84 @@ $$
 
 where $P_i$ is the probability a person becomes infected conditional on them spending time $t$ in a room with $C_{ss}$ concentration of infective virus, $B$ is the volume rate at which air is breathed in, and $r$ is the risk parameter, the probability that a single inhaled infective virus will initiate an infection.
 
-#### Estimating Variation in Riskiness Across Different Locations Belonging to the Same Setting Type
+#### Estimating Variation in "Riskiness" Across Locations of the Same Setting Type
 
-We carried out a sensitivity analysis to derive reasonable bounds for the $\gamma$ parameter described above.
+With the modelling framework to assess risk in place, we carried out a sensitivity analysis to derive reasonable bounds for $\gamma$.
 We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces and parameter estimates for SARS-CoV-2 from Blatchley et al (see Table \@ref(tab:1)) to explore how Location riskiness varied whilst varying:
 
 1.  Infection Prevalence (i.e. the number of infectious individuals in the space).
-2.  Air Changes Per Hour
-3.  The Density of Individuals in the Space
-4.  The Time Spent in the Space
+2.  Air Changes Per Hour (considering the minimum and maximum of the ranges provided in Table \@ref(tab:1))
+3.  The Time Spent in the Space (ranging from 0 to 8 hours).
 
-Code and analyses to go here
+Our results show that the ratio of "riskiness" for the most and least risky locations for each Setting Type are invariant across different infection prevalences and assumptions about the time spent in the space.
+We use these ratios as the basis for the Setting Type and Location specific $\gamma_{j,m}$ values used in the modelling analyses presented in the next section.
 
-Write something that because of our parameterisation using infection prevalence, that both the I term and the room vol term have setting sizes in them, which cancel out and so it's really density and the air changes per hour that drives things.
+```{r wells-riley-1, fig.cap="(ref:wells-riley-1)"}
 
-As we can see, the ratio is
+overall_df <- readRDS(paste0(here::here(), "/inst/blueprint_july_wells_riley_infection_risk_variation.rds"))
+a <- ggplot(subset(overall_df, infection_prevalence == "1% Prev."),
+       aes(x = as.numeric(time), y = prob_inf, col = factor(ACPH))) +
+  geom_line() +
+  geom_point() +
+  facet_grid(. ~ setting_type, scales = "free_y") +
+  theme_bw() +
+  labs(x = "Time (Hours)", y = "Prob. Infected\n(Wells Riley)",
+       col = "Air Changes\nPer Hour",
+       title = "Infection Risk Over Time for Each Setting Type Across\nACPH Range")
 
-| Parameter       | Value Used                      | Description                                                                                                                                                                         | Source                                                                                                                                                                                                                                                                                                                                                                                                                               |
-|---------|-----------|--------------------------------|-------------------|
-| $\pi$           | 27 viruses per person per hour  | Rates of (infective) virus emission from infected individuals.                                                                                                                      | [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#) & [Buonanno et al, 2020](https://www.sciencedirect.com/science/article/pii/S0160412020320675#f0020)                                                                                                                                                                                                                                                  |
-| $A_{school}$    | 0.1-2.9 air changes per hour    | Range of air-changes per hour considered for schools.                                                                                                                               | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                                                                                                                                                                                                                                                                                                                  |
-| $D_{school}$    | 30 per 100m\^2                  | Assumed density of individuals in schools                                                                                                                                           | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                                                                                                                                                                                                                                                                                                             |
-| $A_{workplace}$ | 0.22-4.84 air changes per hour  | Range of air-changes per hour considered for workplaces.                                                                                                                            | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                                                                                                                                                                                                                                                                                                                  |
-| $D_{workplace}$ | 10 per 100m\^2                  | Assumed density of individuals in workplaces                                                                                                                                        | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                                                                                                                                                                                                                                                                                                             |
-| $A_{household}$ | 0.21-1.48 air changes per hour  | Range of air-changes per hour considered for households.                                                                                                                            | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                                                                                                                                                                                                                                                                                                                  |
-| $D_{household}$ | 5 per 100m\^2                   | Density of individuals in households                                                                                                                                                | Assumed                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| $A_{leisure}$   | 0.22-4.84 air changes per hour  | Range of air-changes per hour considered for leisure settings.                                                                                                                      | Assumed to be the same as workplaces.                                                                                                                                                                                                                                                                                                                                                                                                |
-| $D_{leisure}$   | 50 per 100m\^2                  | Density of individuals in leisure settings                                                                                                                                          | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                                                                                                                                                                                                                                                                                                             |
-| $k_D$           | 0.64                            | Natural decay constant for SARS-CoV-2 in aerosols                                                                                                                                   | [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#) & [van Doremalen et al, 2020](https://www.nejm.org/doi/full/10.1056/NEJMc2004973)                                                                                                                                                                                                                                                                    |
-| $H$             | 2.5m                            | Height of the space                                                                                                                                                                 | Assumed                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| $B$             | 0.45 m\^3 per hour              | Volume breathing rate i.e. the volume of air breathed in and out per hour. Assumes 15 breaths per minute and 500ml tidal volume to produce 0.45m\^3 volume breathing rate per hour. | [the internet - <https://www.verywellhealth.com/tidal-volume-5090250#>[:\~:text=What%20Is%20Tidal%20Volume%3F&text=Tidal%20volume%20(Vt%20or%20TV,mL%20for%20those%20assigned%20female](https://www.verywellhealth.com/tidal-volume-5090250#:~:text=What%20Is%20Tidal%20Volume%3F&text=Tidal%20volume%20(Vt%20or%20TV,mL%20for%20those%20assigned%20female). and <https://my.clevelandclinic.org/health/articles/10881-vital-signs>] |
-| $r$             | $1.37 × 10^{-2}$                | The probability that a single inhaled infective virus will initiate an infection.                                                                                                   | [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#) & [Killingley et al, 2022](https://www.nature.com/articles/s41591-022-01780-9)                                                                                                                                                                                                                                                                       |
+overall_df2 <- overall_df %>%
+  filter(time != 0) %>%
+  group_by(time, infection_prevalence, setting_type) %>%
+  summarise(ratio = prob_inf[airchanges_per_hour == min(airchanges_per_hour)]/
+                    prob_inf[airchanges_per_hour == max(airchanges_per_hour)])
+
+b <- ggplot(overall_df2, aes(x = as.numeric(time), y = ratio, col = setting_type)) +
+  geom_line() +
+  geom_point() +
+  facet_grid(. ~ infection_prevalence) +
+  lims(y = c(0, 10)) +
+  theme_bw() +
+  labs(x = "Time (Hours)", y = "Ratio of\nInfection Risk",
+       col = "Air Changes\nPer Hour",
+       title = "Ratio of Infection Risk in Most vs Least Ventilated Locations\nof Each Setting Type")
+
+c <- cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
+c
+```
+
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                                                              |
++=================+=====================================+=================================================================================================+=====================================================================================================================================================================================+
+| $\pi$           | 27 viruses per person per hour      | Rates of infective virus emission from infected individuals.                                    | [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#) & [Buonanno et al, 2020](https://www.sciencedirect.com/science/article/pii/S0160412020320675#f0020) |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $D_{school}$    | 30 per 100m\^2                      | Assumed density of individuals in schools                                                       | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                                                            |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $A_{school}$    | 0.1-2.9 air changes per hour (ACPH) | Range of ACPH considered for schools.                                                           | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                                                                 |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $D_{workplace}$ | 10 per 100m\^2                      | Assumed density of individuals in workplaces                                                    | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                                                            |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $A_{workplace}$ | 0.22-4.84 ACPH                      | Range of ACPH considered for workplaces.                                                        | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                                                                 |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $D_{household}$ | 5 per 100m\^2                       | Density of individuals in households                                                            | Assumed                                                                                                                                                                             |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $A_{household}$ | 0.21-1.48 ACPH                      | Range of ACPH considered for households.                                                        | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                                                                 |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $D_{leisure}$   | 50 per 100m\^2                      | Density of individuals in leisure settings                                                      | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                                                            |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $A_{leisure}$   | 0.22-4.84 ACPH                      | Range of ACPH considered for leisure locations.                                                 | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                                                                 |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $k_D$           | 0.64                                | Natural decay constant for SARS-CoV-2 in aerosols                                               | [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#) & [van Doremalen et al, 2020](https://www.nejm.org/doi/full/10.1056/NEJMc2004973)                   |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $H$             | 2.5m                                | Height of the space                                                                             | Assumed                                                                                                                                                                             |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $B$             | 0.45 m\^3 per hour                  | Volume breathing rate assumes 15 breaths per minute and 500ml tidal volume = 0.45m\^3 per hour. | <https://www.verywellhealth.com/tidal-volume-5090250#>                                                                                                                              |
+|                 |                                     |                                                                                                 |                                                                                                                                                                                     |
+|                 |                                     |                                                                                                 | &                                                                                                                                                                                   |
+|                 |                                     |                                                                                                 |                                                                                                                                                                                     |
+|                 |                                     |                                                                                                 | <https://my.clevelandclinic.org/health/articles/10881-vital-signs>                                                                                                                  |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| $r$             | 1.37 × 10\^-2                       | The probability that a single inhaled infective virus will initiate an infection.               | [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#) & [Killingley et al, 2022](https://www.nature.com/articles/s41591-022-01780-9)                      |
++-----------------+-------------------------------------+-------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Table 1: Parameter Estimates Used to Calculate Variation in Riskiness Across Locations Belonging to the Same Setting Type
 
