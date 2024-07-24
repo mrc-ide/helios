@@ -106,19 +106,18 @@ Parameterisation and estimation of the parameter $\gamma$ is described further b
 
 ### Parameterising $\gamma$ - Estimating Empirical Variation in Transmission Riskiness Across Locations Belonging to the Same Setting Type
 
-To generate estimates of $\gamma$, we integrated a mathematical model of indoor air quality (as applied to infective virus concentrations) with a well-studied airborne infectious risk model (the Wells-Riley equation).
+To estimate $\gamma$, we combined a mathematical model of indoor air quality (as applied to infective virus concentrations) with a well-studied airborne infectious risk model (the Wells-Riley equation).
 We then parameterised these models with literature-derived estimates of:
 
-1.  Virus-specific parameters (with SARS-CoV-2 chosen as a case study)
-
-2.  Variation in ventilation rates across Locations belonging to the same Setting Type.
+1. Virus-specific parameters (with SARS-CoV-2 chosen as a case study),
+2. Variation in ventilation rates across Locations belonging to the same Setting Type.
 
 Together, these components enable us to produce estimates of the variation in riskiness for SARS-CoV-2 transmission between different Locations belonging to the same Setting Type.
 Below we describe this process.
 
 #### Modelling the Concentration of Infective Virus in an Enclosed Space and Associated Infection Risk
 
-Following the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#), we model the concentration of pathogen in the air in an enclosed space via the following ODE:
+Following the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#), we model the concentration of pathogen in the air in an enclosed space via the following ordinary differential equation (ODE):
 
 $$
 \nu \frac{dC(t)}{dt} =  - QC - k_DC \nu + I\pi 
