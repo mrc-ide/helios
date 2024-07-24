@@ -142,7 +142,7 @@ household_melt_df <- household_melt_df %>%
 
 ## Plotting overall results
 overall_df <- rbind(school_melt_df, workplace_melt_df, leisure_melt_df, household_melt_df)
-saveRDS(overall_df, file = "inst/blueprint_july_wells_riley_infection_risk_variation.rds")
+saveRDS(overall_df, file = "inst/blueprint_july_transient_wells_riley_infection_risk_variation.rds")
 
 a <- ggplot(subset(overall_df, infection_prevalence == "1% Prev."),
             aes(x = as.numeric(time), y = prob_inf, col = factor(ACPH))) +
