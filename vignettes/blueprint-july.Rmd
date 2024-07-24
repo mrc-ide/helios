@@ -99,10 +99,10 @@ $$
 $$
 
 i.e. a draw from a Lognormal distribution.
-$\gamma$ controls how much more or less risky a particular Location of a specific Setting Type is relative to the **average** for that Setting Type.
+The parameter $\gamma$ controls how risky a particular Location of a specific Setting Type is relative to the **average** for that Setting Type.
 For example, $\gamma = 1$ is a setting which is as "risky" as the average location of that Setting Type.
-$\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
-Parameterisation and estimation of this parameter $\gamma$ is described further below.
+Meanwhile, $\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
+Parameterisation and estimation of the parameter $\gamma$ is described further below.
 
 ### Parameterising $\gamma$ - Estimating Empirical Variation in Transmission Riskiness Across Locations Belonging to the Same Setting Type
 
