@@ -45,21 +45,26 @@ exemplar_data <- readRDS("./exemplar_simulations.rds")
 parameter_sweep_data <- readRDS("./parameter_sweep_data.rds")
 ```
 
-# Overview
+# Overview {-}
 
-This document builds on [previous work](https://mrc-ide.github.io/helios/articles/blueprint.html) that introduced `helios`, an individual-based modelling framework for exploring the impact that installation of far UVC could have on the transmission and burden of respiratory infections.
-In this document, we present a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden....
+In our [initial report](https://mrc-ide.github.io/helios/articles/blueprint.html) we introduced `helios`: an individual-based modelling framework for exploring the impact that installation of far UVC could have on the transmission and burden of respiratory infections.
+This report describes updates made to the modelling framework since that initial report (Section \@ref(changes)).
+Additionally, we present a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden.... (Section \@ref(assessing)).
 
-# Major Model Changes
+# Major Model Changes {#changes}
 
-Include relevant details about the model here, and changes from the first report:
+Two major updates to the model have been made since the initial report.
+These are:
 
-## Consistent Use of Data from the United States of America {#locations}
+1. Using data from the United States of America (USA) to parameterise all aspects of the model (Section \@ref(usa-data)).
+2. Including variation in the propensity for infectious disease transmission (which we call "riskiness") by individual locations in the model (Section \@ref(location)).
+
+## Consistent Use of Data from the USA {#usa-data}
 
 Add some subsections here about the data we now use.
 Can basically copy the structure of the first report.
 
-## Location-Specific Variability in "Riskiness"
+## Location-Specific Variability in "Riskiness" {#location}
 
 Previously, we modelled differences in "riskiness" (i.e. how receptive to onwards transmission it is) between different Setting Types (schools, workplaces, leisure settings and households).
 However, we made the simplifying assumption that all Locations with a particular Setting Type (e.g. individual schools) had the same "riskiness".
@@ -234,7 +239,7 @@ c
 
 : Table 1: Parameter Estimates Used to Calculate Variation in Riskiness Across Locations Belonging to the Same Setting Type
 
-# Assessing how various far UVC parameters shape another outcome
+# Assessing how various far UVC parameters shape another outcome {#assessing}
 
 We considered two pathogen archetypes, SARS-CoV-2 and influenza.
 The properties of SARS-CoV-2 were as follows.
