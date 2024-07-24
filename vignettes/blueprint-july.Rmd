@@ -73,7 +73,7 @@ Below is a mathematical description of this addition and the parameterisation us
 
 ### Modelling Variation in Transmission Riskiness Across Locations Belonging to the Same Setting Type
 
-As a reminder, the previous version of the force of infection experienced by individual $i$ in Location $m$ at time $t$ was calculated as follows:
+Previously, we modelled the force of infection experienced by individual $i$ in Location $m$ at time $t$ as follows:
 
 $$ \lambda_{i,j,m}(t) = \frac{\beta_{m} I_{j,m}(t)}{N_{j,m}} $$
 
