@@ -29,17 +29,17 @@ library(tictoc)
 #----- 2) Parameter Sweep Set-Up -------------------------------------------------------------------
 
 # Calculate the simulation_time required to simulate a 2 year period:
-years_to_simulate <- 7
+years_to_simulate <- 6
 simulation_time_days <- (365 * years_to_simulate)
 
 # Set the human population size:
-human_population <- 100000
+human_population <- 115000 # 100000
 
 # Specify a duration of immunity following infection:
 duration_of_immunity <- 365
 
-# Set a probability of infection from an external source:
-external_infection_probability <- 0.00025
+# Set a probability of infection from an external source (1 person per timestep on average):
+external_infection_probability <- 1 / human_population # 0.000008
 
 # Archetypes to simulate for:
 archetypes <- c("flu", "sars_cov_2")
@@ -250,6 +250,7 @@ Sys.sleep(45)
 saveRDS(object = results1, file = "./inst/blueprint_output_2_July2024/raw_outputs_results3.rds")
 Sys.sleep(15)
 
+## make sure we also save and return the dt and years to simulate and when UVC is started somehow
 
 results[[1]]
 x <- results[[2]]
