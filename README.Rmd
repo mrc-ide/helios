@@ -35,4 +35,9 @@ devtools::install_github("mrc-ide/helios")
 ## Vignettes
 
 * [Get started](https://mrc-ide.github.io/helios/articles/helios.html) gives an introduction to use of the package
-* [An individual-based model for assessing far UVC interventions](https://mrc-ide.github.io/helios/articles/model.html) gives a more detailed description of the model
+* [Technical model description](https://mrc-ide.github.io/helios/articles/model.html) gives a more detailed description of the model
+
+## Working reports
+
+* **May 2024**: [Assessing far UVC interventions with an individual based infectious disease model](https://mrc-ide.github.io/helios/articles/blueprint.html) introduces the `helios` package and demonstrates its application in simulating installation of far UVC interventions and their impact on disease dynamics
+* **July 2024**: [Update to "assessing far UVC interventions with an individual based infectious disease model"](https://mrc-ide.github.io/helios/articles/blueprint-july.html) describes two updates to our initial model, and...
