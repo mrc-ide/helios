@@ -120,11 +120,33 @@ overall3 <- overall %>%
                values_to = "incidence", names_to = "period")
 
 overall3$period <- factor(overall3$period, levels = c("incidence_pre_uvc", "incidence_after_uvc"))
-ggplot(overall3, aes(x = 100 * efficacy, y = incidence, fill = period)) +
+ggplot(overall3, aes(x = 100 * efficacy, y = 0.5 * incidence * 1000 / population, fill = period)) +
   geom_bar(stat = "identity", position = "dodge", col = "black") +
   scale_fill_manual(values = c("#E1E1E1", "#324A5F"),
                     labels = c("Incidence\nPre-UVC", "Incidence\nPost-UVC"),
                     breaks = c("incidence_pre_uvc", "incidence_after_uvc")) +
+  theme_bw() +
+  facet_grid(archetype ~ coverage, scales = "free_y",
+             labeller = as_labeller(c(`0` = "0% Coverage",
+                                      `0.1` = "10% Coverage",
+                                      `0.25` = "25% Coverage",
+                                      `0.5` = "50% Coverage",
+                                      `flu` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2"))) +
+  labs(fill = "Time\nPeriod", x = "Far UVC Efficacy (%)",
+       y = "Annual Infection Incidence (Per 1,000 Population)")
+
+overall4 <- overall %>%
+  group_by(daily_timestep, archetype, efficacy, coverage) %>%
+  summarise(S_count = mean(S_count), E_new = mean(E_new)) %>%
+  ungroup() %>%
+  group_by(archetype, efficacy, coverage) %>%
+  summarise(incidence_pre_uvc = sum(E_new[1:index]),
+            incidence_after_uvc = sum(E_new[(index + 1):end])) %>%
+  mutate(incidence_reduction = incidence_pre_uvc - incidence_after_uvc,
+         incidence_percentage_reduction = incidence_reduction / incidence_pre_uvc)
+ggplot(overall4, aes(x = 100 * efficacy, y = 100 * incidence_percentage_reduction)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "#324A5F", col = "black") +
   theme_bw() +
   facet_grid(archetype ~ coverage, scales = "free_y",
              labeller = as_labeller(c(`0` = "0% Coverage",
