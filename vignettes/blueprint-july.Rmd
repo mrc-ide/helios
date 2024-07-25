@@ -46,26 +46,26 @@ exemplar_data <- readRDS("./exemplar_simulations.rds")
 parameter_sweep_data <- readRDS("./parameter_sweep_data.rds")
 ```
 
-# Overview {-}
+# Overview {.unnumbered}
 
 In our [initial report](https://mrc-ide.github.io/helios/articles/blueprint.html) we introduced `helios`: an individual-based modelling framework for exploring the impact that installation of far UVC could have on the transmission and burden of respiratory infections.
 This report describes updates made to the modelling framework since that initial report (Section \@ref(changes)).
-Additionally, we present a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden.... (Section \@ref(assessing)).
+Additionally, we present a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden of endemic respiratory pathogens, using influenza and SARS-CoV-2 as case studies.
+(Section \@ref(assessing)).
 
 # Major Model Changes {#changes}
 
 Two major updates to the model have been made since the initial report.
 These are:
 
-1. Using data from the United States of America (USA) to parameterise all aspects of the model (Section \@ref(usa-data)).
-2. Including variation in the propensity for infectious disease transmission (which we call "riskiness") by individual locations in the model (Section \@ref(location)).
+1.  Using data from the United States of America (USA) to parameterise all aspects of the model (Section \@ref(usa-data)).
+2.  Including variation in the propensity for infectious disease transmission (which we call "riskiness") by individual locations in the model (Section \@ref(location)).
 
 ## Consistent Use of Data from the USA {#usa-data}
 
 Previously, we used data both from the United Kingdom (UK) and from the USA.
 In particular, we used data from the UK to parameterise the household and school Setting Types and data from the USA to parameterise the workplace Setting Type.
-<!-- Note: what data is the leisure Setting Type based on? -->
-In this update to the model, we parameterise the household and school Setting Types using data from the USA as follows.
+<!-- Note: what data is the leisure Setting Type based on? --> In this update to the model, we parameterise the household and school Setting Types using data from the USA as follows.
 
 ### Household Setting Type
 
@@ -124,8 +124,8 @@ Parameterisation and estimation of the parameter $\gamma$ is described further b
 To estimate $\gamma$, we combined a mathematical model of indoor air quality (as applied to infective virus concentrations) with a well-studied airborne infectious risk model (the Wells-Riley equation).
 We then parameterised these models with literature-derived estimates of:
 
-1. Virus-specific parameters (with SARS-CoV-2 chosen as a case study),
-2. Variation in ventilation rates across Locations belonging to the same Setting Type.
+1.  Virus-specific parameters (with SARS-CoV-2 chosen as a case study),
+2.  Variation in ventilation rates across Locations belonging to the same Setting Type.
 
 Together, these components enable us to produce estimates of the variation in riskiness for SARS-CoV-2 transmission between different Locations belonging to the same Setting Type.
 Below we describe this process.
@@ -142,7 +142,7 @@ where $v$ is the space volume, $C$ is the infective virus concentration, $t$ is 
 The closed-form solution to this equation is:
 
 $$
-C =  \frac{I\pi}{\alpha \nu}(1 - e^{-\alpha t}) 
+C(t) =  \frac{I\pi}{\alpha \nu}(1 - e^{-\alpha t}) 
 $$
 
 where:
@@ -153,15 +153,9 @@ $$
 
 $\frac{Q}{\nu}$ is sometimes referred to as $A$ or the number of hair changes per hour.
 $\alpha$ is therefore the number of equivalent air changes per hour taking into account both natural decay of the virus and ventilation driven removal of infective virus.
-As $t \rightarrow\infty$, we get the steady state solution, which is the following:
-
-$$
-C_{ss} =  \frac{I\pi}{\alpha \nu}
-$$
-
 For the purposes of the analyses presented here, we assume the volume of the space is the following: $$
 \nu = N D_mH
-$$ where $N$ is the number of people occupying the space, $D_m$ is the density of people in the space (i.e. the number of people per m\^2) and $H$ is the height of the space.
+$$where $N$ is the number of people occupying the space, $D_m$ is the density of people in the space (i.e. the number of people per m\^2) and $H$ is the height of the space.
 
 We then integrate this estimate of the concentration of infective virus in the room with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
 The Wells-Riley equation takes the following form:
@@ -184,9 +178,9 @@ We used the above equations in tandem with estimates of variation in the ventila
 Our results show that the ratio of riskiness for the most and least risky locations for each Setting Type are invariant across different infection prevalences and assumptions about the time spent in the space.
 We use these ratios as the basis for the Setting Type and Location specific $\gamma_{j,m}$ values used in the modelling analyses presented in the next section.
 
-```{r wells-riley-1, fig.cap="(ref:wells-riley-1)"}
+```{r wells-riley-1, fig.cap="(ref:wells-riley-1)", fig.fullwidth = TRUE, fig.height=5}
 
-overall_df <- readRDS(paste0(here::here(), "/inst/blueprint_july_wells_riley_infection_risk_variation.rds"))
+overall_df <- readRDS(paste0(here::here(), "/inst/blueprint_july_transient_wells_riley_infection_risk_variation.rds"))
 a <- ggplot(subset(overall_df, infection_prevalence == "1% Prev."),
        aes(x = as.numeric(time), y = prob_inf, col = factor(ACPH))) +
   geom_line() +
@@ -195,7 +189,7 @@ a <- ggplot(subset(overall_df, infection_prevalence == "1% Prev."),
   theme_bw() +
   labs(x = "Time (Hours)", y = "Prob. Infected\n(Wells Riley)",
        col = "Air Changes\nPer Hour",
-       title = "Infection Risk Over Time for Each Setting Type Across\nACPH Range")
+       title = "Infection Risk for Each Setting Type Across ACPH Range")
 
 overall_df2 <- overall_df %>%
   filter(time != 0) %>%
@@ -211,7 +205,7 @@ b <- ggplot(overall_df2, aes(x = as.numeric(time), y = ratio, col = setting_type
   theme_bw() +
   labs(x = "Time (Hours)", y = "Ratio of\nInfection Risk",
        col = "Air Changes\nPer Hour",
-       title = "Ratio of Infection Risk in Most vs Least Ventilated Locations\nof Each Setting Type")
+       title = "Ratio of Infection Risk in Most vs Least Ventilated Locations")
 
 c <- cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
 c
