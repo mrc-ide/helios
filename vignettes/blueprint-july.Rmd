@@ -64,8 +64,8 @@ These are:
 ## Consistent Use of Data from the USA {#usa-data}
 
 Previously, we used data both from the United Kingdom (UK) and from the USA.
-In particular, we used data from the UK to parameterise the household and school Setting Types and data from the USA to parameterise the workplace Setting Type.
-In this update to the model, we parameterise the household and school Setting Types using data only from the USA.
+In particular, we used data from the UK to parameterise the age distribution, household and school Setting Types; and data from the USA to parameterise the workplace Setting Type.
+In this update to the model, we parameterise the age distribution, household and school Setting Types using data only from the USA.
 
 ### Household Setting Type & Age Distribution
 
