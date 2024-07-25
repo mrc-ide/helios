@@ -65,7 +65,7 @@ ggplot(overall, aes(x = daily_timestep, y = I_count * 1000 / population,
 
 ## Plotting the range spanned by the stochastic simulations
 overall2 <- overall %>%
-  group_by(timestep, archetype, efficacy, coverage) %>%
+  group_by(daily_timestep, archetype, efficacy, coverage) %>%
   summarise(S_count = mean(S_count),
             S_lower = min(S_count),
             S_upper = max(S_count),
@@ -81,23 +81,36 @@ overall2 <- overall %>%
             E_new = mean(E_new),
             E_new_lower = min(E_new),
             E_new_upper = max(E_new))
-ggplot(overall2, aes(x = timestep, col = archetype)) +
+ggplot(overall2, aes(x = daily_timestep, col = archetype)) +
   geom_line(aes(y = 1000 * E_new / population), linewidth = 0.1) +
-  geom_ribbon(aes(ymin = 1000 * E_new_lower / population, ymax = 1000 * E_new_upper / population), alpha = 0.15) +
-  facet_grid(efficacy ~ coverage) +
+  geom_ribbon(aes(fill = archetype,
+                  ymin = 1000 * E_new_lower / population,
+                  ymax = 1000 * E_new_upper / population), alpha = 0.15) +
+  geom_vline(xintercept = c(0, 365, 730, 1095, 1460), linewidth = 0.25, linetype = "dashed") +
+  geom_vline(xintercept = index, linewidth = 0.5, linetype = "solid") +
+  facet_grid(efficacy ~ coverage,
+             labeller = as_labeller(c(`0` = "0% Coverage",
+                                      `0.1` = "10% Coverage",
+                                      `0.25` = "25% Coverage",
+                                      `0.5` = "50% Coverage",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
   theme_bw() +
   scale_colour_manual(values = c("#C463B1", "#79CB97"),
                       labels = c("Influenza", "SARS-CoV-2"),
                       breaks = c("flu", "sars_cov_2")) +
-  labs(col = "Pathogen\nArchetype",
-       x = "Time (Days)",
+  scale_fill_manual(values = c("#C463B1", "#79CB97"),
+                    labels = c("Influenza", "SARS-CoV-2"),
+                    breaks = c("flu", "sars_cov_2")) +
+  labs(col = "Pathogen\nArchetype", fill = "Pathogen\nArchetype", x = "Time (Days)",
        y = "Daily Infection Incidence (Per 1,000 Population)")
 
 ## Calculating and plotting incidence reduction
-index <- 2 * 365 / 0.5
-end <- length(unique(overall$timestep))
+index <- 2 * 365
+end <- length(unique(overall$daily_timestep))
 overall3 <- overall %>%
-  group_by(timestep, archetype, efficacy, coverage) %>%
+  group_by(daily_timestep, archetype, efficacy, coverage) %>%
   summarise(S_count = mean(S_count), E_new = mean(E_new)) %>%
   ungroup() %>%
   group_by(archetype, efficacy, coverage) %>%
@@ -106,14 +119,22 @@ overall3 <- overall %>%
   pivot_longer(cols = c(incidence_pre_uvc, incidence_after_uvc),
                values_to = "incidence", names_to = "period")
 
-overall3$period <- factor(overall3$period,
-                          levels = c("incidence_pre_uvc",
-                                     "incidence_after_uvc"))
-
-ggplot(overall3,
-       aes(x = efficacy, y = incidence, fill = period)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  facet_grid(archetype ~ coverage, scales = "free_y")
+overall3$period <- factor(overall3$period, levels = c("incidence_pre_uvc", "incidence_after_uvc"))
+ggplot(overall3, aes(x = 100 * efficacy, y = incidence, fill = period)) +
+  geom_bar(stat = "identity", position = "dodge", col = "black") +
+  scale_fill_manual(values = c("#E1E1E1", "#324A5F"),
+                    labels = c("Incidence\nPre-UVC", "Incidence\nPost-UVC"),
+                    breaks = c("incidence_pre_uvc", "incidence_after_uvc")) +
+  theme_bw() +
+  facet_grid(archetype ~ coverage, scales = "free_y",
+             labeller = as_labeller(c(`0` = "0% Coverage",
+                                      `0.1` = "10% Coverage",
+                                      `0.25` = "25% Coverage",
+                                      `0.5` = "50% Coverage",
+                                      `flu` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2"))) +
+  labs(fill = "Time\nPeriod", x = "Far UVC Efficacy (%)",
+       y = "Infection Incidence (Per 1,000 Population)")
 
 for (i in 1:40) {
 
