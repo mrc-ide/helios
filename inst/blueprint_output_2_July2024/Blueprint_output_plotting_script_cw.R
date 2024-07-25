@@ -7,14 +7,16 @@ library(tidyverse)
 outputs <- readRDS("inst/blueprint_output_2_July2024/raw_outputs_results1.rds")
 
 # Processing the data
-years_to_simulate <- 7 # 6 in newer outputs
+### NEED SOME WAY OF PORTING IN YEARS TO SIMULATE, TIMING OF UVC ETC FROM THE RUNS IN HERE
+years_to_simulate <- 7 # 6 in newer outputs CHANGE THIS!!!
 dt <- 0.5
+population <- 100000 ## 115000
 timestep_baseline_start <- ((years_to_simulate - 4) * 365) / dt
 timestep_baseline_end <- ((years_to_simulate - 2) * 365) / dt
 timestep_uvc_start <- ((years_to_simulate - 2) * 365 + 1) / dt
 timestep_uvc_end <- (years_to_simulate * 365) / dt
 
-##
+## Removing the burnin whilst the model reaches equilibrium
 outputs_processed <- outputs
 index_start <- which(outputs_processed[[1]]$timestep == timestep_baseline_start)
 index_end <- which(outputs_processed[[1]]$timestep == timestep_uvc_end)
@@ -24,32 +26,74 @@ for (i in 1:length(outputs)) {
   outputs_processed[[i]]$coverage <- simulations_to_run[i, "coverage"]
   outputs_processed[[i]]$efficacy <- simulations_to_run[i, "efficacy"]
   outputs_processed[[i]]$iteration <- simulations_to_run[i, "iteration"]
+  outputs_processed[[i]]$new_timestep <- outputs_processed[[i]]$timestep - min(outputs_processed[[i]]$timestep)
 }
 
-overall <- dplyr::bind_rows(outputs_processed)
-colnames(overall)
+## Plotting the trajectories of individual stochastic simulations
+index <- 2 * 365
+end <- length(unique(overall$daily_timestep))
+overall <- dplyr::bind_rows(outputs_processed) %>%
+  mutate(daily_timestep = floor(new_timestep * dt)) %>%
+  group_by(iteration, archetype, efficacy, coverage, daily_timestep) %>%
+  summarise(S_count = mean(S_count),
+            E_count = mean(E_count),
+            I_count = mean(I_count),
+            R_count = mean(R_count),
+            E_new = sum(E_new),
+            n_external_infections = sum(n_external_infections))
+ggplot(overall, aes(x = daily_timestep, y = I_count * 1000 / population,
+                     group = interaction(archetype, factor(iteration)),
+                    col = archetype)) +
+  geom_line(alpha = 1) +
+  geom_vline(xintercept = c(0, 365, 730, 1095, 1460), linewidth = 0.25, linetype = "dashed") +
+  geom_vline(xintercept = index, linewidth = 0.5, linetype = "solid") +
+  facet_grid(efficacy ~ coverage,
+             labeller = as_labeller(c(`0` = "0% Coverage",
+                                      `0.1` = "10% Coverage",
+                                      `0.25` = "25% Coverage",
+                                      `0.5` = "50% Coverage",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme_bw() +
+  scale_colour_manual(values = c("#C463B1", "#79CB97"),
+                      labels = c("Influenza", "SARS-CoV-2"),
+                      breaks = c("flu", "sars_cov_2")) +
+  labs(col = "Pathogen\nArchetype",
+       x = "Time (Days)",
+       y = "Number of Infectious Individuals (Per 1,000 Population)")
 
-table(overall$archetype)
-table(overall$ID)
-table(overall$efficacy)
-table(overall$coverage)
-table(overall$iteration)
-table(overall$E_new)
-
-ggplot(overall, aes(x = timestep, y = E_new,
-                    col = interaction(factor(iteration), archetype))) +
-  geom_line() +
-  facet_grid(efficacy ~ coverage)
-
+## Plotting the range spanned by the stochastic simulations
 overall2 <- overall %>%
   group_by(timestep, archetype, efficacy, coverage) %>%
   summarise(S_count = mean(S_count),
-            E_new = mean(E_new))
+            S_lower = min(S_count),
+            S_upper = max(S_count),
+            E_count = mean(E_count),
+            E_lower = min(E_count),
+            E_upper = max(E_count),
+            I_count = mean(I_count),
+            I_lower = min(I_count),
+            I_upper = max(I_count),
+            R_count = mean(R_count),
+            R_lower = min(R_count),
+            R_upper = max(R_count),
+            E_new = mean(E_new),
+            E_new_lower = min(E_new),
+            E_new_upper = max(E_new))
+ggplot(overall2, aes(x = timestep, col = archetype)) +
+  geom_line(aes(y = 1000 * E_new / population), linewidth = 0.1) +
+  geom_ribbon(aes(ymin = 1000 * E_new_lower / population, ymax = 1000 * E_new_upper / population), alpha = 0.15) +
+  facet_grid(efficacy ~ coverage) +
+  theme_bw() +
+  scale_colour_manual(values = c("#C463B1", "#79CB97"),
+                      labels = c("Influenza", "SARS-CoV-2"),
+                      breaks = c("flu", "sars_cov_2")) +
+  labs(col = "Pathogen\nArchetype",
+       x = "Time (Days)",
+       y = "Daily Infection Incidence (Per 1,000 Population)")
 
-ggplot(overall2, aes(x = timestep, y = S_count, col = archetype)) +
-  geom_line() +
-  facet_grid(efficacy ~ coverage)
-
+## Calculating and plotting incidence reduction
 index <- 2 * 365 / 0.5
 end <- length(unique(overall$timestep))
 overall3 <- overall %>%
@@ -60,8 +104,7 @@ overall3 <- overall %>%
   summarise(incidence_pre_uvc = sum(E_new[1:index]),
             incidence_after_uvc = sum(E_new[(index + 1):end])) %>%
   pivot_longer(cols = c(incidence_pre_uvc, incidence_after_uvc),
-               values_to = "incidence",
-               names_to = "period")
+               values_to = "incidence", names_to = "period")
 
 overall3$period <- factor(overall3$period,
                           levels = c("incidence_pre_uvc",
