@@ -58,7 +58,7 @@ Additionally, we present a series of analyses evaluating the impact that install
 Two major updates to the model have been made since the initial report.
 These are:
 
-1.  Using data from the United States of America (USA) to parameterise all aspects of the model (Section \@ref(usa-data)).
+1.  Using data from the United States of America (USA) to parameterise all aspects of the model's representation of the physical environment (Section \@ref(usa-data)).
 2.  Including variation in the propensity for infectious disease transmission (which we call "riskiness") by individual locations in the model (Section \@ref(location)).
 
 ## Consistent Use of Data from the USA {#usa-data}
