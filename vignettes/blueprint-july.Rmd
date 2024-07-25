@@ -229,7 +229,7 @@ b <- ggplot(overall_df2, aes(x = as.numeric(time), y = ratio, col = setting_type
   geom_line() +
   geom_point() +
   facet_grid(. ~ infection_prevalence) +
-  geom_vline(data = y_intercepts, aes(xintercept = time_spent)) +
+  geom_vline(data = y_intercepts, aes(xintercept = time_spent, col = setting_type), linetype = "dashed") +
   lims(y = c(0, 10)) +
   theme_bw() +
   scale_x_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12)) +
