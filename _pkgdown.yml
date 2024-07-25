@@ -2,6 +2,24 @@ url: https://mrc-ide.github.io/helios/
 template:
   bootstrap: 5
 
+navbar:
+  structure:
+    left: [intro, reference, articles, reports]
+    right: [search, github, lightswitch]
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: Technical model description
+        href: articles/model.html
+    reports:
+      text: Working reports
+      menu:
+      - text: Assessing far UVC interventions with an individual based infectious disease model
+        href: articles/blueprint.html
+      - text: Update to "Assessing far UVC interventions with an individual based infectious disease model"
+        href: articles/blueprint-july.html
+
 reference:
 - title: Parameters
   contents:

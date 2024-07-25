@@ -2,6 +2,7 @@
 title: "Assessing far UVC interventions with an individual based infectious disease model"
 author:
   - Charlie Whittaker^[Imperial College London], Tom Brewer^[Imperial College London], Adam Howes^[Independent]
+date: "May 2024"
 output: 
   bookdown::html_document2:
     fig_caption: yes
@@ -14,6 +15,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 bibliography: REFERENCES.bib
 ---
+
+::: {.alert .alert-warning}
+This report is not up to date with latest changes to the model!
+:::
 
 ```{r, include = FALSE}
 options(rmarkdown.html_vignette.check_title = FALSE)
