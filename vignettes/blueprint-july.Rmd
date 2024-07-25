@@ -77,8 +77,7 @@ State and county specific data are available - we selected data from San Francis
 Fig XA shows the previous household size distribution used (based on UK-wide data); Fig XB shows the household size distribution now being used (which is based on the data described above).
 Fig Y shows the same but for the age distribution used.
 
-[[ Adam - can you insert some figures here please!]
-]
+**[[ Adam - can you insert some figures here please!]]**
 
 ### School Setting Type
 
@@ -283,4 +282,3 @@ data.frame(x = 1:5, y = 1:5) |>
 (ref:placeholder-2) Placeholder two.
 
 # Bibliography {.unnumbered}
-
