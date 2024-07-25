@@ -2,6 +2,7 @@
 title: 'Update to "assessing far UVC interventions with an individual based infectious disease model"'
 author:
   - Charlie Whittaker^[Imperial College London], Tom Brewer^[Imperial College London], Adam Howes^[Independent]
+date: "July 2024"
 output: 
   bookdown::html_document2:
     fig_caption: yes
@@ -61,14 +62,22 @@ These are:
 
 ## Consistent Use of Data from the USA {#usa-data}
 
-Previously, we had used a mixture of data from the United Kingdom (UK) and the USA.
+Previously, we used data both from the United Kingdom (UK) and from the USA.
 In particular, we used data from the UK to parameterise the household and school Setting Types and data from the USA to parameterise the workplace Setting Type.
 <!-- Note: what data is the leisure Setting Type based on? -->
-In this update to the model, we alter the household and school Setting Types to be parameterised using data from the USA as follows.
+In this update to the model, we parameterise the household and school Setting Types using data from the USA as follows.
 
 ### Household Setting Type
 
+To parameterise the model's household distribution (and implicitly age distribution) we use data from an synthetic household population of the USA developed by RTI International [@wheaton2014us].
+State and county specific data are available.
+We selected data from San Francisco, California.
+
 ### School Setting Type
+
+To parameterise the enrollment size of US schools we used data from 2019-2020 from the National Center for Education Statistics, available from @deBrey2023Digest.
+We included all schools categorised as "prekindergarten", "elementary", "middle", or "secondary and high".
+As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550).
 
 ## Location-Specific Variability in "Riskiness" {#location}
 
