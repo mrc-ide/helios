@@ -81,9 +81,14 @@ Fig Y shows the same but for the age distribution used.
 
 ### School Setting Type
 
-To parameterise the enrollment size of US schools we used data from 2019-2020 from the National Center for Education Statistics, available from @deBrey2023Digest.
+To parameterise the model's schools sizes, we used US school size data from 2019-2020 from the National Center for Education Statistics, available from @deBrey2023Digest.
 We included all schools categorised as "prekindergarten", "elementary", "middle", or "secondary and high".
 As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550) for the purposes of constructing the distribution of schools sizes.
+This data was available only at the national level, which we use here.
+
+Fig ZA shows the previous school size distribution used (based on UK-wide data); Fig ZB shows the household size distribution now being used (which is based on the data described above).
+
+**[[ Adam - can you insert some figures here please!]]**
 
 ## Location-Specific Variability in "Riskiness" {#location}
 
