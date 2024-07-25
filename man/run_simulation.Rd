@@ -14,4 +14,8 @@ run_simulation(parameters_list)
 \description{
 Run the simulation
 }
+\seealso{
+Other model: 
+\code{\link{run_simulations_from_table}()}
+}
 \concept{model}

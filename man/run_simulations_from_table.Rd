@@ -14,3 +14,8 @@ run_simulations_from_table(parameters_table, output_type = "simulations")
 \description{
 Run helios simulations using table of parameter values
 }
+\seealso{
+Other model: 
+\code{\link{run_simulation}()}
+}
+\concept{model}
