@@ -65,19 +65,26 @@ These are:
 
 Previously, we used data both from the United Kingdom (UK) and from the USA.
 In particular, we used data from the UK to parameterise the household and school Setting Types and data from the USA to parameterise the workplace Setting Type.
-<!-- Note: what data is the leisure Setting Type based on? --> In this update to the model, we parameterise the household and school Setting Types using data from the USA as follows.
+In this update to the model, we parameterise the household and school Setting Types using data only from the USA.
 
-### Household Setting Type
+### Household Setting Type & Age Distribution
 
-To parameterise the model's household distribution (and implicitly age distribution) we use data from an synthetic household population of the USA developed by RTI International [@wheaton2014us].
-State and county specific data are available.
-We selected data from San Francisco, California.
+To parameterise the model's household size and age distribution we use data from a synthetic USA population developed by RTI International for the purposes of disease modelling [@wheaton2014us].
+This dataset is synthetic, but was developed by calibrating to datasources from the USA - it is therefore a virtual, anonymised population that is representative of the USA.
+It contains individual-level information on household residency and age, which we use to construct the household Setting Type and age distribution used in the results presented here.
+State and county specific data are available - we selected data from San Francisco, California.
+
+Fig XA shows the previous household size distribution used (based on UK-wide data); Fig XB shows the household size distribution now being used (which is based on the data described above).
+Fig Y shows the same but for the age distribution used.
+
+[[ Adam - can you insert some figures here please!]
+]
 
 ### School Setting Type
 
 To parameterise the enrollment size of US schools we used data from 2019-2020 from the National Center for Education Statistics, available from @deBrey2023Digest.
 We included all schools categorised as "prekindergarten", "elementary", "middle", or "secondary and high".
-As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550).
+As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550) for the purposes of constructing the distribution of schools sizes.
 
 ## Location-Specific Variability in "Riskiness" {#location}
 
@@ -276,3 +283,4 @@ data.frame(x = 1:5, y = 1:5) |>
 (ref:placeholder-2) Placeholder two.
 
 # Bibliography {.unnumbered}
+
