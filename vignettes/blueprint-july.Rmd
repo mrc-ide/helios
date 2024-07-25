@@ -263,7 +263,7 @@ c
 
 We considered two pathogen archetypes, SARS-CoV-2 and influenza.
 The properties of SARS-CoV-2 were as follows.
-The properties of influenze were as follows.
+The properties of influenza were as follows.
 For each pathogen archetype, we considered the effect of far UVC efficacy and far UVC coverage on another outcome.
 We varied far UVC efficacy in the following range.
 We varied far UVC coverage in the following range with the following settings.
