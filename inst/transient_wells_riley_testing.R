@@ -7,7 +7,7 @@ kD <- 0.64     # natural decay constant for SARS-CoV-2
 r <- 1.37e-2   # the probability that a single inhaled infective virus will initiate an infection
 RRtv <- 0.45   # volume breathing rate - assumes 15 breaths per minute and 500ml tidal volume = 0.45m^3 per hour
 infection_prevalence <- c(0.0001, 0.001, 0.01, 0.025) # prevalence of infection
-time_in_room <- seq(0, 8, 1) # time spent in the room
+time_in_room <- seq(0, 12, 1) # time spent in the room
 room_height <- 2.5 # height of the room
 setting_occupancy <- 100 # number of people in the room (note this cancels out via I and room_vol in equations below
 # so not actually required); only put here for completeness

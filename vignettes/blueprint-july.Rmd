@@ -109,7 +109,6 @@ The total force of infection $\lambda_T$ experienced across all Setting Types is
 $$ P(infection) = 1 - e^{- \lambda_{i,T}t}. $$
 
 Previously, $\beta$ was specific to the Setting Type (i.e. it was different for schools, workplaces, households and leisure settings) but assumed to be the same same for every location of that setting type e.g. all schools had the same $\beta$.
-
 We have now relaxed this assumption.
 The updated force of infection term is:
 
@@ -138,10 +137,10 @@ We then parameterised these models with literature-derived estimates of:
 1.  Virus-specific parameters (with SARS-CoV-2 chosen as a case study),
 2.  Variation in ventilation rates across Locations belonging to the same Setting Type.
 
-Together, these components enable us to produce estimates of the variation in riskiness for SARS-CoV-2 transmission between different Locations belonging to the same Setting Type.
+Together, these enable us to produce estimates of the variation in riskiness for SARS-CoV-2 transmission between different Locations belonging to the same Setting Type.
 Below we describe this process.
 
-#### Modelling the Concentration of Infective Virus in an Enclosed Space and Associated Infection Risk
+#### Step 1: Modelling the Concentration of Infective Virus in an Enclosed Space and Associated Infection Risk
 
 Following the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#), we model the concentration of pathogen in the air in an enclosed space via the following ordinary differential equation (ODE):
 
@@ -162,22 +161,22 @@ $$
 \alpha = \frac{Q}{\nu} + k_D
 $$
 
-$\frac{Q}{\nu}$ is sometimes referred to as $A$ or the number of hair changes per hour.
-$\alpha$ is therefore the number of equivalent air changes per hour taking into account both natural decay of the virus and ventilation driven removal of infective virus.
+$\frac{Q}{\nu}$ is the number of air changes per hour.
+$\alpha$ is therefore the number of equivalent air changes per hour taking into account both natural decay of the virus and ventilation-driven removal of infective virus.
 For the purposes of the analyses presented here, we assume the volume of the space is the following: $$
 \nu = N D_mH
 $$where $N$ is the number of people occupying the space, $D_m$ is the density of people in the space (i.e. the number of people per m\^2) and $H$ is the height of the space.
 
-We then integrate this estimate of the concentration of infective virus in the room with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
+We then integrate this estimate of the concentration of infective virus in the space with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
 The Wells-Riley equation takes the following form:
 
 $$
 P_{i}(t) =  1 - e^{-r C_{ss}Bt}
 $$
 
-where $P_i$ is the probability a person becomes infected conditional on them spending time $t$ in a room with $C_{ss}$ concentration of infective virus, $B$ is the volume rate at which air is breathed in, and $r$ is the risk parameter, the probability that a single inhaled infective virus will initiate an infection.
+where $P_i$ is the probability a person becomes infected conditional on them spending time $t$ in a space with $C_{ss}$ concentration of infective virus, $B$ is the volume rate at which air is breathed in, and $r$ is the risk parameter, the probability that a single inhaled infective virus will initiate an infection.
 
-#### Estimating Variation in Riskiness Across Locations of the Same Setting Type
+#### Step 2: Estimating Variation in Riskiness Across Locations of the Same Setting Type
 
 With the modelling framework to assess risk in place, we carried out a sensitivity analysis to derive reasonable bounds for $\gamma$.
 We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces and parameter estimates for SARS-CoV-2 from Blatchley et al (see Table \@ref(tab:1)) to explore how Location riskiness varied whilst varying:
@@ -186,7 +185,20 @@ We used the above equations in tandem with estimates of variation in the ventila
 2.  Air Changes Per Hour (considering the minimum and maximum of the ranges provided in Table \@ref(tab:1))
 3.  The Time Spent in the Space (ranging from 0 to 8 hours).
 
-Our results show that the ratio of riskiness for the most and least risky locations for each Setting Type are invariant across different infection prevalences and assumptions about the time spent in the space.
+The results of this are shown in \@ref(fig:wells-riley-1).
+They show that the riskiness ratio (i.e. how much more risky the most risky setting is compared to the least risky setting) for each Setting Type is largely the same across the different modelled infection prevalences.
+They do however depend on the assumed time spent in the space.
+For the purposes of the results presented here, we assume that individuals spend the following time in each Setting Type:
+
+-   Household: 12 hours [corresponding to a riskiness ratio of 2.5]
+
+-   Leisure: 2.5 hours [riskiness ratio of 5.5]
+
+-   School: 8 hours [riskiness ratio of 4.75]
+
+-   Workplace: 8 hours [riskiness ratio of 6.35]
+
+and 1.5 hours in the community, noting that individuals spend time in either Schools (children and teachers) or Workplaces (all other adults) but not both.
 We use these ratios as the basis for the Setting Type and Location specific $\gamma_{j,m}$ values used in the modelling analyses presented in the next section.
 
 ```{r wells-riley-1, fig.cap="(ref:wells-riley-1)", fig.fullwidth = TRUE, fig.height=5}
@@ -198,6 +210,7 @@ a <- ggplot(subset(overall_df, infection_prevalence == "1% Prev."),
   geom_point() +
   facet_grid(. ~ setting_type, scales = "free_y") +
   theme_bw() +
+  scale_x_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12)) +
   labs(x = "Time (Hours)", y = "Prob. Infected\n(Wells Riley)",
        col = "Air Changes\nPer Hour",
        title = "Infection Risk for Each Setting Type Across ACPH Range")
@@ -208,12 +221,18 @@ overall_df2 <- overall_df %>%
   summarise(ratio = prob_inf[airchanges_per_hour == min(airchanges_per_hour)]/
                     prob_inf[airchanges_per_hour == max(airchanges_per_hour)])
 
+y_intercepts <- data.frame(setting_type = c("Household", "Leisure", 
+                                            "School", "Workplace"), 
+                           time_spent = c(12, 2.5, 8, 8))
+
 b <- ggplot(overall_df2, aes(x = as.numeric(time), y = ratio, col = setting_type)) +
   geom_line() +
   geom_point() +
   facet_grid(. ~ infection_prevalence) +
+  geom_vline(data = y_intercepts, aes(xintercept = time_spent)) +
   lims(y = c(0, 10)) +
   theme_bw() +
+  scale_x_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12)) +
   labs(x = "Time (Hours)", y = "Ratio of\nInfection Risk",
        col = "Air Changes\nPer Hour",
        title = "Ratio of Infection Risk in Most vs Least Ventilated Locations")
