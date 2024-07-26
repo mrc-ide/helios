@@ -71,6 +71,17 @@ variables_usa <- create_variables(parameters_list_usa)
 disease_states_usa <- variables_usa$variables_list$disease_state$get_categories()
 age_classes_usa <- variables_usa$variables_list$age_class$get_categories()
 age_class_counts_usa <- purrr::map_vec(age_classes_usa, function(x) variables_usa$variables_list$age_class$get_size_of(values = x))
+
+parameters_list_uk <- get_parameters(list(
+  human_population = human_population,
+  seed = 1,
+  household_distribution_country = "UK",
+  school_distribution_country = "UK"
+))
+variables_uk <- create_variables(parameters_list_uk)
+disease_states_uk <- variables_uk$variables_list$disease_state$get_categories()
+age_classes_uk <- variables_uk$variables_list$age_class$get_categories()
+age_class_counts_uk <- purrr::map_vec(age_classes_uk, function(x) variables_uk$variables_list$age_class$get_size_of(values = x))
 ```
 
 Previously, we used data both from the United Kingdom (UK) and from the USA.
@@ -87,26 +98,48 @@ State and county specific data are available - we selected data from San Francis
 Figure \@ref(fig:household-size)A shows the previous household size distribution used (based on UK data); Figure \@ref(fig:household-size)B shows the household size distribution now being used (based on the USA data described above).
 Figure \@ref(fig:age) shows the same but for the age distribution used.
 
+(ref:household-size) The distribution of household sizes.
+
 ```{r household-size, fig.cap="(ref:household-size)"}
 households_usa <- variables_usa$variables_list$household$get_categories()
 household_sizes_usa <- purrr::map_vec(households_usa, function(x) variables_usa$variables_list$household$get_size_of(values = x))
 
-table(household_sizes_usa) |>
+plot_household_usa <- table(household_sizes_usa) |>
   data.frame() |>
   ggplot(aes(x = household_sizes_usa, y = Freq)) +
   geom_col() +
   labs(x = "Number of individuals in the household", y = "Count")
+
+households_uk <- variables_uk$variables_list$household$get_categories()
+household_sizes_uk <- purrr::map_vec(households_uk, function(x) variables_uk$variables_list$household$get_size_of(values = x))
+
+plot_household_uk <- table(household_sizes_uk) |>
+  data.frame() |>
+  ggplot(aes(x = household_sizes_uk, y = Freq)) +
+  geom_col() +
+  labs(x = "Number of individuals in the household", y = "Count")
+
+cowplot::plot_grid(plot_household_uk, plot_household_usa, nrow = 2, labels = c("A", "B"))
 ```
 
 (ref:age) Age group sizes follow from the household sampling procedure.
 
 ```{r age, fig.cap="(ref:age)"}
-data.frame(age_classes_usa, age_class_counts_usa) |>
+plot_age_usa <- data.frame(age_classes_usa, age_class_counts_usa) |>
   mutate(age_classes_usa = dplyr::recode_factor(age_classes_usa, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
   ggplot(aes(x = age_classes_usa, y = age_class_counts_usa)) +
   geom_col() +
   labs(x = "Age group", y = "Number of individuals") +
   coord_flip()
+
+plot_age_uk <- data.frame(age_classes_uk, age_class_counts_uk) |>
+  mutate(age_classes_uk = dplyr::recode_factor(age_classes_uk, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
+  ggplot(aes(x = age_classes_uk, y = age_class_counts_uk)) +
+  geom_col() +
+  labs(x = "Age group", y = "Number of individuals") +
+  coord_flip()
+
+cowplot::plot_grid(plot_age_uk, plot_age_usa, nrow = 2, labels = c("A", "B"))
 ```
 
 ### School Setting Type
@@ -125,11 +158,23 @@ schools_usa <- variables_usa$variables_list$school$get_categories()
 schools_usa <- schools_usa[schools_usa != "0"]
 school_sizes_usa <- purrr::map_vec(schools_usa, function(x) variables_usa$variables_list$school$get_size_of(values = x))
 
-data.frame(school_sizes_usa) |>
+plot_schools_usa <- data.frame(school_sizes_usa) |>
   ggplot(aes(x = school_sizes_usa)) +
   geom_histogram() +
   labs(x = "Number of students per school", y = "Count") +
   scale_y_continuous(limits = c(0, NA))
+
+schools_uk <- variables_uk$variables_list$school$get_categories()
+schools_uk <- schools_uk[schools_uk != "0"]
+school_sizes_uk <- purrr::map_vec(schools_uk, function(x) variables_uk$variables_list$school$get_size_of(values = x))
+
+plot_schools_uk <- data.frame(school_sizes_uk) |>
+  ggplot(aes(x = school_sizes_uk)) +
+  geom_histogram() +
+  labs(x = "Number of students per school", y = "Count") +
+  scale_y_continuous(limits = c(0, NA))
+
+cowplot::plot_grid(plot_schools_uk, plot_schools_usa, nrow = 2, labels = c("A", "B"))
 ```
 
 ## Location-Specific Variability in "Riskiness" {#location}
