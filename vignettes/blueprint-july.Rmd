@@ -159,7 +159,7 @@ We included all schools categorised as "prekindergarten", "elementary", "middle"
 As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550) for the purposes of constructing the distribution of schools sizes (this is in contrast to the UK data where exact school sizes were available).
 This data was available only at the national level, which we use here.
 
-Figure \@ref(fig:school-size)A shows the previous school size distribution used (based on UK data); Figure \@ref(fig:school-size)B shows the household size distribution now being used (based on the USA data described above).
+Figure \@ref(fig:school-size)A shows, for a population of 250,000, the resulting school size distribution used based on previous data which was from the UK; Figure \@ref(fig:school-size)B shows the household size distribution now being used, which is based on the USA data described above.
 
 (ref:school-size) A distribution of school sizes for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US.
 
@@ -191,7 +191,7 @@ cowplot::plot_grid(plot_schools_uk, plot_schools_usa, nrow = 2, labels = c("A", 
 
 ## Location-Specific Variability in "Riskiness" {#location}
 
-Previously, we modelled differences in "riskiness" (i.e. how receptive to onwards transmission it is) between different Setting Types (schools, workplaces, leisure settings and households).
+Previously, we modelled differences in "riskiness" (i.e. how conducive to transmission it is) between different Setting Types (schools, workplaces, leisure settings and households).
 However, we made the simplifying assumption that all Locations with a particular Setting Type (e.g. individual schools) had the same riskiness.
 We now explicitly incorporate variation in riskiness between Locations belonging to the same Setting Type.
 Below is a mathematical description of this addition and the parameterisation used for the results presented in this report.
