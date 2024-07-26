@@ -65,11 +65,12 @@ These are:
 
 ```{r}
 human_population <- 50000L
-parameters_list <- get_parameters(list(human_population = human_population, seed = 1))
-variables <- create_variables(parameters_list)
-disease_states <- variables$variables_list$disease_state$get_categories()
-age_classes <- variables$variables_list$age_class$get_categories()
-age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
+
+parameters_list_usa <- get_parameters(list(human_population = human_population, seed = 1))
+variables_usa <- create_variables(parameters_list_usa)
+disease_states_usa <- variables_usa$variables_list$disease_state$get_categories()
+age_classes_usa <- variables_usa$variables_list$age_class$get_categories()
+age_class_counts_usa <- purrr::map_vec(age_classes_usa, function(x) variables_usa$variables_list$age_class$get_size_of(values = x))
 ```
 
 Previously, we used data both from the United Kingdom (UK) and from the USA.
@@ -87,12 +88,12 @@ Figure \@ref(fig:household-size)A shows the previous household size distribution
 Figure \@ref(fig:age) shows the same but for the age distribution used.
 
 ```{r household-size, fig.cap="(ref:household-size)"}
-households <- variables$variables_list$household$get_categories()
-household_sizes <- purrr::map_vec(households, function(x) variables$variables_list$household$get_size_of(values = x))
+households_usa <- variables_usa$variables_list$household$get_categories()
+household_sizes_usa <- purrr::map_vec(households_usa, function(x) variables_usa$variables_list$household$get_size_of(values = x))
 
-table(household_sizes) |>
+table(household_sizes_usa) |>
   data.frame() |>
-  ggplot(aes(x = household_sizes, y = Freq)) +
+  ggplot(aes(x = household_sizes_usa, y = Freq)) +
   geom_col() +
   labs(x = "Number of individuals in the household", y = "Count")
 ```
@@ -100,9 +101,9 @@ table(household_sizes) |>
 (ref:age) Age group sizes follow from the household sampling procedure.
 
 ```{r age, fig.cap="(ref:age)"}
-data.frame(age_classes, age_class_counts) |>
-  mutate(age_classes = dplyr::recode_factor(age_classes, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
-  ggplot(aes(x = age_classes, y = age_class_counts)) +
+data.frame(age_classes_usa, age_class_counts_usa) |>
+  mutate(age_classes_usa = dplyr::recode_factor(age_classes_usa, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
+  ggplot(aes(x = age_classes_usa, y = age_class_counts_usa)) +
   geom_col() +
   labs(x = "Age group", y = "Number of individuals") +
   coord_flip()
@@ -120,12 +121,12 @@ Figure \@ref(fig:school-size)A shows the previous school size distribution used 
 (ref:school-size) The distribution of school sizes.
 
 ```{r school-size, fig.cap="(ref:school-size)"}
-schools <- variables$variables_list$school$get_categories()
-schools <- schools[schools != "0"]
-school_sizes <- purrr::map_vec(schools, function(x) variables$variables_list$school$get_size_of(values = x))
+schools_usa <- variables_usa$variables_list$school$get_categories()
+schools_usa <- schools_usa[schools_usa != "0"]
+school_sizes_usa <- purrr::map_vec(schools_usa, function(x) variables_usa$variables_list$school$get_size_of(values = x))
 
-data.frame(school_sizes) |>
-  ggplot(aes(x = school_sizes)) +
+data.frame(school_sizes_usa) |>
+  ggplot(aes(x = school_sizes_usa)) +
   geom_histogram() +
   labs(x = "Number of students per school", y = "Count") +
   scale_y_continuous(limits = c(0, NA))
