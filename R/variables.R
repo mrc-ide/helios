@@ -151,8 +151,17 @@ generate_initial_disease_states <- function(parameters_list) {
 
   # Checking that the parameters contain the initial human population size, proportion
   # initially exposed, and a seed:
-  if (!("number_initially_exposed" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called number_initially_exposed")
+  if (!("number_initial_S" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called number_initial_S")
+  }
+  if (!("number_initial_E" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called number_initial_E")
+  }
+  if (!("number_initial_I" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called number_initial_I")
+  }
+  if (!("number_initial_R" %in% names(parameters_list))) {
+    stop("parameters list must contain a variable called number_initial_R")
   }
   if (!("human_population" %in% names(parameters_list))) {
     stop("parameters list must contain a variable called human_population")
@@ -166,15 +175,30 @@ generate_initial_disease_states <- function(parameters_list) {
 
   # Create a vector of disease states of length human_population:
   initial_disease_states <- rep("S", parameters_list$human_population)
+  population_index <- 1:length(initial_disease_states)
 
-  # Sample indices between 1:human population to set an initially exposed:
-  infection_index <- sample(x = 1:length(initial_disease_states),
-                            size = parameters_list$number_initially_exposed,
+  # Sample indices between 1:human population to set those initially exposed:
+  exposed_index <- sample(x = population_index,
+                          size = parameters_list$number_initial_E,
+                          replace = FALSE,
+                          prob = NULL)
+  initial_disease_states[exposed_index] <- "E"
+
+  # Sample indices between 1:human population (minus those initially exposed) to set those initially infectious:
+  infectious_index <- sample(x = population_index[-exposed_index],
+                             size = parameters_list$number_initial_I,
+                             replace = FALSE,
+                             prob = NULL)
+  initial_disease_states[infectious_index] <- "I"
+
+  # Sample indices between 1:human population (minus those initially exposed) to set those initially infectious:
+  recovered_index <- sample(x = population_index[-c(exposed_index, infectious_index)],
+                            size = parameters_list$number_initial_R,
                             replace = FALSE,
                             prob = NULL)
+  initial_disease_states[recovered_index] <- "R"
 
   # Replace the disease state at the sampled indices with to "E" (Exposed)
-  initial_disease_states[infection_index] <- "E"
 
   # Return the vector of initial disease states:
   return(initial_disease_states)

@@ -11,7 +11,10 @@
 #' * `initial_proportion_child`: proportion of population initially in the 'child' age class
 #' * `initial_proportion_adult`: proportion of population initially in the 'adult' age class
 #' * `initial_proportion_elderly`: proportion of population initially in the 'elderly' age class
-#' * `number_initially_exposed`: number of humans initially exposed (state = E)
+#' * `number_initial_S`: number of humans initially Susceptible (state = S)
+#' * `number_initial_E`: number of humans initially Exposed (state = E)
+#' * `number_initial_I`: number of humans initially Infectious (state = I)
+#' * `number_initial_R`: number of humans initially Recovered (state = R)
 #' * `seed`: a seed to run the simulation with
 #' * `mean_household_size`: TBD
 #' * `workplace_prop_max`: maximum size of a workplace as a proportion of total adult population size
@@ -106,7 +109,10 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     initial_proportion_child = 0.2,
     initial_proportion_adult = 0.6,
     initial_proportion_elderly = 0.2,
-    number_initially_exposed = 5,
+    number_initial_S = 9995,
+    number_initial_E = 5,
+    number_initial_I = 0,
+    number_initial_R = 0,
     seed = NULL,
     mean_household_size = 3,
     workplace_prop_max = 0.1,
@@ -290,6 +296,12 @@ get_parameters <- function(overrides = list(), archetype = "none") {
          length(parameters$beta_leisure) != 1,
          length(parameters$beta_community) != 1)) {
     stop("ERROR: A setting-specific beta has length not equal to 1. All setting-specific betas must be of length 1")
+  }
+
+  # Check that initial numbers in each state sum to the human population size
+  number_initial <- parameters$number_initial_S + parameters$number_initial_E + parameters$number_initial_I + parameters$number_initial_R
+  if (number_initial != parameters$human_population) {
+    stop("total of number_initial_S, number_initial_E, number_initial_I and number_initial_R should sum to human_population")
   }
 
   ## ADD MORE CHECKS IN HERE FOR PARAMETERS ##
