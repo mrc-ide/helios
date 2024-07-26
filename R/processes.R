@@ -447,16 +447,16 @@ create_external_source_process <- function(variables_list, events_list, paramete
   function(t) {
 
     # Get the indices of all susceptible individuals:
-    S <- variables_list$disease_state$get_index_of("S")
+    S_endemic <- variables_list$disease_state$get_index_of("S")
 
     # Calculate the probability of getting infected in the current interval for each individual:
     p_inf_ext <- 1 - exp(-parameters_list$prob_inf_external * parameters_list$dt)
 
     # Sample susceptible individuals using their infection probability to determine who gets infected:
-    S$sample(rate = p_inf_ext)
+    S_endemic$sample(rate = p_inf_ext)
 
     # Queue an update to the infectious state of the newly infected susceptible individuals to Exposed:
-    variables_list$disease_state$queue_update(value = "E",index = S)
+    variables_list$disease_state$queue_update(value = "E", index = S_endemic)
 
     # Render the number of individuals infected through the external mechanism
     renderer$render('n_external_infections', S$size(), t)
