@@ -59,14 +59,19 @@ Two major updates to the model have been made since the initial report.
 These are:
 
 1.  Using data from the United States of America (USA) to parameterise all aspects of the model's representation of the physical environment (Section \@ref(usa-data)).
-2.  Including variation in the propensity for infectious disease transmission (which we call "riskiness") by individual locations in the model (Section \@ref(location)).
+2.  Including variation in the propensity for infectious disease transmission (which we call "riskiness") across individual locations in the model (Section \@ref(location)).
 
 ## Consistent Use of Data from the USA {#usa-data}
 
 ```{r}
-human_population <- 50000L
+human_population <- 250000L
 
-parameters_list_usa <- get_parameters(list(human_population = human_population, seed = 1))
+parameters_list_usa <- get_parameters(list(human_population = human_population, 
+                                           seed = 1, 
+                                           number_initial_S = human_population - 2500,
+                                           number_initial_E = 1000, 
+                                           number_initial_I = 1000, 
+                                           number_initial_R = 500))
 variables_usa <- create_variables(parameters_list_usa)
 disease_states_usa <- variables_usa$variables_list$disease_state$get_categories()
 age_classes_usa <- variables_usa$variables_list$age_class$get_categories()
@@ -74,6 +79,10 @@ age_class_counts_usa <- purrr::map_vec(age_classes_usa, function(x) variables_us
 
 parameters_list_uk <- get_parameters(list(
   human_population = human_population,
+  number_initial_S = human_population - 2500, 
+  number_initial_E = 1000, 
+  number_initial_I = 1000, 
+  number_initial_R = 500,
   seed = 1,
   household_distribution_country = "UK",
   school_distribution_country = "UK"
@@ -105,20 +114,20 @@ Figure \@ref(fig:age) shows the same but for the age distribution used.
 households_usa <- variables_usa$variables_list$household$get_categories()
 household_sizes_usa <- purrr::map_vec(households_usa, function(x) variables_usa$variables_list$household$get_size_of(values = x))
 
-plot_household_usa <- table(household_sizes_usa) |>
+plot_household_usa <- table(household_sizes_usa)[1:10] |>
   data.frame() |>
-  ggplot(aes(x = household_sizes_usa, y = Freq)) +
+  ggplot(aes(x = household_sizes_usa, y = 100 * Freq/sum(Freq))) +
   geom_col() +
-  labs(x = "Number of individuals in the household", y = "Count")
+  labs(x = "Number of individuals in the household", y = "% of Households")
 
 households_uk <- variables_uk$variables_list$household$get_categories()
 household_sizes_uk <- purrr::map_vec(households_uk, function(x) variables_uk$variables_list$household$get_size_of(values = x))
 
 plot_household_uk <- table(household_sizes_uk) |>
   data.frame() |>
-  ggplot(aes(x = household_sizes_uk, y = Freq)) +
+  ggplot(aes(x = household_sizes_uk, y = 100 * Freq/sum(Freq))) +
   geom_col() +
-  labs(x = "Number of individuals in the household", y = "Count")
+  labs(x = "Number of individuals in the household", y = "% of Households")
 
 cowplot::plot_grid(plot_household_uk, plot_household_usa, nrow = 2, labels = c("A", "B"))
 ```
@@ -128,16 +137,16 @@ cowplot::plot_grid(plot_household_uk, plot_household_usa, nrow = 2, labels = c("
 ```{r age, fig.cap="(ref:age)"}
 plot_age_usa <- data.frame(age_classes_usa, age_class_counts_usa) |>
   mutate(age_classes_usa = dplyr::recode_factor(age_classes_usa, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
-  ggplot(aes(x = age_classes_usa, y = age_class_counts_usa)) +
+  ggplot(aes(x = age_classes_usa, y = 100 * age_class_counts_usa / sum(age_class_counts_usa))) +
   geom_col() +
-  labs(x = "Age group", y = "Number of individuals") +
+  labs(x = "Age group", y = "% of individuals") +
   coord_flip()
 
 plot_age_uk <- data.frame(age_classes_uk, age_class_counts_uk) |>
   mutate(age_classes_uk = dplyr::recode_factor(age_classes_uk, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
-  ggplot(aes(x = age_classes_uk, y = age_class_counts_uk)) +
+  ggplot(aes(x = age_classes_uk, y = 100 * age_class_counts_uk/sum(age_class_counts_uk))) +
   geom_col() +
-  labs(x = "Age group", y = "Number of individuals") +
+  labs(x = "Age group", y = "% of individuals") +
   coord_flip()
 
 cowplot::plot_grid(plot_age_uk, plot_age_usa, nrow = 2, labels = c("A", "B"))
@@ -147,7 +156,7 @@ cowplot::plot_grid(plot_age_uk, plot_age_usa, nrow = 2, labels = c("A", "B"))
 
 To parameterise the model's schools sizes, we used US school size data from 2019-2020 from the National Center for Education Statistics, available from @deBrey2023Digest.
 We included all schools categorised as "prekindergarten", "elementary", "middle", or "secondary and high".
-As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550) for the purposes of constructing the distribution of schools sizes.
+As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550) for the purposes of constructing the distribution of schools sizes (this is in contrast to the UK data where exact school sizes were available).
 This data was available only at the national level, which we use here.
 
 Figure \@ref(fig:school-size)A shows the previous school size distribution used (based on UK data); Figure \@ref(fig:school-size)B shows the household size distribution now being used (based on the USA data described above).
@@ -163,7 +172,8 @@ plot_schools_usa <- data.frame(school_sizes_usa) |>
   ggplot(aes(x = school_sizes_usa)) +
   geom_histogram() +
   labs(x = "Number of students per school", y = "Count") +
-  scale_y_continuous(limits = c(0, NA))
+  scale_y_continuous(limits = c(0, NA)) +
+  scale_x_continuous(limits = c(0, 3000))
 
 schools_uk <- variables_uk$variables_list$school$get_categories()
 schools_uk <- schools_uk[schools_uk != "0"]
@@ -173,7 +183,8 @@ plot_schools_uk <- data.frame(school_sizes_uk) |>
   ggplot(aes(x = school_sizes_uk)) +
   geom_histogram() +
   labs(x = "Number of students per school", y = "Count") +
-  scale_y_continuous(limits = c(0, NA))
+  scale_y_continuous(limits = c(0, NA)) +
+  scale_x_continuous(limits = c(0, 3000))
 
 cowplot::plot_grid(plot_schools_uk, plot_schools_usa, nrow = 2, labels = c("A", "B"))
 ```
@@ -330,7 +341,7 @@ c
 ```
 
 | Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                  |
-|-------------|-------------|-------------------|----------------------------|
+|-----------------|-----------------|-----------------|-----------------------|
 | $\pi$           | 27 viruses per person per hour      | Rates of infective virus emission from infected individuals.                                    | @blatchley2023quantitative & @buonanno2020quantitative                                                                                  |
 | $D_{school}$    | 30 per 100m^2^                      | Assumed density of individuals in schools                                                       | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                |
 | $A_{school}$    | 0.1-2.9 air changes per hour (ACPH) | Range of ACPH considered for schools.                                                           | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                     |
