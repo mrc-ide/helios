@@ -76,11 +76,14 @@ matched_final_sizes
 #----- 3) Influenza Testing ------------------------------------------------------------------------
 
 # Use generate_betas() to create a dataframe of betas for all settings:
-betas <- generate_betas(beta_community = 0.044,
+betas <- generate_betas(beta_community = 0.069,
                         household_ratio = 3,
                         school_ratio = 3,
                         workplace_ratio = 3,
                         leisure_ratio = 3)
+
+# 0.058 -> 0.4047 final size
+# 0.068 -> 0.5666 final size
 
 # Generate a list of model parameters:
 parameters_list <- get_parameters(overrides = list(
@@ -90,15 +93,18 @@ parameters_list <- get_parameters(overrides = list(
   beta_workplace = betas$beta_workplace,
   beta_leisure = betas$beta_leisure,
   beta_community = betas$beta_community,
+  duration_exposed = 1,
+  duration_infectious = 2,
   endemic_or_epidemic = "epidemic",
-  simulation_time = 225
+  simulation_time = 175
 ))
 
 # Run the simulation:
-simulation_output <- run_simulation(parameters_list = parameters_list); beep(1)
+simulation_output <- run_simulation(parameters_list = parameters_list);
 
 # Check the final size:
-(simulation_output$R_count / 10000)[390:400]
+(simulation_output$R_count / 10000)[(length(simulation_output$R_count) - 10):length(simulation_output$R_count)]
+matched_final_sizes[1]
 
 # Calculate the final proportion of individuals in each compartment:
 simulation_output %>%
@@ -121,7 +127,7 @@ simulation_output %>%
   scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
   geom_hline(yintercept = 0.583, linetype = "dashed")
 
-##' This generates an epideic with a final size of 0.5829.
+##' This generates an epidemic with a final size of 0.5829.
 
 #----- 4) SARS-CoV-2 Testing -----------------------------------------------------------------------
 
