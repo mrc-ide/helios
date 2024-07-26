@@ -63,6 +63,15 @@ These are:
 
 ## Consistent Use of Data from the USA {#usa-data}
 
+```{r}
+human_population <- 50000L
+parameters_list <- get_parameters(list(human_population = human_population, seed = 1))
+variables <- create_variables(parameters_list)
+disease_states <- variables$variables_list$disease_state$get_categories()
+age_classes <- variables$variables_list$age_class$get_categories()
+age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
+```
+
 Previously, we used data both from the United Kingdom (UK) and from the USA.
 In particular, we used data from the UK to parameterise the age distribution, household and school Setting Types; and data from the USA to parameterise the workplace Setting Type.
 In this update to the model, we parameterise the age distribution, household and school Setting Types using data only from the USA.
@@ -74,10 +83,30 @@ This dataset is synthetic, but was developed by calibrating to datasources from 
 It contains individual-level information on household residency and age, which we use to construct the household Setting Type and age distribution used in the results presented here.
 State and county specific data are available - we selected data from San Francisco, California.
 
-Fig XA shows the previous household size distribution used (based on UK-wide data); Fig XB shows the household size distribution now being used (which is based on the data described above).
-Fig Y shows the same but for the age distribution used.
+Figure \@ref(fig:household-size)A shows the previous household size distribution used (based on UK data); Figure \@ref(fig:household-size)B shows the household size distribution now being used (based on the USA data described above).
+Figure \@ref(fig:age) shows the same but for the age distribution used.
 
-**[[ Adam - can you insert some figures here please!]]**
+```{r household-size, fig.cap="(ref:household-size)"}
+households <- variables$variables_list$household$get_categories()
+household_sizes <- purrr::map_vec(households, function(x) variables$variables_list$household$get_size_of(values = x))
+
+table(household_sizes) |>
+  data.frame() |>
+  ggplot(aes(x = household_sizes, y = Freq)) +
+  geom_col() +
+  labs(x = "Number of individuals in the household", y = "Count")
+```
+
+(ref:age) Age group sizes follow from the household sampling procedure.
+
+```{r age, fig.cap="(ref:age)"}
+data.frame(age_classes, age_class_counts) |>
+  mutate(age_classes = dplyr::recode_factor(age_classes, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
+  ggplot(aes(x = age_classes, y = age_class_counts)) +
+  geom_col() +
+  labs(x = "Age group", y = "Number of individuals") +
+  coord_flip()
+```
 
 ### School Setting Type
 
@@ -86,9 +115,21 @@ We included all schools categorised as "prekindergarten", "elementary", "middle"
 As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550) for the purposes of constructing the distribution of schools sizes.
 This data was available only at the national level, which we use here.
 
-Fig ZA shows the previous school size distribution used (based on UK-wide data); Fig ZB shows the household size distribution now being used (which is based on the data described above).
+Figure \@ref(fig:school-size)A shows the previous school size distribution used (based on UK data); Figure \@ref(fig:school-size)B shows the household size distribution now being used (based on the USA data described above).
 
-**[[ Adam - can you insert some figures here please!]]**
+(ref:school-size) The distribution of school sizes.
+
+```{r school-size, fig.cap="(ref:school-size)"}
+schools <- variables$variables_list$school$get_categories()
+schools <- schools[schools != "0"]
+school_sizes <- purrr::map_vec(schools, function(x) variables$variables_list$school$get_size_of(values = x))
+
+data.frame(school_sizes) |>
+  ggplot(aes(x = school_sizes)) +
+  geom_histogram() +
+  labs(x = "Number of students per school", y = "Count") +
+  scale_y_continuous(limits = c(0, NA))
+```
 
 ## Location-Specific Variability in "Riskiness" {#location}
 
