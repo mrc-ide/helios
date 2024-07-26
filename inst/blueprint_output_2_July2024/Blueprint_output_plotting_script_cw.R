@@ -5,12 +5,14 @@ library(tidyverse)
 
 # Loading in the outputs
 outputs <- readRDS("inst/blueprint_output_2_July2024/raw_outputs_results1.rds")
+simulations_to_run <- readRDS("inst/blueprint_output_2_July2024/simulations_to_run.rds")
+parameter_lists <- readRDS("inst/blueprint_output_2_July2024/parameter_lists.rds")
 
 # Processing the data
 ### NEED SOME WAY OF PORTING IN YEARS TO SIMULATE, TIMING OF UVC ETC FROM THE RUNS IN HERE
-years_to_simulate <- 6 # 6 in newer outputs CHANGE THIS!!!
-dt <- 0.5
-population <- 115000
+dt <- parameter_lists[[1]]$dt
+population <- parameter_lists[[1]]$human_population
+years_to_simulate <- parameter_lists[[1]]$simulation_time / 365
 timestep_baseline_start <- ((years_to_simulate - 4) * 365) / dt
 timestep_baseline_end <- ((years_to_simulate - 2) * 365) / dt
 timestep_uvc_start <- ((years_to_simulate - 2) * 365 + 1) / dt
@@ -156,7 +158,7 @@ ggplot(overall4, aes(x = 100 * efficacy, y = 100 * incidence_percentage_reductio
                                       `flu` = "Influenza",
                                       `sars_cov_2` = "SARS-CoV-2"))) +
   labs(fill = "Time\nPeriod", x = "Far UVC Efficacy (%)",
-       y = "Infection Incidence (Per 1,000 Population)")
+       y = "Reduction in Infection Incidence (Per 1,000 Population)")
 
 for (i in 1:40) {
 
