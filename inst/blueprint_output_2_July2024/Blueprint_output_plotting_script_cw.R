@@ -8,9 +8,9 @@ outputs <- readRDS("inst/blueprint_output_2_July2024/raw_outputs_results1.rds")
 
 # Processing the data
 ### NEED SOME WAY OF PORTING IN YEARS TO SIMULATE, TIMING OF UVC ETC FROM THE RUNS IN HERE
-years_to_simulate <- 7 # 6 in newer outputs CHANGE THIS!!!
+years_to_simulate <- 6 # 6 in newer outputs CHANGE THIS!!!
 dt <- 0.5
-population <- 100000 ## 115000
+population <- 115000
 timestep_baseline_start <- ((years_to_simulate - 4) * 365) / dt
 timestep_baseline_end <- ((years_to_simulate - 2) * 365) / dt
 timestep_uvc_start <- ((years_to_simulate - 2) * 365 + 1) / dt
@@ -31,7 +31,6 @@ for (i in 1:length(outputs)) {
 
 ## Plotting the trajectories of individual stochastic simulations
 index <- 2 * 365
-end <- length(unique(overall$daily_timestep))
 overall <- dplyr::bind_rows(outputs_processed) %>%
   mutate(daily_timestep = floor(new_timestep * dt)) %>%
   group_by(iteration, archetype, efficacy, coverage, daily_timestep) %>%
@@ -41,6 +40,7 @@ overall <- dplyr::bind_rows(outputs_processed) %>%
             R_count = mean(R_count),
             E_new = sum(E_new),
             n_external_infections = sum(n_external_infections))
+end <- length(unique(overall$daily_timestep))
 ggplot(overall, aes(x = daily_timestep, y = I_count * 1000 / population,
                      group = interaction(archetype, factor(iteration)),
                     col = archetype)) +
@@ -167,7 +167,7 @@ for (i in 1:40) {
 
   layout(matrix(c(1,1,2,3, 1,1,4,5), nrow = 2, byrow = TRUE))
   par(mar = c(3, 3, 3, 3))
-  plot(x$timestep * 0.5, x$S_count, ylim = c(0, 100000), type = "l", col = "#333333", xlab = "Time", ylab = "Number")
+  plot(x$timestep * 0.5, x$S_count, ylim = c(0, 115000), type = "l", col = "#333333", xlab = "Time", ylab = "Number")
   lines(x$timestep * 0.5, x$E_new, ylim = c(0, 100000), type = "l", col = "#A0D848")
   lines(x$timestep * 0.5, x$n_external_infections, ylim = c(0, 100000), type = "l", col = "#F15A24")
   lines(x$timestep * 0.5, x$R_count, ylim = c(0, 100000), type = "l", col = "#29ABE2")
