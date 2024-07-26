@@ -33,13 +33,13 @@ years_to_simulate <- 10
 simulation_time_days <- (365 * years_to_simulate)
 
 # Set the human population size:
-human_population <- 80000 # 100000
+human_population <- 100000
 
 # Specify a duration of immunity following infection:
 duration_of_immunity <- 365
 
 # Set a probability of infection from an external source (1 person per timestep on average):
-external_infection_probability <- 0 # 1 / human_population # 0.000008
+external_infection_probability <- 1 / human_population
 
 # Archetypes to simulate for:
 archetypes <- c("flu", "sars_cov_2")
@@ -55,7 +55,7 @@ far_uvc_coverage <- c(0.1, 0.25, 0.5)
 far_uvc_efficacy <- seq(0.4, 0.8, 0.2)
 
 # Number of iterations to simulate for each parameterisation:
-iterations <- 1:5
+iterations <- 1:10
 
 # Set up the unique simulations to run
 simulations_to_run <- expand.grid("riskiness" = riskiness,

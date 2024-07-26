@@ -428,7 +428,7 @@ create_RS_process <- function(variables_list, events_list, parameters_list) {
     R$and(RS_already_scheduled$not(inplace = TRUE))
 
     # Calculate recovery times for infectious individuals without transitions scheduled:
-    S_times <- round(rgamma(n = R$size(), shape = 2, rate = 2 / parameters_list$duration_immune) / parameters_list$dt)
+    S_times <- round(rgamma(n = R$size(), shape = 1, rate = 1 / parameters_list$duration_immune) / parameters_list$dt)
 
     # Schedule the recovery events for infectious individuals without transitions scheduled:
     events_list$RS_event$schedule(target = R, delay = S_times)
