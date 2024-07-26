@@ -93,12 +93,13 @@ In this update to the model, we parameterise the age distribution, household and
 To parameterise the model's household size and age distribution we use data from a synthetic USA population developed by RTI International for the purposes of disease modelling [@wheaton2014us].
 This dataset is synthetic, but was developed by calibrating to datasources from the USA - it is therefore a virtual, anonymised population that is representative of the USA.
 It contains individual-level information on household residency and age, which we use to construct the household Setting Type and age distribution used in the results presented here.
-State and county specific data are available - we selected data from San Francisco, California.
+State and county specific data are available.
+We selected data from San Francisco, California.
 
 Figure \@ref(fig:household-size)A shows the previous household size distribution used (based on UK data); Figure \@ref(fig:household-size)B shows the household size distribution now being used (based on the USA data described above).
 Figure \@ref(fig:age) shows the same but for the age distribution used.
 
-(ref:household-size) The distribution of household sizes.
+(ref:household-size) A distribution of household sizes for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B).
 
 ```{r household-size, fig.cap="(ref:household-size)"}
 households_usa <- variables_usa$variables_list$household$get_categories()
@@ -122,7 +123,7 @@ plot_household_uk <- table(household_sizes_uk) |>
 cowplot::plot_grid(plot_household_uk, plot_household_usa, nrow = 2, labels = c("A", "B"))
 ```
 
-(ref:age) Age group sizes follow from the household sampling procedure.
+(ref:age) An age group population sizes distribution for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B).
 
 ```{r age, fig.cap="(ref:age)"}
 plot_age_usa <- data.frame(age_classes_usa, age_class_counts_usa) |>
@@ -151,7 +152,7 @@ This data was available only at the national level, which we use here.
 
 Figure \@ref(fig:school-size)A shows the previous school size distribution used (based on UK data); Figure \@ref(fig:school-size)B shows the household size distribution now being used (based on the USA data described above).
 
-(ref:school-size) The distribution of school sizes.
+(ref:school-size) A distribution of school sizes for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US.
 
 ```{r school-size, fig.cap="(ref:school-size)"}
 schools_usa <- variables_usa$variables_list$school$get_categories()
