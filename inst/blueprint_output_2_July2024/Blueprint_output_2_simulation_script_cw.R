@@ -29,17 +29,17 @@ library(tictoc)
 #----- 2) Parameter Sweep Set-Up -------------------------------------------------------------------
 
 # Calculate the simulation_time required to simulate a 2 year period:
-years_to_simulate <- 6
+years_to_simulate <- 10
 simulation_time_days <- (365 * years_to_simulate)
 
 # Set the human population size:
-human_population <- 115000 # 100000
+human_population <- 80000 # 100000
 
 # Specify a duration of immunity following infection:
 duration_of_immunity <- 365
 
 # Set a probability of infection from an external source (1 person per timestep on average):
-external_infection_probability <- 1 / human_population # 0.000008
+external_infection_probability <- 0 # 1 / human_population # 0.000008
 
 # Archetypes to simulate for:
 archetypes <- c("flu", "sars_cov_2")
@@ -49,7 +49,7 @@ archetypes <- c("flu", "sars_cov_2")
 riskiness <- c("setting_specific_riskiness")
 
 # Set up a vector of far-UVC coverages to simulate:
-far_uvc_coverage <- c(0, 0.1, 0.25, 0.5)
+far_uvc_coverage <- c(0.1, 0.25, 0.5)
 
 # Set up a vector of far-UVC efficacies to simulate
 far_uvc_efficacy <- seq(0.4, 0.8, 0.2)
@@ -173,6 +173,9 @@ for(i in 1:nrow(simulations_to_run)) {
   }
 }
 
+saveRDS(simulations_to_run, file = "./inst/blueprint_output_2_July2024/simulations_to_run.rds")
+saveRDS(parameter_lists, file = "./inst/blueprint_output_2_July2024/parameter_lists.rds")
+
 #----- 3) Simulation Runs --------------------------------------------------------------------------
 
 # Set up a list to store the simulation_outputs:
@@ -240,7 +243,7 @@ saveRDS(object = results1, file = "./inst/blueprint_output_2_July2024/raw_output
 Sys.sleep(15)
 
 tic()
-results3 <- mclapply(81:120, mc.cores = num_cores, function(i) {
+results3 <- mclapply(81:90, mc.cores = num_cores, function(i) {
   temp <- run_simulation(parameters_list = parameter_lists[[i]])
   temp$ID <- simulations_to_run$ID[i]
   return(temp)
