@@ -424,7 +424,7 @@ create_RS_process <- function(variables_list, events_list, parameters_list) {
     # Get the indices of individuals with I to R transitions already scheduled:
     RS_already_scheduled <- events_list$RS_event$get_scheduled()
 
-    # Get the indices of infectious individuals without I to R transitions already scheduled:
+    # Get the indices of infectious individuals without R to S transitions already scheduled:
     R$and(RS_already_scheduled$not(inplace = TRUE))
 
     # Calculate recovery times for infectious individuals without transitions scheduled:
