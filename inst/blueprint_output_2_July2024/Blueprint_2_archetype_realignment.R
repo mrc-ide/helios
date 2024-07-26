@@ -84,6 +84,7 @@ betas <- generate_betas(beta_community = 0.069,
 
 # 0.058 -> 0.4047 final size
 # 0.068 -> 0.5666 final size
+# 0.069 -> 0.5736 final size
 
 # Generate a list of model parameters:
 parameters_list <- get_parameters(overrides = list(

@@ -260,11 +260,11 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   if(archetype == "flu") {
     parameters$duration_exposed = 1
     parameters$duration_infectious = 2
-    parameters$beta_household = 0.132
-    parameters$beta_workplace = 0.132
-    parameters$beta_school = 0.132
-    parameters$beta_leisure = 0.132
-    parameters$beta_community = 0.044
+    parameters$beta_household = 0.207
+    parameters$beta_workplace = 0.207
+    parameters$beta_school = 0.207
+    parameters$beta_leisure = 0.207
+    parameters$beta_community = 0.069
   }
 
   # SARS-CoV-2 (R0 ~ 2.5)
