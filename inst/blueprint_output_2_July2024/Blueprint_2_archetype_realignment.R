@@ -147,15 +147,18 @@ parameters_list <- get_parameters(overrides = list(
   beta_workplace = betas$beta_workplace,
   beta_leisure = betas$beta_leisure,
   beta_community = betas$beta_community,
+  duration_exposed = 2,
+  duration_infectious = 4,
   endemic_or_epidemic = "epidemic",
-  simulation_time = 200
+  simulation_time = 130
 ))
 
 # Run the simulation:
-simulation_output <- run_simulation(parameters_list = parameters_list); beep(1)
+simulation_output <- run_simulation(parameters_list = parameters_list)
 
 # Check the final size:
-(simulation_output$R_count / 10000)[390:400]
+(simulation_output$R_count / 10000)[(length(simulation_output$R_count) - 10):length(simulation_output$R_count)]
+matched_final_sizes[2]
 
 # Calculate the final proportion of individuals in each compartment:
 simulation_output %>%
