@@ -55,7 +55,7 @@ far_uvc_coverage <- c(0.1, 0.25, 0.5)
 far_uvc_efficacy <- seq(0.4, 0.8, 0.2)
 
 # Number of iterations to simulate for each parameterisation:
-iterations <- 1:10
+iterations <- 1:9
 
 # Set up the unique simulations to run
 simulations_to_run <- expand.grid("riskiness" = riskiness,
@@ -172,7 +172,6 @@ for(i in 1:nrow(simulations_to_run)) {
                                      max = sqrt(5.5)) -> parameter_lists[[i]]
   }
 }
-
 saveRDS(simulations_to_run, file = "./inst/blueprint_output_2_July2024/simulations_to_run.rds")
 saveRDS(parameter_lists, file = "./inst/blueprint_output_2_July2024/parameter_lists.rds")
 
@@ -219,9 +218,9 @@ saveRDS(parameter_lists, file = "./inst/blueprint_output_2_July2024/parameter_li
 # parallel::stopCluster(cl)
 # toc()
 
-num_cores <- 40
+num_cores <- 41
 tic()
-results1 <- mclapply(1:40, mc.cores = num_cores, function(i) {
+results1 <- mclapply(1:41, mc.cores = num_cores, function(i) {
   temp <- run_simulation(parameters_list = parameter_lists[[i]])
   temp$ID <- simulations_to_run$ID[i]
   return(temp)
@@ -232,25 +231,36 @@ saveRDS(object = results1, file = "./inst/blueprint_output_2_July2024/raw_output
 Sys.sleep(15)
 
 tic()
-results2 <- mclapply(41:80, mc.cores = num_cores, function(i) {
+results2 <- mclapply(42:82, mc.cores = num_cores, function(i) {
   temp <- run_simulation(parameters_list = parameter_lists[[i]])
   temp$ID <- simulations_to_run$ID[i]
   return(temp)
 })
 toc()
 Sys.sleep(45)
-saveRDS(object = results1, file = "./inst/blueprint_output_2_July2024/raw_outputs_results2.rds")
+saveRDS(object = results2, file = "./inst/blueprint_output_2_July2024/raw_outputs_results2.rds")
 Sys.sleep(15)
 
 tic()
-results3 <- mclapply(81:90, mc.cores = num_cores, function(i) {
+results3 <- mclapply(83:123, mc.cores = num_cores, function(i) {
   temp <- run_simulation(parameters_list = parameter_lists[[i]])
   temp$ID <- simulations_to_run$ID[i]
   return(temp)
 })
 toc()
 Sys.sleep(45)
-saveRDS(object = results1, file = "./inst/blueprint_output_2_July2024/raw_outputs_results3.rds")
+saveRDS(object = results3, file = "./inst/blueprint_output_2_July2024/raw_outputs_results3.rds")
+Sys.sleep(15)
+
+tic()
+results4 <- mclapply(124:162, mc.cores = num_cores, function(i) {
+  temp <- run_simulation(parameters_list = parameter_lists[[i]])
+  temp$ID <- simulations_to_run$ID[i]
+  return(temp)
+})
+toc()
+Sys.sleep(45)
+saveRDS(object = results4, file = "./inst/blueprint_output_2_July2024/raw_outputs_results4.rds")
 Sys.sleep(15)
 
 ## make sure we also save and return the dt and years to simulate and when UVC is started somehow

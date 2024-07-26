@@ -2,18 +2,32 @@
 library(helios); library(tictoc)
 
 # Calculating approximate equilibrium solution for flu
-human_pop <- 4000
-simulation_time <- 2500
+human_pop <- 10000
+archetype <- "flu"
+if (archetype == "flu") {
+  S <- round(0.66 * human_pop)
+  E <- round(0.01 * human_pop)
+  I <- round(0.02 * human_pop)
+  R <- human_pop - S - E - I
+  prob_inf_external <- 0.5 / human_pop
+} else {
+  S <- round(0.33 * human_pop)
+  E <- round(0.03 * human_pop)
+  I <- round(0.06 * human_pop)
+  R <- human_pop - S - E - I
+  prob_inf_external <- 0.5 / human_pop
+}
+simulation_time <- 7000
 parameters_list <- get_parameters(overrides = list(human_population = human_pop,
                                                    endemic_or_epidemic = "endemic",
-                                                   number_initial_S = 1200,
-                                                   number_initial_E = 200,
-                                                   number_initial_I = 200,
-                                                   number_initial_R = 2400,
+                                                   number_initial_S = S,
+                                                   number_initial_E = E,
+                                                   number_initial_I = I,
+                                                   number_initial_R = R,
                                                    duration_immune = 365,
-                                                   prob_inf_external = 0, #0.125/human_pop,
+                                                   prob_inf_external = 0.5/human_pop,
                                                    simulation_time = simulation_time),
-                                  archetype = "sars_cov_2")
+                                  archetype = archetype)
 #### check why this isn't working when prob_inf_external is 0 - is this because of the same issue as before with
 #### duration of immunity?
 
@@ -30,9 +44,9 @@ lines(output$timestep, output$R_count, col = "purple")
 plot(output$timestep, output$E_new, col = "purple", type = "l")
 plot(output$timestep, output$n_external_infections, col = "purple", type = "l")
 
-sum(output$n_external_infections)
-sum(output$E_new)
-sum(output$E_new) / (sum(output$E_new) + sum(output$n_external_infections))
+sum(output$n_external_infections[(simulation_time - 730):simulation_time])
+sum(output$E_new[(simulation_time - 730):simulation_time])
+sum(output$E_new[(simulation_time - 730):simulation_time]) / (sum(output$E_new[(simulation_time - 730):simulation_time]) + sum(output$n_external_infections[(simulation_time - 730):simulation_time]))
 
 
 ## with population of 50,000 - running 20 days with 0.5 day timestep (40 total) = 90 seconds

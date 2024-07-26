@@ -459,7 +459,7 @@ create_external_source_process <- function(variables_list, events_list, paramete
     variables_list$disease_state$queue_update(value = "E", index = S_endemic)
 
     # Render the number of individuals infected through the external mechanism
-    renderer$render('n_external_infections', S$size(), t)
+    renderer$render('n_external_infections', S_endemic$size(), t)
 
   }
 }
