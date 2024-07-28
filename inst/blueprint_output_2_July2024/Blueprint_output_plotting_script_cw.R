@@ -4,7 +4,11 @@ library(ggplot2)
 library(tidyverse)
 
 # Loading in the outputs
-outputs <- readRDS("inst/blueprint_output_2_July2024/raw_outputs_results1.rds")
+outputs1 <- readRDS("inst/blueprint_output_2_July2024/raw_outputs_results1.rds")
+outputs2 <- readRDS("inst/blueprint_output_2_July2024/raw_outputs_results2.rds")
+outputs3 <- readRDS("inst/blueprint_output_2_July2024/raw_outputs_results3.rds")
+outputs4 <- readRDS("inst/blueprint_output_2_July2024/raw_outputs_results4.rds")
+outputs <- c(outputs1, outputs2, outputs3, outputs4)
 simulations_to_run <- readRDS("inst/blueprint_output_2_July2024/simulations_to_run.rds")
 parameter_lists <- readRDS("inst/blueprint_output_2_July2024/parameter_lists.rds")
 
@@ -13,7 +17,7 @@ parameter_lists <- readRDS("inst/blueprint_output_2_July2024/parameter_lists.rds
 dt <- parameter_lists[[1]]$dt
 population <- parameter_lists[[1]]$human_population
 years_to_simulate <- parameter_lists[[1]]$simulation_time / 365
-timestep_baseline_start <- ((years_to_simulate - 4) * 365) / dt
+timestep_baseline_start <- ((years_to_simulate - 6) * 365) / dt
 timestep_baseline_end <- ((years_to_simulate - 2) * 365) / dt
 timestep_uvc_start <- ((years_to_simulate - 2) * 365 + 1) / dt
 timestep_uvc_end <- (years_to_simulate * 365) / dt
@@ -32,7 +36,7 @@ for (i in 1:length(outputs)) {
 }
 
 ## Plotting the trajectories of individual stochastic simulations
-index <- 2 * 365
+index <- 4 * 365
 overall <- dplyr::bind_rows(outputs_processed) %>%
   mutate(daily_timestep = floor(new_timestep * dt)) %>%
   group_by(iteration, archetype, efficacy, coverage, daily_timestep) %>%
@@ -109,15 +113,15 @@ ggplot(overall2, aes(x = daily_timestep, col = archetype)) +
        y = "Daily Infection Incidence (Per 1,000 Population)")
 
 ## Calculating and plotting incidence reduction
-index <- 2 * 365
+index <- 4 * 365
 end <- length(unique(overall$daily_timestep))
 overall3 <- overall %>%
   group_by(daily_timestep, archetype, efficacy, coverage) %>%
-  summarise(S_count = mean(S_count), E_new = mean(E_new)) %>%
+  summarise(S_count = median(S_count), E_new = median(E_new)) %>%
   ungroup() %>%
   group_by(archetype, efficacy, coverage) %>%
-  summarise(incidence_pre_uvc = sum(E_new[1:index]),
-            incidence_after_uvc = sum(E_new[(index + 1):end])) %>%
+  summarise(incidence_pre_uvc = sum(E_new[1:index]) / 4,
+            incidence_after_uvc = sum(E_new[(index + 1):end]) / 2) %>%
   pivot_longer(cols = c(incidence_pre_uvc, incidence_after_uvc),
                values_to = "incidence", names_to = "period")
 
@@ -143,8 +147,8 @@ overall4 <- overall %>%
   summarise(S_count = mean(S_count), E_new = mean(E_new)) %>%
   ungroup() %>%
   group_by(archetype, efficacy, coverage) %>%
-  summarise(incidence_pre_uvc = sum(E_new[1:index]),
-            incidence_after_uvc = sum(E_new[(index + 1):end])) %>%
+  summarise(incidence_pre_uvc = sum(E_new[1:index]) / 4,
+            incidence_after_uvc = sum(E_new[(index + 1):end]) / 2) %>%
   mutate(incidence_reduction = incidence_pre_uvc - incidence_after_uvc,
          incidence_percentage_reduction = incidence_reduction / incidence_pre_uvc)
 ggplot(overall4, aes(x = 100 * efficacy, y = 100 * incidence_percentage_reduction)) +
@@ -159,6 +163,37 @@ ggplot(overall4, aes(x = 100 * efficacy, y = 100 * incidence_percentage_reductio
                                       `sars_cov_2` = "SARS-CoV-2"))) +
   labs(fill = "Time\nPeriod", x = "Far UVC Efficacy (%)",
        y = "Reduction in Infection Incidence (Per 1,000 Population)")
+
+overall5 <- overall %>%
+  group_by(iteration, daily_timestep, archetype, efficacy, coverage) %>%
+  summarise(S_count = mean(S_count), E_new = mean(E_new)) %>%
+  ungroup() %>%
+  group_by(iteration, archetype, efficacy, coverage) %>%
+  summarise(incidence_pre_uvc = sum(E_new[1:index]) / 4,
+            incidence_after_uvc = sum(E_new[(index + 1):end]) / 2) %>%
+  mutate(incidence_reduction = incidence_pre_uvc - incidence_after_uvc,
+         incidence_percentage_reduction = incidence_reduction / incidence_pre_uvc) %>%
+  ungroup() %>%
+  group_by(archetype, efficacy, coverage) %>%
+  summarise(incidence_percentage_reduction_mean = mean(incidence_percentage_reduction),
+            incidence_percentage_reduction_lower = min(incidence_percentage_reduction),
+            incidence_percentage_reduction_upper = max(incidence_percentage_reduction))
+ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_reduction_mean)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "#324A5F", col = "black") +
+  geom_errorbar(aes(ymin = 100 * incidence_percentage_reduction_lower,
+                    ymax = 100 * incidence_percentage_reduction_upper),
+                width = 0.5) +
+  theme_bw() +
+  facet_grid(archetype ~ coverage, scales = "free_y",
+             labeller = as_labeller(c(`0` = "0% Coverage",
+                                      `0.1` = "10% Coverage",
+                                      `0.25` = "25% Coverage",
+                                      `0.5` = "50% Coverage",
+                                      `flu` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2"))) +
+  labs(fill = "Time\nPeriod", x = "Far UVC Efficacy (%)",
+       y = "% Reduction in Annual Infection Incidence (Per 1,000 Population)")
+
 
 for (i in 1:40) {
 
