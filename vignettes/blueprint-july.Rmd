@@ -360,6 +360,8 @@ c
 
 # Assessing the impact of far UVC on the burden of an endemic respiratory virus {#assessing}
 
+### Results
+
 Using the modelling framework described above, we carried out a suite of exploratory analyses evaluating the potential impact of far UVC deployment on the burden of a hypothetical endemic respiratory virus (i.e. a virus which is consistently present in a population and maintained at a particular baseline level).
 We considered two pathogen archetypes for this hypothetical virus:
 
@@ -376,8 +378,9 @@ For each pathogen archetype, we investigated the effect of far UVC efficacy and 
 -   **far UVC Efficacy:** Either 40%, 60% and 80%, with the assumption that far UVC efficacy was identical across all Settings and Locations where it had been installed.
 
 The results of these analyses are presented in Figure \@ref(fig:placeholder-1).
-
-For
+In general, we estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact.
+Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like".
+At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
 
 ```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
 
@@ -457,14 +460,17 @@ ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_
 Figure \@ref(fig:placeholder-1): The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for each of the pathogen archetypes considered.
 Values presented represent the mean (bars) averaged over the 10 stochastic model simulations carried out, with the range (error bars) of % reduction in incidence across those simulations also plotted.
 
-These differences between the two pathogen archetypes arises primarily because of their different $R_0$ values.In Figure \@ref(fig:placeholder-2) we show the analytical relationship between $R_0$ and prevalence of infection, derived for a SEIRS compartmental model (see [here](https://www.nature.com/articles/s41592-020-0856-2)) and [here](https://shiny.bcgsc.ca/posepi2/)) that shares a similar representation of a disease's natural history to `helios`.
-We note that the results presented in \@ref(fig:placeholder-2) are not results from running `helios` and are displayed here solely for the purpose of illustrating a generally-held non-linearity between transmissibility ($R_{0}$) and disease burden (in this case infection prevalence).
+### Discussion
+
+The observed differences in predictd far UVC impact between the two pathogen archetypes arises primarily because of their different $R_0$ values.
+In Figure \@ref(fig:placeholder-2) we show the analytical relationship between $R_0$ and prevalence of infection, derived for a SEIRS compartmental model (see [here](https://www.nature.com/articles/s41592-020-0856-2)) and [here](https://shiny.bcgsc.ca/posepi2/)) that shares a similar representation of a disease's natural history to `helios`.
+We note that the results presented in \@ref(fig:placeholder-2) are not results from running `helios` (instead they are the analytical solution of a significantly more tractable mathematical model that is simpler but similar to `helios`) and are displayed here solely for the purpose of illustrating a generally-held non-linearity between transmissibility ($R_{0}$) and disease burden (in this case infection prevalence).
 
 There is a non-linear influence of $R_{0}$ on prevalence of infection (and hence disease burden).
 For lower values of $R_{0}$, there is a near-linear relationship between the two quantities.
 At higher values of $R_{0}$ however, increasing values of $R_0$ have decreasing impact on infection prevalence, which begins to saturate.
-This means that when $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. as a result of the installation of far UVC) will have only a slight impact on infection prevalence.
-By contrast, when the baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence (and hence burden of disease) will decrease more (in relative terms) for the same reduction in $R_0$.
+When $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. due to far UVC) will have only a slight impact on infection prevalence.
+By contrast, when baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence will decrease more (in relative terms) for the same reduction in $R_0$.
 
 ```{r placeholder-2, fig.cap="(ref:placeholder-2)"}
 
@@ -508,7 +514,8 @@ ggplot(overall_R0_df, aes(x = R0, y = prevalence, col = archetype)) +
   geom_point() +
   geom_line() +
   theme_bw() +
-  labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)")
+  labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)",
+       col = "Pathogen\nArchetype")
 
 ```
 
