@@ -64,7 +64,7 @@ These are:
 ## Consistent Use of Data from the USA {#usa-data}
 
 ```{r}
-human_population <- 100000L
+human_population <- 500000L
 
 parameters_list_usa <- get_parameters(list(human_population = human_population, 
                                            seed = 1, 
@@ -314,9 +314,9 @@ a <- ggplot(subset(overall_df, infection_prevalence == "1% Prev."),
        col = "Air Changes\nPer Hour",
        title = "Infection Risk for Each Setting Type Across ACPH Range")
 
-overall_df2 <- overall_df %>%
-  filter(time != 0) %>%
-  group_by(time, infection_prevalence, setting_type) %>%
+overall_df2 <- overall_df |>
+  filter(time != 0) |>
+  group_by(time, infection_prevalence, setting_type) |>
   summarise(ratio = prob_inf[airchanges_per_hour == min(airchanges_per_hour)]/
                     prob_inf[airchanges_per_hour == max(airchanges_per_hour)])
 
@@ -338,10 +338,17 @@ b <- ggplot(overall_df2, aes(x = as.numeric(time), y = ratio, col = setting_type
 
 c <- cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
 c
+
 ```
 
+(ref:wells-riley-1): Estimating the variation in riskiness between Locations belonging to the same Setting Type.
+A) For each Setting Type, the probability of infection in the least and most risky settings (i.e. with the lowest and highest ventilation rates) over time.
+B) The ratio of infection risk in the most vs least risky Locations over time for each Setting Type.
+Dashed lines indicate the time assumed spent in each Setting Type for purposes of modelling.
+Note ratios are the same for Leisure and Workplace and so only Workplace is plotted.
+
 | Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                  |
-|----------------|----------------|-----------------|-------------------------|
+|-----------------|-----------------|-----------------|-----------------------|
 | $\pi$           | 27 viruses per person per hour      | Rates of infective virus emission from infected individuals.                                    | @blatchley2023quantitative & @buonanno2020quantitative                                                                                  |
 | $D_{school}$    | 30 per 100m^2^                      | Assumed density of individuals in schools                                                       | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                |
 | $A_{school}$    | 0.1-2.9 air changes per hour (ACPH) | Range of ACPH considered for schools.                                                           | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                     |
@@ -360,18 +367,19 @@ c
 
 # Assessing the impact of far UVC on the burden of an endemic respiratory virus {#assessing}
 
-### Results
+Using the modelling framework described above, we carried analyses to evaluate the potential impact of far UVC deployment on transmission and disease burden of a hypothetical endemic respiratory virus (i.e. one which is consistently present in a population and maintained at a particular baseline prevalence level).
 
-Using the modelling framework described above, we carried out a suite of exploratory analyses evaluating the potential impact of far UVC deployment on the burden of a hypothetical endemic respiratory virus (i.e. a virus which is consistently present in a population and maintained at a particular baseline level).
+## Results
+
 We considered two pathogen archetypes for this hypothetical virus:
 
 -   **"SARS-CoV-2-Like" Archetype** - $R_0$ of 2.5, a mean latent period of 2 days, a mean duration of infectiousness of 4 days, and a mean duration of immunity of 365 days.
-    This gives an approximate infection prevalence of 1% (i.e. approximately 1 in 100 individuals are infected at any given timepoint), and \_\_ average infections per person per year.
+    This gives an approximate infection prevalence of 1% (i.e. approximately 1 in 100 individuals are infected at any given timepoint).
 
 -   **"Influenza-Like" Archetype** - $R_0$ of 1.5, a mean latent period of 1 day, a mean duration of infectiousness of 2 days, and a mean duration of immunity of 365 days.
-    This gives an approximate infection prevalence of 0.3% (i.e. approximately 1 in 330 individuals are infected at any given timepoint), and \_\_ average infections per person per year.
+    This gives an approximate infection prevalence of 0.3% (i.e. 1 in 330 individuals infected at any given timepoint).
 
-For each pathogen archetype, we investigated the effect of far UVC efficacy and far UVC coverage on the annual incidence of infection, running multiple model simulations where the following parameters were varied:
+For each pathogen archetype, we investigated the effect of far UVC efficacy and far UVC coverage on the annual incidence of infection, varying:
 
 -   **far UVC Coverage:** Either 10%, 25% or 50% - in all cases, far UVC was assumed to be installed in schools, workplaces and leisure locations only (i.e. not households), and within each Setting Type, a random set of locations .
 
@@ -381,6 +389,7 @@ The results of these analyses are presented in Figure \@ref(fig:placeholder-1).
 In general, we estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact.
 Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like".
 At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
+
 
 ```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
 
@@ -415,9 +424,9 @@ for (i in 1:length(outputs)) {
 }
 
 subset_index <- 4 * 365
-overall <- dplyr::bind_rows(outputs_processed) %>%
-  mutate(daily_timestep = floor(new_timestep * dt)) %>%
-  group_by(iteration, archetype, efficacy, coverage, daily_timestep) %>%
+overall <- dplyr::bind_rows(outputs_processed) |>
+  mutate(daily_timestep = floor(new_timestep * dt)) |>
+  group_by(iteration, archetype, efficacy, coverage, daily_timestep) |>
   summarise(S_count = mean(S_count),
             E_count = mean(E_count),
             I_count = mean(I_count),
@@ -426,17 +435,17 @@ overall <- dplyr::bind_rows(outputs_processed) %>%
             n_external_infections = sum(n_external_infections))
 end <- length(unique(overall$daily_timestep))
 
-overall5 <- overall %>%
-  group_by(iteration, daily_timestep, archetype, efficacy, coverage) %>%
-  summarise(S_count = mean(S_count), E_new = mean(E_new)) %>%
-  ungroup() %>%
-  group_by(iteration, archetype, efficacy, coverage) %>%
+overall5 <- overall |>
+  group_by(iteration, daily_timestep, archetype, efficacy, coverage) |>
+  summarise(S_count = mean(S_count), E_new = mean(E_new)) |>
+  ungroup() |>
+  group_by(iteration, archetype, efficacy, coverage) |>
   summarise(incidence_pre_uvc = sum(E_new[1:subset_index]) / 4,
-            incidence_after_uvc = sum(E_new[(subset_index + 1):end]) / 2) %>%
+            incidence_after_uvc = sum(E_new[(subset_index + 1):end]) / 2) |>
   mutate(incidence_reduction = incidence_pre_uvc - incidence_after_uvc,
-         incidence_percentage_reduction = incidence_reduction / incidence_pre_uvc) %>%
-  ungroup() %>%
-  group_by(archetype, efficacy, coverage) %>%
+         incidence_percentage_reduction = incidence_reduction / incidence_pre_uvc) |>
+  ungroup() |>
+  group_by(archetype, efficacy, coverage) |>
   summarise(incidence_percentage_reduction_mean = mean(incidence_percentage_reduction),
             incidence_percentage_reduction_lower = min(incidence_percentage_reduction),
             incidence_percentage_reduction_upper = max(incidence_percentage_reduction))
@@ -457,22 +466,25 @@ ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_
        y = "% Reduction in Annual Incidence of Infection")
 ```
 
-Figure \@ref(fig:placeholder-1): The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for each of the pathogen archetypes considered.
-Values presented represent the mean (bars) averaged over the 10 stochastic model simulations carried out, with the range (error bars) of % reduction in incidence across those simulations also plotted.
 
-### Discussion
+(ref:placeholder-1): The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for each of the pathogen archetypes considered.
+Values presented by the bars represent the mean averaged over the 10 stochastic model simulations, with the range of % reduction in incidence across those 10 simulations shown by the error bars.
 
-The observed differences in predictd far UVC impact between the two pathogen archetypes arises primarily because of their different $R_0$ values.
-In Figure \@ref(fig:placeholder-2) we show the analytical relationship between $R_0$ and prevalence of infection, derived for a SEIRS compartmental model (see [here](https://www.nature.com/articles/s41592-020-0856-2)) and [here](https://shiny.bcgsc.ca/posepi2/)) that shares a similar representation of a disease's natural history to `helios`.
-We note that the results presented in \@ref(fig:placeholder-2) are not results from running `helios` (instead they are the analytical solution of a significantly more tractable mathematical model that is simpler but similar to `helios`) and are displayed here solely for the purpose of illustrating a generally-held non-linearity between transmissibility ($R_{0}$) and disease burden (in this case infection prevalence).
+
+## Discussion
+
+The observed differences in predicted far UVC impact between the two pathogen archetypes arises primarily because of their different $R_0$ values.
+In Figure \@ref(fig:analytical-relationship) we show the analytical relationship between $R_0$ and prevalence of infection, derived for a SEIRS compartmental model (see [here](https://www.nature.com/articles/s41592-020-0856-2)) and [here](https://shiny.bcgsc.ca/posepi2/)) that shares a similar representation of a disease's natural history to `helios`.
+We note that the results presented in \@ref(fig:analytical-relationship) are not results from running `helios` (instead they are the analytical solution of a significantly more tractable mathematical model that is simpler but similar to `helios`) and are displayed here solely for the purpose of illustrating a generally-held non-linearity between transmissibility ($R_{0}$) and disease burden (in this case infection prevalence).
 
 There is a non-linear influence of $R_{0}$ on prevalence of infection (and hence disease burden).
 For lower values of $R_{0}$, there is a near-linear relationship between the two quantities.
-At higher values of $R_{0}$ however, increasing values of $R_0$ have decreasing impact on infection prevalence, which begins to saturate.
+At higher values of $R_{0}$ however, infection prevalecne saturates and increasing values of $R_0$ have a diminishing impact on increasing it.
 When $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. due to far UVC) will have only a slight impact on infection prevalence.
 By contrast, when baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence will decrease more (in relative terms) for the same reduction in $R_0$.
 
-```{r placeholder-2, fig.cap="(ref:placeholder-2)"}
+
+```{r analytical-relationship, fig.cap="(ref:analytical-relationship)"}
 
 ## R0 - infection prevalence relationship for Influenza archetype
 R0 <- seq(1, 4, 0.1)
@@ -480,6 +492,7 @@ gamma <- 1 / 2
 sigma <- 1 / 1
 omega <- 1 / 365
 mu <- 1 / 100000
+alpha <- 0
 beta <- R0 * ((sigma + mu) / sigma) * (gamma + mu)
 influenza_infection_prevalence <- c()
 for (i in 1:length(R0)) {
@@ -510,13 +523,19 @@ sc2_R0 <- data.frame(archetype = "SARS-CoV-2-Like", R0 = R0, prevalence = sc2_in
 
 overall_R0_df <- rbind(influenza_R0, sc2_R0)
 
-ggplot(overall_R0_df, aes(x = R0, y = prevalence, col = archetype)) +
+plot <- ggplot(overall_R0_df, aes(x = R0, y = prevalence, col = archetype)) +
   geom_point() +
   geom_line() +
+  geom_vline(xintercept = c(1.5, 3), linetype = "dashed") +
   theme_bw() +
   labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)",
        col = "Pathogen\nArchetype")
+plot
 
 ```
+
+
+(ref:analytical-relationship): The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`.
+Vertical dashed line indicates the value of $R_0$ used for each archetype in the analyses carried out.
 
 # Bibliography {.unnumbered}

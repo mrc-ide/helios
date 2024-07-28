@@ -86,7 +86,8 @@ overall2 <- overall %>%
             R_upper = max(R_count),
             E_new = mean(E_new),
             E_new_lower = min(E_new),
-            E_new_upper = max(E_new))
+            E_new_upper = max(E_new),
+            n_external = mean(n_external_infections))
 ggplot(overall2, aes(x = daily_timestep, col = archetype)) +
   geom_line(aes(y = 1000 * E_new / population), linewidth = 0.1) +
   geom_ribbon(aes(fill = archetype,
@@ -117,7 +118,7 @@ index <- 4 * 365
 end <- length(unique(overall$daily_timestep))
 overall3 <- overall %>%
   group_by(daily_timestep, archetype, efficacy, coverage) %>%
-  summarise(S_count = median(S_count), E_new = median(E_new)) %>%
+  summarise(E_new = median(E_new)) %>%
   ungroup() %>%
   group_by(archetype, efficacy, coverage) %>%
   summarise(incidence_pre_uvc = sum(E_new[1:index]) / 4,
@@ -126,7 +127,7 @@ overall3 <- overall %>%
                values_to = "incidence", names_to = "period")
 
 overall3$period <- factor(overall3$period, levels = c("incidence_pre_uvc", "incidence_after_uvc"))
-ggplot(overall3, aes(x = 100 * efficacy, y = 0.5 * incidence * 1000 / population, fill = period)) +
+ggplot(overall3, aes(x = 100 * efficacy, y = incidence * 1000 / population, fill = period)) +
   geom_bar(stat = "identity", position = "dodge", col = "black") +
   scale_fill_manual(values = c("#E1E1E1", "#324A5F"),
                     labels = c("Incidence\nPre-UVC", "Incidence\nPost-UVC"),
