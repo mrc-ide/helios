@@ -277,7 +277,7 @@ where $P_i$ is the probability a person becomes infected conditional on them spe
 #### Step 2: Estimating Variation in Riskiness Across Locations of the Same Setting Type
 
 With the modelling framework to assess risk in place, we carried out a sensitivity analysis to derive reasonable bounds for $\gamma$.
-We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces (from [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1) and parameter estimates for SARS-CoV-2 from Blatchley et al (see \@ref(tab:parameter-estimates)) to explore how Location riskiness varied whilst varying:
+We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces (from [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1) and parameter estimates for SARS-CoV-2 from Blatchley et al (see Table \@ref(tab:parameter-estimates)) to explore how Location riskiness varied whilst varying:
 
 1.  Infection Prevalence (i.e. the number of infectious individuals in the space).
 2.  Air Changes Per Hour (considering the minimum and maximum of the ranges provided in \@ref(tab:parameter-estimates))
@@ -358,7 +358,7 @@ c
 | $B$             | 0.45 m^3^ per hour                  | Volume breathing rate assumes 15 breaths per minute and 500ml tidal volume = 0.45m^3^ per hour. | [Here](https://www.verywellhealth.com/tidal-volume-5090250#) & [here](https://my.clevelandclinic.org/health/articles/10881-vital-signs) |
 | $r$             | 1.37 × 10^-2^                       | The probability that a single inhaled infective virus will initiate an infection.               | @blatchley2023quantitative & @killingley2022safety                                                                                      |
 
-: Table 1: Parameter Estimates Used to Calculate Variation in Riskiness Across Locations Belonging to the Same Setting Type
+Table: (\#tab:parameter-estimates) Parameter Estimates Used to Calculate Variation in Riskiness Across Locations Belonging to the Same Setting Type
 
 # Assessing the impact of far UVC on the burden of endemic respiratory viruses {#assessing}
 
