@@ -300,6 +300,8 @@ For the purposes of the results presented here, we assume that individuals spend
 and 1.5 hours in the community, noting that individuals spend time in either Schools (children and teachers) or Workplaces (all other adults) but not both.
 We use these ratios as the basis for the Setting Type and Location specific $\gamma_{j,m}$ values used in the modelling analyses presented in the next section.
 
+(ref:wells-riley-1) Estimating the variation in riskiness between Locations belonging to the same Setting Type. A) For each Setting Type, the probability of infection in the least and most risky settings (i.e. with the lowest and highest ventilation rates) over time. B) The ratio of infection risk in the most vs least risky Locations over time for each Setting Type. Dashed lines indicate the time assumed spent in each Setting Type for purposes of modelling. Note ratios are the same for Leisure and Workplace and so only Workplace is plotted.
+
 ```{r wells-riley-1, fig.cap="(ref:wells-riley-1)", fig.fullwidth = TRUE, fig.height=5}
 
 overall_df <- readRDS(paste0(here::here(), "/inst/blueprint_july_transient_wells_riley_infection_risk_variation.rds"))
@@ -340,12 +342,6 @@ c <- cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
 c
 
 ```
-
-(ref:wells-riley-1): Estimating the variation in riskiness between Locations belonging to the same Setting Type.
-A) For each Setting Type, the probability of infection in the least and most risky settings (i.e. with the lowest and highest ventilation rates) over time.
-B) The ratio of infection risk in the most vs least risky Locations over time for each Setting Type.
-Dashed lines indicate the time assumed spent in each Setting Type for purposes of modelling.
-Note ratios are the same for Leisure and Workplace and so only Workplace is plotted.
 
 | Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                  |
 |-----------------|-----------------|-----------------|-----------------------|
@@ -467,9 +463,7 @@ ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_
 ```
 
 
-(ref:placeholder-1): The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for each of the pathogen archetypes considered.
-Values presented by the bars represent the mean averaged over the 10 stochastic model simulations, with the range of % reduction in incidence across those 10 simulations shown by the error bars.
-
+(ref:placeholder-1) The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for each of the pathogen archetypes considered. Values presented by the bars represent the mean averaged over the 10 stochastic model simulations, with the range of % reduction in incidence across those 10 simulations shown by the error bars.
 
 ## Discussion
 
@@ -483,9 +477,9 @@ At higher values of $R_{0}$ however, infection prevalecne saturates and increasi
 When $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. due to far UVC) will have only a slight impact on infection prevalence.
 By contrast, when baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence will decrease more (in relative terms) for the same reduction in $R_0$.
 
+(ref:analytical-relationship) The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`. Vertical dashed line indicates the value of $R_0$ used for each archetype in the analyses carried out.
 
 ```{r analytical-relationship, fig.cap="(ref:analytical-relationship)"}
-
 ## R0 - infection prevalence relationship for Influenza archetype
 R0 <- seq(1, 4, 0.1)
 gamma <- 1 / 2
@@ -531,11 +525,6 @@ plot <- ggplot(overall_R0_df, aes(x = R0, y = prevalence, col = archetype)) +
   labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)",
        col = "Pathogen\nArchetype")
 plot
-
 ```
-
-
-(ref:analytical-relationship): The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`.
-Vertical dashed line indicates the value of $R_0$ used for each archetype in the analyses carried out.
 
 # Bibliography {.unnumbered}
