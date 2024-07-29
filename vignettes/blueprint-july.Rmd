@@ -14,9 +14,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: REFERENCES.bib
-editor_options: 
-  markdown: 
-    wrap: sentence
 ---
 
 ```{r, include = FALSE}
@@ -64,7 +61,7 @@ These are:
 ## Use of Data from the USA {#usa-data}
 
 ```{r}
-human_population <- 30000
+human_population <- 50000
 
 parameters_list_usa <- get_parameters(list(human_population = human_population, 
                                            seed = 1, 
@@ -199,29 +196,31 @@ Below is a mathematical description of this addition and the parameterisation us
 ### Modelling Variation in Transmission Riskiness Between Locations of the Same Setting Type
 
 Previously, we modelled the force of infection experienced by individual $i$ in Location $m$ at time $t$ as follows:
-
-$$ \lambda_{i,j,m}(t) = \frac{\beta_{m} I_{j,m}(t)}{N_{j,m}} $$
-
+$$
+\lambda_{i,j,m}(t) = \frac{\beta_{m} I_{j,m}(t)}{N_{j,m}}
+$$
 where $I_m(t)$ are the number of infectious individuals in Location $j$ of Setting Type $m$ at time $t$ , $N_{j,m}$ is the total number of individuals visiting Location $j$ of Setting Type $m$ at time $t$ and $\beta_m$ is a Setting Type-specific (i.e. workplace, school, household, leisure-venue specific) transmissibility parameter that models **on average** how much transmission happens in a particular Setting Type (e.g. workplaces) compared to other Settings Types (e.g. schools).
 The total force of infection $\lambda_T$ experienced across all Setting Types is then summed and forms the basis for calculating an individual's probability of infection during one time-step $t$:
-
-$$ P(infection) = 1 - e^{- \lambda_{i,T}t}. $$
+$$
+P(infection) = 1 - e^{- \lambda_{i,T}t}.
+$$
 
 Previously, $\beta$ was specific to the Setting Type (i.e. it was different for schools, workplaces, households and leisure settings) but assumed to be the same same for every location of that setting type e.g. all schools had the same $\beta$.
 We have now relaxed this assumption.
 The updated force of infection term is:
 
-$$ \lambda_{i,j,m}(t) = \frac{\beta_{j,m} I_{j,m}(t)}{N_{j,m}} $$
+$$
+\lambda_{i,j,m}(t) = \frac{\beta_{j,m} I_{j,m}(t)}{N_{j,m}}
+$$
 
 where:\
-$$ \beta_{j,m} = \gamma_{j,m}\beta_{m} $$
-
+$$
+\beta_{j,m} = \gamma_{j,m}\beta_{m}
+$$
 and:
-
 $$
 \gamma_{j,m} \sim Lognormal(\mu_{m}, \sigma_{m}).
 $$
-
 The parameter $\gamma$ controls how risky a particular Location of a specific Setting Type is relative to the **average** for that Setting Type and is drawn from a Lognormal distribution.
 For example, $\gamma = 1$ is a setting which is as "risky" as the average location of that Setting Type.
 Meanwhile, $\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
@@ -241,24 +240,18 @@ Below we describe this process.
 #### Step 1: Modelling the Concentration of Infective Virus in an Enclosed Space and Associated Infection Risk
 
 Following the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#), we model the concentration of a pathogen in the air in an enclosed space via the following ordinary differential equation (ODE):
-
 $$
 \nu \frac{dC(t)}{dt} =  - QC - k_DC \nu + I\pi 
 $$
-
 where $v$ is the space volume, $C$ is the infective virus concentration, $t$ is time, $Q$ is the flow rate of air into and out of the space, $k_D$ is the natural decay constant, $I$ is the number of infectious individuals in the space, and $\pi$ is the per capita (infective) virus emission rate.
 The closed-form solution to this equation is:
-
 $$
 C(t) =  \frac{I\pi}{\alpha \nu}(1 - e^{-\alpha t}) 
 $$
-
 where:
-
 $$
 \alpha = \frac{Q}{\nu} + k_D
 $$
-
 $\frac{Q}{\nu}$ is the number of air changes per hour.
 $\alpha$ is therefore the number of equivalent air changes per hour taking into account both natural decay of the virus and ventilation-driven removal of infective virus.
 For the purposes of the analyses presented here, we assume the volume of the space is the following: $$
@@ -267,11 +260,9 @@ $$where $N$ is the number of people occupying the space, $D_m$ is the density of
 
 We then integrate this estimate of the concentration of infective virus in the space with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
 The Wells-Riley equation takes the following form:
-
 $$
 P_{i}(t) =  1 - e^{-r C_{ss}Bt}
 $$
-
 where $P_i$ is the probability a person becomes infected conditional on them spending time $t$ in a space with $C_{ss}$ concentration of infective virus, $B$ is the volume rate at which air is breathed in, and $r$ is the risk parameter, the probability that a single inhaled infective virus will initiate an infection.
 
 #### Step 2: Estimating Variation in Riskiness Across Locations of the Same Setting Type

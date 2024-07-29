@@ -112,15 +112,15 @@ Figure <a href="#fig:age">1.2</a> shows the same but for the age distribution us
 
 <div class="figure">
 <span style="display:block;" id="fig:household-size"></span>
-<img src="blueprint-july_files/figure-html/household-size-1.png" alt="A distribution of household sizes for a synthetic population of size 3^{4} using data from the UK (A) and from the USA (B)." width="90%"><p class="caption">
-Figure 1.1: A distribution of household sizes for a synthetic population of size 3^{4} using data from the UK (A) and from the USA (B).
+<img src="blueprint-july_files/figure-html/household-size-1.png" alt="A distribution of household sizes for a synthetic population of size 5^{4} using data from the UK (A) and from the USA (B)." width="90%"><p class="caption">
+Figure 1.1: A distribution of household sizes for a synthetic population of size 5^{4} using data from the UK (A) and from the USA (B).
 </p>
 </div>
 
 <div class="figure">
 <span style="display:block;" id="fig:age"></span>
-<img src="blueprint-july_files/figure-html/age-1.png" alt="An age group population sizes distribution for a synthetic population of size 3^{4} using data from the UK (A) and from the USA (B)." width="90%"><p class="caption">
-Figure 1.2: An age group population sizes distribution for a synthetic population of size 3^{4} using data from the UK (A) and from the USA (B).
+<img src="blueprint-july_files/figure-html/age-1.png" alt="An age group population sizes distribution for a synthetic population of size 5^{4} using data from the UK (A) and from the USA (B)." width="90%"><p class="caption">
+Figure 1.2: An age group population sizes distribution for a synthetic population of size 5^{4} using data from the UK (A) and from the USA (B).
 </p>
 </div>
 </div>
@@ -136,8 +136,8 @@ This data was available only at the national level, which we use here.</p>
 
 <div class="figure">
 <span style="display:block;" id="fig:school-size"></span>
-<img src="blueprint-july_files/figure-html/school-size-1.png" alt="A distribution of school sizes for a synthetic population of size 3^{4} using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US." width="90%"><p class="caption">
-Figure 1.3: A distribution of school sizes for a synthetic population of size 3^{4} using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US.
+<img src="blueprint-july_files/figure-html/school-size-1.png" alt="A distribution of school sizes for a synthetic population of size 5^{4} using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US." width="90%"><p class="caption">
+Figure 1.3: A distribution of school sizes for a synthetic population of size 5^{4} using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US.
 </p>
 </div>
 </div>
@@ -154,21 +154,29 @@ Below is a mathematical description of this addition and the parameterisation us
 <h4 id="modelling-variation-in-transmission-riskiness-between-locations-of-the-same-setting-type">
 <span class="header-section-number">1.2.1</span> Modelling Variation in Transmission Riskiness Between Locations of the Same Setting Type<a class="anchor" aria-label="anchor" href="#modelling-variation-in-transmission-riskiness-between-locations-of-the-same-setting-type"></a>
 </h4>
-<p>Previously, we modelled the force of infection experienced by individual <span class="math inline">\(i\)</span> in Location <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> as follows:</p>
-<p><span class="math display">\[ \lambda_{i,j,m}(t) = \frac{\beta_{m} I_{j,m}(t)}{N_{j,m}} \]</span></p>
-<p>where <span class="math inline">\(I_m(t)\)</span> are the number of infectious individuals in Location <span class="math inline">\(j\)</span> of Setting Type <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> , <span class="math inline">\(N_{j,m}\)</span> is the total number of individuals visiting Location <span class="math inline">\(j\)</span> of Setting Type <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> and <span class="math inline">\(\beta_m\)</span> is a Setting Type-specific (i.e. workplace, school, household, leisure-venue specific) transmissibility parameter that models <strong>on average</strong> how much transmission happens in a particular Setting Type (e.g. workplaces) compared to other Settings Types (e.g. schools).
-The total force of infection <span class="math inline">\(\lambda_T\)</span> experienced across all Setting Types is then summed and forms the basis for calculating an individual’s probability of infection during one time-step <span class="math inline">\(t\)</span>:</p>
-<p><span class="math display">\[ P(infection) = 1 - e^{- \lambda_{i,T}t}. \]</span></p>
+<p>Previously, we modelled the force of infection experienced by individual <span class="math inline">\(i\)</span> in Location <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> as follows:
+<span class="math display">\[
+\lambda_{i,j,m}(t) = \frac{\beta_{m} I_{j,m}(t)}{N_{j,m}}
+\]</span>
+where <span class="math inline">\(I_m(t)\)</span> are the number of infectious individuals in Location <span class="math inline">\(j\)</span> of Setting Type <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> , <span class="math inline">\(N_{j,m}\)</span> is the total number of individuals visiting Location <span class="math inline">\(j\)</span> of Setting Type <span class="math inline">\(m\)</span> at time <span class="math inline">\(t\)</span> and <span class="math inline">\(\beta_m\)</span> is a Setting Type-specific (i.e. workplace, school, household, leisure-venue specific) transmissibility parameter that models <strong>on average</strong> how much transmission happens in a particular Setting Type (e.g. workplaces) compared to other Settings Types (e.g. schools).
+The total force of infection <span class="math inline">\(\lambda_T\)</span> experienced across all Setting Types is then summed and forms the basis for calculating an individual’s probability of infection during one time-step <span class="math inline">\(t\)</span>:
+<span class="math display">\[
+P(infection) = 1 - e^{- \lambda_{i,T}t}.
+\]</span></p>
 <p>Previously, <span class="math inline">\(\beta\)</span> was specific to the Setting Type (i.e. it was different for schools, workplaces, households and leisure settings) but assumed to be the same same for every location of that setting type e.g. all schools had the same <span class="math inline">\(\beta\)</span>.
 We have now relaxed this assumption.
 The updated force of infection term is:</p>
-<p><span class="math display">\[ \lambda_{i,j,m}(t) = \frac{\beta_{j,m} I_{j,m}(t)}{N_{j,m}} \]</span></p>
-<p>where:<br><span class="math display">\[ \beta_{j,m} = \gamma_{j,m}\beta_{m} \]</span></p>
-<p>and:</p>
 <p><span class="math display">\[
-\gamma_{j,m} \sim Lognormal(\mu_{m}, \sigma_{m}).
+\lambda_{i,j,m}(t) = \frac{\beta_{j,m} I_{j,m}(t)}{N_{j,m}}
 \]</span></p>
-<p>The parameter <span class="math inline">\(\gamma\)</span> controls how risky a particular Location of a specific Setting Type is relative to the <strong>average</strong> for that Setting Type and is drawn from a Lognormal distribution.
+<p>where:<br><span class="math display">\[
+\beta_{j,m} = \gamma_{j,m}\beta_{m}
+\]</span>
+and:
+<span class="math display">\[
+\gamma_{j,m} \sim Lognormal(\mu_{m}, \sigma_{m}).
+\]</span>
+The parameter <span class="math inline">\(\gamma\)</span> controls how risky a particular Location of a specific Setting Type is relative to the <strong>average</strong> for that Setting Type and is drawn from a Lognormal distribution.
 For example, <span class="math inline">\(\gamma = 1\)</span> is a setting which is as “risky” as the average location of that Setting Type.
 Meanwhile, <span class="math inline">\(\gamma = 2\)</span> would describe a setting that is twice as risky; <span class="math inline">\(\gamma = 0.5\)</span> would describe a setting that is half as risky etc.
 Parameterisation and estimation of <span class="math inline">\(\gamma\)</span> is described below.</p>
@@ -189,40 +197,40 @@ Below we describe this process.</p>
 <h5 id="step-1-modelling-the-concentration-of-infective-virus-in-an-enclosed-space-and-associated-infection-risk">
 <span class="header-section-number">1.2.2.1</span> Step 1: Modelling the Concentration of Infective Virus in an Enclosed Space and Associated Infection Risk<a class="anchor" aria-label="anchor" href="#step-1-modelling-the-concentration-of-infective-virus-in-an-enclosed-space-and-associated-infection-risk"></a>
 </h5>
-<p>Following the approach of <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#" class="external-link">Blatchley et al, 2024</a>, we model the concentration of a pathogen in the air in an enclosed space via the following ordinary differential equation (ODE):</p>
-<p><span class="math display">\[
+<p>Following the approach of <a href="https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#" class="external-link">Blatchley et al, 2024</a>, we model the concentration of a pathogen in the air in an enclosed space via the following ordinary differential equation (ODE):
+<span class="math display">\[
 \nu \frac{dC(t)}{dt} =  - QC - k_DC \nu + I\pi
-\]</span></p>
-<p>where <span class="math inline">\(v\)</span> is the space volume, <span class="math inline">\(C\)</span> is the infective virus concentration, <span class="math inline">\(t\)</span> is time, <span class="math inline">\(Q\)</span> is the flow rate of air into and out of the space, <span class="math inline">\(k_D\)</span> is the natural decay constant, <span class="math inline">\(I\)</span> is the number of infectious individuals in the space, and <span class="math inline">\(\pi\)</span> is the per capita (infective) virus emission rate.
-The closed-form solution to this equation is:</p>
-<p><span class="math display">\[
+\]</span>
+where <span class="math inline">\(v\)</span> is the space volume, <span class="math inline">\(C\)</span> is the infective virus concentration, <span class="math inline">\(t\)</span> is time, <span class="math inline">\(Q\)</span> is the flow rate of air into and out of the space, <span class="math inline">\(k_D\)</span> is the natural decay constant, <span class="math inline">\(I\)</span> is the number of infectious individuals in the space, and <span class="math inline">\(\pi\)</span> is the per capita (infective) virus emission rate.
+The closed-form solution to this equation is:
+<span class="math display">\[
 C(t) =  \frac{I\pi}{\alpha \nu}(1 - e^{-\alpha t})
-\]</span></p>
-<p>where:</p>
-<p><span class="math display">\[
+\]</span>
+where:
+<span class="math display">\[
 \alpha = \frac{Q}{\nu} + k_D
-\]</span></p>
-<p><span class="math inline">\(\frac{Q}{\nu}\)</span> is the number of air changes per hour.
+\]</span>
+<span class="math inline">\(\frac{Q}{\nu}\)</span> is the number of air changes per hour.
 <span class="math inline">\(\alpha\)</span> is therefore the number of equivalent air changes per hour taking into account both natural decay of the virus and ventilation-driven removal of infective virus.
 For the purposes of the analyses presented here, we assume the volume of the space is the following: <span class="math display">\[
 \nu = N D_mH
 \]</span>where <span class="math inline">\(N\)</span> is the number of people occupying the space, <span class="math inline">\(D_m\)</span> is the density of people in the space (i.e. the number of people per m<sup>2</sup>) and <span class="math inline">\(H\)</span> is the height of the space.</p>
 <p>We then integrate this estimate of the concentration of infective virus in the space with the Wells-Riley equation, a simple and widely used model for the airbone transmission of infectious diseases.
-The Wells-Riley equation takes the following form:</p>
-<p><span class="math display">\[
+The Wells-Riley equation takes the following form:
+<span class="math display">\[
 P_{i}(t) =  1 - e^{-r C_{ss}Bt}
-\]</span></p>
-<p>where <span class="math inline">\(P_i\)</span> is the probability a person becomes infected conditional on them spending time <span class="math inline">\(t\)</span> in a space with <span class="math inline">\(C_{ss}\)</span> concentration of infective virus, <span class="math inline">\(B\)</span> is the volume rate at which air is breathed in, and <span class="math inline">\(r\)</span> is the risk parameter, the probability that a single inhaled infective virus will initiate an infection.</p>
+\]</span>
+where <span class="math inline">\(P_i\)</span> is the probability a person becomes infected conditional on them spending time <span class="math inline">\(t\)</span> in a space with <span class="math inline">\(C_{ss}\)</span> concentration of infective virus, <span class="math inline">\(B\)</span> is the volume rate at which air is breathed in, and <span class="math inline">\(r\)</span> is the risk parameter, the probability that a single inhaled infective virus will initiate an infection.</p>
 </div>
 <div class="section level5" number="1.2.2.2">
 <h5 id="step-2-estimating-variation-in-riskiness-across-locations-of-the-same-setting-type">
 <span class="header-section-number">1.2.2.2</span> Step 2: Estimating Variation in Riskiness Across Locations of the Same Setting Type<a class="anchor" aria-label="anchor" href="#step-2-estimating-variation-in-riskiness-across-locations-of-the-same-setting-type"></a>
 </h5>
 <p>With the modelling framework to assess risk in place, we carried out a sensitivity analysis to derive reasonable bounds for <span class="math inline">\(\gamma\)</span>.
-We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces (from <a href="https://corsiaq.com/reports-etc/" class="external-link">Corsi et al, 2006</a> - Section 3.1) and parameter estimates for SARS-CoV-2 from Blatchley et al (see <a href="#tab:parameter-estimates"><strong>??</strong></a>) to explore how Location riskiness varied whilst varying:</p>
+We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces (from <a href="https://corsiaq.com/reports-etc/" class="external-link">Corsi et al, 2006</a> - Section 3.1) and parameter estimates for SARS-CoV-2 from Blatchley et al (see Table <a href="#tab:parameter-estimates">1.1</a>) to explore how Location riskiness varied whilst varying:</p>
 <ol style="list-style-type: decimal">
 <li>Infection Prevalence (i.e. the number of infectious individuals in the space).</li>
-<li>Air Changes Per Hour (considering the minimum and maximum of the ranges provided in <a href="#tab:parameter-estimates"><strong>??</strong></a>)</li>
+<li>Air Changes Per Hour (considering the minimum and maximum of the ranges provided in <a href="#tab:parameter-estimates">1.1</a>)</li>
 <li>The Time Spent in the Space (ranging from 0 to 8 hours).</li>
 </ol>
 <p>The results of this are shown in <a href="#fig:wells-riley-1">1.4</a>.
@@ -245,7 +253,8 @@ Figure 1.4: Estimating the variation in riskiness between Locations belonging to
 </p>
 </div>
 <table class="table">
-<caption>Table 1: Parameter Estimates Used to Calculate Variation in Riskiness Across Locations Belonging to the Same Setting Type</caption>
+<caption>
+<span id="tab:parameter-estimates">Table 1.1: </span> Parameter Estimates Used to Calculate Variation in Riskiness Across Locations Belonging to the Same Setting Type</caption>
 <colgroup>
 <col width="24%">
 <col width="24%">
