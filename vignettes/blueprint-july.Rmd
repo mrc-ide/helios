@@ -10,7 +10,7 @@ output:
 pkgdown:
   as_is: true
 vignette: >
-  %\VignetteIndexEntry{blueprint}
+  %\VignetteIndexEntry{blueprint_july}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: REFERENCES.bib
