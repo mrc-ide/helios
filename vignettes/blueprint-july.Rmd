@@ -50,7 +50,7 @@ parameter_sweep_data <- readRDS("./parameter_sweep_data.rds")
 
 In our [initial report](https://mrc-ide.github.io/helios/articles/blueprint.html) we introduced `helios`: an individual-based modelling framework for exploring the impact that installation of far UVC could have on the transmission and burden of respiratory infections.
 This report describes updates made to the modelling framework since that initial report (Section \@ref(changes)).
-Additionally, we present a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden of endemic respiratory pathogens, using influenza and SARS-CoV-2 as case studies.
+Additionally, we present a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden of endemic respiratory pathogens, using "influenza-like" and "SARS-CoV-2-like" pathogen archetypes as case studies.
 (Section \@ref(assessing)).
 
 # Major Model Changes {#changes}
@@ -61,7 +61,7 @@ These are:
 1.  Using data from the United States of America (USA) to parameterise all aspects of the model's representation of the physical environment (Section \@ref(usa-data)).
 2.  Including variation in the propensity for infectious disease transmission (which we call "riskiness") across individual locations in the model (Section \@ref(location)).
 
-## Consistent Use of Data from the USA {#usa-data}
+## Use of Data from the USA {#usa-data}
 
 ```{r}
 human_population <- 10000
@@ -105,10 +105,10 @@ It contains individual-level information on household residency and age, which w
 State and county specific data are available.
 We selected data from San Francisco, California.
 
-Figure \@ref(fig:household-size)A shows the previous household size distribution used (based on UK data); Figure \@ref(fig:household-size)B shows the household size distribution now being used (based on the USA data described above).
+**Figure** \@ref(fig:household-size)**A** shows the previous household size distribution used (based on UK data); **Figure** \@ref(fig:household-size)**B** shows the household size distribution now being used (based on the USA data described above).
 Figure \@ref(fig:age) shows the same but for the age distribution used.
 
-(ref:household-size) A distribution of household sizes for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B).
+**(ref:household-size)** A distribution of household sizes for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B).
 
 ```{r household-size, fig.cap="(ref:household-size)"}
 households_usa <- variables_usa$variables_list$household$get_categories()
@@ -132,7 +132,7 @@ plot_household_uk <- table(household_sizes_uk) |>
 cowplot::plot_grid(plot_household_uk, plot_household_usa, nrow = 2, labels = c("A", "B"))
 ```
 
-(ref:age) An age group population sizes distribution for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B).
+**(ref:age)** An age group population sizes distribution for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B).
 
 ```{r age, fig.cap="(ref:age)"}
 plot_age_usa <- data.frame(age_classes_usa, age_class_counts_usa) |>
@@ -159,9 +159,9 @@ We included all schools categorised as "prekindergarten", "elementary", "middle"
 As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550) for the purposes of constructing the distribution of schools sizes (this is in contrast to the UK data where exact school sizes were available).
 This data was available only at the national level, which we use here.
 
-Figure \@ref(fig:school-size)A shows, for a population of 250,000, the resulting school size distribution used based on previous data which was from the UK; Figure \@ref(fig:school-size)B shows the household size distribution now being used, which is based on the USA data described above.
+**Figure** \@ref(fig:school-size)**A** shows, for a population of 500,000, the resulting school size distribution used based on previous data which was from the UK; **Figure** \@ref(fig:school-size)**B** shows the household size distribution now being used, which is based on the USA data described above.
 
-(ref:school-size) A distribution of school sizes for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US.
+**(ref:school-size)** A distribution of school sizes for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US.
 
 ```{r school-size, fig.cap="(ref:school-size)"}
 schools_usa <- variables_usa$variables_list$school$get_categories()
@@ -196,13 +196,13 @@ However, we made the simplifying assumption that all Locations within a particul
 We now explicitly incorporate variation in riskiness between Locations belonging to the same Setting Type.
 Below is a mathematical description of this addition and the parameterisation used for the results presented in this report.
 
-### Modelling Variation in Transmission Riskiness Across Locations Belonging to the Same Setting Type
+### Modelling Variation in Transmission Riskiness Between Locations of the Same Setting Type
 
 Previously, we modelled the force of infection experienced by individual $i$ in Location $m$ at time $t$ as follows:
 
 $$ \lambda_{i,j,m}(t) = \frac{\beta_{m} I_{j,m}(t)}{N_{j,m}} $$
 
-where $I_m(t)$ are the number of infectious individuals in Location $j$ of Setting Type $m$ at time $t$ , $N_{j,m}$ are the total number of individuals visiting Location $j$ of Setting Type $m$ at time $t$ and $\beta_m$ is a Setting Type-specific (i.e. workplace, school, household, leisure-venue specific) transmissibility parameter that models **on average** how much transmission happens in a particular Setting Type (e.g. workplaces) compared to other Settings Types (e.g. schools).
+where $I_m(t)$ are the number of infectious individuals in Location $j$ of Setting Type $m$ at time $t$ , $N_{j,m}$ is the total number of individuals visiting Location $j$ of Setting Type $m$ at time $t$ and $\beta_m$ is a Setting Type-specific (i.e. workplace, school, household, leisure-venue specific) transmissibility parameter that models **on average** how much transmission happens in a particular Setting Type (e.g. workplaces) compared to other Settings Types (e.g. schools).
 The total force of infection $\lambda_T$ experienced across all Setting Types is then summed and forms the basis for calculating an individual's probability of infection during one time-step $t$:
 
 $$ P(infection) = 1 - e^{- \lambda_{i,T}t}. $$
@@ -225,9 +225,9 @@ $$
 The parameter $\gamma$ controls how risky a particular Location of a specific Setting Type is relative to the **average** for that Setting Type and is drawn from a Lognormal distribution.
 For example, $\gamma = 1$ is a setting which is as "risky" as the average location of that Setting Type.
 Meanwhile, $\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
-Parameterisation and estimation of the parameter $\gamma$ is described further below.
+Parameterisation and estimation of $\gamma$ is described below.
 
-### Parameterising $\gamma$ - Estimating Empirical Variation in Transmission Riskiness Across Locations Belonging to the Same Setting Type
+### Parameterising $\gamma$  and Estimating Variation in Transmission Riskiness Across Locations of the Same Setting Type
 
 To estimate $\gamma$, we combined a mathematical model of indoor air quality (as applied to infective virus concentrations) with a well-studied airborne infectious risk model (the Wells-Riley equation).
 We then parameterised these models with literature-derived estimates of:
@@ -277,10 +277,10 @@ where $P_i$ is the probability a person becomes infected conditional on them spe
 #### Step 2: Estimating Variation in Riskiness Across Locations of the Same Setting Type
 
 With the modelling framework to assess risk in place, we carried out a sensitivity analysis to derive reasonable bounds for $\gamma$.
-We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces and parameter estimates for SARS-CoV-2 from Blatchley et al (see Table 1) to explore how Location riskiness varied whilst varying:
+We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces (from [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1) and parameter estimates for SARS-CoV-2 from Blatchley et al (see \@ref(tab:parameter-estimates)) to explore how Location riskiness varied whilst varying:
 
 1.  Infection Prevalence (i.e. the number of infectious individuals in the space).
-2.  Air Changes Per Hour (considering the minimum and maximum of the ranges provided in Table 1)
+2.  Air Changes Per Hour (considering the minimum and maximum of the ranges provided in \@ref(tab:parameter-estimates))
 3.  The Time Spent in the Space (ranging from 0 to 8 hours).
 
 The results of this are shown in \@ref(fig:wells-riley-1).
@@ -299,7 +299,7 @@ For the purposes of the results presented here, we assume that individuals spend
 and 1.5 hours in the community, noting that individuals spend time in either Schools (children and teachers) or Workplaces (all other adults) but not both.
 We use these ratios as the basis for the Setting Type and Location specific $\gamma_{j,m}$ values used in the modelling analyses presented in the next section.
 
-(ref:wells-riley-1) Estimating the variation in riskiness between Locations belonging to the same Setting Type. A) For each Setting Type, the probability of infection in the least and most risky settings (i.e. with the lowest and highest ventilation rates) over time. B) The ratio of infection risk in the most vs least risky Locations over time for each Setting Type. Vertical dashed lines indicate the time assumed spent in each Setting Type for purposes of modelling. Note ratios are the same for Leisure and Workplace and so only Workplace is plotted.
+**(ref:wells-riley-1)** Estimating the variation in riskiness between Locations belonging to the same Setting Type. **A)** For each Setting Type, the probability of infection in the least and most risky settings (i.e. with the lowest and highest ventilation rates) over time. **B)** The ratio of infection risk in the most vs least risky Locations over time for each Setting Type. Vertical dashed lines indicate the time assumed spent in each Setting Type for purposes of modelling. Note ratios are the same for Leisure and Workplace and so only Workplace is plotted.
 
 ```{r wells-riley-1, fig.cap="(ref:wells-riley-1)", fig.fullwidth = TRUE, fig.height=5}
 
@@ -343,8 +343,8 @@ c
 ```
 
 | Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                  |
-|-----------------|-----------------|-----------------|-----------------------|
-| $\pi$           | 27 viruses per person per hour      | Rate of infective virus emission from infected individuals.                                    | @blatchley2023quantitative & @buonanno2020quantitative                                                                                  |
+|-----------------|-----------------|-----------------|---------------------|
+| $\pi$           | 27 viruses per person per hour      | Rate of infective virus emission from infected individuals.                                     | @blatchley2023quantitative & @buonanno2020quantitative                                                                                  |
 | $D_{school}$    | 30 per 100m^2^                      | Assumed density of individuals in schools                                                       | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                |
 | $A_{school}$    | 0.1-2.9 air changes per hour (ACPH) | Range of ACPH considered for schools.                                                           | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                     |
 | $D_{workplace}$ | 10 per 100m^2^                      | Assumed density of individuals in workplaces                                                    | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                |
@@ -360,7 +360,7 @@ c
 
 : Table 1: Parameter Estimates Used to Calculate Variation in Riskiness Across Locations Belonging to the Same Setting Type
 
-# Assessing the impact of far UVC on the burden of an endemic respiratory virus {#assessing}
+# Assessing the impact of far UVC on the burden of endemic respiratory viruses {#assessing}
 
 Using the modelling framework described above, we conducted analyses to evaluate the potential impact of far UVC deployment on the transmission and disease burden of a hypothetical endemic respiratory virus (i.e. one which is consistently present in a population and maintained at a particular baseline prevalence level).
 
@@ -384,7 +384,6 @@ The results of these analyses are presented in Figure \@ref(fig:placeholder-1).
 In general, we estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact.
 Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like".
 At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
-
 
 ```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
 
@@ -461,22 +460,21 @@ ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_
        y = "% Reduction in Annual Incidence of Infection")
 ```
 
-
-(ref:placeholder-1) The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for "Influenza-Like" and "SARS-CoV-2-Like" pathogen archetypes. The bars represent the mean percentage reduction in infection incidence averaged over the 10 stochastic model simulations run for each parametrisation, with the range of % reduction in incidence across those 10 simulations shown by the error bars.
+**(ref:placeholder-1)** The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for "Influenza-Like" and "SARS-CoV-2-Like" pathogen archetypes. The bars represent the mean percentage reduction in infection incidence averaged over the 10 stochastic model simulations run for each parametrisation, with the range of % reduction in incidence across those 10 simulations shown by the error bars.
 
 ## Discussion
 
 The observed differences in predicted far UVC impact between the two pathogen archetypes arise primarily because of their different $R_0$ values.
 In Figure \@ref(fig:analytical-relationship) we show the analytical relationship between $R_0$ and prevalence of infection, derived for a SEIRS compartmental model (see [here](https://www.nature.com/articles/s41592-020-0856-2) and [here](https://shiny.bcgsc.ca/posepi2/)) that shares a similar representation of a disease's natural history to `helios`.
-We note that the results presented in \@ref(fig:analytical-relationship) are not results from running `helios` (instead they are the analytical solution of a significantly more tractable mathematical model that is simpler but similar to `helios`) and are displayed here solely for the purpose of illustrating a generally-held non-linearity between transmissibility ($R_{0}$) and disease burden (in this case infection prevalence).
+We note that the results presented in \@ref(fig:analytical-relationship) are not results from running `helios` (instead they are the analytical solution of a significantly more tractable mathematical model that is simpler than but similar to `helios`) and are displayed here solely for the purpose of illustrating a generally-held non-linearity between transmissibility ($R_{0}$) and infection prevalence.
 
 There is a non-linear influence of $R_{0}$ on prevalence of infection (and hence disease burden).
 For lower values of $R_{0}$, there is a near-linear relationship between the two quantities.
-At higher values of $R_{0}$ however, infection prevalence saturates and the rate at which increasing values of $R_0$ increases prevalence diminishes.
+At higher values of $R_{0}$ however, infection prevalence saturates and the rate at which increasing values of $R_0$ increases infection prevalence diminishes.
 When $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. due to far UVC) will have only a slight impact on infection prevalence.
 By contrast, when baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence will decrease more (in relative terms) for the same reduction in $R_0$.
 
-(ref:analytical-relationship) The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`. The vertical dashed lines indicate the value of $R_0$ used for each archetype in the analyses carried out.
+**(ref:analytical-relationship)** The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`. The vertical dashed lines indicate the value of $R_0$ used for each archetype in the analyses carried out.
 
 ```{r analytical-relationship, fig.cap="(ref:analytical-relationship)"}
 ## R0 - infection prevalence relationship for Influenza archetype
