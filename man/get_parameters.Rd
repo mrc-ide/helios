@@ -14,7 +14,10 @@ These parameters are:
 \item \code{initial_proportion_child}: proportion of population initially in the 'child' age class
 \item \code{initial_proportion_adult}: proportion of population initially in the 'adult' age class
 \item \code{initial_proportion_elderly}: proportion of population initially in the 'elderly' age class
-\item \code{number_initially_exposed}: number of humans initially exposed (state = E)
+\item \code{number_initial_S}: number of humans initially Susceptible (state = S)
+\item \code{number_initial_E}: number of humans initially Exposed (state = E)
+\item \code{number_initial_I}: number of humans initially Infectious (state = I)
+\item \code{number_initial_R}: number of humans initially Recovered (state = R)
 \item \code{seed}: a seed to run the simulation with
 \item \code{mean_household_size}: TBD
 \item \code{workplace_prop_max}: maximum size of a workplace as a proportion of total adult population size

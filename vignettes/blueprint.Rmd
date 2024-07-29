@@ -64,7 +64,15 @@ We note here that the results presented are purely **examples** of the types of 
 
 ```{r}
 human_population <- 50000L
-parameters_list <- get_parameters(list(human_population = human_population, seed = 1))
+parameters_list <- get_parameters(list(human_population = human_population, 
+                                       number_initial_S = 45000,
+                                       number_initial_E = 5000,
+                                       number_initial_I = 0,
+                                       number_initial_R = 0,
+                                       household_distribution_country = "UK",
+                                       school_distribution_country = "UK",
+                                       workplace_distribution_country = "USA",
+                                       seed = 1))
 variables <- create_variables(parameters_list)
 disease_states <- variables$variables_list$disease_state$get_categories()
 age_classes <- variables$variables_list$age_class$get_categories()

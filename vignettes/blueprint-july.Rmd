@@ -64,7 +64,7 @@ These are:
 ## Use of Data from the USA {#usa-data}
 
 ```{r}
-human_population <- 600000
+human_population <- 300000
 
 parameters_list_usa <- get_parameters(list(human_population = human_population, 
                                            seed = 1, 
@@ -227,7 +227,7 @@ For example, $\gamma = 1$ is a setting which is as "risky" as the average locati
 Meanwhile, $\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
 Parameterisation and estimation of $\gamma$ is described below.
 
-### Parameterising $\gamma$  and Estimating Variation in Transmission Riskiness Across Locations of the Same Setting Type
+### Parameterising $\gamma$ and Estimating Variation in Transmission Riskiness Across Locations of the Same Setting Type
 
 To estimate $\gamma$, we combined a mathematical model of indoor air quality (as applied to infective virus concentrations) with a well-studied airborne infectious risk model (the Wells-Riley equation).
 We then parameterised these models with literature-derived estimates of:
@@ -343,7 +343,7 @@ c
 ```
 
 | Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                  |
-|-----------------|-----------------|-----------------|---------------------|
+|------------------|------------------|------------------|--------------------|
 | $\pi$           | 27 viruses per person per hour      | Rate of infective virus emission from infected individuals.                                     | @blatchley2023quantitative & @buonanno2020quantitative                                                                                  |
 | $D_{school}$    | 30 per 100m^2^                      | Assumed density of individuals in schools                                                       | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                |
 | $A_{school}$    | 0.1-2.9 air changes per hour (ACPH) | Range of ACPH considered for schools.                                                           | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                     |

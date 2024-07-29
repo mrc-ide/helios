@@ -45,6 +45,9 @@ reference:
 - title: Intervention
   contents:
   - has_concept("intervention")
+- title: Riskiness
+  contents:
+  - has_concept("setting-specific riskiness")
 - title: Miscellaneous
   contents:
   - has_concept("miscellaneous")

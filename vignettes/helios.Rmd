@@ -24,8 +24,7 @@ This vignette is not up to date with latest changes to the model!
 
 [`helios`](https://mrc-ide.github.io/helios/) is an R package which allows users to simulate the impact of [far UVC](https://www.nature.com/articles/s41598-018-21058-w) interventions in curtailing the spread of infectious disease outbreaks.
 
-This vignette serves to demonstrate basic use of the package.
-We start by loading the package, as well as other packages used in the vignette:
+This vignette serves to demonstrate basic use of the package. We start by loading the package, as well as other packages used in the vignette:
 
 ```{r setup}
 library(helios)
@@ -38,12 +37,16 @@ theme_set(theme_minimal())
 
 ## Parameters {#param}
 
-First, we define some constant parameters to be used in the model.
-In this vignette we use the default options, aside from the `human_population` variable.
-To facilitate reproducibility, we also set the seed for random number generation:
+First, we define some constant parameters to be used in the model. In this vignette we use the default options, aside from the `human_population` variable. To facilitate reproducibility, we also set the seed for random number generation:
 
 ```{r}
-parameters_list <- get_parameters(list(human_population = 5000, seed = 1))
+parameters_list <- get_parameters(list(human_population = 10000, 
+                                       number_initial_S = 8000,
+                                       number_initial_E = 1000,
+                                       number_initial_I = 800,
+                                       number_initial_R = 200,
+                                       simulation_time = 150,
+                                       seed = 1))
 ```
 
 The names of all parameters are as follows:
@@ -80,10 +83,11 @@ The outbreak is implemented as individual-level SEIR [compartmental model](https
 (disease_states <- variables_list$disease_state$get_categories())
 ```
 
-The number of individuals initially exposed is controlled by `parameters_list$number_initially_exposed`.
+The number of individuals initially exposed is controlled by `parameters_list$number_initial_E` and `parameters_list$number_initial_I`
 
 ```{r}
-parameters_list$number_initially_exposed
+parameters_list$number_initial_E
+parameters_list$number_initial_I
 ```
 
 Initially, all other individuals are placed into the susceptible disease state:
@@ -97,8 +101,7 @@ data.frame("State" = disease_states, "Count" = disease_state_counts) |>
 
 ### Age classes
 
-There are three age classes: children, adults, and the elderly.
-The age of each individual remains fixed throughout the simulation.
+There are three age classes: children, adults, and the elderly. The age of each individual remains fixed throughout the simulation.
 
 ```{r}
 parameters_list[c("initial_proportion_child", "initial_proportion_adult", "initial_proportion_elderly")]
@@ -116,8 +119,7 @@ data.frame(age_classes, age_class_counts) |>
 
 ### Schools
 
-Each child attends a fixed school.
-Additionally, a small number of adults attend schools as staff:
+Each child attends a fixed school. Additionally, a small number of adults attend schools as staff:
 
 ```{r}
 schools <- variables_list$school$get_categories()
@@ -168,6 +170,7 @@ household_df <- purrr::map_df(households, function(x) {
   if(length(indices > 0)) data.frame("individual" = indices, "household" = as.numeric(x))
 })
 
+age_classes <- variables_list$age_class$get_categories()
 age_df <- purrr::map_df(age_classes, function(x) {
   indices <- variables_list$age_class$get_index_of(values = x)$to_vector()
   if(length(indices > 0)) data.frame("individual" = indices, "age_class" = x)
@@ -190,7 +193,6 @@ household_df |>
   head() |>
   gt::gt()
 ```
-
 
 ### Leisure
 
@@ -242,6 +244,13 @@ class(renderer)
 Processes enable queing of events:
 
 ```{r}
+variables_list <- create_variables(parameters_list)
+parameters_list <- variables_list$parameters_list 
+variables_list <- variables_list$variables_list
+events_list <- create_events(variables_list = variables_list, parameters_list = parameters_list)
+timesteps <- round(parameters_list$simulation_time/parameters_list$dt)
+renderer <- individual::Render$new(timesteps)
+
 processes_list <- create_processes(
   variables_list = variables_list,
   events_list = events_list,
@@ -259,9 +268,9 @@ See [`individual::simulation_loop`](https://mrc-ide.github.io/individual/referen
 ```{r}
 individual::simulation_loop(
   variables = variables_list,
-  events = events_list,
+  events = unlist(events_list),
   processes = processes_list,
-  timesteps = timesteps
+  timesteps = timesteps,
 )
 ```
 
