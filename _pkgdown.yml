@@ -1,6 +1,7 @@
 url: https://mrc-ide.github.io/helios/
 template:
   bootstrap: 5
+  math-rendering: mathjax
 
 navbar:
   structure:

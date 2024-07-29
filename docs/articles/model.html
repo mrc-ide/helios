@@ -10,7 +10,7 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Technical model description">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="../deps/MathJax-3.2.2/tex-chtml.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Technical model description">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -81,10 +81,9 @@ started</a> vignette.</p>
 <div class="section level2">
 <h2 id="population">Population<a class="anchor" aria-label="anchor" href="#population"></a>
 </h2>
-<p>The population consists of a fixed number of individuals
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">i = 1, \ldots, N</annotation></semantics></math>.
-Each individual has properties. Some properties remain constant during
-the simulation, and others change.</p>
+<p>The population consists of a fixed number of individuals <span class="math inline">\(i = 1, \ldots, N\)</span>. Each individual has
+properties. Some properties remain constant during the simulation, and
+others change.</p>
 </div>
 <div class="section level2">
 <h2 id="age">Age structure<a class="anchor" aria-label="anchor" href="#age"></a>
@@ -92,10 +91,10 @@ the simulation, and others change.</p>
 <p>The age categories included in the model are children, adults, and
 the elderly. Each individual has a fixed age category, assumed not to
 change during the simulation. The age category is sampled from a
-categorical distribution at initialisation such that <span class="math display">$$
+categorical distribution at initialisation such that <span class="math display">\[
 \mathbb{P}(\text{age}_i = k) = p_k, \\
 k \in \{\text{child}, \text{adult}, \text{elderly}\}.
-$$</span></p>
+\]</span></p>
 </div>
 <div class="section level2">
 <h2 id="households">Households<a class="anchor" aria-label="anchor" href="#households"></a>
@@ -105,15 +104,12 @@ We consider two approaches.</p>
 <div class="section level3">
 <h3 id="parametric">Parametric<a class="anchor" aria-label="anchor" href="#parametric"></a>
 </h3>
-<p>In the parameteric approach, household sizes
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">household</mtext></msubsup><annotation encoding="application/x-tex">N_j^\text{household}</annotation></semantics></math>
-are drawn from a Poisson distribution with rate parameter
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>λ</mi><mtext mathvariant="normal">household</mtext></msup><annotation encoding="application/x-tex">\lambda^\text{household}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">household</mtext></msubsup><mo>∼</mo><mtext mathvariant="normal">Poisson</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>λ</mi><mtext mathvariant="normal">household</mtext></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+<p>In the parameteric approach, household sizes <span class="math inline">\(N_j^\text{household}\)</span> are drawn from a
+Poisson distribution with rate parameter <span class="math inline">\(\lambda^\text{household}\)</span> <span class="math display">\[
 N_j^\text{household} \sim \text{Poisson}(\lambda^\text{household}).
-</annotation></semantics></math> Individuals are then assigned to
-households. To ensure that no household contains only children, one
-adult is paired to each child assigned to a household without any
-existing adults.</p>
+\]</span> Individuals are then assigned to households. To ensure that no
+household contains only children, one adult is paired to each child
+assigned to a household without any existing adults.</p>
 </div>
 <div class="section level3">
 <h3 id="bootstrap">Bootstrap<a class="anchor" aria-label="anchor" href="#bootstrap"></a>
@@ -135,20 +131,16 @@ attending each school are considered.</p>
 <h3 id="parametric-1">Parametric<a class="anchor" aria-label="anchor" href="#parametric-1"></a>
 </h3>
 <p>In the parametric approach, the sizes of schools are drawn from a
-log-normal distribution with mean
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>μ</mi><mtext mathvariant="normal">school</mtext></msup><annotation encoding="application/x-tex">\mu^\text{school}</annotation></semantics></math>
-and variance
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><msup><mi>σ</mi><mtext mathvariant="normal">school</mtext></msup><mn>2</mn></msup><annotation encoding="application/x-tex">{\sigma^\text{school}}^2</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">school</mtext></msubsup><mo>∼</mo><mtext mathvariant="normal">Lognormal</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>μ</mi><mtext mathvariant="normal">school</mtext></msup><mo>,</mo><msup><msup><mi>σ</mi><mtext mathvariant="normal">school</mtext></msup><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
-N^\text{school}_j \sim \text{Lognormal}(\mu^\text{school}, {\sigma^\text{school}}^2).
-</annotation></semantics></math> Schools
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
-are drawn until
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mi>j</mi></msub><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">school</mtext></msubsup><mo>≥</mo><msup><mi>N</mi><mtext mathvariant="normal">child</mtext></msup></mrow><annotation encoding="application/x-tex">\sum_j N^\text{school}_j \geq N^\text{child}</annotation></semantics></math>.
-Any samples
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">school</mtext></msubsup><mo>&gt;</mo><msubsup><mi>N</mi><mtext mathvariant="normal">max</mtext><mtext mathvariant="normal">school</mtext></msubsup><mo>∈</mo><mi>ℕ</mi></mrow><annotation encoding="application/x-tex">N^\text{school}_j &gt; N^\text{school}_\text{max}  \in \mathbb{N}</annotation></semantics></math>
-are discarded. The final school size is adjusted such that the sum of
-school sizes corresponds to the number of children. Assignment of
-children to particular schools is made using random sampling without
+log-normal distribution with mean <span class="math inline">\(\mu^\text{school}\)</span> and variance <span class="math inline">\({\sigma^\text{school}}^2\)</span> <span class="math display">\[
+N^\text{school}_j \sim \text{Lognormal}(\mu^\text{school},
+{\sigma^\text{school}}^2).
+\]</span> Schools <span class="math inline">\(j\)</span> are drawn until
+<span class="math inline">\(\sum_j N^\text{school}_j \geq
+N^\text{child}\)</span>. Any samples <span class="math inline">\(N^\text{school}_j &gt;
+N^\text{school}_\text{max}  \in \mathbb{N}\)</span> are discarded. The
+final school size is adjusted such that the sum of school sizes
+corresponds to the number of children. Assignment of children to
+particular schools is made using random sampling without
 replacement.</p>
 </div>
 <div class="section level3">
@@ -172,37 +164,34 @@ nearest integer.</p>
 </h2>
 <p>Workplaces are attended by adults who are not school staff. Following
 <span class="citation">Ferguson et al. (2005)</span>, the sizes of
-workplaces
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">workplace</mtext></msubsup><annotation encoding="application/x-tex">N^\text{workplace}_j</annotation></semantics></math>
-are drawn from an offset truncated power distribution. The cumulative
-distribution function is
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℙ</mi><mrow><mo stretchy="true" form="prefix">(</mo><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">workplace</mtext></msubsup><mo>&gt;</mo><mi>N</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mrow><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mn>1</mn><mo>+</mo><msubsup><mi>N</mi><mtext mathvariant="normal">max</mtext><mtext mathvariant="normal">workplace</mtext></msubsup><mi>/</mi><mi>a</mi></mrow><mrow><mn>1</mn><mo>+</mo><mi>m</mi><mi>/</mi><mi>a</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mi>c</mi></msup><mo>−</mo><mn>1</mn></mrow><mrow><msup><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>+</mo><msubsup><mi>N</mi><mtext mathvariant="normal">max</mtext><mtext mathvariant="normal">workplace</mtext></msubsup><mi>/</mi><mi>a</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>c</mi></msup><mo>−</mo><mn>1</mn></mrow></mfrac><mo>,</mo><mspace width="1.0em"></mspace><mrow><mtext mathvariant="normal">for </mtext><mspace width="0.333em"></mspace></mrow><mi>N</mi><mo>≤</mo><msubsup><mi>N</mi><mtext mathvariant="normal">max</mtext><mtext mathvariant="normal">workplace</mtext></msubsup><mo>,</mo></mrow><annotation encoding="application/x-tex">
-\mathbb{P}(N^\text{workplace}_j &gt; N) = \frac{\left( \frac{1 + N^\text{workplace}_\text{max} / a}{1 + m / a} \right) ^ c - 1}{(1 + N^\text{workplace}_\text{max} / a)^c - 1}, \quad \text{for } N \leq N^\text{workplace}_\text{max},
-</annotation></semantics></math> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>&gt;</mo><mn>0</mn><mo>,</mo><mi>c</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">a &gt; 0, c &gt; 0</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>N</mi><mtext mathvariant="normal">max</mtext><mtext mathvariant="normal">workplace</mtext></msubsup><mo>∈</mo><mi>ℕ</mi></mrow><annotation encoding="application/x-tex">N^\text{workplace}_\text{max} \in \mathbb{N}</annotation></semantics></math>.
-As with the school sizes, workplace sizes are drawn until their sum
-exceeds the number of adults who are not school staff. The final
-workplace is then adjusted downward. Assignment of adults to particular
-workplaces is done using random sampling without replacement.</p>
+workplaces <span class="math inline">\(N^\text{workplace}_j\)</span> are
+drawn from an offset truncated power distribution. The cumulative
+distribution function is <span class="math display">\[
+\mathbb{P}(N^\text{workplace}_j &gt; N) = \frac{\left( \frac{1 +
+N^\text{workplace}_\text{max} / a}{1 + m / a} \right) ^ c - 1}{(1 +
+N^\text{workplace}_\text{max} / a)^c - 1}, \quad \text{for } N \leq
+N^\text{workplace}_\text{max},
+\]</span> where <span class="math inline">\(a &gt; 0, c &gt; 0\)</span>
+and <span class="math inline">\(N^\text{workplace}_\text{max} \in
+\mathbb{N}\)</span>. As with the school sizes, workplace sizes are drawn
+until their sum exceeds the number of adults who are not school staff.
+The final workplace is then adjusted downward. Assignment of adults to
+particular workplaces is done using random sampling without
+replacement.</p>
 </div>
 <div class="section level2">
 <h2 id="leisure">Leisure<a class="anchor" aria-label="anchor" href="#leisure"></a>
 </h2>
 <p>Leisure venues are attended by all individuals. Leisure venue sizes
-are drawn from a negative binomial distribution
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">leisure</mtext></msubsup><mo>∼</mo><mtext mathvariant="normal">NB</mtext><mrow><mo stretchy="true" form="prefix">(</mo><msup><mi>μ</mi><mtext mathvariant="normal">leisure</mtext></msup><mo>,</mo><msup><mi>κ</mi><mtext mathvariant="normal">leisure</mtext></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
-N^\text{leisure}_j \sim \text{NB}(\mu^\text{leisure}, \kappa^\text{leisure}),
-</annotation></semantics></math> with mean
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>μ</mi><mtext mathvariant="normal">leisure</mtext></msup><annotation encoding="application/x-tex">\mu^\text{leisure}</annotation></semantics></math>
-and overdispersion parameter
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>κ</mi><mtext mathvariant="normal">leisure</mtext></msup><annotation encoding="application/x-tex">\kappa^\text{leisure}</annotation></semantics></math>.
-As above, any samples
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">leisure</mtext></msubsup><mo>&gt;</mo><msubsup><mi>N</mi><mtext mathvariant="normal">max</mtext><mtext mathvariant="normal">leisure</mtext></msubsup><mo>∈</mo><mi>ℕ</mi></mrow><annotation encoding="application/x-tex">N^\text{leisure}_j &gt; N^\text{leisure}_\text{max} \in \mathbb{N}</annotation></semantics></math>
-are discarded and the final sample is adjusted such that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mo>∑</mo><mi>j</mi></msub><msubsup><mi>N</mi><mi>j</mi><mtext mathvariant="normal">leisure</mtext></msubsup><mo>=</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">\sum_j N^\text{leisure}_j = N</annotation></semantics></math>.
-The number of leisure visits per person per week is drawn from a Poisson
+are drawn from a negative binomial distribution <span class="math display">\[
+N^\text{leisure}_j \sim \text{NB}(\mu^\text{leisure},
+\kappa^\text{leisure}),
+\]</span> with mean <span class="math inline">\(\mu^\text{leisure}\)</span> and overdispersion
+parameter <span class="math inline">\(\kappa^\text{leisure}\)</span>. As
+above, any samples <span class="math inline">\(N^\text{leisure}_j &gt;
+N^\text{leisure}_\text{max} \in \mathbb{N}\)</span> are discarded and
+the final sample is adjusted such that <span class="math inline">\(\sum_j N^\text{leisure}_j = N\)</span>. The number
+of leisure visits per person per week is drawn from a Poisson
 distribution, truncated at 7 corresponding to one leisure visit every
 day. The locations for each individual’s leisure visits are sampled
 without replacement with probability proportional to leisure venue size.
@@ -219,87 +208,61 @@ location are also sampled without replacement.</p>
 </h2>
 <p>We consider a SEIR compartmental model with susceptible, exposed,
 infectious, and recovered disease states. At a given time, each
-individual is in exactly one of the states
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>S</mi><mo>,</mo><mi>E</mi><mo>,</mo><mi>I</mi><mo>,</mo><mi>R</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{S, E, I, R\}</annotation></semantics></math>.
-Transitions between states are simulated as follows.</p>
+individual is in exactly one of the states <span class="math inline">\(\{S, E, I, R\}\)</span>. Transitions between
+states are simulated as follows.</p>
 <div class="section level3">
-<h3 id="transition-from-state-s-to-e">Transition from state
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>→</mo><mi>E</mi></mrow><annotation encoding="application/x-tex">S \to E</annotation></semantics></math><a class="anchor" aria-label="anchor" href="#transition-from-state-s-to-e"></a>
+<h3 id="transition-from-state-s-to-e">Transition from state <span class="math inline">\(S \to
+E\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-s-to-e"></a>
 </h3>
-<p>The total force of infection
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>λ</mi><annotation encoding="application/x-tex">\lambda</annotation></semantics></math>
-for each individual is a sum of household, workplace, school, leisure,
-and community specific force of infections
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo>=</mo><msub><mi>λ</mi><mi>h</mi></msub><mo>+</mo><msub><mi>λ</mi><mi>w</mi></msub><mo>+</mo><msub><mi>λ</mi><mi>s</mi></msub><mo>+</mo><msub><mi>λ</mi><mi>l</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+<p>The total force of infection <span class="math inline">\(\lambda\)</span> for each individual is a sum of
+household, workplace, school, leisure, and community specific force of
+infections <span class="math display">\[
 \lambda = \lambda_h + \lambda_w + \lambda_s + \lambda_l.
-</annotation></semantics></math> The location specific force of
-infection terms are given as:</p>
+\]</span> The location specific force of infection terms are given
+as:</p>
 <ul>
-<li>Household
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>h</mi></msub><annotation encoding="application/x-tex">\lambda_h</annotation></semantics></math>:
+<li>Household <span class="math inline">\(\lambda_h\)</span>:
 proportional to the number of infectious individuals in the household
-multiplied by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>h</mi></msub><annotation encoding="application/x-tex">\beta_h</annotation></semantics></math>.</li>
-<li>Workplace
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>w</mi></msub><annotation encoding="application/x-tex">\lambda_w</annotation></semantics></math>:
+multiplied by <span class="math inline">\(\beta_h\)</span>.</li>
+<li>Workplace <span class="math inline">\(\lambda_w\)</span>:
 proportional to the number of infectious individuals in the workplace
-multiplied by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>w</mi></msub><annotation encoding="application/x-tex">\beta_w</annotation></semantics></math>.</li>
-<li>School
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\lambda_s</annotation></semantics></math>:
-proportional to the number of infectious individuals in the school
-multiplied by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\beta_s</annotation></semantics></math>.</li>
-<li>Leisure
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\lambda_l</annotation></semantics></math>:
-proportional to the number of infectious individuals in the leisure
-setting multiplied by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>l</mi></msub><annotation encoding="application/x-tex">\beta_l</annotation></semantics></math>.</li>
-<li>Community
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>λ</mi><mi>c</mi></msub><annotation encoding="application/x-tex">\lambda_c</annotation></semantics></math>:
+multiplied by <span class="math inline">\(\beta_w\)</span>.</li>
+<li>School <span class="math inline">\(\lambda_s\)</span>: proportional
+to the number of infectious individuals in the school multiplied by
+<span class="math inline">\(\beta_s\)</span>.</li>
+<li>Leisure <span class="math inline">\(\lambda_l\)</span>: proportional
+to the number of infectious individuals in the leisure setting
+multiplied by <span class="math inline">\(\beta_l\)</span>.</li>
+<li>Community <span class="math inline">\(\lambda_c\)</span>:
 proportional to the total number of infectious individuals multiplied by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>c</mi></msub><annotation encoding="application/x-tex">\beta_c</annotation></semantics></math>.</li>
+<span class="math inline">\(\beta_c\)</span>.</li>
 </ul>
-<p>The probability of infection in a given time step
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>δ</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\delta &gt; 0</annotation></semantics></math>
-is
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>ℙ</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>S</mi><mo>→</mo><mi>E</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>1</mn><mo>−</mo><mo>exp</mo><mrow><mo stretchy="true" form="prefix">(</mo><mo>−</mo><mi>λ</mi><mi>δ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p>The probability of infection in a given time step <span class="math inline">\(\delta &gt; 0\)</span> is <span class="math display">\[
 \mathbb{P}(S \to E) = 1 - \exp(- \lambda \delta)
-</annotation></semantics></math></p>
+\]</span></p>
 </div>
 <div class="section level3">
-<h3 id="transition-from-state-e-to-i">Transition from state
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo>→</mo><mi>I</mi></mrow><annotation encoding="application/x-tex">E \to I</annotation></semantics></math><a class="anchor" aria-label="anchor" href="#transition-from-state-e-to-i"></a>
+<h3 id="transition-from-state-e-to-i">Transition from state <span class="math inline">\(E \to
+I\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-e-to-i"></a>
 </h3>
 <p>Individuals progress from exposed to infectious with a random delay
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>≥</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">d \geq 1</annotation></semantics></math>
-such that <span class="math display">$$
+<span class="math inline">\(d \geq 1\)</span> such that <span class="math display">\[
 c \sim \text{Gamma}(2\gamma, 2), \\
 d = \text{round}(c + 1).
-$$</span> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>γ</mi><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\gamma &gt; 0</annotation></semantics></math>
-is the duration exposed which we set to 2. The delay
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>
-is a number of time steps
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>.</p>
+\]</span> where <span class="math inline">\(\gamma &gt; 0\)</span> is
+the duration exposed which we set to 2. The delay <span class="math inline">\(d\)</span> is a number of time steps <span class="math inline">\(\delta\)</span>.</p>
 </div>
 <div class="section level3">
-<h3 id="transition-from-state-i-to-r">Transition from state
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mo>→</mo><mi>R</mi></mrow><annotation encoding="application/x-tex">I \to R</annotation></semantics></math><a class="anchor" aria-label="anchor" href="#transition-from-state-i-to-r"></a>
+<h3 id="transition-from-state-i-to-r">Transition from state <span class="math inline">\(I \to
+R\)</span><a class="anchor" aria-label="anchor" href="#transition-from-state-i-to-r"></a>
 </h3>
 <p>Individuals progress from infectious to recovered after a random
-disease duration
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>≥</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">f \geq 1</annotation></semantics></math>
-such that <span class="math display">$$
+disease duration <span class="math inline">\(f \geq 1\)</span> such that
+<span class="math display">\[
 e \sim \text{Gamma}(2\upsilon, 2), \\
 f = \text{round}(e + 1).
-$$</span> where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>υ</mi><annotation encoding="application/x-tex">\upsilon</annotation></semantics></math>
-is the duration of infectiousness which we set to 4. The disease
-duration
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
-is a number of time steps
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>.</p>
+\]</span> where <span class="math inline">\(\upsilon\)</span> is the
+duration of infectiousness which we set to 4. The disease duration <span class="math inline">\(f\)</span> is a number of time steps <span class="math inline">\(\delta\)</span>.</p>
 </div>
 </div>
 <div class="section level2 unnumbered">
