@@ -1,8 +1,8 @@
 ---
-title: "An individual-based model for assessing far UVC interventions"
-output: rmarkdown::html_vignette
+title: "Technical model description"
+output: bookdown::html_vignette2
 vignette: >
-  %\VignetteIndexEntry{model}
+  %\VignetteIndexEntry{Technical model description}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: REFERENCES.bib
@@ -16,6 +16,10 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+::: {.alert .alert-warning}
+This vignette is not up to date with latest changes to the model!
+:::
 
 This vignette describes the modelling approach used in [`helios`](https://mrc-ide.github.io/helios/).
 For an introduction to practical use of the package, see the [Get started](https://mrc-ide.github.io/helios/articles/helios.html) vignette.

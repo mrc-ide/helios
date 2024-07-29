@@ -372,7 +372,7 @@ create_EI_process <- function(variables_list, events_list, parameters_list){
     E$and(EI_already_scheduled$not(inplace = TRUE))
 
     # Calculate the delay until each exposed individual without a delay transitions to infected:
-    I_times <- round((rgamma(E$size(), 2 * parameters_list$duration_exposed, 2) + 1) / parameters_list$dt)
+    I_times <- round((rgamma(n = E$size(), shape = 2, rate = 2 / parameters_list$duration_exposed) + 1) / parameters_list$dt)
 
     # Schedule the new transitions from exposed to infected:
     events_list$EI_event$schedule(target = E, delay = I_times)
@@ -400,7 +400,7 @@ create_IR_process <- function(variables_list, events_list, parameters_list) {
     I$and(IR_already_scheduled$not(inplace = TRUE))
 
     # Calculate recovery times for infectious individuals without transitions scheduled:
-    R_times <- round((rgamma(I$size(), 2 * parameters_list$duration_infectious, 2) + 1) / parameters_list$dt)
+    R_times <- round((rgamma(n = I$size(), shape = 2, rate = 2 / parameters_list$duration_infectious) + 1) / parameters_list$dt)
 
     # Schedule the recovery events for infectious individuals without transitions scheduled:
     events_list$IR_event$schedule(target = I, delay = R_times)
@@ -424,11 +424,11 @@ create_RS_process <- function(variables_list, events_list, parameters_list) {
     # Get the indices of individuals with I to R transitions already scheduled:
     RS_already_scheduled <- events_list$RS_event$get_scheduled()
 
-    # Get the indices of infectious individuals without I to R transitions already scheduled:
+    # Get the indices of infectious individuals without R to S transitions already scheduled:
     R$and(RS_already_scheduled$not(inplace = TRUE))
 
     # Calculate recovery times for infectious individuals without transitions scheduled:
-    S_times <- round((rgamma(R$size(), 2 * parameters_list$duration_immune, 2) + 1) / parameters_list$dt)
+    S_times <- round(rgamma(n = R$size(), shape = 1, rate = 1 / parameters_list$duration_immune) / parameters_list$dt)
 
     # Schedule the recovery events for infectious individuals without transitions scheduled:
     events_list$RS_event$schedule(target = R, delay = S_times)
@@ -447,19 +447,19 @@ create_external_source_process <- function(variables_list, events_list, paramete
   function(t) {
 
     # Get the indices of all susceptible individuals:
-    S <- variables_list$disease_state$get_index_of("S")
+    S_endemic <- variables_list$disease_state$get_index_of("S")
 
     # Calculate the probability of getting infected in the current interval for each individual:
     p_inf_ext <- 1 - exp(-parameters_list$prob_inf_external * parameters_list$dt)
 
     # Sample susceptible individuals using their infection probability to determine who gets infected:
-    S$sample(rate = p_inf_ext)
+    S_endemic$sample(rate = p_inf_ext)
 
     # Queue an update to the infectious state of the newly infected susceptible individuals to Exposed:
-    variables_list$disease_state$queue_update(value = "E",index = S)
+    variables_list$disease_state$queue_update(value = "E", index = S_endemic)
 
     # Render the number of individuals infected through the external mechanism
-    renderer$render('n_external_infections', S$size(), t)
+    renderer$render('n_external_infections', S_endemic$size(), t)
 
   }
 }

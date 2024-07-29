@@ -40,6 +40,7 @@ run_simulation <- function(parameters_list) {
 #' @param parameters_table A data frame in which each row contains parameter values for helios model parameters (preferably in data.frame() format)
 #' @param output_type A character string instructing the function to output the parameters, simulations, or both (default = simulations)
 #'
+#' @family model
 #' @export
 #'
 run_simulations_from_table <- function(parameters_table, output_type = "simulations") {

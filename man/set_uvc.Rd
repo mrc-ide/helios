@@ -17,9 +17,9 @@ set_uvc(
 \arguments{
 \item{parameters_list}{A list of parameters as generated using \code{get_parameters()}}
 
-\item{setting}{A character string describing the setting in which far UVC is being deployed}
+\item{setting}{A character string describing the setting type in which far UVC is being deployed}
 
-\item{coverage}{A numeric value describing the proportion of the settings in which far UVC is deployed}
+\item{coverage}{A numeric value describing the coverage of far UVC within the setting class for which which far UVC is deployed}
 
 \item{coverage_target}{A character describing the target of the coverage ("buildings" or "individuals")}
 
@@ -31,11 +31,11 @@ set_uvc(
 }
 \description{
 The \code{set_uvc()} function is a user-facing function that is used to parameterise far UVC deployment
-for an individual setting class (e.g. workplace). The function takes as arguments a \code{helios}
-parameter list, the \code{setting} for which far UVC deployment is being parameterised, the \code{coverage}
-of far UVC within each setting of a setting class (e.g. coverage of individual workplaces within
+for an individual setting type (e.g. workplace). The function takes as arguments a \code{helios}
+parameter list, the \code{setting} type for which far UVC deployment is being parameterised, the \code{coverage}
+of far UVC within each location of a setting type (e.g. coverage of individual workplaces within
 the workplace setting class), the \code{coverage_type} (currently supporting random and targeted at the
-most populated settings), the \code{efficacy} of far UVC in the setting class, and the \code{timestep} on
+most populated settings), the \code{efficacy} of far UVC in the setting type, and the \code{timestep} on
 which far UVC is deployed. The function appends these additional setting-specific parameters to
 the parameter list and returns an updated version of it.
 }

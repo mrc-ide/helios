@@ -1,6 +1,6 @@
 ---
 title: "Get started"
-output: rmarkdown::html_vignette
+output: bookdown::html_vignette2
 vignette: >
   %\VignetteIndexEntry{get-started}
   %\VignetteEngine{knitr::rmarkdown}
@@ -15,6 +15,10 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+::: {.alert .alert-warning}
+This vignette is not up to date with latest changes to the model!
+:::
 
 ## Introduction {#intro}
 
