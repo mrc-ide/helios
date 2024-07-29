@@ -64,7 +64,7 @@ These are:
 ## Consistent Use of Data from the USA {#usa-data}
 
 ```{r}
-human_population <- 500000L
+human_population <- 10000
 
 parameters_list_usa <- get_parameters(list(human_population = human_population, 
                                            seed = 1, 
@@ -192,7 +192,7 @@ cowplot::plot_grid(plot_schools_uk, plot_schools_usa, nrow = 2, labels = c("A", 
 ## Location-Specific Variability in "Riskiness" {#location}
 
 Previously, we modelled differences in "riskiness" (i.e. how conducive to transmission it is) between different Setting Types (schools, workplaces, leisure settings and households).
-However, we made the simplifying assumption that all Locations with a particular Setting Type (e.g. individual schools) had the same riskiness.
+However, we made the simplifying assumption that all Locations within a particular Setting Type (e.g. individual schools) had the same riskiness.
 We now explicitly incorporate variation in riskiness between Locations belonging to the same Setting Type.
 Below is a mathematical description of this addition and the parameterisation used for the results presented in this report.
 
@@ -219,11 +219,10 @@ $$ \beta_{j,m} = \gamma_{j,m}\beta_{m} $$
 and:
 
 $$
-\gamma_{j,m} \sim Lognormal(\mu_{m}, \sigma_{m})
+\gamma_{j,m} \sim Lognormal(\mu_{m}, \sigma_{m}).
 $$
 
-i.e. a draw from a Lognormal distribution.
-The parameter $\gamma$ controls how risky a particular Location of a specific Setting Type is relative to the **average** for that Setting Type.
+The parameter $\gamma$ controls how risky a particular Location of a specific Setting Type is relative to the **average** for that Setting Type and is drawn from a Lognormal distribution.
 For example, $\gamma = 1$ is a setting which is as "risky" as the average location of that Setting Type.
 Meanwhile, $\gamma = 2$ would describe a setting that is twice as risky; $\gamma = 0.5$ would describe a setting that is half as risky etc.
 Parameterisation and estimation of the parameter $\gamma$ is described further below.
@@ -241,7 +240,7 @@ Below we describe this process.
 
 #### Step 1: Modelling the Concentration of Infective Virus in an Enclosed Space and Associated Infection Risk
 
-Following the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#), we model the concentration of pathogen in the air in an enclosed space via the following ordinary differential equation (ODE):
+Following the approach of [Blatchley et al, 2024](https://pubs.acs.org/doi/full/10.1021/acs.est.3c03026#), we model the concentration of a pathogen in the air in an enclosed space via the following ordinary differential equation (ODE):
 
 $$
 \nu \frac{dC(t)}{dt} =  - QC - k_DC \nu + I\pi 
@@ -278,10 +277,10 @@ where $P_i$ is the probability a person becomes infected conditional on them spe
 #### Step 2: Estimating Variation in Riskiness Across Locations of the Same Setting Type
 
 With the modelling framework to assess risk in place, we carried out a sensitivity analysis to derive reasonable bounds for $\gamma$.
-We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces and parameter estimates for SARS-CoV-2 from Blatchley et al (see Table \@ref(tab:1)) to explore how Location riskiness varied whilst varying:
+We used the above equations in tandem with estimates of variation in the ventilation rates in different spaces and parameter estimates for SARS-CoV-2 from Blatchley et al (see Table 1) to explore how Location riskiness varied whilst varying:
 
 1.  Infection Prevalence (i.e. the number of infectious individuals in the space).
-2.  Air Changes Per Hour (considering the minimum and maximum of the ranges provided in Table \@ref(tab:1))
+2.  Air Changes Per Hour (considering the minimum and maximum of the ranges provided in Table 1)
 3.  The Time Spent in the Space (ranging from 0 to 8 hours).
 
 The results of this are shown in \@ref(fig:wells-riley-1).
@@ -300,7 +299,7 @@ For the purposes of the results presented here, we assume that individuals spend
 and 1.5 hours in the community, noting that individuals spend time in either Schools (children and teachers) or Workplaces (all other adults) but not both.
 We use these ratios as the basis for the Setting Type and Location specific $\gamma_{j,m}$ values used in the modelling analyses presented in the next section.
 
-(ref:wells-riley-1) Estimating the variation in riskiness between Locations belonging to the same Setting Type. A) For each Setting Type, the probability of infection in the least and most risky settings (i.e. with the lowest and highest ventilation rates) over time. B) The ratio of infection risk in the most vs least risky Locations over time for each Setting Type. Dashed lines indicate the time assumed spent in each Setting Type for purposes of modelling. Note ratios are the same for Leisure and Workplace and so only Workplace is plotted.
+(ref:wells-riley-1) Estimating the variation in riskiness between Locations belonging to the same Setting Type. A) For each Setting Type, the probability of infection in the least and most risky settings (i.e. with the lowest and highest ventilation rates) over time. B) The ratio of infection risk in the most vs least risky Locations over time for each Setting Type. Vertical dashed lines indicate the time assumed spent in each Setting Type for purposes of modelling. Note ratios are the same for Leisure and Workplace and so only Workplace is plotted.
 
 ```{r wells-riley-1, fig.cap="(ref:wells-riley-1)", fig.fullwidth = TRUE, fig.height=5}
 
@@ -345,7 +344,7 @@ c
 
 | Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                  |
 |-----------------|-----------------|-----------------|-----------------------|
-| $\pi$           | 27 viruses per person per hour      | Rates of infective virus emission from infected individuals.                                    | @blatchley2023quantitative & @buonanno2020quantitative                                                                                  |
+| $\pi$           | 27 viruses per person per hour      | Rate of infective virus emission from infected individuals.                                    | @blatchley2023quantitative & @buonanno2020quantitative                                                                                  |
 | $D_{school}$    | 30 per 100m^2^                      | Assumed density of individuals in schools                                                       | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                |
 | $A_{school}$    | 0.1-2.9 air changes per hour (ACPH) | Range of ACPH considered for schools.                                                           | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                     |
 | $D_{workplace}$ | 10 per 100m^2^                      | Assumed density of individuals in workplaces                                                    | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                |
@@ -363,7 +362,7 @@ c
 
 # Assessing the impact of far UVC on the burden of an endemic respiratory virus {#assessing}
 
-Using the modelling framework described above, we carried analyses to evaluate the potential impact of far UVC deployment on transmission and disease burden of a hypothetical endemic respiratory virus (i.e. one which is consistently present in a population and maintained at a particular baseline prevalence level).
+Using the modelling framework described above, we conducted analyses to evaluate the potential impact of far UVC deployment on the transmission and disease burden of a hypothetical endemic respiratory virus (i.e. one which is consistently present in a population and maintained at a particular baseline prevalence level).
 
 ## Results
 
@@ -377,9 +376,9 @@ We considered two pathogen archetypes for this hypothetical virus:
 
 For each pathogen archetype, we investigated the effect of far UVC efficacy and far UVC coverage on the annual incidence of infection, varying:
 
--   **far UVC Coverage:** Either 10%, 25% or 50% - in all cases, far UVC was assumed to be installed in schools, workplaces and leisure locations only (i.e. not households), and within each Setting Type, a random set of locations .
+-   **far UVC Coverage:** Either 10%, 25% or 50% - in all cases, far UVC was assumed to be installed in schools, workplaces and leisure locations only (i.e. not households), at a random set of locations within each Setting Type.
 
--   **far UVC Efficacy:** Either 40%, 60% and 80%, with the assumption that far UVC efficacy was identical across all Settings and Locations where it had been installed.
+-   **far UVC Efficacy:** Either 40%, 60% or 80%, with the assumption that far UVC efficacy was identical across all Settings and Locations where it had been installed.
 
 The results of these analyses are presented in Figure \@ref(fig:placeholder-1).
 In general, we estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact.
@@ -463,21 +462,21 @@ ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_
 ```
 
 
-(ref:placeholder-1) The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for each of the pathogen archetypes considered. Values presented by the bars represent the mean averaged over the 10 stochastic model simulations, with the range of % reduction in incidence across those 10 simulations shown by the error bars.
+(ref:placeholder-1) The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for "Influenza-Like" and "SARS-CoV-2-Like" pathogen archetypes. The bars represent the mean percentage reduction in infection incidence averaged over the 10 stochastic model simulations run for each parametrisation, with the range of % reduction in incidence across those 10 simulations shown by the error bars.
 
 ## Discussion
 
-The observed differences in predicted far UVC impact between the two pathogen archetypes arises primarily because of their different $R_0$ values.
-In Figure \@ref(fig:analytical-relationship) we show the analytical relationship between $R_0$ and prevalence of infection, derived for a SEIRS compartmental model (see [here](https://www.nature.com/articles/s41592-020-0856-2)) and [here](https://shiny.bcgsc.ca/posepi2/)) that shares a similar representation of a disease's natural history to `helios`.
+The observed differences in predicted far UVC impact between the two pathogen archetypes arise primarily because of their different $R_0$ values.
+In Figure \@ref(fig:analytical-relationship) we show the analytical relationship between $R_0$ and prevalence of infection, derived for a SEIRS compartmental model (see [here](https://www.nature.com/articles/s41592-020-0856-2) and [here](https://shiny.bcgsc.ca/posepi2/)) that shares a similar representation of a disease's natural history to `helios`.
 We note that the results presented in \@ref(fig:analytical-relationship) are not results from running `helios` (instead they are the analytical solution of a significantly more tractable mathematical model that is simpler but similar to `helios`) and are displayed here solely for the purpose of illustrating a generally-held non-linearity between transmissibility ($R_{0}$) and disease burden (in this case infection prevalence).
 
 There is a non-linear influence of $R_{0}$ on prevalence of infection (and hence disease burden).
 For lower values of $R_{0}$, there is a near-linear relationship between the two quantities.
-At higher values of $R_{0}$ however, infection prevalecne saturates and increasing values of $R_0$ have a diminishing impact on increasing it.
+At higher values of $R_{0}$ however, infection prevalence saturates and the rate at which increasing values of $R_0$ increases prevalence diminishes.
 When $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. due to far UVC) will have only a slight impact on infection prevalence.
 By contrast, when baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence will decrease more (in relative terms) for the same reduction in $R_0$.
 
-(ref:analytical-relationship) The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`. Vertical dashed line indicates the value of $R_0$ used for each archetype in the analyses carried out.
+(ref:analytical-relationship) The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`. The vertical dashed lines indicate the value of $R_0$ used for each archetype in the analyses carried out.
 
 ```{r analytical-relationship, fig.cap="(ref:analytical-relationship)"}
 ## R0 - infection prevalence relationship for Influenza archetype
