@@ -201,16 +201,15 @@ we also set the seed for random number generation:</p>
 <p>Next, we define the model variables:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">variables_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_variables.html">create_variables</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">)</span></span>
-<span><span class="co">#&gt; There are less than or equal to 2 schools. Consider the population size may be too small!</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">variables_list</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">variables_list</span></span>
+<span><span class="co">#&gt; There are less than or equal to 2 schools. Consider the population size may be too small!</span></span>
+<span><span class="va">variables_list</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">variables_list</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">variables_list</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "disease_state"    "age_class"        "workplace"        "school"          </span></span>
 <span><span class="co">#&gt; [5] "household"        "leisure"          "specific_leisure"</span></span></code></pre></div>
 <p>Aside from <code>leisure</code>, each entry of
 <code>variables_list</code> is of the <a href="https://mrc-ide.github.io/individual/reference/CategoricalVariable.html" class="external-link"><code>CategoricalVariable</code></a>
 class:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">variables_list</span>, <span class="va">class</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $disease_state</span></span>
 <span><span class="co">#&gt; [1] "CategoricalVariable" "R6"                 </span></span>
@@ -243,21 +242,20 @@ fixed (<code>age_class</code>, <code>workplace</code>,
 </h3>
 <p>The outbreak is implemented as individual-level SEIR <a href="https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology" class="external-link">compartmental
 model</a>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">disease_states</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">disease_state</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "S" "E" "I" "R"</span></span></code></pre></div>
 <p>The number of individuals initially exposed is controlled by
 <code>parameters_list$number_initial_E</code> and
 <code>parameters_list$number_initial_I</code></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters_list</span><span class="op">$</span><span class="va">number_initial_E</span></span>
-<span><span class="co">#&gt; [1] 500</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">parameters_list</span><span class="op">$</span><span class="va">number_initial_I</span></span>
+<span><span class="co">#&gt; [1] 500</span></span>
+<span><span class="va">parameters_list</span><span class="op">$</span><span class="va">number_initial_I</span></span>
 <span><span class="co">#&gt; [1] 400</span></span></code></pre></div>
 <p>Initially, all other individuals are placed into the susceptible
 disease state:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">disease_state_counts</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">disease_states</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">disease_state</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"State"</span> <span class="op">=</span> <span class="va">disease_states</span>, <span class="st">"Count"</span> <span class="op">=</span> <span class="va">disease_state_counts</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -701,15 +699,6 @@ disease state:</p>
 #ttmqthcazt .gt_indent_5 {
   text-indent: 25px;
 }
-
-#ttmqthcazt .katex-display {
-  display: inline-flex !important;
-  margin-bottom: 0.75em !important;
-}
-
-#ttmqthcazt div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
-  height: 0px !important;
-}
 </style>
 <table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead><tr class="gt_col_headings">
@@ -742,7 +731,7 @@ disease state:</p>
 </h3>
 <p>There are three age classes: children, adults, and the elderly. The
 age of each individual remains fixed throughout the simulation.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters_list</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"initial_proportion_child"</span>, <span class="st">"initial_proportion_adult"</span>, <span class="st">"initial_proportion_elderly"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $initial_proportion_child</span></span>
 <span><span class="co">#&gt; [1] 0.2</span></span>
@@ -751,9 +740,8 @@ age of each individual remains fixed throughout the simulation.</p>
 <span><span class="co">#&gt; [1] 0.6</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $initial_proportion_elderly</span></span>
-<span><span class="co">#&gt; [1] 0.2</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="co">#&gt; [1] 0.2</span></span>
+<span></span>
 <span><span class="va">age_classes</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">age_class</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">age_class_counts</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">age_classes</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">age_class</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -770,7 +758,7 @@ age of each individual remains fixed throughout the simulation.</p>
 </h3>
 <p>Each child attends a fixed school. Additionally, a small number of
 adults attend schools as staff:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">schools</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">school</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">schools</span> <span class="op">&lt;-</span> <span class="va">schools</span><span class="op">[</span><span class="va">schools</span> <span class="op">!=</span> <span class="st">"0"</span><span class="op">]</span></span>
 <span><span class="va">school_sizes</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">schools</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">school</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
@@ -787,7 +775,7 @@ adults attend schools as staff:</p>
 </h3>
 <p>Each adult (aside from those who are school staff) attends a fixed
 workplace:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">workplaces</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">workplace</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">workplaces</span> <span class="op">&lt;-</span> <span class="va">workplaces</span><span class="op">[</span><span class="va">workplaces</span> <span class="op">!=</span> <span class="st">"0"</span><span class="op">]</span></span>
 <span><span class="va">workplace_sizes</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">workplaces</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">workplace</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
@@ -804,7 +792,7 @@ workplace:</p>
 </h3>
 <p>Children, adults and elderly people are grouped into fixed
 households:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">households</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">household</span><span class="op">$</span><span class="fu">get_categories</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">household_sizes</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_vec</a></span><span class="op">(</span><span class="va">households</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">household</span><span class="op">$</span><span class="fu">get_size_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -815,7 +803,7 @@ households:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Household size"</span>, y <span class="op">=</span> <span class="st">"Count"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="helios_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 <p>The age distribution in households is as follows:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">household_df</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_df</a></span><span class="op">(</span><span class="va">households</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">indices</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">household</span><span class="op">$</span><span class="fu">get_index_of</span><span class="op">(</span>values <span class="op">=</span> <span class="va">x</span><span class="op">)</span><span class="op">$</span><span class="fu">to_vector</span><span class="op">(</span><span class="op">)</span></span>
 <span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">indices</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"individual"</span> <span class="op">=</span> <span class="va">indices</span>, <span class="st">"household"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
@@ -1284,15 +1272,6 @@ households:</p>
 #hzxeqjsdyo .gt_indent_5 {
   text-indent: 25px;
 }
-
-#hzxeqjsdyo .katex-display {
-  display: inline-flex !important;
-  margin-bottom: 0.75em !important;
-}
-
-#hzxeqjsdyo div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
-  height: 0px !important;
-}
 </style>
 <table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <thead><tr class="gt_col_headings">
@@ -1346,7 +1325,7 @@ households:</p>
 <h3 id="leisure">Leisure<a class="anchor" aria-label="anchor" href="#leisure"></a>
 </h3>
 <p>Each week, individuals attend leisure venues:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">leisure_places</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">leisure</span><span class="op">$</span><span class="fu">get_values</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">number_leisure_places</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">leisure_places</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -1363,13 +1342,13 @@ households:</p>
 </h2>
 <p>Events govern the transition of individuals between disease
 states:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">events_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_events.html">create_events</a></span><span class="op">(</span>variables_list <span class="op">=</span> <span class="va">variables_list</span>, parameters_list <span class="op">=</span> <span class="va">parameters_list</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">events_list</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "EI_event" "IR_event"</span></span></code></pre></div>
 <p>Each event is in the <a href="https://mrc-ide.github.io/individual/reference/TargetedEvent.html" class="external-link"><code>TargetedEvent</code></a>
 class:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">events_list</span>, <span class="va">class</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $EI_event</span></span>
 <span><span class="co">#&gt; [1] "TargetedEvent" "EventBase"     "R6"           </span></span>
@@ -1381,11 +1360,11 @@ class:</p>
 <h2 id="render">Render<a class="anchor" aria-label="anchor" href="#render"></a>
 </h2>
 <p>We use a fixed number of time-steps to simulate over:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">$</span><span class="va">simulation_time</span> <span class="op">/</span> <span class="va">parameters_list</span><span class="op">$</span><span class="va">dt</span><span class="op">)</span></span></code></pre></div>
 <p>The object <code>renderer</code> is of class <a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link"><code>Render</code></a>,
 and stores output from the model at each timestep:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">renderer</span> <span class="op">&lt;-</span> <span class="fu">individual</span><span class="fu">::</span><span class="va"><a href="https://mrc-ide.github.io/individual/reference/Render.html" class="external-link">Render</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">timesteps</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">renderer</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Render" "R6"</span></span></code></pre></div>
@@ -1394,11 +1373,10 @@ and stores output from the model at each timestep:</p>
 <h2 id="processes">Processes<a class="anchor" aria-label="anchor" href="#processes"></a>
 </h2>
 <p>Processes enable queing of events:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">variables_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_variables.html">create_variables</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">)</span></span>
-<span><span class="co">#&gt; There are less than or equal to 2 schools. Consider the population size may be too small!</span></span></code></pre></div>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">parameters_list</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">parameters_list</span> </span>
+<span><span class="co">#&gt; There are less than or equal to 2 schools. Consider the population size may be too small!</span></span>
+<span><span class="va">parameters_list</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">parameters_list</span> </span>
 <span><span class="va">variables_list</span> <span class="op">&lt;-</span> <span class="va">variables_list</span><span class="op">$</span><span class="va">variables_list</span></span>
 <span><span class="va">events_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_events.html">create_events</a></span><span class="op">(</span>variables_list <span class="op">=</span> <span class="va">variables_list</span>, parameters_list <span class="op">=</span> <span class="va">parameters_list</span><span class="op">)</span></span>
 <span><span class="va">timesteps</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">parameters_list</span><span class="op">$</span><span class="va">simulation_time</span><span class="op">/</span><span class="va">parameters_list</span><span class="op">$</span><span class="va">dt</span><span class="op">)</span></span>
@@ -1418,7 +1396,7 @@ and stores output from the model at each timestep:</p>
 <h2 id="simulate">Simulate<a class="anchor" aria-label="anchor" href="#simulate"></a>
 </h2>
 <p>See <a href="https://mrc-ide.github.io/individual/reference/simulation_loop.html" class="external-link"><code>individual::simulation_loop</code></a>:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">individual</span><span class="fu">::</span><span class="fu"><a href="https://mrc-ide.github.io/individual/reference/simulation_loop.html" class="external-link">simulation_loop</a></span><span class="op">(</span></span>
 <span>  variables <span class="op">=</span> <span class="va">variables_list</span>,</span>
 <span>  events <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">events_list</span><span class="op">)</span>,</span>
@@ -1428,7 +1406,7 @@ and stores output from the model at each timestep:</p>
 <p>The output of the simulation is contained within
 <code>renderer</code>, and can be accessed using the
 <code>to_dataframe()</code> method:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">states</span> <span class="op">&lt;-</span> <span class="va">renderer</span><span class="op">$</span><span class="fu">to_dataframe</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">states</span> <span class="op">|&gt;</span></span>

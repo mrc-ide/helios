@@ -1,5 +1,7 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://mrc-ide.github.io/helios/404.html</loc></url>
+<url><loc>https://mrc-ide.github.io/helios/LICENSE-text.html</loc></url>
+<url><loc>https://mrc-ide.github.io/helios/LICENSE.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/articles/blueprint-july.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/articles/blueprint.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/articles/helios.html</loc></url>
@@ -7,18 +9,16 @@
 <url><loc>https://mrc-ide.github.io/helios/articles/model.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/authors.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/index.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/LICENSE-text.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/LICENSE.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics_uk.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics_usa.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/create_EI_process.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_events.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_external_source_process.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/create_IR_process.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_processes.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/create_RS_process.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/create_SE_process.html</loc></url>
+<url><loc>https://mrc-ide.github.io/helios/reference/create_events.html</loc></url>
+<url><loc>https://mrc-ide.github.io/helios/reference/create_external_source_process.html</loc></url>
+<url><loc>https://mrc-ide.github.io/helios/reference/create_processes.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/create_variables.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/generate_betas.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/generate_far_uvc_switches.html</loc></url>

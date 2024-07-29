@@ -64,7 +64,7 @@ These are:
 ## Use of Data from the USA {#usa-data}
 
 ```{r}
-human_population <- 300000
+human_population <- 30000
 
 parameters_list_usa <- get_parameters(list(human_population = human_population, 
                                            seed = 1, 
