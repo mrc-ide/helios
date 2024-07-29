@@ -9,7 +9,6 @@
 <url><loc>https://mrc-ide.github.io/helios/articles/model.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/authors.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/index.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics_uk.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics_usa.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/create_EI_process.html</loc></url>
@@ -34,14 +33,12 @@
 <url><loc>https://mrc-ide.github.io/helios/reference/generate_setting_specific_riskinesses.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/get_parameters.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/get_setting_size.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/get_setting_sizes.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/index.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/run_simulation.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/run_simulations_from_table.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/sample_log_normal.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/sample_negbinom.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/sample_offset_truncated_power_distribution.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/schools_england.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/schools_uk.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/schools_usa.html</loc></url>
 <url><loc>https://mrc-ide.github.io/helios/reference/set_setting_specific_riskiness.html</loc></url>
