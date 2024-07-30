@@ -1,12 +1,13 @@
 pandoc: 3.1.11
-pkgdown: 2.1.0
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   blueprint-july: blueprint-july.html
   blueprint: blueprint.html
   helios: helios.html
   model: model.html
-last_built: 2024-07-29T15:42Z
+last_built: 2024-07-30T08:25Z
 urls:
   reference: https://mrc-ide.github.io/helios/reference
   article: https://mrc-ide.github.io/helios/articles
+

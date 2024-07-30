@@ -1,47 +1,135 @@
-<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
-<url><loc>https://mrc-ide.github.io/helios/404.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/LICENSE-text.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/LICENSE.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/articles/blueprint-july.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/articles/blueprint.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/articles/helios.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/articles/index.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/articles/model.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/authors.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/index.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics_uk.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics_usa.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_EI_process.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_IR_process.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_RS_process.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_SE_process.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_events.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_external_source_process.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_processes.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/create_variables.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_betas.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_far_uvc_switches.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_initial_age_classes.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_initial_disease_states.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_initial_households.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_initial_households_bootstrap.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_initial_leisure.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_initial_schools.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_initial_schools_bootstrap.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_initial_workplaces.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_setting_far_uvc_switches.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/generate_setting_specific_riskinesses.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/get_parameters.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/get_setting_size.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/index.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/run_simulation.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/run_simulations_from_table.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/sample_log_normal.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/sample_negbinom.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/sample_offset_truncated_power_distribution.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/schools_uk.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/schools_usa.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/set_setting_specific_riskiness.html</loc></url>
-<url><loc>https://mrc-ide.github.io/helios/reference/set_uvc.html</loc></url>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://mrc-ide.github.io/helios/404.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/articles/blueprint-july.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/articles/blueprint.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/articles/helios.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/articles/model.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/authors.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/index.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics_uk.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/baseline_household_demographics_usa.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/create_EI_process.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/create_IR_process.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/create_RS_process.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/create_SE_process.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/create_events.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/create_external_source_process.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/create_processes.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/create_variables.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_betas.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_far_uvc_switches.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_age_classes.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_disease_states.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_households.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_households_bootstrap.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_leisure.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_schools.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_schools_bootstrap.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_initial_workplaces.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_setting_far_uvc_switches.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/generate_setting_specific_riskinesses.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/get_parameters.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/get_setting_size.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/index.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/run_simulation.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/run_simulations_from_table.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/sample_log_normal.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/sample_negbinom.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/sample_offset_truncated_power_distribution.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/schools_uk.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/schools_usa.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/set_setting_specific_riskiness.html</loc>
+  </url>
+  <url>
+    <loc>https://mrc-ide.github.io/helios/reference/set_uvc.html</loc>
+  </url>
 </urlset>
-
