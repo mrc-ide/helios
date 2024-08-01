@@ -57,7 +57,7 @@ Two major updates to the model have been made since the initial report. These ar
 ## Use of Data from the USA {#usa-data}
 
 ```{r}
-human_population <- 5000
+human_population <- 500000
 
 parameters_list_usa <- get_parameters(list(human_population = human_population, 
                                            seed = 1, 
