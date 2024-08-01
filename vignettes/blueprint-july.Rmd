@@ -286,7 +286,7 @@ c
 ```
 
 | Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                  |
-|----------------|----------------|-----------------|-------------------------|
+|-----------------|-------------------------------------|-------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | $\pi$           | 27 viruses per person per hour      | Rate of infective virus emission from infected individuals.                                     | @blatchley2023quantitative & @buonanno2020quantitative                                                                                  |
 | $D_{school}$    | 30 per 100m^2^                      | Assumed density of individuals in schools                                                       | ANSI/ASHRAE Standard 62.1-2022 Table 6.1                                                                                                |
 | $A_{school}$    | 0.1-2.9 air changes per hour (ACPH) | Range of ACPH considered for schools.                                                           | [Corsi et al, 2006](https://corsiaq.com/reports-etc/) - Section 3.1                                                                     |
