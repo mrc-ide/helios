@@ -160,20 +160,28 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       if (household_size_list[[i]] != 1) {
 
         # Retrieve the bitset of individuals in the i-th household
-        spec_household <- household_bitset_list[[i]]
+        # spec_household <- household_bitset_list[[i]]
 
         # Retrieve the bitset of all infectious individuals in the i-th household
-        spec_household_I <- I$copy()$and(spec_household)
+        # spec_household_I <- I$copy()$and(spec_household)
+        # I$copy()$and(spec_household)$size()
+        spec_household_I_size <- individual:::bitset_count_and(I,  household_bitset_list[[i]])
+
+        ### these produce different results currently
+        # spec_household_I_2 <- bitset_and_size(I$.bitset, spec_household$.bitset)
 
         #  Calculate the FOI for the i-th household - with and without farUVC installed
         if (parameters_list$far_uvc_household) {
           if (parameters_list$uvc_household[i] == 1 & t > parameters_list$far_uvc_household_timestep) {
-            spec_household_FOI <- household_specific_riskiness[i] * (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]])
+            # spec_household_FOI <- household_specific_riskiness[i] * (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]])
+            spec_household_FOI <- household_specific_riskiness[i] * (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I_size / household_size_list[[i]])
           } else {
-            spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]
+            # spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]
+            spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I_size / household_size_list[[i]]
           }
         } else {
-          spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]
+          # spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I$size() / household_size_list[[i]]
+          spec_household_FOI <- household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I_size / household_size_list[[i]]
         }
 
         # Assign the i-th households FOI to the indices of the individuals residing in that household
@@ -192,20 +200,24 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     for (i in seq(num_workplaces)) {
 
       # Get the indices of individuals that work in the i-th workplace:
-      spec_workplace <- workplace_bitset_list[[i]]
+      # spec_workplace <- workplace_bitset_list[[i]]
 
       # Get the indices of infectious individuals in the i-th workplace:
-      spec_workplace_I <- I$copy()$and(spec_workplace)
+      # spec_workplace_I <- I$copy()$and(spec_workplace)
+      spec_workplace_I_size <- individual:::bitset_count_and(I,  workplace_bitset_list[[i]])
 
       # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
       if (parameters_list$far_uvc_workplace) {
         if (parameters_list$uvc_workplace[i] == 1 & t > parameters_list$far_uvc_workplace_timestep) {
-          spec_workplace_FOI <- workplace_specific_riskiness[i] * (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]])
+          # spec_workplace_FOI <- workplace_specific_riskiness[i] * (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]])
+          spec_workplace_FOI <- workplace_specific_riskiness[i] * (1 - parameters_list$far_uvc_workplace_efficacy) * (parameters_list$beta_workplace * spec_workplace_I_size / workplace_size_list[[i]])
         } else {
-          spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]
+          # spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]
+          spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I_size / workplace_size_list[[i]]
         }
       } else {
-        spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]
+        # spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I$size() / workplace_size_list[[i]]
+        spec_workplace_FOI <- workplace_specific_riskiness[i] * parameters_list$beta_workplace * spec_workplace_I_size / workplace_size_list[[i]]
       }
 
       # Store the workplace-specific FOR in the indices of all individuals that work there:
@@ -222,20 +234,24 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     for (i in seq(num_schools)) {
 
       # Retrieve the indices of children in the i-th school
-      spec_school <- school_bitset_list[[i]]
+      # spec_school <- school_bitset_list[[i]]
 
       # Retrieve the indices of all infectious individuals in the i-th school:
-      spec_school_I <- I$copy()$and(spec_school)
+      # spec_school_I <- I$copy()$and(spec_school)
+      spec_school_I_size <- individual:::bitset_count_and(I,  school_bitset_list[[i]])
 
       # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
       if (parameters_list$far_uvc_school) {
         if (parameters_list$uvc_school[i] == 1 & t > parameters_list$far_uvc_school_timestep) {
-          spec_school_FOI <- school_specific_riskiness[i] * (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]])
+          # spec_school_FOI <- school_specific_riskiness[i] * (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]])
+          spec_school_FOI <- school_specific_riskiness[i] * (1 - parameters_list$far_uvc_school_efficacy) * (parameters_list$beta_school * spec_school_I_size / school_size_list[[i]])
         } else {
-          spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]
+          # spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]
+          spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I_size / school_size_list[[i]]
         }
       } else {
-        spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]
+        # spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I$size() / school_size_list[[i]]
+        spec_school_FOI <- school_specific_riskiness[i] * parameters_list$beta_school * spec_school_I_size / school_size_list[[i]]
       }
 
       # Store the school-specific FOI at the indices of all children that attend it:
@@ -290,7 +306,8 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
         spec_leisure <- variables_list$specific_leisure$get_index_of(as.character(spec_leisure_location))
 
         # Retrieve the indices of all infectious individuals in the particular leisure location being considered
-        spec_leisure_I <- I$copy()$and(spec_leisure)
+        # spec_leisure_I <- I$copy()$and(spec_leisure)
+        spec_leisure_I_size <- individual:::bitset_count_and(I,  spec_leisure)
 
         # Calculate the leisure-specific FOI for the i-th leisure location - with and without farUVC installed
         ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure locations
@@ -298,12 +315,15 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
         ##  and which span 1 to max(leisure_indices) with some gaps)
         if (parameters_list$far_uvc_leisure) {
           if (parameters_list$uvc_leisure[i] == 1 & t > parameters_list$far_uvc_leisure_timestep) {
-            spec_leisure_FOI <- leisure_specific_riskiness[i] * (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
+            # spec_leisure_FOI <- leisure_specific_riskiness[i] * (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size()) ## this calculation needs more in it
+            spec_leisure_FOI <- leisure_specific_riskiness[i] * (1 - parameters_list$far_uvc_leisure_efficacy) * (parameters_list$beta_leisure * spec_leisure_I_size / spec_leisure$size()) ## this calculation needs more in it
           } else {
-            spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+            # spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+            spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I_size / spec_leisure$size() ## this calculation needs more in it
           }
         } else {
-          spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+          # spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I$size() / spec_leisure$size() ## this calculation needs more in it
+          spec_leisure_FOI <- leisure_specific_riskiness[i] * parameters_list$beta_leisure * spec_leisure_I_size / spec_leisure$size() ## this calculation needs more in it
         }
 
         # Store the leisure location-specific FOI at the indices of all individuals that attend it:
