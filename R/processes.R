@@ -167,9 +167,6 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
         # I$copy()$and(spec_household)$size()
         spec_household_I_size <- individual:::bitset_count_and(I,  household_bitset_list[[i]])
 
-        ### these produce different results currently
-        # spec_household_I_2 <- bitset_and_size(I$.bitset, spec_household$.bitset)
-
         #  Calculate the FOI for the i-th household - with and without farUVC installed
         if (parameters_list$far_uvc_household) {
           if (parameters_list$uvc_household[i] == 1 & t > parameters_list$far_uvc_household_timestep) {
