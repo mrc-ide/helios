@@ -25,8 +25,8 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverag
     stop("Error: Number of settings input greater than 1, parameterise for one setting at a time")
   }
 
-  if (!(setting %in% c("workplace", "school", "leisure", "household"))) {
-    stop("Error: Input setting invalid - far UVC only deployable in workplace, school, leisure, or household settings")
+  if (!(setting %in% c("workplace", "school", "leisure", "household", "joint"))) {
+    stop("Error: Input setting invalid - far UVC only deployable in workplace, school, leisure, household, or joint settings")
   }
 
   if (coverage < 0 | coverage > 1) {
@@ -51,6 +51,10 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverag
 
   if (efficacy < 0 | efficacy > 1) {
     stop("Error: efficacy must take a value between 0 and 1")
+  }
+
+  if (setting == "joint" & (coverage_target != "individuals" | coverage_type != "random")) {
+    stop("Error: Input setting invalid - joint far UVC coverage only applicable to individuals and at random")
   }
 
   parameters_list[[paste0("far_uvc_", setting)]] <- TRUE
