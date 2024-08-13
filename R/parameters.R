@@ -105,6 +105,13 @@
 #' * `setting_specific_riskiness_household_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.37
 #' * `setting_specific_riskiness_household_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.4472
 #' * `setting_specific_riskiness_household_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
+#'
+#' Setting-Specific Room Size Per Individual Parameters:
+#' * `size_per_individual_workplace`: The volumne or surface area for each individual in the workplace setting type; default = 1
+#' * `size_per_individual_school`: The volumne or surface area for each individual in the school setting type; default = 1
+#' * `size_per_individual_leisure`: The volumne or surface area for each individual in the leisure setting type; default = 1
+#' * `size_per_individual_household`: The volumne or surface area for each individual in the household setting type; default = 1
+#'
 #' @param archetype A text string indicating the pathogen archetype parameter set to load (default = "none", current options are flu, sars_cov_2, and measles)
 #' @family parameters
 #' @export
@@ -218,7 +225,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_household_coverage_target = NULL,
     far_uvc_household_coverage_type = NULL,
     far_uvc_household_efficacy = NULL,
-    far_uvc_household_timestep = NULL
+    far_uvc_household_timestep = NULL,
+
+    # Room Size Per Individual Parameters:
+    size_per_individual_workplace = 1,
+    size_per_individual_school = 1,
+    size_per_individual_leisure = 1,
+    size_per_individual_household = 1
 
   )
 
