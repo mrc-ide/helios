@@ -49,6 +49,13 @@
 #' * `render_diagnostics`: FALSE
 #'
 #' Far UVC Intervention Parameters:
+#' * `far_uvc_joint`: boolean switch set to TRUE if far UVC intervention parameterised jointly using `set_uvc()`; default = FALSE
+#' * `far_uvc_joint_coverage`: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
+#' * `far_uvc_joint_coverage_target`: The target that coverage proportion applies to. Must be "individuals" for joint far UVC
+#' * `far_uvc_joint_coverage_type`: Type of coverage. Must be "random" for joint far UVC
+#' * `far_uvc_joint_efficacy`: : Efficacy of far UVC in the joint setting (must be a numeric value between 0 and 1)
+#' * `far_uvc_joint_timestep`: The timestep on which far UVC is jointly implemented (must be a numeric value greater than or equal to 0)
+#'
 #' * `far_uvc_workplace`: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using `set_uvc()`; default = FALSE
 #' * `far_uvc_workplace_coverage`: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
 #' * `far_uvc_workplace_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "buildings"
