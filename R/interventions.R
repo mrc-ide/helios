@@ -84,6 +84,10 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverag
 #' @family intervention
 #' @export
 generate_far_uvc_switches <- function(parameters_list, variables_list) {
+  if (parameters_list$far_uvc_joint) {
+    stop("Here we implement the joint switches setting! (But I've not done it yet!)")
+  }
+
   for (setting in c("workplace", "school", "leisure", "household")) {
     # If the setting is set to be switched on then generate the switches using
     # the helper function generate_setting_far_uvc_swtiches

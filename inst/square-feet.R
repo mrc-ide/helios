@@ -1,11 +1,21 @@
 # Loading library
 library(helios)
 
-# Pass in square feet per person for each setting type
-# Seperate or joint as another parameter
-# New "joint_allocation" function
-# Master parameters and then the setting specific parameters inherit if not specified
-# For this function don't need targetted
-# For this function also don't need buildings
-# Just individual and just random
-# Get rid of buildings version from other part of tree
+# * [x] Pass in size per person for each setting type
+# * [x] Pass in joint UVC parameters
+# * [x] New "joint_allocation" function within generate_far_uvc_switches
+# * [ ] Appropriate handling of defaults and making life easy for users
+# * [ ] Get rid of buildings version from other part of tree
+
+parameters_list <- get_parameters(archetype = "sars_cov_2")
+variables_list <- create_variables(parameters_list)
+
+parameters <- variables_list$parameters_list
+variables_list <- variables_list$variables_list
+
+parameters <- set_uvc(parameters_list = parameters, setting = "joint", coverage = 0.5, coverage_target = "individuals", coverage_type = "random", efficacy = 0.5, timestep = 10)
+
+x <- generate_far_uvc_switches(parameters, variables_list)
+
+# Check this is geq to coverage times population
+sum(x$setting_sizes$household * x$uvc_household)
