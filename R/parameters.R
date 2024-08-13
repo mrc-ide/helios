@@ -173,6 +173,14 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     setting_specific_riskiness_household_min = NULL,
     setting_specific_riskiness_household_max = NULL,
 
+    # Far UVC Parameters: Joint
+    far_uvc_joint = FALSE,
+    far_uvc_joint_coverage = NULL,
+    far_uvc_joint_coverage_target = NULL,
+    far_uvc_joint_coverage_type = NULL,
+    far_uvc_joint_efficacy = NULL,
+    far_uvc_joint_timestep = NULL,
+
     # Far UVC Parameters: Workplace
     far_uvc_workplace = FALSE,
     far_uvc_workplace_coverage = NULL,
