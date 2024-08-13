@@ -145,7 +145,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
   # Create vector to store all the possible leisure visits
   leisure_indvidual_possible_visits_list <- vector(mode = "list", length = parameters_list$human_population)
   for (i in seq(parameters_list$human_population)) {
-    leisure_indvidual_possible_visits_list[[i]] <- variables_list$leisure$get_values(i)
+    leisure_indvidual_possible_visits_list[[i]] <- unlist(variables_list$leisure$get_values(i))
   }
 
 
@@ -251,7 +251,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       for (i in seq(parameters_list$human_population)) {
 
         # Sampling which leisure location actually visited (0 = visit none and staying home) from the leisure locations individuals have associated with them (and could visit)
-        leisure_visit[i] <- sample(x = unlist(leisure_indvidual_possible_visits_list[[i]]), size = 1)
+        leisure_visit[i] <- sample(x = leisure_indvidual_possible_visits_list[[i]], size = 1)
 
       }
 
