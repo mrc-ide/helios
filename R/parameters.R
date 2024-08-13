@@ -49,28 +49,28 @@
 #' * `render_diagnostics`: FALSE
 #'
 #' Far UVC Intervention Parameters:
-#' * `far_uvc_workplace`: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using `set_ucv()`; default = FALSE
+#' * `far_uvc_workplace`: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using `set_uvc()`; default = FALSE
 #' * `far_uvc_workplace_coverage`: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
 #' * `far_uvc_workplace_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "buildings"
 #' * `far_uvc_workplace_coverage_type`: Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted" for targeting interventions at most populous workplaces
 #' * `far_uvc_workplace_efficacy`: : Efficacy of far UVC in the workplace setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_workplace_timestep`: The timestep on which far UVC is implemented in the workplace setting (must be a numeric value greater than or equal to 0)
 #'
-#' * `far_uvc_school`: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using `set_ucv()`; default = FALSE
+#' * `far_uvc_school`: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using `set_uvc()`; default = FALSE
 #' * `far_uvc_school_coverage`: Proportion of schools covered with far UVC (must be a numeric value between 0 and 1)
 #' * `far_uvc_school_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "buildings"
 #' * `far_uvc_school_coverage_type`: Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted" for targeting interventions at most populous schools
 #' * `far_uvc_school_efficacy`: : Efficacy of far UVC in the school setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_school_timestep`: The timestep on which far UVC is implemented in the school setting (must be a numeric value greater than or equal to 0)
 #'
-#' * `far_uvc_leisure`: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using `set_ucv()`; default = FALSE
+#' * `far_uvc_leisure`: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using `set_uvc()`; default = FALSE
 #' * `far_uvc_leisure_coverage`: Proportion of leisure settings covered with far UVC (must be a numeric value between 0 and 1)
 #' * `far_uvc_leisure_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "buildings"
 #' * `far_uvc_leisure_coverage_type`: Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted" for targeting interventions at most populous leisure settings
 #' * `far_uvc_leisure_efficacy`: : Efficacy of far UVC in the leisure setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_leisure_timestep`: The timestep on which far UVC is implemented in the leisure setting (must be a numeric value greater than or equal to 0)
 #'
-#' * `far_uvc_household`: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using `set_ucv()`; default = FALSE
+#' * `far_uvc_household`: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using `set_uvc()`; default = FALSE
 #' * `far_uvc_household_coverage`: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
 #' * `far_uvc_household_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "buildings"
 #' * `far_uvc_household_coverage_type`: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted" for targeting interventions at most populous households
