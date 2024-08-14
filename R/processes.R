@@ -164,7 +164,7 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     for (i in seq(num_households)) {
 
       ## Only calculate FOI is household size is greater than 1
-      if (household_size_list[[i]] != 1) {
+      if (household_size_list[[i]] > 1) {
 
         # Count the number of infectious individuals in the i-th household
         spec_household_I_size <- individual:::bitset_count_and(I,  household_bitset_list[[i]])
