@@ -135,18 +135,19 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
     parameters_list[["uvc_school"]] <- uvc_switches[setting_name_index == "school"]
     parameters_list[["uvc_household"]] <- uvc_switches[setting_name_index == "household"]
     parameters_list[["uvc_leisure"]] <- uvc_switches[setting_name_index == "leisure"]
-  }
-
-  for (setting in c("workplace", "school", "leisure", "household")) {
-    # If the setting is set to be switched on then generate the switches using
-    # the helper function generate_setting_far_uvc_swtiches
-    if (parameters_list[[paste0("far_uvc_", setting)]]) {
-      parameters_list <- generate_setting_far_uvc_switches(
-        parameters_list, variables_list, setting = setting
-      )
+  } else {
+    # This part of the if else does the assignment if there isn't joint UVC
+    # It will check if there is UVC for any of these settings and turn it on if so
+    for (setting in c("workplace", "school", "leisure", "household")) {
+      # If the setting is set to be switched on then generate the switches using
+      # the helper function generate_setting_far_uvc_swtiches
+      if (parameters_list[[paste0("far_uvc_", setting)]]) {
+        parameters_list <- generate_setting_far_uvc_switches(
+          parameters_list, variables_list, setting = setting
+        )
+      }
     }
   }
-
   return(parameters_list)
 }
 
