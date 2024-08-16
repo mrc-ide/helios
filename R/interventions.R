@@ -87,6 +87,14 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
   if (parameters_list$far_uvc_joint) {
     # (Perhaps this could be in its own function)
 
+    if(parameters_list[["far_uvc_joint_coverage_type"]] == "buildings") {
+      message("Warning: buildings coverage type not implemented for joint allocation. Using individuals.")
+    }
+
+    if(parameters_list[["far_uvc_joint_coverage_target"]] == "targeted") {
+      message("Warning: targeted coverage target not implemented for joint allocation. Using random.")
+    }
+
     # A list with vectors containing the setting sizes: by sizes I mean the number of indivudals
     # multipled by the size per individual. Because of this, we should probably rename get_setting_size
     # to something like get_setting_capacity

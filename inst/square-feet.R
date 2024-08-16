@@ -17,8 +17,18 @@ parameters <- set_uvc(parameters_list = parameters, setting = "joint", coverage 
 
 x <- generate_far_uvc_switches(parameters, variables_list)
 
+size_covered <- list(
+  "workplace" = sum(x$setting_sizes$workplace * x$size_per_individual_workplace * x$uvc_workplace),
+  "school" = sum(x$setting_sizes$school * x$size_per_individual_school * x$uvc_school),
+  "household" = sum(x$setting_sizes$household * x$size_per_individual_household * x$uvc_household),
+  "leisure" = sum(x$setting_sizes$leisure * x$size_per_individual_leisure * x$uvc_leisure)
+)
 
-sum(x$setting_sizes$household * x$size_per_individual_household * x$uvc_household)
-sum(x$setting_sizes$household * x$size_per_individual_household * x$uvc_household)
-sum(x$setting_sizes$household * x$size_per_individual_household * x$uvc_household)
-sum(x$setting_sizes$household * x$size_per_individual_household * x$uvc_household)
+total_size <- sum(x$setting_sizes$workplace * x$size_per_individual_workplace) +
+  sum(x$setting_sizes$school * x$size_per_individual_school) +
+  sum(x$setting_sizes$household * x$size_per_individual_household) +
+  sum(x$setting_sizes$leisure * x$size_per_individual_leisure)
+
+total_size * x$far_uvc_joint_coverage
+
+sum(unlist(size_covered))
