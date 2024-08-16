@@ -248,6 +248,12 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     parameters[[name]] <- overrides[[name]]
   }
 
+  # Ensure size_per_individual parameters are greater than or equal to 1
+  if (size_per_individual_workplace < 1 | size_per_individual_school < 1 |
+      size_per_individual_leisure < 1 | size_per_individual_household < 1) {
+    stop("all size_per_individual parameters must be equal to or greater than 1")
+  }
+
   # Ensure archetype input from recognised options:
   if(!(archetype %in% c("none", "flu", "measles", "sars_cov_2"))) {
     stop('archetype not recognised')
