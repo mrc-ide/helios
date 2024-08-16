@@ -83,7 +83,7 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
 
   # Checking that if far_uvc_joint = TRUE, no Setting-Type specific farUVC switches have been turned on
   setting_types <- c("workplace", "school", "leisure", "household")
-  if (parameters_list$far_uvc_joint & any(unlist(parameters_list[[paste0("far_uvc_", setting_types)]]))) {
+  if (parameters_list$far_uvc_joint & any(unlist(parameters_list[paste0("far_uvc_", setting_types)]))) {
     stop("If far_uvc_joint is set to TRUE, setting-type specific far_UVC switches must be set to FALSE")
   }
 
