@@ -197,68 +197,50 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
 #' @family intervention
 #' @export
 generate_setting_far_uvc_switches <- function(parameters_list, variables_list, setting) {
-  if (setting == "leisure") {
-    setting_size <- parameters_list$setting_sizes$leisure
+
+  # Defining how coverage is defined (i.e. based on the number of individuals a location holds, or its square footage)
+  if (parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]] == "individuals") { ## based on number of individuals
+    if (setting == "leisure") {
+      setting_size <- parameters_list$setting_sizes$leisure
+    } else {
+      setting_size <- get_setting_size(variables_list, setting = setting)
+    }
+  } else if (parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]] == "square_footage") { ## based on square footage
+    if (setting == "leisure") {
+      setting_size <- parameters_list$setting_sizes$leisure * parameters_list[[paste0("size_per_individual_", setting)]]
+    } else {
+      setting_size <- get_setting_size(variables_list, setting = setting) * parameters_list[[paste0("size_per_individual_", setting)]]
+    }
   } else {
-    setting_size <- get_setting_size(variables_list, setting = setting)
+    stop("coverage_target must be either individuals or square_footage")
   }
 
-  coverage_target <- parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]]
-  coverage_type <- parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]]
+  # Summing total size of locations and creating a vector to store the farUVC indicator variable
+  total <- sum(setting_size)
+  uvc_switches <- rep(0, length(setting_size))
+  total_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * total)
 
-  # coverage_target can be either buildings or individual, and coverage_type can
-  # be either random or targetted. Here we go through these four possible cases
+  if (parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]] == "random") {
+    sum <- 0
+    indices <- c()
+    location_indices <- 1:length(setting_size)
 
-  if (coverage_target == "buildings") {
-    total <- length(setting_size)
-    uvc_switches <- rep(0, total)
-    total_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * total)
-
-    if (coverage_type == "random") {
-      indices_with_uvc <- sample.int(n = total, size = total_with_uvc, replace = FALSE)
-      uvc_switches[indices_with_uvc] <- 1
-      parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
-    } else if (coverage_type == "targeted") {
-      indices_with_uvc <- sort(
-        x = setting_size,
-        decreasing = TRUE,
-        index.return = TRUE
-      )$ix[1:total_with_uvc]
-      uvc_switches[indices_with_uvc] <- 1
-      parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
-    }
-  }
-
-  # Note here that the cumulative sum is likely going to be bigger than the required total_with_uvc
-  if (coverage_target == "individuals") {
-    total <- sum(setting_size)
-    uvc_switches <- rep(0, length(setting_size))
-    total_with_uvc <- floor(parameters_list[[paste0("far_uvc_", setting, "_coverage")]] * total)
-
-    if (coverage_type == "random") {
-      sum <- 0
-      indices <- c()
-      location_indices <- 1:length(setting_size)
-
-      while (sum < total_with_uvc) {
-        i <- sample(location_indices, 1)
-        sum <- sum + setting_size[i]
-        indices <- c(indices, i)
-        location_indices <- setdiff(location_indices, i)
-        if (length(location_indices) == 0) {
-          stop("Insufficient individuals to meet far UVC coverage")
-        }
+    while (sum < total_with_uvc) {
+      i <- sample(location_indices, 1)
+      sum <- sum + setting_size[i]
+      indices <- c(indices, i)
+      location_indices <- setdiff(location_indices, i)
+      if (length(location_indices) == 0) {
+        stop("Insufficient individuals to meet far UVC coverage")
       }
-
-      uvc_switches[indices] <- 1
-      parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
-
-    } else if (coverage_type == "targeted") {
-      setting_size_sorted <- sort(x = setting_size, decreasing = TRUE, index.return = TRUE)
-      final_index <- min(which(cumsum(setting_size_sorted$x) >= total_with_uvc))
-      uvc_switches[1:final_index] <- 1
-      parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
     }
+    uvc_switches[indices] <- 1
+    parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
+
+  } else if (parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]] == "targeted_riskiness") {
+    stop("coverage_type targeted_riskinesss not implemented Use random instead")
+  } else {
+    stop("coverage_type must be either random or targeted_riskiness")
   }
 
   return(parameters_list)
