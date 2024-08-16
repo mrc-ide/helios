@@ -17,5 +17,8 @@ parameters <- set_uvc(parameters_list = parameters, setting = "joint", coverage 
 
 x <- generate_far_uvc_switches(parameters, variables_list)
 
-# Check this is geq to coverage times population
-sum(x$setting_sizes$household * x$uvc_household)
+
+sum(x$setting_sizes$household * x$size_per_individual_household * x$uvc_household)
+sum(x$setting_sizes$household * x$size_per_individual_household * x$uvc_household)
+sum(x$setting_sizes$household * x$size_per_individual_household * x$uvc_household)
+sum(x$setting_sizes$household * x$size_per_individual_household * x$uvc_household)
