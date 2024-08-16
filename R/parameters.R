@@ -249,8 +249,8 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   }
 
   # Ensure size_per_individual parameters are greater than or equal to 1
-  if (size_per_individual_workplace < 1 | size_per_individual_school < 1 |
-      size_per_individual_leisure < 1 | size_per_individual_household < 1) {
+  if (parameters$size_per_individual_workplace < 1 | parameters$size_per_individual_school < 1 |
+      parameters$size_per_individual_leisure < 1 | parameters$size_per_individual_household < 1) {
     stop("all size_per_individual parameters must be equal to or greater than 1")
   }
 
