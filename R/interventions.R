@@ -84,14 +84,20 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverag
 #' @family intervention
 #' @export
 generate_far_uvc_switches <- function(parameters_list, variables_list) {
+
+  # Checking that if far_uvc_joint = TRUE, no Setting-Type specific farUVC switches have been turned on
+  setting_types <- c("workplace", "school", "leisure", "household")
+  if (parameters_list$far_uvc_joint & any(parameters_list[[paste0("far_uvc_", setting_types)]])) {
+    stop("If far_uvc_joint is set to TRUE, setting-type specific far_UVC switches must be set to FALSE")
+  }
+
+  # If far_uvc_joint = TRUE calculate farUVC coverage for all locations across all setting-types altogether
   if (parameters_list$far_uvc_joint) {
     parameters_list <- generate_joint_far_uvc_switches(parameters_list, variables_list)
   } else {
-    # This part of the if else does the assignment if there isn't joint UVC
-    # It will check if there is UVC for any of these settings and turn it on if so
-    for (setting in c("workplace", "school", "leisure", "household")) {
-      # If the setting is set to be switched on then generate the switches using
-      # the helper function generate_setting_far_uvc_swtiches
+    # Else, check if there is UVC for any of these setting-types and turn it on if so
+    for (setting in setting_types) {
+      # If the setting-type has farUVC, generate the switches using the helper function generate_setting_far_uvc_switches
       if (parameters_list[[paste0("far_uvc_", setting)]]) {
         parameters_list <- generate_setting_far_uvc_switches(
           parameters_list, variables_list, setting = setting
