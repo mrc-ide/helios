@@ -85,56 +85,7 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverag
 #' @export
 generate_far_uvc_switches <- function(parameters_list, variables_list) {
   if (parameters_list$far_uvc_joint) {
-    # (Perhaps this could be in its own function)
-
-    if(parameters_list[["far_uvc_joint_coverage_type"]] == "buildings") {
-      message("Warning: buildings coverage type not implemented for joint allocation. Using individuals.")
-    }
-
-    if(parameters_list[["far_uvc_joint_coverage_target"]] == "targeted") {
-      message("Warning: targeted coverage target not implemented for joint allocation. Using random.")
-    }
-
-    # A list with vectors containing the setting sizes: by sizes I mean the number of indivudals
-    # multipled by the size per individual. Because of this, we should probably rename get_setting_size
-    # to something like get_setting_capacity
-    setting_size_list <- list(
-      "workplace" = get_setting_size(variables_list, "workplace") * parameters_list$size_per_individual_workplace,
-      "school" = get_setting_size(variables_list, "school") * parameters_list$size_per_individual_school,
-      "household" = get_setting_size(variables_list, "household") * parameters_list$size_per_individual_household,
-      "leisure" = parameters_list$setting_sizes$leisure * parameters_list$size_per_individual_leisure
-    )
-
-    # A single vector with all setting sizes together
-    # We then do the random allocation on that single vector jointly
-    setting_size_flat <- unlist(setting_size_list, use.names = FALSE)
-    total_size <- sum(setting_size_flat)
-    total_length <- length(setting_size_flat)
-    uvc_switches <- rep(0, total_length)
-    total_uvc_size <- total_size * parameters_list[["far_uvc_joint_coverage"]]
-
-    sum <- 0
-    indices <- c()
-    location_indices <- 1:total_length
-
-    while (sum < total_uvc_size) {
-      i <- sample(location_indices, 1)
-      sum <- sum + setting_size_flat[i]
-      indices <- c(indices, i)
-      location_indices <- setdiff(location_indices, i)
-      if (length(location_indices) == 0) {
-        stop("Insufficient space to meet far UVC coverage")
-      }
-    }
-
-    uvc_switches[indices] <- 1
-
-    # Now we need to extract out the parts of uvc_switches which correspond to each setting
-    setting_name_index <- rep(names(setting_size_list), lengths(setting_size_list))
-    parameters_list[["uvc_workplace"]] <- uvc_switches[setting_name_index == "workplace"]
-    parameters_list[["uvc_school"]] <- uvc_switches[setting_name_index == "school"]
-    parameters_list[["uvc_household"]] <- uvc_switches[setting_name_index == "household"]
-    parameters_list[["uvc_leisure"]] <- uvc_switches[setting_name_index == "leisure"]
+    parameters_list <- generate_joint_far_uvc_switches(parameters_list, variables_list)
   } else {
     # This part of the if else does the assignment if there isn't joint UVC
     # It will check if there is UVC for any of these settings and turn it on if so
@@ -148,6 +99,69 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
       }
     }
   }
+  return(parameters_list)
+}
+
+#' Generate joint far UVC switches
+#'
+#' This is a helper function to generate the joint far UVC switches across all
+#' locations, as used in `generate_far_uvc_switches()`.
+#'
+#' @param parameters_list A list of model parameters as generated using `get_parameters()`
+#' @param variables_list A list of model variables as generated using `create_variables()`
+#'
+#' @family intervention
+#' @export
+generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
+  if (parameters_list[["far_uvc_joint_coverage_type"]] == "buildings") {
+    message("Warning: buildings coverage type not implemented for joint allocation. Using individuals.")
+  }
+
+  if (parameters_list[["far_uvc_joint_coverage_target"]] == "targeted") {
+    message("Warning: targeted coverage target not implemented for joint allocation. Using random.")
+  }
+
+  # A list with vectors containing the setting sizes: by sizes I mean the number of indivudals
+  # multiplied by the size per individual. Because of this, we should probably rename get_setting_size
+  # to something like get_setting_capacity
+  setting_size_list <- list(
+    "workplace" = get_setting_size(variables_list, "workplace") * parameters_list$size_per_individual_workplace,
+    "school" = get_setting_size(variables_list, "school") * parameters_list$size_per_individual_school,
+    "household" = get_setting_size(variables_list, "household") * parameters_list$size_per_individual_household,
+    "leisure" = parameters_list$setting_sizes$leisure * parameters_list$size_per_individual_leisure
+  )
+
+  # A single vector with all setting sizes together
+  # We then do the random allocation on that single vector jointly
+  setting_size_flat <- unlist(setting_size_list, use.names = FALSE)
+  total_size <- sum(setting_size_flat)
+  total_length <- length(setting_size_flat)
+  uvc_switches <- rep(0, total_length)
+  total_uvc_size <- total_size * parameters_list[["far_uvc_joint_coverage"]]
+
+  sum <- 0
+  indices <- c()
+  location_indices <- 1:total_length
+
+  while (sum < total_uvc_size) {
+    i <- sample(location_indices, 1)
+    sum <- sum + setting_size_flat[i]
+    indices <- c(indices, i)
+    location_indices <- setdiff(location_indices, i)
+    if (length(location_indices) == 0) {
+      stop("Insufficient space to meet far UVC coverage")
+    }
+  }
+
+  uvc_switches[indices] <- 1
+
+  # Now we need to extract out the parts of uvc_switches which correspond to each setting
+  setting_name_index <- rep(names(setting_size_list), lengths(setting_size_list))
+  parameters_list[["uvc_workplace"]] <- uvc_switches[setting_name_index == "workplace"]
+  parameters_list[["uvc_school"]] <- uvc_switches[setting_name_index == "school"]
+  parameters_list[["uvc_household"]] <- uvc_switches[setting_name_index == "household"]
+  parameters_list[["uvc_leisure"]] <- uvc_switches[setting_name_index == "leisure"]
+
   return(parameters_list)
 }
 
