@@ -130,6 +130,7 @@ model_run_square_footage <- run_simulation(parameters_square_footage)
 model_run_individual_riskiness <- run_simulation(parameters_individuals_riskiness)
 model_run_square_footage_riskiness <- run_simulation(parameters_square_footage_riskiness)
 
+### needs to be completed
 plot(model_run_individual$____, model_run_individual$new_E, type = "l", col = "black")
 lines(model_run_individual$____, model_run_square_footage$new_E, type = "l", col = "blue")
 lines(model_run_individual$____, model_run_individual_riskiness$new_E, type = "l", col = "darkorchid")
