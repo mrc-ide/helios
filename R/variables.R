@@ -154,8 +154,8 @@ create_variables <- function(parameters_list) {
     parameters_list <- generate_far_uvc_switches(parameters_list, variables_list)
 
     # If joint has been specified, updating setting-type specific far UVC parameters used during model running
+    setting_types <- c("workplace", "school", "leisure", "household")
     if (far_uvc_joint) {
-      setting_types <- c("workplace", "school", "leisure", "household")
       parameters_list[[paste0("far_uvc_", setting_types)]] <- TRUE
       parameters_list[[paste0("far_uvc_", setting_types, "_efficacy")]] <- parameters_list$far_uvc_joint_efficacy
       parameters_list[[paste0("far_uvc_", setting_types, "_timestep")]] <- parameters_list$far_uvc_joint_timestep
@@ -163,8 +163,7 @@ create_variables <- function(parameters_list) {
   }
 
   # Return the list of model variables:
-  return(list(variables_list = variables_list,
-              parameters_list = parameters_list))
+  return(list(variables_list = variables_list, parameters_list = parameters_list))
 
 }
 
