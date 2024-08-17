@@ -126,7 +126,8 @@ create_variables <- function(parameters_list) {
   parameters_list$setting_sizes <- setting_sizes
 
   # If any setting has UVC installed, retrieve the sizes of all of the settings:
-  if(any(parameters_list$far_uvc_workplace,
+  if(any(parameters_list$far_uvc_joint,
+         parameters_list$far_uvc_workplace,
          parameters_list$far_uvc_school,
          parameters_list$far_uvc_leisure,
          parameters_list$far_uvc_household)) {
