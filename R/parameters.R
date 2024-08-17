@@ -267,6 +267,9 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     stop("dt must evenly divide into 1 e.g. 0.1, 0.2, 0.25, 0.5")
   }
 
+  ## put warning or check in here about if coverage_type = "targeted_riskiness" but riskiness
+  ## isn't turned on.
+
   # Check duration_immune is set if endemic_or_epidemic == "endemic"
   if (!(parameters$endemic_or_epidemic %in% c("endemic", "epidemic"))) {
     stop("endemic_or_epidemic must be set to either epidemic or endemic")

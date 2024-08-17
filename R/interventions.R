@@ -37,16 +37,16 @@ set_uvc <- function(parameters_list, setting, coverage, coverage_target, coverag
     stop("Error: Number of coverage targets input greater than 1, parameterise for one coverage target at a time")
   }
 
-  if (coverage_target != "individuals" & coverage_target != "buildings") {
-    stop("Error: Input setting invalid - far UVC coverage only applicable to individuals or buildings")
+  if (coverage_target != "individuals" & coverage_target != "square_footage") {
+    stop("Error: Input setting invalid - far UVC coverage only applicable to individuals or square_footage")
   }
 
   if (length(coverage_type) > 1) {
     stop("Error: Number of coverage types input greater than 1, parameterise for one coverage type at a time")
   }
 
-  if (coverage_type != "random" & coverage_type != "targeted") {
-    stop("Error: Input setting invalid - far UVC only deployable in random or targeted coverage types")
+  if (coverage_type != "random" & coverage_type != "targeted_riskiness") {
+    stop("Error: Input setting invalid - far UVC only deployable in random or targeted_riskiness coverage types")
   }
 
   if (efficacy < 0 | efficacy > 1) {
@@ -168,8 +168,8 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
     )
     riskiness_flat <- unlist(riskiness_list, use.names = FALSE)
     riskiness_sorted <- sort(x = riskiness_flat, decreasing = TRUE, index.return = TRUE)
-    final_index <- min(which(cumsum(setting_size_flat[riskiness_sorted$x]) >= total_uvc_size))
-    indices <- riskiness_sorted$x[1:final_index]
+    final_index <- min(which(cumsum(setting_size_flat[riskiness_sorted$ix]) >= total_uvc_size))
+    indices <- riskiness_sorted$ix[1:final_index]
   } else {
     stop("far_uvc_joint_coverage_type must be either random or targeted_riskiness")
   }
@@ -246,8 +246,8 @@ generate_setting_far_uvc_switches <- function(parameters_list, variables_list, s
 
     riskiness <- parameters_list[[paste0(setting, "_specific_riskiness")]]
     riskiness_sorted <- sort(x = riskiness, decreasing = TRUE, index.return = TRUE)
-    final_index <- min(which(cumsum(setting_size[riskiness_sorted$x]) >= total_with_uvc))
-    indices <- riskiness_sorted$x[1:final_index]
+    final_index <- min(which(cumsum(setting_size[riskiness_sorted$ix]) >= total_with_uvc))
+    indices <- riskiness_sorted$ix[1:final_index]
     uvc_switches[indices] <- 1
     parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
 
