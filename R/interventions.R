@@ -160,7 +160,6 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
       }
     }
   } else if (parameters_list[["far_uvc_joint_coverage_type"]] == "targeted_riskiness") {
-
     riskiness_list <- list(
       "workplace" = parameters_list$workplace_specific_riskiness,
       "school" = parameters_list$school_specific_riskiness,
@@ -168,15 +167,9 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
       "leisure" = parameters_list$leisure_specific_riskiness
     )
     riskiness_flat <- unlist(riskiness_list, use.names = FALSE)
-
-    indices_with_uvc <- sort(
-      x = riskiness_list,
-      decreasing = TRUE,
-      index.return = TRUE
-    )$ix
-
-
-    stop("far_uvc_joint_coverage_type targeted_riskinesss not implemented for joint allocation. Use random instead")
+    riskiness_sorted <- sort(x = riskiness_flat, decreasing = TRUE, index.return = TRUE)
+    final_index <- min(which(cumsum(setting_size_flat[riskiness_sorted$x]) >= total_uvc_size))
+    indices <- riskiness_sorted$x[1:final_index]
   } else {
     stop("far_uvc_joint_coverage_type must be either random or targeted_riskiness")
   }
@@ -250,7 +243,14 @@ generate_setting_far_uvc_switches <- function(parameters_list, variables_list, s
     parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
 
   } else if (parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]] == "targeted_riskiness") {
-    stop("coverage_type targeted_riskinesss not implemented Use random instead")
+
+    riskiness <- parameters_list[[paste0(setting, "_specific_riskiness")]]
+    riskiness_sorted <- sort(x = riskiness, decreasing = TRUE, index.return = TRUE)
+    final_index <- min(which(cumsum(setting_size[riskiness_sorted$x]) >= total_with_uvc))
+    indices <- riskiness_sorted$x[1:final_index]
+    uvc_switches[indices] <- 1
+    parameters_list[[paste0("uvc_", setting)]] <- uvc_switches
+
   } else {
     stop("coverage_type must be either random or targeted_riskiness")
   }
