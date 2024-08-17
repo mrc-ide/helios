@@ -3,11 +3,11 @@ library(helios)
 
 ## Setting up the parameters list and variables list
 parameters_list <- get_parameters(archetype = "sars_cov_2",
-                                  overrides = list(human_population = 50000,
-                                                   number_initial_S = 45000,
-                                                   number_initial_E = 5000,
-                                                   number_initial_I = 0,
-                                                   number_initial_R = 0,
+                                  overrides = list(human_population = 25000,
+                                                   number_initial_S = 11500,
+                                                   number_initial_E = 500,
+                                                   number_initial_I = 500,
+                                                   number_initial_R = 12500,
                                                    size_per_individual_workplace = 5,
                                                    size_per_individual_school = 2,
                                                    size_per_individual_leisure = 15,
@@ -35,7 +35,7 @@ parameters_list <- get_parameters(archetype = "sars_cov_2",
                                                    endemic_or_epidemic = "endemic",
                                                    duration_immune = 20,
                                                    prob_inf_external = 1 / 50000,
-                                                   simulation_time = 365))
+                                                   simulation_time = 250))
 variables_list <- create_variables(parameters_list)
 parameters <- variables_list$parameters_list
 variables_list <- variables_list$variables_list
