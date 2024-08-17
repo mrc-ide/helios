@@ -160,6 +160,22 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
       }
     }
   } else if (parameters_list[["far_uvc_joint_coverage_type"]] == "targeted_riskiness") {
+
+    riskiness_list <- list(
+      "workplace" = parameters_list$workplace_specific_riskiness,
+      "school" = parameters_list$school_specific_riskiness,
+      "household" = parameters_list$household_specific_riskiness,
+      "leisure" = parameters_list$leisure_specific_riskiness
+    )
+    riskiness_flat <- unlist(riskiness_list, use.names = FALSE)
+
+    indices_with_uvc <- sort(
+      x = riskiness_list,
+      decreasing = TRUE,
+      index.return = TRUE
+    )$ix
+
+
     stop("far_uvc_joint_coverage_type targeted_riskinesss not implemented for joint allocation. Use random instead")
   } else {
     stop("far_uvc_joint_coverage_type must be either random or targeted_riskiness")
