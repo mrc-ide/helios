@@ -125,6 +125,24 @@ create_variables <- function(parameters_list) {
   # Append setting sizes to variables_list:
   parameters_list$setting_sizes <- setting_sizes
 
+  # Creating vector of setting-specific riskinesses for each setting type
+  num_households <- max(as.numeric(variables_list$household$get_categories()))
+  parameters_list$household_specific_riskiness <- generate_setting_specific_riskinesses(parameters_list = parameters_list,
+                                                                                        setting = "household",
+                                                                                        number_of_locations = num_households)
+  num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
+  parameters_list$workplace_specific_riskiness <- generate_setting_specific_riskinesses(parameters_list = parameters_list,
+                                                                                        setting = "workplace",
+                                                                                        number_of_locations = num_workplaces)
+  num_schools <- max(as.numeric(variables_list$school$get_categories()))
+  parameters_list$school_specific_riskiness <- generate_setting_specific_riskinesses(parameters_list = parameters_list,
+                                                                                     setting = "school",
+                                                                                     number_of_locations = num_schools)
+  num_leisure <- length(parameters_list$setting_sizes$leisure)
+  parameters_list$leisure_specific_riskiness <- generate_setting_specific_riskinesses(parameters_list = parameters_list,
+                                                                                      setting = "leisure",
+                                                                                      number_of_locations = num_leisure)
+
   # If any setting has UVC installed, retrieve the sizes of all of the settings:
   if(any(parameters_list$far_uvc_joint,
          parameters_list$far_uvc_workplace,
@@ -134,6 +152,14 @@ create_variables <- function(parameters_list) {
 
     # Generate and append the far UVC switches for settings in which it has been switched on:
     parameters_list <- generate_far_uvc_switches(parameters_list, variables_list)
+
+    # If joint has been specified, updating setting-type specific far UVC parameters used during model running
+    if (far_uvc_joint) {
+      setting_types <- c("workplace", "school", "leisure", "household")
+      parameters_list[[paste0("far_uvc_", setting_types)]] <- TRUE
+      parameters_list[[paste0("far_uvc_", setting_types, "_efficacy")]] <- parameters_list$far_uvc_joint_efficacy
+      parameters_list[[paste0("far_uvc_", setting_types, "_timestep")]] <- parameters_list$far_uvc_joint_timestep
+    }
   }
 
   # Return the list of model variables:
