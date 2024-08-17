@@ -31,14 +31,20 @@ parameters_list <- get_parameters(archetype = "sars_cov_2",
                                                    setting_specific_riskiness_household_meanlog = 0,
                                                    setting_specific_riskiness_household_sdlog = 0.3544,
                                                    setting_specific_riskiness_household_min = 1/sqrt(4.75),
-                                                   setting_specific_riskiness_household_max = sqrt(4.75)))
+                                                   setting_specific_riskiness_household_max = sqrt(4.75),
+                                                   endemic_or_epidemic = "endemic",
+                                                   duration_immune = 20,
+                                                   prob_inf_external = 1 / 50000,
+                                                   simulation_time = 365))
 variables_list <- create_variables(parameters_list)
 parameters <- variables_list$parameters_list
 variables_list <- variables_list$variables_list
+timestep_far_UVC <- 150
+efficacy_far_UVC <- 0.9
 
 ## Testing setting = "joint" and coverage_target = "individuals" and coverage_type = "random"
 parameters_individuals <- set_uvc(parameters_list = parameters, setting = "joint", coverage = 0.5,
-                                  coverage_target = "individuals", coverage_type = "random", efficacy = 0.5, timestep = 10)
+                                  coverage_target = "individuals", coverage_type = "random", efficacy = efficacy_far_UVC, timestep = timestep_far_UVC)
 switches_individuals <- generate_far_uvc_switches(parameters_list = parameters_individuals, variables_list = variables_list)
 size_covered_individuals <- list(
   "workplace" = sum(switches_individuals$setting_sizes$workplace * switches_individuals$uvc_workplace),
@@ -59,7 +65,7 @@ plot(switches_individuals$uvc_leisure, parameters_individuals$leisure_specific_r
 
 ## Testing setting = "joint" and coverage_target = "individuals" and coverage_type = "random"
 parameters_square_footage <- set_uvc(parameters_list = parameters, setting = "joint", coverage = 0.5,
-                                     coverage_target = "square_footage", coverage_type = "random", efficacy = 0.5, timestep = 10)
+                                     coverage_target = "square_footage", coverage_type = "random", efficacy = efficacy_far_UVC, timestep = timestep_far_UVC)
 switches_square_footage <- generate_far_uvc_switches(parameters_list = parameters_square_footage, variables_list = variables_list)
 size_covered_square_footage <- list(
   "workplace" = sum(switches_square_footage$setting_sizes$workplace * switches_square_footage$uvc_workplace *  switches_square_footage$size_per_individual_workplace),
@@ -79,7 +85,7 @@ plot(switches_square_footage$uvc_leisure, parameters_square_footage$leisure_spec
 
 ## Testing setting = "joint" and coverage_target = "individuals" and coverage_type = "targeted_riskiness"
 parameters_individuals_riskiness <- set_uvc(parameters_list = parameters, setting = "joint", coverage = 0.5,
-                                            coverage_target = "individuals", coverage_type = "targeted_riskiness", efficacy = 0.5, timestep = 10)
+                                            coverage_target = "individuals", coverage_type = "targeted_riskiness", efficacy = efficacy_far_UVC, timestep = timestep_far_UVC)
 switches_individuals_riskiness <- generate_far_uvc_switches(parameters_list = parameters_individuals_riskiness, variables_list = variables_list)
 size_covered_individuals_riskiness <- list(
   "workplace" = sum(switches_individuals_riskiness$setting_sizes$workplace * switches_individuals_riskiness$uvc_workplace),
@@ -100,7 +106,7 @@ plot(switches_individuals_riskiness$uvc_leisure, parameters_individuals_riskines
 
 ## Testing setting = "joint" and coverage_target = "individuals" and coverage_type = "random"
 parameters_square_footage_riskiness <- set_uvc(parameters_list = parameters, setting = "joint", coverage = 0.5,
-                                               coverage_target = "square_footage", coverage_type = "targeted_riskiness", efficacy = 0.5, timestep = 10)
+                                               coverage_target = "square_footage", coverage_type = "targeted_riskiness", efficacy = efficacy_far_UVC, timestep = timestep_far_UVC)
 switches_square_footage_riskiness <- generate_far_uvc_switches(parameters_list = parameters_square_footage_riskiness, variables_list = variables_list)
 size_covered_square_footage_riskiness <- list(
   "workplace" = sum(switches_square_footage_riskiness$setting_sizes$workplace * switches_square_footage_riskiness$uvc_workplace *  switches_square_footage_riskiness$size_per_individual_workplace),
@@ -118,4 +124,13 @@ plot(switches_square_footage_riskiness$uvc_school, parameters_square_footage_ris
 plot(switches_square_footage_riskiness$uvc_workplace, parameters_square_footage_riskiness$workplace_specific_riskiness, cex = 0.01)
 plot(switches_square_footage_riskiness$uvc_leisure, parameters_square_footage_riskiness$leisure_specific_riskiness, cex = 0.01)
 
+## Running the model with and without far UVC etc etc
+model_run_individual <- run_simulation(parameters_individuals)
+model_run_square_footage <- run_simulation(parameters_square_footage)
+model_run_individual_riskiness <- run_simulation(parameters_individuals_riskiness)
+model_run_square_footage_riskiness <- run_simulation(parameters_square_footage_riskiness)
 
+plot(model_run_individual$____, model_run_individual$new_E, type = "l", col = "black")
+lines(model_run_individual$____, model_run_square_footage$new_E, type = "l", col = "blue")
+lines(model_run_individual$____, model_run_individual_riskiness$new_E, type = "l", col = "darkorchid")
+lines(model_run_individual$____, model_run_square_footage_riskiness$new_E, type = "l", col = "orange")

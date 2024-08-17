@@ -155,10 +155,10 @@ create_variables <- function(parameters_list) {
 
     # If joint has been specified, updating setting-type specific far UVC parameters used during model running
     setting_types <- c("workplace", "school", "leisure", "household")
-    if (far_uvc_joint) {
-      parameters_list[[paste0("far_uvc_", setting_types)]] <- TRUE
-      parameters_list[[paste0("far_uvc_", setting_types, "_efficacy")]] <- parameters_list$far_uvc_joint_efficacy
-      parameters_list[[paste0("far_uvc_", setting_types, "_timestep")]] <- parameters_list$far_uvc_joint_timestep
+    if (parameters_list$far_uvc_joint) {
+      parameters_list[paste0("far_uvc_", setting_types)] <- TRUE
+      parameters_list[paste0("far_uvc_", setting_types, "_efficacy")] <- parameters_list$far_uvc_joint_efficacy
+      parameters_list[paste0("far_uvc_", setting_types, "_timestep")] <- parameters_list$far_uvc_joint_timestep
     }
   }
 
