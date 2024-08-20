@@ -49,31 +49,38 @@
 #' * `render_diagnostics`: FALSE
 #'
 #' Far UVC Intervention Parameters:
-#' * `far_uvc_workplace`: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using `set_ucv()`; default = FALSE
+#' * `far_uvc_joint`: boolean switch set to TRUE if far UVC intervention parameterised jointly using `set_uvc()`; default = FALSE
+#' * `far_uvc_joint_coverage`: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
+#' * `far_uvc_joint_coverage_target`: The target that coverage proportion applies to. Can either be "individuals" or "square footage".
+#' * `far_uvc_joint_coverage_type`: Type of coverage. Can either be "random" or "targeted_riskiness".
+#' * `far_uvc_joint_efficacy`: : Efficacy of far UVC in the joint setting (must be a numeric value between 0 and 1)
+#' * `far_uvc_joint_timestep`: The timestep on which far UVC is jointly implemented (must be a numeric value greater than or equal to 0)
+#'
+#' * `far_uvc_workplace`: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using `set_uvc()`; default = FALSE
 #' * `far_uvc_workplace_coverage`: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_workplace_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "buildings"
-#' * `far_uvc_workplace_coverage_type`: Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted" for targeting interventions at most populous workplaces
+#' * `far_uvc_workplace_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
+#' * `far_uvc_workplace_coverage_type`: Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted_riskiness" for targeting interventions at most risky workplaces
 #' * `far_uvc_workplace_efficacy`: : Efficacy of far UVC in the workplace setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_workplace_timestep`: The timestep on which far UVC is implemented in the workplace setting (must be a numeric value greater than or equal to 0)
 #'
-#' * `far_uvc_school`: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using `set_ucv()`; default = FALSE
+#' * `far_uvc_school`: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using `set_uvc()`; default = FALSE
 #' * `far_uvc_school_coverage`: Proportion of schools covered with far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_school_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "buildings"
-#' * `far_uvc_school_coverage_type`: Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted" for targeting interventions at most populous schools
+#' * `far_uvc_school_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
+#' * `far_uvc_school_coverage_type`: Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted_riskiness" for targeting interventions at most risky schools
 #' * `far_uvc_school_efficacy`: : Efficacy of far UVC in the school setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_school_timestep`: The timestep on which far UVC is implemented in the school setting (must be a numeric value greater than or equal to 0)
 #'
-#' * `far_uvc_leisure`: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using `set_ucv()`; default = FALSE
+#' * `far_uvc_leisure`: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using `set_uvc()`; default = FALSE
 #' * `far_uvc_leisure_coverage`: Proportion of leisure settings covered with far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_leisure_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "buildings"
-#' * `far_uvc_leisure_coverage_type`: Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted" for targeting interventions at most populous leisure settings
+#' * `far_uvc_leisure_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
+#' * `far_uvc_leisure_coverage_type`: Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted_riskiness" for targeting interventions at most risky leisure settings
 #' * `far_uvc_leisure_efficacy`: : Efficacy of far UVC in the leisure setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_leisure_timestep`: The timestep on which far UVC is implemented in the leisure setting (must be a numeric value greater than or equal to 0)
 #'
-#' * `far_uvc_household`: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using `set_ucv()`; default = FALSE
+#' * `far_uvc_household`: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using `set_uvc()`; default = FALSE
 #' * `far_uvc_household_coverage`: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_household_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "buildings"
-#' * `far_uvc_household_coverage_type`: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted" for targeting interventions at most populous households
+#' * `far_uvc_household_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
+#' * `far_uvc_household_coverage_type`: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted_riskiness" for targeting interventions at most risky households
 #' * `far_uvc_household_efficacy`: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
 #' * `far_uvc_household_timestep`: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
 #'
@@ -98,6 +105,13 @@
 #' * `setting_specific_riskiness_household_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.37
 #' * `setting_specific_riskiness_household_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.4472
 #' * `setting_specific_riskiness_household_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
+#'
+#' Setting-Specific Room Size Per Individual Parameters:
+#' * `size_per_individual_workplace`: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
+#' * `size_per_individual_school`: The volume or surface area for each individual in the school setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
+#' * `size_per_individual_leisure`: The volume or surface area for each individual in the leisure setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
+#' * `size_per_individual_household`: The volume or surface area for each individual in the household setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
+#'
 #' @param archetype A text string indicating the pathogen archetype parameter set to load (default = "none", current options are flu, sars_cov_2, and measles)
 #' @family parameters
 #' @export
@@ -173,6 +187,14 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     setting_specific_riskiness_household_min = NULL,
     setting_specific_riskiness_household_max = NULL,
 
+    # Far UVC Parameters: Joint
+    far_uvc_joint = FALSE,
+    far_uvc_joint_coverage = NULL,
+    far_uvc_joint_coverage_target = NULL,
+    far_uvc_joint_coverage_type = NULL,
+    far_uvc_joint_efficacy = NULL,
+    far_uvc_joint_timestep = NULL,
+
     # Far UVC Parameters: Workplace
     far_uvc_workplace = FALSE,
     far_uvc_workplace_coverage = NULL,
@@ -203,7 +225,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_household_coverage_target = NULL,
     far_uvc_household_coverage_type = NULL,
     far_uvc_household_efficacy = NULL,
-    far_uvc_household_timestep = NULL
+    far_uvc_household_timestep = NULL,
+
+    # Room Size Per Individual Parameters:
+    size_per_individual_workplace = 1,
+    size_per_individual_school = 1,
+    size_per_individual_leisure = 1,
+    size_per_individual_household = 1
 
   )
 
@@ -220,6 +248,12 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     parameters[[name]] <- overrides[[name]]
   }
 
+  # Ensure size_per_individual parameters are greater than or equal to 1
+  if (parameters$size_per_individual_workplace < 1 | parameters$size_per_individual_school < 1 |
+      parameters$size_per_individual_leisure < 1 | parameters$size_per_individual_household < 1) {
+    stop("all size_per_individual parameters must be equal to or greater than 1")
+  }
+
   # Ensure archetype input from recognised options:
   if(!(archetype %in% c("none", "flu", "measles", "sars_cov_2"))) {
     stop('archetype not recognised')
@@ -231,6 +265,39 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   }
   if ((1/parameters$dt) != floor(1/parameters$dt)) {
     stop("dt must evenly divide into 1 e.g. 0.1, 0.2, 0.25, 0.5")
+  }
+
+  ## put warning or check in here about if coverage_type = "targeted_riskiness" but riskiness
+  ## isn't turned on.
+  if (parameters$far_uvc_joint) {
+    if (parameters$far_uvc_joint_coverage_target == "targeted_riskiness" &
+      !any(parameters$setting_specific_riskiness_workplace | parameters$setting_specific_riskiness_school | parameters$setting_specific_riskiness_leisure | parameters$setting_specific_riskiness_household)) {
+      warning("coverage_target is set to targeted_riskiness but at least one of the setting_specific_riskinesses is not turned on")
+    }
+  }
+  if (parameters$far_uvc_household) {
+    if (parameters$far_uvc_household_coverage_target == "targeted_riskiness" &
+      !parameters$setting_specific_riskiness_household) {
+      warning("far_uvc_household_coverage_target is set to targeted_riskiness but setting_specific_riskiness_household is not turned on")
+    }
+  }
+  if (parameters$far_uvc_workplace) {
+    if (parameters$far_uvc_workplace_coverage_target == "targeted_riskiness" &
+      !parameters$setting_specific_riskiness_workplace) {
+      warning("far_uvc_workplace_coverage_target is set to targeted_riskiness but setting_specific_riskiness_workplace is not turned on")
+    }
+  }
+  if (parameters$far_uvc_school) {
+    if(parameters$far_uvc_school_coverage_target == "targeted_riskiness" &
+      !parameters$setting_specific_riskiness_school) {
+      warning("far_uvc_school_coverage_target is set to targeted_riskiness but setting_specific_riskiness_school is not turned on")
+    }
+  }
+  if (parameters$far_uvc_leisure) {
+    if(parameters$far_uvc_leisure_coverage_target == "targeted_riskiness" &
+      !parameters$setting_specific_riskiness_leisure) {
+      warning("far_uvc_leisure_coverage_target is set to targeted_riskiness but setting_specific_riskiness_leisure is not turned on")
+    }
   }
 
   # Check duration_immune is set if endemic_or_epidemic == "endemic"
