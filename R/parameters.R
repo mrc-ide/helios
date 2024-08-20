@@ -269,6 +269,28 @@ get_parameters <- function(overrides = list(), archetype = "none") {
 
   ## put warning or check in here about if coverage_type = "targeted_riskiness" but riskiness
   ## isn't turned on.
+  if (parameters_list$far_uvc_joint & far_uvc_joint_coverage_target == "targeted_riskiness" &
+      !any(setting_specific_riskiness_workplace | setting_specific_riskiness_school | setting_specific_riskiness_leisure | setting_specific_riskiness_household)) {
+    warning("coverage_target is set to targeted_riskiness but at least one of the setting_specific_riskinesses is not turned on")
+  }
+  if (parameters_list$far_uvc_household & far_uvc_household_coverage_target == "targeted_riskiness" &
+      !setting_specific_riskiness_household) {
+    warning("far_uvc_household_coverage_target is set to targeted_riskiness but setting_specific_riskiness_household is not turned on")
+  }
+  if (parameters_list$far_uvc_workplace & far_uvc_workplace_coverage_target == "targeted_riskiness" &
+      !setting_specific_riskiness_workplace) {
+    warning("far_uvc_workplace_coverage_target is set to targeted_riskiness but setting_specific_riskiness_workplace is not turned on")
+  }
+  if (parameters_list$far_uvc_school & far_uvc_school_coverage_target == "targeted_riskiness" &
+      !setting_specific_riskiness_school) {
+    warning("far_uvc_school_coverage_target is set to targeted_riskiness but setting_specific_riskiness_school is not turned on")
+  }
+  if (parameters_list$far_uvc_leisure & far_uvc_leisure_coverage_target == "targeted_riskiness" &
+      !setting_specific_riskiness_leisure) {
+    warning("far_uvc_leisure_coverage_target is set to targeted_riskiness but setting_specific_riskiness_leisure is not turned on")
+  }
+
+
 
   # Check duration_immune is set if endemic_or_epidemic == "endemic"
   if (!(parameters$endemic_or_epidemic %in% c("endemic", "epidemic"))) {
