@@ -133,5 +133,5 @@ model_run_square_footage_riskiness <- run_simulation(parameters_square_footage_r
 ### needs to be completed
 plot(model_run_individual$timestep, model_run_individual$E_new, type = "l", col = "black")
 lines(model_run_individual_riskiness$timestep, model_run_individual_riskiness$E_new, type = "l", col = "darkorchid")
-plot(model_run_square_footage$timestep, model_run_square_footage$E_new, type = "l", col = "blue")
+lines(model_run_square_footage$timestep, model_run_square_footage$E_new, type = "l", col = "blue")
 lines(model_run_individual_riskiness$timestep, model_run_square_footage_riskiness$E_new, type = "l", col = "orange")
