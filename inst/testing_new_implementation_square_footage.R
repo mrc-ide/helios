@@ -3,11 +3,11 @@ library(helios)
 
 ## Setting up the parameters list and variables list
 parameters_list <- get_parameters(archetype = "sars_cov_2",
-                                  overrides = list(human_population = 25000,
-                                                   number_initial_S = 11500,
+                                  overrides = list(human_population = 15000,
+                                                   number_initial_S = 7000,
                                                    number_initial_E = 500,
                                                    number_initial_I = 500,
-                                                   number_initial_R = 12500,
+                                                   number_initial_R = 7000,
                                                    size_per_individual_workplace = 5,
                                                    size_per_individual_school = 2,
                                                    size_per_individual_leisure = 15,
@@ -33,13 +33,13 @@ parameters_list <- get_parameters(archetype = "sars_cov_2",
                                                    setting_specific_riskiness_household_min = 1/sqrt(4.75),
                                                    setting_specific_riskiness_household_max = sqrt(4.75),
                                                    endemic_or_epidemic = "endemic",
-                                                   duration_immune = 20,
+                                                   duration_immune = 10,
                                                    prob_inf_external = 1 / 50000,
-                                                   simulation_time = 250))
+                                                   simulation_time = 500))
 variables_list <- create_variables(parameters_list)
 parameters <- variables_list$parameters_list
 variables_list <- variables_list$variables_list
-timestep_far_UVC <- 150
+timestep_far_UVC <- 250
 efficacy_far_UVC <- 0.9
 
 ## Testing setting = "joint" and coverage_target = "individuals" and coverage_type = "random"
@@ -131,7 +131,7 @@ model_run_individual_riskiness <- run_simulation(parameters_individuals_riskines
 model_run_square_footage_riskiness <- run_simulation(parameters_square_footage_riskiness)
 
 ### needs to be completed
-plot(model_run_individual$____, model_run_individual$new_E, type = "l", col = "black")
-lines(model_run_individual$____, model_run_square_footage$new_E, type = "l", col = "blue")
-lines(model_run_individual$____, model_run_individual_riskiness$new_E, type = "l", col = "darkorchid")
-lines(model_run_individual$____, model_run_square_footage_riskiness$new_E, type = "l", col = "orange")
+plot(model_run_individual$timestep, model_run_individual$E_new, type = "l", col = "black")
+lines(model_run_individual_riskiness$timestep, model_run_individual_riskiness$E_new, type = "l", col = "darkorchid")
+plot(model_run_square_footage$timestep, model_run_square_footage$E_new, type = "l", col = "blue")
+lines(model_run_individual_riskiness$timestep, model_run_square_footage_riskiness$E_new, type = "l", col = "orange")
