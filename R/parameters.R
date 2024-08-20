@@ -107,10 +107,10 @@
 #' * `setting_specific_riskiness_household_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
 #'
 #' Setting-Specific Room Size Per Individual Parameters:
-#' * `size_per_individual_workplace`: The volumne or surface area for each individual in the workplace setting type; default = 1
-#' * `size_per_individual_school`: The volumne or surface area for each individual in the school setting type; default = 1
-#' * `size_per_individual_leisure`: The volumne or surface area for each individual in the leisure setting type; default = 1
-#' * `size_per_individual_household`: The volumne or surface area for each individual in the household setting type; default = 1
+#' * `size_per_individual_workplace`: The volume or surface area for each individual in the workplace setting type; default = 1
+#' * `size_per_individual_school`: The volume or surface area for each individual in the school setting type; default = 1
+#' * `size_per_individual_leisure`: The volume or surface area for each individual in the leisure setting type; default = 1
+#' * `size_per_individual_household`: The volume or surface area for each individual in the household setting type; default = 1
 #'
 #' @param archetype A text string indicating the pathogen archetype parameter set to load (default = "none", current options are flu, sars_cov_2, and measles)
 #' @family parameters
