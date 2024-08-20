@@ -87,7 +87,7 @@ generate_far_uvc_switches <- function(parameters_list, variables_list) {
     stop("If far_uvc_joint is set to TRUE, setting-type specific far_UVC switches must be set to FALSE")
   }
 
-  # If far_uvc_joint = TRUE calculate farUVC coverage for all locations across all setting-types altogether
+  # If far_uvc_joint = TRUE calculate far UVC coverage for all locations across all setting-types altogether
   if (parameters_list$far_uvc_joint) {
     parameters_list <- generate_joint_far_uvc_switches(parameters_list, variables_list)
   } else {
