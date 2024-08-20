@@ -133,22 +133,27 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
     # Calculate the household FOI for each individual (if HH size = 1, FOI = 0)
     for (i in seq(num_households)) {
 
-      # Count the number of infectious individuals in the i-th household
-      spec_household_I_size <- individual:::bitset_count_and(I,  household_bitset_list[[i]])
+      ## Only calculate FOI is household size is greater than 1
+      if (household_size_list[[i]] > 1) {
 
-      #  Calculate the FOI for the i-th household - with and without farUVC installed
-      if (parameters_list$far_uvc_household) {
-        if (parameters_list$uvc_household[i] == 1 & t > parameters_list$far_uvc_household_timestep) {
-          spec_household_FOI <- parameters_list$household_specific_riskiness[i] * (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I_size / household_size_list[[i]])
+        # Count the number of infectious individuals in the i-th household
+        spec_household_I_size <- individual:::bitset_count_and(I,  household_bitset_list[[i]])
+
+        #  Calculate the FOI for the i-th household - with and without farUVC installed
+        if (parameters_list$far_uvc_household) {
+          if (parameters_list$uvc_household[i] == 1 & t > parameters_list$far_uvc_household_timestep) {
+            spec_household_FOI <- parameters_list$household_specific_riskiness[i] * (1 - parameters_list$far_uvc_household_efficacy) * (parameters_list$beta_household * spec_household_I_size / household_size_list[[i]])
+          } else {
+            spec_household_FOI <- parameters_list$household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I_size / household_size_list[[i]]
+          }
         } else {
           spec_household_FOI <- parameters_list$household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I_size / household_size_list[[i]]
         }
-      } else {
-        spec_household_FOI <- parameters_list$household_specific_riskiness[i] * parameters_list$beta_household * spec_household_I_size / household_size_list[[i]]
-      }
 
-      # Assign the i-th households FOI to the indices of the individuals residing in that household
-      household_FOI[household_index_list[[i]]] <- spec_household_FOI
+        # Assign the i-th households FOI to the indices of the individuals residing in that household
+        household_FOI[household_index_list[[i]]] <- spec_household_FOI
+
+      }
     }
 
     #=== Workplace FOI ===#
