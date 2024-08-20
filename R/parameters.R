@@ -290,8 +290,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     warning("far_uvc_leisure_coverage_target is set to targeted_riskiness but setting_specific_riskiness_leisure is not turned on")
   }
 
-
-
   # Check duration_immune is set if endemic_or_epidemic == "endemic"
   if (!(parameters$endemic_or_epidemic %in% c("endemic", "epidemic"))) {
     stop("endemic_or_epidemic must be set to either epidemic or endemic")
