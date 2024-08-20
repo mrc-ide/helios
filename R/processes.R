@@ -220,11 +220,9 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
       # For each individual, work out which leisure location they go to that particular day. 0 = they don't go to any
       for (i in seq(parameters_list$human_population)) {
 
-        # Which leisure locations do individuals have associated with them (and could visit)
-        potential_leisure_visits <- variables_list$leisure$get_values(i)
+        # Sampling which leisure location actually visited (0 = visit none and staying home) from the leisure locations individuals have associated with them (and could visit)
+        leisure_visit[i] <- leisure_indvidual_possible_visits_list[[i]][dqrng::dqsample.int(n = 7, size = 1)]
 
-        # Sampling which leisure location actually visited (0 = visit none and staying home)
-        leisure_visit[i] <- sample(x = unlist(potential_leisure_visits), size = 1)
       }
 
       # Updating the leisure setting visited that day
