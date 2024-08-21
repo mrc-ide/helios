@@ -119,6 +119,12 @@ create_SE_process <- function(variables_list, events_list, parameters_list, rend
   # Leisure occupancy is dynamically updated each day, so we don't calculate that here.
   num_leisure <- length(parameters_list$setting_sizes$leisure)
 
+  # Create vector to store all the possible leisure visits
+  leisure_indvidual_possible_visits_list <- vector(mode = "list", length = parameters_list$human_population)
+  for (i in seq(parameters_list$human_population)) {
+    leisure_indvidual_possible_visits_list[[i]] <- unlist(variables_list$leisure$get_values(i))
+  }
+
   ## Process Function
   function(t) {
 
