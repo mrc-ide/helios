@@ -125,7 +125,7 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
       # "household" = get_setting_size(variables_list, "household"),
       "leisure" = parameters_list$setting_sizes$leisure
     )
-  # Defining coverage according to the size of the setting (i.e. number of individuals multiplied by square footage per person)
+    # Defining coverage according to the size of the setting (i.e. number of individuals multiplied by square footage per person)
   } else if (parameters_list[["far_uvc_joint_coverage_target"]] == "square_footage") { ## based on square footage
     # A list with vectors containing the setting sizes multiplied by the size per individual.
     setting_size_list <- list(
@@ -155,7 +155,7 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
       sum <- sum + setting_size_flat[i]
       indices <- c(indices, i)
       location_indices <- setdiff(location_indices, i)
-      if (length(location_indices) == 0 & sum < total_with_uvc) {
+      if (length(location_indices) == 0 & sum < total_uvc_size) {
         stop("Insufficient space to meet far UVC coverage")
       }
     }
