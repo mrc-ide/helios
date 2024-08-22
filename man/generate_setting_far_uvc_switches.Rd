@@ -25,6 +25,7 @@ the far UVC intervention.
 \seealso{
 Other intervention: 
 \code{\link{generate_far_uvc_switches}()},
+\code{\link{generate_joint_far_uvc_switches}()},
 \code{\link{set_uvc}()}
 }
 \concept{intervention}

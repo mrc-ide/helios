@@ -42,6 +42,7 @@ the parameter list and returns an updated version of it.
 \seealso{
 Other intervention: 
 \code{\link{generate_far_uvc_switches}()},
+\code{\link{generate_joint_far_uvc_switches}()},
 \code{\link{generate_setting_far_uvc_switches}()}
 }
 \concept{intervention}

@@ -56,28 +56,34 @@ Rendering Parameters
 
 Far UVC Intervention Parameters:
 \itemize{
-\item \code{far_uvc_workplace}: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using \code{set_ucv()}; default = FALSE
+\item \code{far_uvc_joint}: boolean switch set to TRUE if far UVC intervention parameterised jointly using \code{set_uvc()}; default = FALSE
+\item \code{far_uvc_joint_coverage}: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
+\item \code{far_uvc_joint_coverage_target}: The target that coverage proportion applies to. Can either be "individuals" or "square footage".
+\item \code{far_uvc_joint_coverage_type}: Type of coverage. Can either be "random" or "targeted_riskiness".
+\item \code{far_uvc_joint_efficacy}: : Efficacy of far UVC in the joint setting (must be a numeric value between 0 and 1)
+\item \code{far_uvc_joint_timestep}: The timestep on which far UVC is jointly implemented (must be a numeric value greater than or equal to 0)
+\item \code{far_uvc_workplace}: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using \code{set_uvc()}; default = FALSE
 \item \code{far_uvc_workplace_coverage}: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
-\item \code{far_uvc_workplace_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "buildings"
-\item \code{far_uvc_workplace_coverage_type}: Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted" for targeting interventions at most populous workplaces
+\item \code{far_uvc_workplace_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "square footage"
+\item \code{far_uvc_workplace_coverage_type}: Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted_riskiness" for targeting interventions at most risky workplaces
 \item \code{far_uvc_workplace_efficacy}: : Efficacy of far UVC in the workplace setting (must be a numeric value between 0 and 1)
 \item \code{far_uvc_workplace_timestep}: The timestep on which far UVC is implemented in the workplace setting (must be a numeric value greater than or equal to 0)
-\item \code{far_uvc_school}: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using \code{set_ucv()}; default = FALSE
+\item \code{far_uvc_school}: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using \code{set_uvc()}; default = FALSE
 \item \code{far_uvc_school_coverage}: Proportion of schools covered with far UVC (must be a numeric value between 0 and 1)
-\item \code{far_uvc_school_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "buildings"
-\item \code{far_uvc_school_coverage_type}: Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted" for targeting interventions at most populous schools
+\item \code{far_uvc_school_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "square footage"
+\item \code{far_uvc_school_coverage_type}: Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted_riskiness" for targeting interventions at most risky schools
 \item \code{far_uvc_school_efficacy}: : Efficacy of far UVC in the school setting (must be a numeric value between 0 and 1)
 \item \code{far_uvc_school_timestep}: The timestep on which far UVC is implemented in the school setting (must be a numeric value greater than or equal to 0)
-\item \code{far_uvc_leisure}: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using \code{set_ucv()}; default = FALSE
+\item \code{far_uvc_leisure}: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using \code{set_uvc()}; default = FALSE
 \item \code{far_uvc_leisure_coverage}: Proportion of leisure settings covered with far UVC (must be a numeric value between 0 and 1)
-\item \code{far_uvc_leisure_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "buildings"
-\item \code{far_uvc_leisure_coverage_type}: Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted" for targeting interventions at most populous leisure settings
+\item \code{far_uvc_leisure_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "square footage"
+\item \code{far_uvc_leisure_coverage_type}: Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted_riskiness" for targeting interventions at most risky leisure settings
 \item \code{far_uvc_leisure_efficacy}: : Efficacy of far UVC in the leisure setting (must be a numeric value between 0 and 1)
 \item \code{far_uvc_leisure_timestep}: The timestep on which far UVC is implemented in the leisure setting (must be a numeric value greater than or equal to 0)
-\item \code{far_uvc_household}: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using \code{set_ucv()}; default = FALSE
+\item \code{far_uvc_household}: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using \code{set_uvc()}; default = FALSE
 \item \code{far_uvc_household_coverage}: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
-\item \code{far_uvc_household_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "buildings"
-\item \code{far_uvc_household_coverage_type}: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted" for targeting interventions at most populous households
+\item \code{far_uvc_household_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "square footage"
+\item \code{far_uvc_household_coverage_type}: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted_riskiness" for targeting interventions at most risky households
 \item \code{far_uvc_household_efficacy}: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
 \item \code{far_uvc_household_timestep}: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
 }
@@ -104,6 +110,14 @@ Setting-Specific Riskiness Parameters:
 \item \code{setting_specific_riskiness_household_sdlog}: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.37
 \item \code{setting_specific_riskiness_household_min}: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.4472
 \item \code{setting_specific_riskiness_household_max}: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
+}
+
+Setting-Specific Room Size Per Individual Parameters:
+\itemize{
+\item \code{size_per_individual_workplace}: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
+\item \code{size_per_individual_school}: The volume or surface area for each individual in the school setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
+\item \code{size_per_individual_leisure}: The volume or surface area for each individual in the leisure setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
+\item \code{size_per_individual_household}: The volume or surface area for each individual in the household setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
 }}
 
 \item{archetype}{A text string indicating the pathogen archetype parameter set to load (default = "none", current options are flu, sars_cov_2, and measles)}
