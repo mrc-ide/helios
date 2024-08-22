@@ -51,10 +51,10 @@ archetypes <- c("flu", "sars_cov_2")
 riskiness <- c("setting_specific_riskiness")
 
 # Set up a vector of far-UVC efficacies to simulate
-far_uvc_efficacy <- seq(0.4, 0.8)
+far_uvc_efficacy <- seq(0.4, 0.6, 0.8)
 
 # Set up a vector of far-UVC coverages to simulate:
-far_uvc_joint_coverage <- seq(0.1, 0.8, by = 0.1)
+far_uvc_joint_coverage <- seq(0, 0.8, by = 0.1)
 
 # Specify joint far UVC coverage type (random vs targeted)
 uvc_joint_coverage_type <- c("random", "targeted_riskiness")
