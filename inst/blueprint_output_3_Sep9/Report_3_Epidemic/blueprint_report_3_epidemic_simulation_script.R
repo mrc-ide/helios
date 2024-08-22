@@ -25,6 +25,7 @@
 #----- 1) Preamble ---------------------------------------------------------------------------------
 
 # Load in the requisite packages:
+library(helios)
 library(tidyverse)
 library(tictoc)
 library(individual)
@@ -32,7 +33,7 @@ library(individual)
 #----- 2) Parameter Sweep Set-Up -------------------------------------------------------------------
 
 # Number of iterations to simulate for each parameterisation:
-iterations <- seq(10)
+iterations <- seq(5)
 
 # Calculate the simulation_time required to simulate a 2 year period:
 years_to_simulate <- 5
@@ -51,10 +52,10 @@ archetypes <- c("flu", "sars_cov_2")
 riskiness <- c("setting_specific_riskiness")
 
 # Set up a vector of far-UVC efficacies to simulate
-far_uvc_efficacy <- seq(0.4, 0.6, 0.8)
+far_uvc_efficacy <- c(0.6, 0.8)
 
 # Set up a vector of far-UVC coverages to simulate:
-far_uvc_joint_coverage <- seq(0, 0.8, by = 0.1)
+far_uvc_joint_coverage <- seq(0, 0.5, by = 0.1)
 
 # Specify joint far UVC coverage type (random vs targeted)
 uvc_joint_coverage_type <- c("random", "targeted_riskiness")
@@ -165,29 +166,14 @@ for(i in 1:nrow(simulations_to_run)) {
   if(simulations_to_run$coverage[i] > 0) {
     parameter_lists[[i]] |>
 
-      # Set UVC in Schools:
-      set_uvc(setting = "school",
-              coverage = simulations_to_run$coverage[i],
-              coverage_target = "square_footage",
-              coverage_type = simulations_to_run$coverage_type[i],
-              efficacy = simulations_to_run$efficacy[i],
-              timestep = timestep_uvc_on) |>
-
-      # Set UVC in Workplaces:
-      set_uvc(setting = "workplace",
-              coverage = simulations_to_run$coverage[i],
-              coverage_target = "square_footage",
-              coverage_type = simulations_to_run$coverage_type[i],
-              efficacy = simulations_to_run$efficacy[i],
-              timestep = timestep_uvc_on) |>
-
-      # Set UVC in Leisure Settings:
-      set_uvc(setting = "leisure",
+      # Set UVC jointly:
+      set_uvc(setting = "joint",
               coverage = simulations_to_run$coverage[i],
               coverage_target = "square_footage",
               coverage_type = simulations_to_run$coverage_type[i],
               efficacy = simulations_to_run$efficacy[i],
               timestep = timestep_uvc_on) -> parameter_lists[[i]]
+
   }
 
   # Set setting-specific riskiness:
@@ -224,26 +210,40 @@ for(i in 1:nrow(simulations_to_run)) {
   }
 }
 
-parameter_lists[[1]]
-
 #saveRDS(simulations_to_run, file = "./inst/blueprint_output_3_Sep9/endemic_simulations_table.rds")
 #saveRDS(parameter_lists, file = "./inst/blueprint_output_3_Sep9/endemic_simulations_parameter_lists.rds")
 
 #----- 3) Simulation Runs --------------------------------------------------------------------------
 
 # Set up a list to store the simulation_outputs:
-tic()
-simulation_outputs <- list()
+# tic()
+# simulation_outputs <- list()
+#
+# # Run through the simulations in simulations_to_run:
+# for(i in 1:1) {
+#   simulation_outputs[[i]] <- run_simulation(parameters_list = parameter_lists[[i]])
+#   simulation_outputs[[i]]$ID <- simulations_to_run$ID[i]
+#   simulation_outputs[[i]]$riskiness_setting <- simulations_to_run$riskiness[i]
+#   simulation_outputs[[i]]$archetype <- simulations_to_run$archetype[i]
+#   simulation_outputs[[i]]$coverage <- simulations_to_run$coverage[i]
+#   simulation_outputs[[i]]$efficacy <- simulations_to_run$efficacy[i]
+#   simulation_outputs[[i]]$iteration <- simulations_to_run$iteration[i]
+#   # print(paste0(i, "th simulation complete (", (i/length(parameter_lists))*100, "% complete)"))
+# }
+# toc()
 
-# Run through the simulations in simulations_to_run:
-for(i in 1:1) {
-  simulation_outputs[[i]] <- run_simulation(parameters_list = parameter_lists[[i]])
-  simulation_outputs[[i]]$ID <- simulations_to_run$ID[i]
-  simulation_outputs[[i]]$riskiness_setting <- simulations_to_run$riskiness[i]
-  simulation_outputs[[i]]$archetype <- simulations_to_run$archetype[i]
-  simulation_outputs[[i]]$coverage <- simulations_to_run$coverage[i]
-  simulation_outputs[[i]]$efficacy <- simulations_to_run$efficacy[i]
-  simulation_outputs[[i]]$iteration <- simulations_to_run$iteration[i]
-  # print(paste0(i, "th simulation complete (", (i/length(parameter_lists))*100, "% complete)"))
-}
+#----- 4) Simulation Runs In Parallel ---------------------------------------------------------------
+
+parameter_lists[[1]]
+test_indices <- which(simulations_to_run$iteration == 1)
+num_cores <- 40
+tic()
+results1 <- mclapply(test_indices, mc.cores = num_cores, function(i) {
+  temp <- run_simulation(parameters_list = parameter_lists[[i]])
+  temp$ID <- simulations_to_run$ID[i]
+  return(temp)
+})
 toc()
+Sys.sleep(45)
+saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/test_epidemic_outputs.rds")
+Sys.sleep(15)

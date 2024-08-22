@@ -264,6 +264,6 @@ results1 <- mclapply(test_indices, mc.cores = num_cores, function(i) {
 })
 toc()
 Sys.sleep(45)
-saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Endemic/Report3_EndemicSimulation_Outputs/")
+saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Endemic/Report3_EndemicSimulation_Outputs/test_endemic_outputs.rds")
 Sys.sleep(15)
 
