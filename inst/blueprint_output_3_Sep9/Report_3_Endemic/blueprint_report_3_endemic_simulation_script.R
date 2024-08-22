@@ -43,10 +43,11 @@ iterations <- seq(10)
 # simulation_time_days <- (365 * years_to_simulate)
 years_to_simulate <- 5
 simulation_time_days <- (365 * years_to_simulate)
+simulation_time_days <- 5
 
 # Set the human population size:
 #human_population <- 100000
-human_population <- 1000
+human_population <- 10000
 
 # Specify a duration of immunity following infection:
 duration_of_immunity <- 365
@@ -61,7 +62,7 @@ archetypes <- c("flu", "sars_cov_2")
 riskiness <- c("setting_specific_riskiness")
 
 # Set up a vector of far-UVC efficacies to simulate
-far_uvc_efficacy <- seq(0.4, 0.8)
+far_uvc_efficacy <- seq(0.4, 0.6, 0.8)
 
 # Set up a vector of far-UVC coverages to simulate:
 far_uvc_joint_coverage <- seq(0.1, 0.8, by = 0.1)
@@ -90,7 +91,7 @@ simulations_to_run |>
   mutate(ID = 1:nrow(simulations_to_run)) -> simulations_to_run
 
 # View the simulations_to_run dataframe:
-head(simulations_to_run)
+nrow(simulations_to_run)
 
 # Set up a list to store the parameter_lists:
 parameter_lists <- list()
@@ -135,8 +136,8 @@ for(i in 1:nrow(simulations_to_run)) {
 
   } else if (simulations_to_run$archetype[i] == "flu") {
 
-    #+++ SARS-CoV-2 +++#
-    #++++++++++++++++++#
+    #+++ Flu +++#
+    #+++++++++++#
     # Setting up initial conditions (approx endemic equilibrium solution for R0 1.5 pathogen)
     initial_S_flu <- round(0.67 * human_population)
     initial_E_flu <- round(0.006 * human_population)
@@ -249,11 +250,11 @@ parameter_lists[[1]]
 #----- 3) Simulation Runs --------------------------------------------------------------------------
 
 # Set up a list to store the simulation_outputs:
-tic()
+tictoc::tic()
 simulation_outputs <- list()
 
 # Run through the simulations in simulations_to_run:
-for(i in 1:1) {
+for(i in 1:nrow(simulations_to_run)) {
   simulation_outputs[[i]] <- run_simulation(parameters_list = parameter_lists[[i]])
   simulation_outputs[[i]]$ID <- simulations_to_run$ID[i]
   simulation_outputs[[i]]$riskiness_setting <- simulations_to_run$riskiness[i]
@@ -263,10 +264,10 @@ for(i in 1:1) {
   simulation_outputs[[i]]$iteration <- simulations_to_run$iteration[i]
   # print(paste0(i, "th simulation complete (", (i/length(parameter_lists))*100, "% complete)"))
 }
-toc()
+tictoc::toc()
 
 
 
-
+simulation_outputs[[1]]
 
 
