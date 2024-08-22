@@ -29,6 +29,7 @@
 #----- 1) Preamble ---------------------------------------------------------------------------------
 
 # Load in the requisite packages:
+library(helios)
 library(tidyverse)
 library(tictoc)
 library(individual)
@@ -183,29 +184,14 @@ for(i in 1:nrow(simulations_to_run)) {
   if(simulations_to_run$coverage[i] > 0) {
     parameter_lists[[i]] |>
 
-      # Set UVC in Schools:
-      set_uvc(setting = "school",
+      # Set UVC jointly:
+      set_uvc(setting = "joint",
               coverage = simulations_to_run$coverage[i],
               coverage_target = "square_footage",
               coverage_type = simulations_to_run$coverage_type[i],
               efficacy = simulations_to_run$efficacy[i],
-              timestep = timestep_uvc_on) |>
+              timestep = timestep_uvc_on)
 
-      # Set UVC in Workplaces:
-      set_uvc(setting = "workplace",
-              coverage = simulations_to_run$coverage[i],
-              coverage_target = "square_footage",
-              coverage_type = simulations_to_run$coverage_type[i],
-              efficacy = simulations_to_run$efficacy[i],
-              timestep = timestep_uvc_on) |>
-
-      # Set UVC in Leisure Settings:
-      set_uvc(setting = "leisure",
-              coverage = simulations_to_run$coverage[i],
-              coverage_target = "square_footage",
-              coverage_type = simulations_to_run$coverage_type[i],
-              efficacy = simulations_to_run$efficacy[i],
-              timestep = timestep_uvc_on) -> parameter_lists[[i]]
   }
 
   # Set setting-specific riskiness:
@@ -262,12 +248,16 @@ for(i in 1:nrow(simulations_to_run)) {
   simulation_outputs[[i]]$coverage <- simulations_to_run$coverage[i]
   simulation_outputs[[i]]$efficacy <- simulations_to_run$efficacy[i]
   simulation_outputs[[i]]$iteration <- simulations_to_run$iteration[i]
-  # print(paste0(i, "th simulation complete (", (i/length(parameter_lists))*100, "% complete)"))
+  print(paste0(i, "th simulation complete (", (i/length(parameter_lists))*100, "% complete)"))
 }
 tictoc::toc()
 
+i
+
+test <- parameter_lists[[29]]
+test$seed <- 243
+run_simulation(parameters_list = test)
 
 
-simulation_outputs[[1]]
 
 
