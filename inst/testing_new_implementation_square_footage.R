@@ -9,11 +9,11 @@ library(helios)
 
 ## Setting up the parameters list and variables list
 parameters_list <- get_parameters(archetype = "sars_cov_2",
-                                  overrides = list(human_population = 15000,
-                                                   number_initial_S = 7000,
+                                  overrides = list(human_population = 10000,
+                                                   number_initial_S = 4500,
                                                    number_initial_E = 500,
                                                    number_initial_I = 500,
-                                                   number_initial_R = 7000,
+                                                   number_initial_R = 4500,
                                                    size_per_individual_workplace = 5,
                                                    size_per_individual_school = 2,
                                                    size_per_individual_leisure = 15,
@@ -77,24 +77,24 @@ switches_individuals <- generate_far_uvc_switches(parameters_list = parameters_i
 size_covered_individuals <- list(
   "workplace" = sum(switches_individuals$setting_sizes$workplace * switches_individuals$uvc_workplace),
   "school" = sum(switches_individuals$setting_sizes$school * switches_individuals$uvc_school),
-  "household" = sum(switches_individuals$setting_sizes$household * switches_individuals$uvc_household),
+  # "household" = sum(switches_individuals$setting_sizes$household * switches_individuals$uvc_household),
   "leisure" = sum(switches_individuals$setting_sizes$leisure * switches_individuals$uvc_leisure)
 )
 
 # Calculate the total number of individuals acfross each setting type (e.g. total occupancy?):
 total_size_individuals <- sum(switches_individuals$setting_sizes$workplace) +
-                          sum(switches_individuals$setting_sizes$school) +
-                          sum(switches_individuals$setting_sizes$household) +
-                          sum(switches_individuals$setting_sizes$leisure)
+  sum(switches_individuals$setting_sizes$school) +
+  # sum(switches_individuals$setting_sizes$household) +
+  sum(switches_individuals$setting_sizes$leisure)
 
 # Check that the total occupancy x far UVC joint coverage (50%) is apporximately equal to the number of covered individuals:
 (total_size_individuals * switches_individuals$far_uvc_joint_coverage) / sum(unlist(size_covered_individuals))
 
 # Plot the UVC switches against the specific-riskinesses of each setting type:
-plot(switches_individuals$uvc_household, parameters_individuals$household_specific_riskiness, cex = 0.01)
 plot(switches_individuals$uvc_school, parameters_individuals$school_specific_riskiness, cex = 0.01)
 plot(switches_individuals$uvc_workplace, parameters_individuals$workplace_specific_riskiness, cex = 0.01)
 plot(switches_individuals$uvc_leisure, parameters_individuals$leisure_specific_riskiness, cex = 0.01)
+# plot(switches_individuals$uvc_household, parameters_individuals$household_specific_riskiness, cex = 0.01)
 
 #----- 3) Setting: Joint, Target = Square Footage, Type = Random -----------------------------------
 
@@ -121,20 +121,20 @@ switches_square_footage <- generate_far_uvc_switches(parameters_list = parameter
 size_covered_square_footage <- list(
   "workplace" = sum(switches_square_footage$setting_sizes$workplace * switches_square_footage$uvc_workplace *  switches_square_footage$size_per_individual_workplace),
   "school" = sum(switches_square_footage$setting_sizes$school * switches_square_footage$uvc_school *  switches_square_footage$size_per_individual_school),
-  "household" = sum(switches_square_footage$setting_sizes$household * switches_square_footage$uvc_household) *  switches_square_footage$size_per_individual_household ,
+  # "household" = sum(switches_square_footage$setting_sizes$household * switches_square_footage$uvc_household) *  switches_square_footage$size_per_individual_household ,
   "leisure" = sum(switches_square_footage$setting_sizes$leisure * switches_square_footage$uvc_leisure *  switches_square_footage$size_per_individual_leisure)
 )
 
 
 total_size_square_footage <- sum(switches_square_footage$setting_sizes$workplace) *  switches_square_footage$size_per_individual_workplace +
   sum(switches_square_footage$setting_sizes$school) *  switches_square_footage$size_per_individual_school  +
-  sum(switches_square_footage$setting_sizes$household) *  switches_square_footage$size_per_individual_household  +
+  # sum(switches_square_footage$setting_sizes$household) *  switches_square_footage$size_per_individual_household  +
   sum(switches_square_footage$setting_sizes$leisure) *  switches_square_footage$size_per_individual_leisure
 (total_size_square_footage * switches_square_footage$far_uvc_joint_coverage) / sum(unlist(size_covered_square_footage)) # checking coverages match up
-plot(switches_square_footage$uvc_household, parameters_square_footage$household_specific_riskiness, cex = 0.01)
 plot(switches_square_footage$uvc_school, parameters_square_footage$school_specific_riskiness, cex = 0.01)
 plot(switches_square_footage$uvc_workplace, parameters_square_footage$workplace_specific_riskiness, cex = 0.01)
 plot(switches_square_footage$uvc_leisure, parameters_square_footage$leisure_specific_riskiness, cex = 0.01)
+# plot(switches_square_footage$uvc_household, parameters_square_footage$household_specific_riskiness, cex = 0.01)
 
 #----- 4) Setting: Joint, Target = Individuals, Type = Target-Riskiness ----------------------------
 
@@ -158,18 +158,18 @@ switches_individuals_riskiness <- generate_far_uvc_switches(parameters_list = pa
 size_covered_individuals_riskiness <- list(
   "workplace" = sum(switches_individuals_riskiness$setting_sizes$workplace * switches_individuals_riskiness$uvc_workplace),
   "school" = sum(switches_individuals_riskiness$setting_sizes$school * switches_individuals_riskiness$uvc_school),
-  "household" = sum(switches_individuals_riskiness$setting_sizes$household * switches_individuals_riskiness$uvc_household),
+  # "household" = sum(switches_individuals_riskiness$setting_sizes$household * switches_individuals_riskiness$uvc_household),
   "leisure" = sum(switches_individuals_riskiness$setting_sizes$leisure * switches_individuals_riskiness$uvc_leisure)
 )
 total_size_individuals_riskiness <- sum(switches_individuals_riskiness$setting_sizes$workplace) +
   sum(switches_individuals_riskiness$setting_sizes$school) +
-  sum(switches_individuals_riskiness$setting_sizes$household) +
+  # sum(switches_individuals_riskiness$setting_sizes$household) +
   sum(switches_individuals_riskiness$setting_sizes$leisure)
 (total_size_individuals_riskiness * switches_individuals_riskiness$far_uvc_joint_coverage) / sum(unlist(size_covered_individuals_riskiness)) # checking coverages match up
-plot(switches_individuals_riskiness$uvc_household, parameters_individuals_riskiness$household_specific_riskiness, cex = 0.01)
 plot(switches_individuals_riskiness$uvc_school, parameters_individuals_riskiness$school_specific_riskiness, cex = 0.01)
 plot(switches_individuals_riskiness$uvc_workplace, parameters_individuals_riskiness$workplace_specific_riskiness, cex = 0.01)
 plot(switches_individuals_riskiness$uvc_leisure, parameters_individuals_riskiness$leisure_specific_riskiness, cex = 0.01)
+# plot(switches_individuals_riskiness$uvc_household, parameters_individuals_riskiness$household_specific_riskiness, cex = 0.01)
 
 #----- 4) Setting: Joint, Target = Square-Footage, Type = Target-Riskiness -------------------------
 
@@ -190,18 +190,18 @@ switches_square_footage_riskiness <- generate_far_uvc_switches(parameters_list =
 size_covered_square_footage_riskiness <- list(
   "workplace" = sum(switches_square_footage_riskiness$setting_sizes$workplace * switches_square_footage_riskiness$uvc_workplace *  switches_square_footage_riskiness$size_per_individual_workplace),
   "school" = sum(switches_square_footage_riskiness$setting_sizes$school * switches_square_footage_riskiness$uvc_school *  switches_square_footage_riskiness$size_per_individual_school),
-  "household" = sum(switches_square_footage_riskiness$setting_sizes$household * switches_square_footage_riskiness$uvc_household) *  switches_square_footage_riskiness$size_per_individual_household ,
+  # "household" = sum(switches_square_footage_riskiness$setting_sizes$household * switches_square_footage_riskiness$uvc_household) *  switches_square_footage_riskiness$size_per_individual_household ,
   "leisure" = sum(switches_square_footage_riskiness$setting_sizes$leisure * switches_square_footage_riskiness$uvc_leisure *  switches_square_footage_riskiness$size_per_individual_leisure)
 )
 total_size_square_footage_riskiness <- sum(switches_square_footage_riskiness$setting_sizes$workplace) *  switches_square_footage_riskiness$size_per_individual_workplace +
   sum(switches_square_footage_riskiness$setting_sizes$school) *  switches_square_footage_riskiness$size_per_individual_school  +
-  sum(switches_square_footage_riskiness$setting_sizes$household) *  switches_square_footage_riskiness$size_per_individual_household  +
+  # sum(switches_square_footage_riskiness$setting_sizes$household) *  switches_square_footage_riskiness$size_per_individual_household  +
   sum(switches_square_footage_riskiness$setting_sizes$leisure) *  switches_square_footage_riskiness$size_per_individual_leisure
 (total_size_square_footage_riskiness * switches_square_footage_riskiness$far_uvc_joint_coverage) / sum(unlist(size_covered_square_footage_riskiness)) # checking coverages match up
-plot(switches_square_footage_riskiness$uvc_household, parameters_square_footage_riskiness$household_specific_riskiness, cex = 0.01)
 plot(switches_square_footage_riskiness$uvc_school, parameters_square_footage_riskiness$school_specific_riskiness, cex = 0.01)
 plot(switches_square_footage_riskiness$uvc_workplace, parameters_square_footage_riskiness$workplace_specific_riskiness, cex = 0.01)
 plot(switches_square_footage_riskiness$uvc_leisure, parameters_square_footage_riskiness$leisure_specific_riskiness, cex = 0.01)
+# plot(switches_square_footage_riskiness$uvc_household, parameters_square_footage_riskiness$household_specific_riskiness, cex = 0.01)
 
 ## Running the model with and without far UVC etc etc
 model_run_individual <- run_simulation(parameters_individuals)
