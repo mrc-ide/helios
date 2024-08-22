@@ -22,6 +22,7 @@ for which far UVC has been parameterised using the \code{set_uvc()} function.
 }
 \seealso{
 Other intervention: 
+\code{\link{generate_joint_far_uvc_switches}()},
 \code{\link{generate_setting_far_uvc_switches}()},
 \code{\link{set_uvc}()}
 }
