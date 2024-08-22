@@ -19,6 +19,8 @@ navbar:
         href: articles/blueprint.html
       - text: Update to "Assessing far UVC interventions with an individual based infectious disease model"
         href: articles/blueprint-july.html
+      - text: Final Report: The Impact of Far UVC Interventions on the Burden of a Respiratory Virus
+        href: articles/blueprint-final-report.html
 
 reference:
 - title: Parameters
