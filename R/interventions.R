@@ -122,7 +122,7 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
     setting_size_list <- list(
       "workplace" = get_setting_size(variables_list, "workplace"),
       "school" = get_setting_size(variables_list, "school"),
-      "household" = get_setting_size(variables_list, "household"),
+      # "household" = get_setting_size(variables_list, "household"),
       "leisure" = parameters_list$setting_sizes$leisure
     )
   # Defining coverage according to the size of the setting (i.e. number of individuals multiplied by square footage per person)
@@ -131,7 +131,7 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
     setting_size_list <- list(
       "workplace" = get_setting_size(variables_list, "workplace") * parameters_list$size_per_individual_workplace,
       "school" = get_setting_size(variables_list, "school") * parameters_list$size_per_individual_school,
-      "household" = get_setting_size(variables_list, "household") * parameters_list$size_per_individual_household,
+      # "household" = get_setting_size(variables_list, "household") * parameters_list$size_per_individual_household,
       "leisure" = parameters_list$setting_sizes$leisure * parameters_list$size_per_individual_leisure
     )
   } else {
@@ -155,7 +155,7 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
       sum <- sum + setting_size_flat[i]
       indices <- c(indices, i)
       location_indices <- setdiff(location_indices, i)
-      if (length(location_indices) == 0) {
+      if (length(location_indices) == 0 & sum < total_with_uvc) {
         stop("Insufficient space to meet far UVC coverage")
       }
     }
@@ -163,7 +163,7 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
     riskiness_list <- list(
       "workplace" = parameters_list$workplace_specific_riskiness,
       "school" = parameters_list$school_specific_riskiness,
-      "household" = parameters_list$household_specific_riskiness,
+      # "household" = parameters_list$household_specific_riskiness,
       "leisure" = parameters_list$leisure_specific_riskiness
     )
     riskiness_flat <- unlist(riskiness_list, use.names = FALSE)
@@ -179,7 +179,7 @@ generate_joint_far_uvc_switches <- function(parameters_list, variables_list) {
   setting_name_index <- rep(names(setting_size_list), lengths(setting_size_list))
   parameters_list[["uvc_workplace"]] <- uvc_switches[setting_name_index == "workplace"]
   parameters_list[["uvc_school"]] <- uvc_switches[setting_name_index == "school"]
-  parameters_list[["uvc_household"]] <- uvc_switches[setting_name_index == "household"]
+  # parameters_list[["uvc_household"]] <- uvc_switches[setting_name_index == "household"]
   parameters_list[["uvc_leisure"]] <- uvc_switches[setting_name_index == "leisure"]
 
   return(parameters_list)
@@ -235,7 +235,7 @@ generate_setting_far_uvc_switches <- function(parameters_list, variables_list, s
       sum <- sum + setting_size[i]
       indices <- c(indices, i)
       location_indices <- setdiff(location_indices, i)
-      if (length(location_indices) == 0) {
+      if (length(location_indices) == 0 & sum < total_with_uvc) {
         stop("Insufficient individuals to meet far UVC coverage")
       }
     }
