@@ -72,7 +72,8 @@ simulations_to_run <- expand.grid("archetype" = archetypes,
                                   "coverage" = far_uvc_joint_coverage,
                                   "efficacy" = far_uvc_efficacy,
                                   "iteration" = iterations,
-                                  "riskiness" = riskiness)
+                                  "riskiness" = riskiness,
+                                  stringsAsFactors = FALSE)
 
 # Arrange the dataframe:
 simulations_to_run |>
