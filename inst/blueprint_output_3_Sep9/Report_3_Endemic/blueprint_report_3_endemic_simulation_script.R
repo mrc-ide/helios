@@ -4,27 +4,8 @@
 
 #+++ Introduction +++#
 #++++++++++++++++++++#
-##'
-##' SARS-CoV-2 and Flu archetypes
-##' far UVC coverages 10% - 80% (in chunks of 10%)
-##' far UVC efficacies of 60% and 80%
-##' human population size of 100,000
-##'
-##' For the immunity, we'll set the duration of immunity to 365 days
-##' The probability of an externally acquited infection is the reciprocal of the human population
-##'
-##'Timesteps: 20 years: - 14 year burnin
-##'                     - Far UVC introduced at the start of the 18th year
-##'                     - Comparisons to be made with years 15/16/17 and 18/19/20
-##'
-##' Run each simulation for 10 replicates
-##'
-##' Setting specific riskiness switched on
-##'
-##' Far UVC coverage using "joint" setting with 10% of locations receiving far UVC
-##'   a. At Random
-##'   b. Targeted at 10% of locations with the greatest square footage
-##'
+
+
 
 #----- 1) Preamble ---------------------------------------------------------------------------------
 
@@ -37,10 +18,10 @@ library(individual)
 #----- 2) Parameter Sweep Set-Up -------------------------------------------------------------------
 
 # Number of iterations to simulate for each parameterisation:
-iterations <- seq(5)
+iterations <- seq(1)
 
 # Calculate the simulation_time required to simulate a 2 year period:
-years_to_simulate <- 20
+years_to_simulate <- 3
 simulation_time_days <- (365 * years_to_simulate)
 # years_to_simulate <- 5
 # simulation_time_days <- (365 * years_to_simulate)
@@ -91,6 +72,9 @@ simulations_to_run |>
   mutate(scenario = "endemic") |>
   arrange(archetype, coverage_type, coverage, efficacy, iteration) |>
   mutate(ID = 1:nrow(simulations_to_run)) -> simulations_to_run
+
+#TODO Remove this line:
+#simulations_to_run <- simulations_to_run[1:10,]
 
 # View the simulations_to_run dataframe:
 nrow(simulations_to_run)
@@ -229,8 +213,8 @@ for(i in 1:nrow(simulations_to_run)) {
   }
 }
 
-#saveRDS(simulations_to_run, file = "./inst/blueprint_output_3_Sep9/endemic_simulations_table.rds")
-#saveRDS(parameter_lists, file = "./inst/blueprint_output_3_Sep9/endemic_simulations_parameter_lists.rds")
+#saveRDS(simulations_to_run, file = "./Report_3_Endemic/endemic_simulations_table.rds")
+#saveRDS(parameter_lists, file = "./Report_3_Endemic/endemic_simulations_parameter_lists.rds")
 
 #----- 3) Simulation Runs --------------------------------------------------------------------------
 
