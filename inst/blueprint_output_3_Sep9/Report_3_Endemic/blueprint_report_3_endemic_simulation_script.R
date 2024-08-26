@@ -210,11 +210,18 @@ for(i in 1:nrow(simulations_to_run)) {
                                      sd = 0.4278,
                                      min = 1/sqrt(5.5),
                                      max = sqrt(5.5)) -> parameter_lists[[i]]
+
+    # Append the simulation parameters
+    parameter_lists[[i]]$ID <- simulations_to_run$ID[i]
+    parameter_lists[[i]]$iteration <- simulations_to_run$iteration[i]
+    parameter_lists[[i]]$pathogen <- simulations_to_run$archetype[i]
+
   }
 }
 
-#saveRDS(simulations_to_run, file = "./Report_3_Endemic/endemic_simulations_table.rds")
-#saveRDS(parameter_lists, file = "./Report_3_Endemic/endemic_simulations_parameter_lists.rds")
+# Save the parameter lists and the simulations dataframe:
+saveRDS(simulations_to_run, file = "./Report_3_Endemic/endemic_simulations_table.rds")
+saveRDS(parameter_lists, file = "./Report_3_Endemic/endemic_simulations_parameter_lists.rds")
 
 #----- 3) Simulation Runs --------------------------------------------------------------------------
 
