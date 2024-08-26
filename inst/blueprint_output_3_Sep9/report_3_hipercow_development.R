@@ -118,7 +118,7 @@ hipercow_environment_create(packages = c("individual", "helios", "tidyverse", "d
 
 parameters <- readRDS("./Report_3_Endemic/endemic_simulations_parameter_lists.rds")
 for(i in 1:length(parameters)) {
-  parameters[[i]]$simulation_time <- 10
+  parameters[[i]]$simulation_time <- 20
 }
 length(parameters)
 
@@ -182,7 +182,7 @@ id5 <- hipercow::task_create_explicit(
     # Load in the run_simulations_hipercow() function:
     source("./Report_3_Endemic/run_simulations_hipercow.R")
 
-    # Run through the parameter lists:
+    # Run through the parameter lists and run the hipercow helios script:
     scenario_output <- parallel::parLapply(
       cl = NULL,
       X = parameters,
@@ -194,7 +194,7 @@ id5 <- hipercow::task_create_explicit(
   }),
 
   # Specify the cluster resources etc.
-  resources = hipercow_resources(cores = 20),
+  resources = hipercow_resources(cores = 32),
   parallel = hipercow_parallel("parallel")
 )
 
@@ -204,11 +204,23 @@ task_result(id5)
 
 # Load and view the output:
 test <- readRDS("./Report_3_Endemic/scenario_output.rds")
-test[[40]]
 
 
+length(test)
+test[[40]][[1]]
+test[[40]][[2]]
 
+test2 <- list()
+for(i in 1:length(test)) {
+  test2[[i]] <- test[[i]][[2]]
+}
 
+test3 <- bind_rows(test2)
+test3 |>
+  pivot_longer(cols = c(S_count, E_count, I_count, R_count), names_to = "State", values_to = "Individuals") |>
+  ggplot(aes(x = timestep, y = Individuals, colour = as.factor(ID))) + geom_line() +
+  theme_bw() +
+  facet_grid(archetype~State)
 
 
 

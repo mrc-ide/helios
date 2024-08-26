@@ -18,18 +18,14 @@ library(individual)
 #----- 2) Parameter Sweep Set-Up -------------------------------------------------------------------
 
 # Number of iterations to simulate for each parameterisation:
-iterations <- seq(1)
+iterations <- seq(5)
 
 # Calculate the simulation_time required to simulate a 2 year period:
-years_to_simulate <- 3
+years_to_simulate <- 20
 simulation_time_days <- (365 * years_to_simulate)
-# years_to_simulate <- 5
-# simulation_time_days <- (365 * years_to_simulate)
-# simulation_time_days <- 5
 
 # Set the human population size:
 human_population <- 100000
-# human_population <- 10000
 
 # Specify a duration of immunity following infection:
 duration_of_immunity <- 365
@@ -72,9 +68,6 @@ simulations_to_run |>
   mutate(scenario = "endemic") |>
   arrange(archetype, coverage_type, coverage, efficacy, iteration) |>
   mutate(ID = 1:nrow(simulations_to_run)) -> simulations_to_run
-
-#TODO Remove this line:
-#simulations_to_run <- simulations_to_run[1:10,]
 
 # View the simulations_to_run dataframe:
 nrow(simulations_to_run)
@@ -221,40 +214,32 @@ for(i in 1:nrow(simulations_to_run)) {
 
 # Save the parameter lists and the simulations dataframe:
 saveRDS(simulations_to_run, file = "./Report_3_Endemic/endemic_simulations_table.rds")
-saveRDS(parameter_lists, file = "./Report_3_Endemic/endemic_simulations_parameter_lists.rds")
+#saveRDS(parameter_lists, file = "./Report_3_Endemic/endemic_simulations_parameter_lists.rds")
 
-#----- 3) Simulation Runs --------------------------------------------------------------------------
+#----- 3) Batch Saving -----------------------------------------------------------------------------
 
-# Set up a list to store the simulation_outputs:
-# tictoc::tic()
-# simulation_outputs <- list()
-#
-# # Run through the simulations in simulations_to_run:
-# for(i in 1:nrow(simulations_to_run)) {
-#   simulation_outputs[[i]] <- run_simulation(parameters_list = parameter_lists[[i]])
-#   simulation_outputs[[i]]$ID <- simulations_to_run$ID[i]
-#   simulation_outputs[[i]]$riskiness_setting <- simulations_to_run$riskiness[i]
-#   simulation_outputs[[i]]$archetype <- simulations_to_run$archetype[i]
-#   simulation_outputs[[i]]$coverage <- simulations_to_run$coverage[i]
-#   simulation_outputs[[i]]$efficacy <- simulations_to_run$efficacy[i]
-#   simulation_outputs[[i]]$iteration <- simulations_to_run$iteration[i]
-#   print(paste0(i, "th simulation complete (", (i/length(parameter_lists))*100, "% complete)"))
-# }
-# tictoc::toc()
+##' As each core on cluster has only 32 nodes, we can batch these simulations up into chunks of 32 to
+##' run in parallel.
 
-#----- 4) Simulation Runs In Parallel ---------------------------------------------------------------
+# Manually save the parameter lists into 7 batches (6 full, 1 remainder)
+endemic_simulation_parameter_list_1_32 <- parameter_lists[1:32]
+endemic_simulation_parameter_list_33_64 <- parameter_lists[33:64]
+endemic_simulation_parameter_list_65_96 <- parameter_lists[65:96]
+endemic_simulation_parameter_list_97_128 <- parameter_lists[97:128]
+endemic_simulation_parameter_list_129_160 <- parameter_lists[129:160]
+endemic_simulation_parameter_list_161_192 <- parameter_lists[161:192]
+endemic_simulation_parameter_list_193_200 <- parameter_lists[193:200]
 
-parameter_lists[[1]]
-test_indices <- which(simulations_to_run$iteration == 1)
-num_cores <- 40
-tic()
-results1 <- mclapply(test_indices, mc.cores = num_cores, function(i) {
-  temp <- run_simulation(parameters_list = parameter_lists[[i]])
-  temp$ID <- simulations_to_run$ID[i]
-  return(temp)
-})
-toc()
-Sys.sleep(45)
-saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Endemic/Report3_EndemicSimulation_Outputs/test_endemic_outputs.rds")
-Sys.sleep(15)
+# Save the independent simulation lists:
+saveRDS(object = endemic_simulation_parameter_list_1_32, file = "./Report_3_Endemic/endemic_parameter_list_1.rds")
+saveRDS(object = endemic_simulation_parameter_list_33_64, file = "./Report_3_Endemic/endemic_parameter_list_2.rds")
+saveRDS(object = endemic_simulation_parameter_list_65_96, file = "./Report_3_Endemic/endemic_parameter_list_3.rds")
+saveRDS(object = endemic_simulation_parameter_list_97_128, file = "./Report_3_Endemic/endemic_parameter_list_4.rds")
+saveRDS(object = endemic_simulation_parameter_list_129_160, file = "./Report_3_Endemic/endemic_parameter_list_5.rds")
+saveRDS(object = endemic_simulation_parameter_list_161_192, file = "./Report_3_Endemic/endemic_parameter_list_6.rds")
+saveRDS(object = endemic_simulation_parameter_list_193_200, file = "./Report_3_Endemic/endemic_parameter_list_7.rds")
+
+
+
+
 
