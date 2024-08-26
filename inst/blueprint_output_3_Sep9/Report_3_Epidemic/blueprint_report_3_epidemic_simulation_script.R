@@ -269,3 +269,35 @@ ggplot(proc_outputs3, aes(x = coverage, y = final_size, colour = coverage_type))
 ggplot(proc_outputs3, aes(x = coverage, y = peak_timing, colour = coverage_type)) +
   geom_line() +
   facet_grid(archetype ~ efficacy)
+
+num_cores <- 30
+tic()
+results1 <- mclapply(1:length(parameter_lists), mc.cores = num_cores, function(i) {
+  temp <- run_simulation(parameters_list = parameter_lists[[i]])
+  temp$ID <- simulations_to_run$ID[i]
+  return(temp)
+})
+toc()
+Sys.sleep(45)
+saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/full_epidemic_outputs.rds")
+Sys.sleep(15)
+
+proc_outputs <- lapply(results1, function(x) {
+  df <- data.frame(ID = unique(x$ID),
+                   peak = max(x$I_count),
+                   peak_timing = which(x$I_count == max(x$I_count)),
+                   final_size = max(x$R_count))
+})
+proc_outputs2 <- bind_rows(proc_outputs)
+proc_outputs3 <- proc_outputs2 %>%
+  left_join(simulations_to_run, by = "ID") %>%
+  group_by(coverage, coverage_type, archetype, efficacy) %>%
+  summarise(peak_timing = mean(peak_timing),
+            final_size = mean(final_size))
+head(proc_outputs3)
+ggplot(proc_outputs3, aes(x = coverage, y = peak_timing, colour = coverage_type)) +
+  geom_line() +
+  facet_grid(archetype ~ efficacy)
+ggplot(proc_outputs3, aes(x = coverage, y = final_size, colour = coverage_type)) +
+  geom_line() +
+  facet_grid(archetype ~ efficacy)
