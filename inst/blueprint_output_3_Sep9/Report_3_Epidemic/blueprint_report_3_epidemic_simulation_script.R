@@ -29,11 +29,12 @@ library(helios)
 library(tidyverse)
 library(tictoc)
 library(individual)
+library(parallel)
 
 #----- 2) Parameter Sweep Set-Up -------------------------------------------------------------------
 
 # Number of iterations to simulate for each parameterisation:
-iterations <- seq(5)
+iterations <- seq(10)
 
 # Calculate the simulation_time required to simulate a 2 year period:
 years_to_simulate <- 5
@@ -95,9 +96,9 @@ for(i in 1:nrow(simulations_to_run)) {
   if (simulations_to_run$archetype[i] == "sars_cov_2") {
 
     ## Setting up initial conditions (approx endemic equilibrium solution for R0 2.5 pathogen)
-    initial_S_SC2 <- round(0.4 * human_population)
-    initial_E_SC2 <- round(0.01 * human_population)
-    initial_I_SC2 <- round(0.02 * human_population)
+    initial_S_SC2 <- floor(0.9995 * human_population)
+    initial_E_SC2 <- floor(0.0005 * human_population)
+    initial_I_SC2 <- 0
     initial_R_SC2 <- human_population - initial_S_SC2 - initial_E_SC2 - initial_I_SC2
 
     # Establish the base parameter list:
@@ -128,9 +129,9 @@ for(i in 1:nrow(simulations_to_run)) {
     #+++ SARS-CoV-2 +++#
     #++++++++++++++++++#
     # Setting up initial conditions (approx endemic equilibrium solution for R0 1.5 pathogen)
-    initial_S_flu <- round(0.67 * human_population)
-    initial_E_flu <- round(0.006 * human_population)
-    initial_I_flu <- round(0.012 * human_population)
+    initial_S_flu <- floor(0.9995 * human_population)
+    initial_E_flu <- floor(0.0005 * human_population)
+    initial_I_flu <- 0
     initial_R_flu <- human_population - initial_S_flu - initial_E_flu - initial_I_flu
 
     # Establish the base parameter list:
@@ -237,7 +238,7 @@ for(i in 1:nrow(simulations_to_run)) {
 
 parameter_lists[[1]]
 test_indices <- which(simulations_to_run$iteration == 1)
-num_cores <- 40
+num_cores <- 48
 tic()
 results1 <- mclapply(test_indices, mc.cores = num_cores, function(i) {
   temp <- run_simulation(parameters_list = parameter_lists[[i]])
@@ -248,3 +249,55 @@ toc()
 Sys.sleep(45)
 saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/test_epidemic_outputs.rds")
 Sys.sleep(15)
+
+proc_outputs <- lapply(results1, function(x) {
+  df <- data.frame(ID = unique(x$ID),
+                   peak = max(x$I_count),
+                   peak_timing = which(x$I_count == max(x$I_count)),
+                   final_size = max(x$R_count))
+})
+proc_outputs2 <- bind_rows(proc_outputs)
+proc_outputs3 <- proc_outputs2 %>%
+  left_join(simulations_to_run, by = "ID")
+
+
+ggplot(proc_outputs3, aes(x = coverage, y = final_size, colour = coverage_type)) +
+  geom_line() +
+  facet_grid(archetype ~ efficacy)
+
+
+ggplot(proc_outputs3, aes(x = coverage, y = peak_timing, colour = coverage_type)) +
+  geom_line() +
+  facet_grid(archetype ~ efficacy)
+
+num_cores <- 30
+tic()
+results1 <- mclapply(1:length(parameter_lists), mc.cores = num_cores, function(i) {
+  temp <- run_simulation(parameters_list = parameter_lists[[i]])
+  temp$ID <- simulations_to_run$ID[i]
+  return(temp)
+})
+toc()
+Sys.sleep(45)
+saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/full_epidemic_outputs.rds")
+Sys.sleep(15)
+
+proc_outputs <- lapply(results1, function(x) {
+  df <- data.frame(ID = unique(x$ID),
+                   peak = max(x$I_count),
+                   peak_timing = which(x$I_count == max(x$I_count)),
+                   final_size = max(x$R_count))
+})
+proc_outputs2 <- bind_rows(proc_outputs)
+proc_outputs3 <- proc_outputs2 %>%
+  left_join(simulations_to_run, by = "ID") %>%
+  group_by(coverage, coverage_type, archetype, efficacy) %>%
+  summarise(peak_timing = mean(peak_timing),
+            final_size = mean(final_size))
+head(proc_outputs3)
+ggplot(proc_outputs3, aes(x = coverage, y = peak_timing, colour = coverage_type)) +
+  geom_line() +
+  facet_grid(archetype ~ efficacy)
+ggplot(proc_outputs3, aes(x = coverage, y = final_size, colour = coverage_type)) +
+  geom_line() +
+  facet_grid(archetype ~ efficacy)

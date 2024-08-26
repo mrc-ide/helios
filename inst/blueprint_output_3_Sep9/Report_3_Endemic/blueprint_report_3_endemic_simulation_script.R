@@ -243,3 +243,43 @@ saveRDS(object = endemic_simulation_parameter_list_193_200, file = "./Report_3_E
 
 
 
+x <- results1[[1]]
+indices_prev_UVC <- round(((years_to_simulate - 4) * 365) / parameter_lists[[i]]$dt) : round(((years_to_simulate - 2) * 365) / parameter_lists[[i]]$dt)
+indices_post_UVC <- round(((years_to_simulate - 2) * 365) / parameter_lists[[i]]$dt):(simulation_time_days / parameter_lists[[i]]$dt)
+
+proc_outputs <- lapply(results1, function(x) {
+  df <- data.frame(ID = unique(x$ID),
+                   avg_pre_UVC = sum(x$E_new[indices_prev_UVC]) / 3,
+                   avg_post_UVC = sum(x$E_new[indices_post_UVC]) / 3,
+                   avg_prev_pre_UVC = mean(x$I_count[indices_prev_UVC]),
+                   avg_prev_post_UVC = mean(x$I_count[indices_post_UVC])) %>%
+    mutate(reduction_incidence = 1 - avg_post_UVC / avg_pre_UVC) %>%
+    mutate(reduction_prevalence = 1 - avg_prev_post_UVC / avg_prev_pre_UVC)
+})
+proc_outputs2 <- bind_rows(proc_outputs)
+proc_outputs3 <- proc_outputs2 %>%
+  left_join(simulations_to_run, by = "ID") %>%
+  group_by(coverage, coverage_type, archetype, efficacy)
+
+head(proc_outputs3)
+ggplot(proc_outputs3, aes(x = coverage, y = reduction_incidence, colour = coverage_type)) +
+  geom_line() +
+  facet_grid(archetype ~ efficacy)
+ggplot(proc_outputs3, aes(x = coverage, y = reduction_prevalence, colour = coverage_type)) +
+  geom_line() +
+  facet_grid(archetype ~ efficacy)
+
+
+
+
+num_cores <- 30
+tic()
+results1 <- mclapply(1:length(parameter_lists), mc.cores = num_cores, function(i) {
+  temp <- run_simulation(parameters_list = parameter_lists[[i]])
+  temp$ID <- simulations_to_run$ID[i]
+  return(temp)
+})
+toc()
+Sys.sleep(45)
+saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/full_epidemic_outputs.rds")
+Sys.sleep(15)
