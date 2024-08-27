@@ -38,6 +38,28 @@ hipercow::hipercow_configuration()
 # Create the environment for hipercow
 hipercow_environment_create(packages = c("individual", "helios", "tidyverse", "dqrng", "EnvStats"))
 
+# Store the job IDs:
+job_ids <- c(sim_out_batch_1,
+             sim_out_batch_2,
+             sim_out_batch_3,
+             sim_out_batch_4,
+             sim_out_batch_5,
+             sim_out_batch_6,
+             sim_out_batch_7)
+#saveRDS(object = job_ids, file = "./Report_3_Endemic/first_batch_job_ids.rds")
+
+# Load the job IDs:
+#job_ids <- readRDS("./Report_3_Endemic/first_batch_job_ids.rds")
+
+# View the task statuses:
+task_status(sim_out_batch_1)
+task_status(sim_out_batch_2)
+task_status(sim_out_batch_3)
+task_status(sim_out_batch_4)
+task_status(sim_out_batch_5)
+task_status(sim_out_batch_6)
+task_status(sim_out_batch_7)
+
 #----- 1) Batch 1: Simulations 1:32 ----------------------------------------------------------------
 
 # Create the task (2 simulations of the basic run_simulation() function:
