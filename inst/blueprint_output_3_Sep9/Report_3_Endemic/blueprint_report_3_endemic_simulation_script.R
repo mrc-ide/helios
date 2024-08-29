@@ -18,10 +18,10 @@ library(individual)
 #----- 2) Parameter Sweep Set-Up -------------------------------------------------------------------
 
 # Number of iterations to simulate for each parameterisation:
-iterations <- seq(5)
+iterations <- seq(10)
 
 # Calculate the simulation_time required to simulate a 2 year period:
-years_to_simulate <- 20
+years_to_simulate <- 24
 simulation_time_days <- (365 * years_to_simulate)
 
 # Set the human population size:
@@ -40,10 +40,10 @@ archetypes <- c("flu", "sars_cov_2")
 riskiness <- c("setting_specific_riskiness")
 
 # Set up a vector of far-UVC efficacies to simulate
-far_uvc_efficacy <- c(0.6, 0.8)
+far_uvc_efficacy <- c(0.4, 0.6, 0.8)
 
 # Set up a vector of far-UVC coverages to simulate:
-far_uvc_joint_coverage <- seq(0.1, 0.5, by = 0.1)
+far_uvc_joint_coverage <- seq(0, 1, by = 0.1)
 
 # Specify joint far UVC coverage type (random vs targeted)
 uvc_joint_coverage_type <- c("random", "targeted_riskiness")
@@ -213,8 +213,8 @@ for(i in 1:nrow(simulations_to_run)) {
 }
 
 # Save the parameter lists and the simulations dataframe:
-saveRDS(simulations_to_run, file = "./Report_3_Endemic/endemic_simulations_table.rds")
-#saveRDS(parameter_lists, file = "./Report_3_Endemic/endemic_simulations_parameter_lists.rds")
+saveRDS(simulations_to_run, file = "endemic_simulations_table_batch_2.rds")
+saveRDS(parameter_lists, file = "endemic_simulations_parameter_lists_batch_2.rds")
 
 #----- 3) Batch Saving -----------------------------------------------------------------------------
 
@@ -239,9 +239,7 @@ saveRDS(object = endemic_simulation_parameter_list_129_160, file = "./Report_3_E
 saveRDS(object = endemic_simulation_parameter_list_161_192, file = "./Report_3_Endemic/endemic_parameter_list_6.rds")
 saveRDS(object = endemic_simulation_parameter_list_193_200, file = "./Report_3_Endemic/endemic_parameter_list_7.rds")
 
-
-
-
+#----- 4) Charlie's Sanity Checks ------------------------------------------------------------------
 
 x <- results1[[1]]
 indices_prev_UVC <- round(((years_to_simulate - 4) * 365) / parameter_lists[[i]]$dt) : round(((years_to_simulate - 2) * 365) / parameter_lists[[i]]$dt)
@@ -270,8 +268,6 @@ ggplot(proc_outputs3, aes(x = coverage, y = reduction_prevalence, colour = cover
   facet_grid(archetype ~ efficacy)
 
 
-
-
 num_cores <- 30
 tic()
 results1 <- mclapply(1:length(parameter_lists), mc.cores = num_cores, function(i) {
@@ -283,3 +279,5 @@ toc()
 Sys.sleep(45)
 saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/full_epidemic_outputs.rds")
 Sys.sleep(15)
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#

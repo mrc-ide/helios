@@ -16,7 +16,7 @@ library(tidyverse)
 library(helios)
 library(patchwork)
 
-#----- X) hipercow Set-Up --------------------------------------------------------------------------
+#----- 1) hipercow Set-Up --------------------------------------------------------------------------
 
 # Set working directtory:
 setwd("./inst/blueprint_output_3_Sep9/")
@@ -60,7 +60,7 @@ task_status(sim_out_batch_5)
 task_status(sim_out_batch_6)
 task_status(sim_out_batch_7)
 
-#----- 1) Batch 1: Simulations 1:32 ----------------------------------------------------------------
+#----- 2) Batch 1: Simulations 1:32 ----------------------------------------------------------------
 
 # Create the task (2 simulations of the basic run_simulation() function:
 sim_out_batch_1 <- hipercow::task_create_explicit(
@@ -95,7 +95,7 @@ sim_out_batch_1 <- hipercow::task_create_explicit(
 task_status(sim_out_batch_1)
 #task_result(sim_out_batch_1)
 
-#----- 2) Batch 2: Simulations 33:64 ---------------------------------------------------------------
+#----- 3) Batch 2: Simulations 33:64 ---------------------------------------------------------------
 
 # Create the task (2 simulations of the basic run_simulation() function:
 sim_out_batch_2 <- hipercow::task_create_explicit(
@@ -130,7 +130,7 @@ sim_out_batch_2 <- hipercow::task_create_explicit(
 task_status(sim_out_batch_2)
 #task_result(sim_out_batch_2)
 
-#----- 3) Batch 3: Simulations 65:96 ---------------------------------------------------------------
+#----- 4) Batch 3: Simulations 65:96 ---------------------------------------------------------------
 
 # Create the task (2 simulations of the basic run_simulation() function:
 sim_out_batch_3 <- hipercow::task_create_explicit(
@@ -165,7 +165,7 @@ sim_out_batch_3 <- hipercow::task_create_explicit(
 task_status(sim_out_batch_3)
 #task_result(sim_out_batch_3)
 
-#----- 4) Batch 4: Simulations 97:128 --------------------------------------------------------------
+#----- 5) Batch 4: Simulations 97:128 --------------------------------------------------------------
 
 # Create the task (2 simulations of the basic run_simulation() function:
 sim_out_batch_4 <- hipercow::task_create_explicit(
@@ -200,7 +200,7 @@ sim_out_batch_4 <- hipercow::task_create_explicit(
 task_status(sim_out_batch_4)
 #task_result(sim_out_batch_4)
 
-#----- 5) Batch 5: Simulations 129:160 -------------------------------------------------------------
+#----- 6) Batch 5: Simulations 129:160 -------------------------------------------------------------
 
 # Create the task (2 simulations of the basic run_simulation() function:
 sim_out_batch_5 <- hipercow::task_create_explicit(
@@ -235,7 +235,7 @@ sim_out_batch_5 <- hipercow::task_create_explicit(
 task_status(sim_out_batch_5)
 #task_result(sim_out_batch_5)
 
-#----- 6) Batch 6: Simulations 161:192 -------------------------------------------------------------
+#----- 7) Batch 6: Simulations 161:192 -------------------------------------------------------------
 
 # Create the task (2 simulations of the basic run_simulation() function:
 sim_out_batch_6 <- hipercow::task_create_explicit(
@@ -270,7 +270,7 @@ sim_out_batch_6 <- hipercow::task_create_explicit(
 task_status(sim_out_batch_6)
 #task_result(sim_out_batch_6)
 
-#----- 7) Batch 7: Simulations 193:200 -------------------------------------------------------------
+#----- 8) Batch 7: Simulations 193:200 -------------------------------------------------------------
 
 # Create the task (2 simulations of the basic run_simulation() function:
 sim_out_batch_7 <- hipercow::task_create_explicit(
