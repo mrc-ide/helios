@@ -218,26 +218,65 @@ saveRDS(parameter_lists, file = "endemic_simulations_parameter_lists_batch_2.rds
 
 #----- 3) Batch Saving -----------------------------------------------------------------------------
 
-##' As each core on cluster has only 32 nodes, we can batch these simulations up into chunks of 32 to
+##' I'm going to batch these simulations up into groups of 64 simulations so that each core runs two
 ##' run in parallel.
 
+# Calculate the number of simulations
+num_sims <- length(parameter_lists)
+
+# We need to run 20 full nodes with 64 sims each plus a 21st node with 40 sims
+
+##' 1, 64
+
+lower_bounds <- c(1, seq(1, 20, 1) * 64 + 1)
+upper_bounds <- seq(1, 20, 1) * 64
+
+
 # Manually save the parameter lists into 7 batches (6 full, 1 remainder)
-endemic_simulation_parameter_list_1_32 <- parameter_lists[1:32]
-endemic_simulation_parameter_list_33_64 <- parameter_lists[33:64]
-endemic_simulation_parameter_list_65_96 <- parameter_lists[65:96]
-endemic_simulation_parameter_list_97_128 <- parameter_lists[97:128]
-endemic_simulation_parameter_list_129_160 <- parameter_lists[129:160]
-endemic_simulation_parameter_list_161_192 <- parameter_lists[161:192]
-endemic_simulation_parameter_list_193_200 <- parameter_lists[193:200]
+endemic_simulation_parameter_list_1_64 <- parameter_lists[1:64]
+endemic_simulation_parameter_list_65_128 <- parameter_lists[65:128]
+endemic_simulation_parameter_list_129_192 <- parameter_lists[129:192]
+endemic_simulation_parameter_list_193_256 <- parameter_lists[193:256]
+endemic_simulation_parameter_list_257_320 <- parameter_lists[257:320]
+endemic_simulation_parameter_list_321_384 <- parameter_lists[321:384]
+endemic_simulation_parameter_list_385_448 <- parameter_lists[385:448]
+endemic_simulation_parameter_list_449_512 <- parameter_lists[449:512]
+endemic_simulation_parameter_list_513_576 <- parameter_lists[513:576]
+endemic_simulation_parameter_list_577_640 <- parameter_lists[577:640]
+endemic_simulation_parameter_list_641_704 <- parameter_lists[641:704]
+endemic_simulation_parameter_list_705_768 <- parameter_lists[705:768]
+endemic_simulation_parameter_list_769_832 <- parameter_lists[769:832]
+endemic_simulation_parameter_list_833_896 <- parameter_lists[833:896]
+endemic_simulation_parameter_list_897_960 <- parameter_lists[897:960]
+endemic_simulation_parameter_list_961_1024 <- parameter_lists[961:1024]
+endemic_simulation_parameter_list_1025_1088 <- parameter_lists[1025:1088]
+endemic_simulation_parameter_list_1089_1152 <- parameter_lists[1089:1152]
+endemic_simulation_parameter_list_1153_1216 <- parameter_lists[1153:1216]
+endemic_simulation_parameter_list_1217_1280 <- parameter_lists[1217:1280]
+endemic_simulation_parameter_list_1281_1320 <- parameter_lists[1281:1320]
 
 # Save the independent simulation lists:
-saveRDS(object = endemic_simulation_parameter_list_1_32, file = "./Report_3_Endemic/endemic_parameter_list_1.rds")
-saveRDS(object = endemic_simulation_parameter_list_33_64, file = "./Report_3_Endemic/endemic_parameter_list_2.rds")
-saveRDS(object = endemic_simulation_parameter_list_65_96, file = "./Report_3_Endemic/endemic_parameter_list_3.rds")
-saveRDS(object = endemic_simulation_parameter_list_97_128, file = "./Report_3_Endemic/endemic_parameter_list_4.rds")
-saveRDS(object = endemic_simulation_parameter_list_129_160, file = "./Report_3_Endemic/endemic_parameter_list_5.rds")
-saveRDS(object = endemic_simulation_parameter_list_161_192, file = "./Report_3_Endemic/endemic_parameter_list_6.rds")
-saveRDS(object = endemic_simulation_parameter_list_193_200, file = "./Report_3_Endemic/endemic_parameter_list_7.rds")
+saveRDS(object = endemic_simulation_parameter_list_1_64, file = "endemic_simulation_parameter_list_1_64.rds")
+saveRDS(object = endemic_simulation_parameter_list_65_128, file = "endemic_simulation_parameter_list_65_128.rds")
+saveRDS(object = endemic_simulation_parameter_list_129_192, file = "endemic_simulation_parameter_list_129_192.rds")
+saveRDS(object = endemic_simulation_parameter_list_193_256, file = "endemic_simulation_parameter_list_193_256.rds")
+saveRDS(object = endemic_simulation_parameter_list_257_320, file = "endemic_simulation_parameter_list_257_320.rds")
+saveRDS(object = endemic_simulation_parameter_list_321_384, file = "endemic_simulation_parameter_list_321_384.rds")
+saveRDS(object = endemic_simulation_parameter_list_385_448, file = "endemic_simulation_parameter_list_385_448.rds")
+saveRDS(object = endemic_simulation_parameter_list_449_512, file = "endemic_simulation_parameter_list_449_512.rds")
+saveRDS(object = endemic_simulation_parameter_list_513_576, file = "endemic_simulation_parameter_list_513_576.rds")
+saveRDS(object = endemic_simulation_parameter_list_577_640, file = "endemic_simulation_parameter_list_577_640.rds")
+saveRDS(object = endemic_simulation_parameter_list_641_704, file = "endemic_simulation_parameter_list_641_704.rds")
+saveRDS(object = endemic_simulation_parameter_list_705_768, file = "endemic_simulation_parameter_list_705_768.rds")
+saveRDS(object = endemic_simulation_parameter_list_769_832, file = "endemic_simulation_parameter_list_769_832.rds")
+saveRDS(object = endemic_simulation_parameter_list_833_896, file = "endemic_simulation_parameter_list_833_896.rds")
+saveRDS(object = endemic_simulation_parameter_list_897_960, file = "endemic_simulation_parameter_list_897_960.rds")
+saveRDS(object = endemic_simulation_parameter_list_961_1024, file = "endemic_simulation_parameter_list_961_1024.rds")
+saveRDS(object = endemic_simulation_parameter_list_1025_1088, file = "endemic_simulation_parameter_list_1025_1088.rds")
+saveRDS(object = endemic_simulation_parameter_list_1089_1152, file = "endemic_simulation_parameter_list_1089_1152.rds")
+saveRDS(object = endemic_simulation_parameter_list_1153_1216, file = "endemic_simulation_parameter_list_1153_1216.rds")
+saveRDS(object = endemic_simulation_parameter_list_1217_1280, file = "endemic_simulation_parameter_list_1217_1280.rds")
+saveRDS(object = endemic_simulation_parameter_list_1281_1320, file = "endemic_simulation_parameter_list_1281_1320.rds")
 
 #----- 4) Charlie's Sanity Checks ------------------------------------------------------------------
 
