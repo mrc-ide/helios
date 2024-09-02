@@ -50,9 +50,9 @@ uvc_joint_coverage_type <- c("random", "targeted_riskiness")
 
 # Specify the setting-specific sizes per individual:
 setting_size_per_ind_workplace <- 10
-setting_size_per_ind_school <- 30
-setting_size_per_ind_leisure <- 50
-setting_size_per_ind_household <- 5
+setting_size_per_ind_school <- 3.33
+setting_size_per_ind_leisure <- 2
+setting_size_per_ind_household <- 20
 
 # Set up the unique simulations to run
 simulations_to_run <- expand.grid("archetype" = archetypes,

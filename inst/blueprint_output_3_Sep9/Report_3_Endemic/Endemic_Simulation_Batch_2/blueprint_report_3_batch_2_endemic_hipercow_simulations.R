@@ -64,7 +64,8 @@ job_ids <- c(sim_out_batch_1,
 # Load the job IDs:
 #job_ids <- readRDS("./Report_3_Endemic/first_batch_job_ids.rds")
 
-##' Last simulation set off at 01:41am on Friday 30th August 2024
+##' Last simulation set off at 01:41am on Friday 30th August 2024, all were completed by 10:50am on
+##' the following morning (~ 9 hours).
 
 # View the task statuses:
 task_status(sim_out_batch_2_1)
