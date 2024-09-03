@@ -273,8 +273,8 @@ indices_post_UVC <- round(((years_to_simulate - 2) * 365) / parameter_lists[[i]]
 
 proc_outputs <- lapply(results1, function(x) {
   df <- data.frame(ID = unique(x$ID),
-                   avg_pre_UVC = sum(x$E_new[indices_prev_UVC]) / 3,
-                   avg_post_UVC = sum(x$E_new[indices_post_UVC]) / 3,
+                   avg_pre_UVC = sum(x$E_new[indices_prev_UVC]) / 2, ## this might not be right, need to check whether 3 or 2 - I think it's 2
+                   avg_post_UVC = sum(x$E_new[indices_post_UVC]) / 2, ## this might not be right, need to check whether 3 or 2 - I think it's 2
                    avg_prev_pre_UVC = mean(x$I_count[indices_prev_UVC]),
                    avg_prev_post_UVC = mean(x$I_count[indices_post_UVC])) %>%
     mutate(reduction_incidence = 1 - avg_post_UVC / avg_pre_UVC) %>%
