@@ -128,7 +128,7 @@ ggplot(riskiness, aes(riskiness)) +
 
 ```
 
-The modelling framework is now able to accommodate targeting of far UVC in a manner based on the riskiness of a location. Below we show how assignment of far UVC works for the two targeting strategies - these strategies are referred to as "random" (far UVC assigned randomly to locations, irrespective of their riskiness) or "targeted riskiness" (far UVC assigned to locations based on the rank ordered riskiness of each setting):
+The modelling framework is now able to accommodate targeting of far UVC in a manner based on the riskiness of a location. Below we show how assignment of far UVC works for the two targeting strategies for an example where far UVC is installed to cover 50% of total School, Workplace and Leisure location area. The two strategies are "random" (far UVC assigned randomly to locations, irrespective of their riskiness) and "targeted riskiness" (far UVC assigned to locations based on the rank ordered riskiness of each setting).
 
 ```{r riskiness-coverage-exemplar, fig.cap="(ref:riskiness-coverage-exemplar)", fig.fullwidth = TRUE, fig.height=5}
 
@@ -173,7 +173,7 @@ uvc_square_footage_targeted <- c(switches_square_footage_targeted$uvc_school,
                                switches_square_footage_targeted$uvc_workplace)
 
 ## Plotting
-data.frame(setting_type = c(location_types_random, location_types_targeted), 
+x <- data.frame(setting_type = c(location_types_random, location_types_targeted), 
            riskiness = c(riskiness_square_footage_random, riskiness_square_footage_targeted),
            uvc = c(uvc_square_footage_random, uvc_square_footage_targeted),
            type = c(rep("Random Targeting of Far UVC", length(riskiness_square_footage_random)), 
@@ -182,8 +182,9 @@ data.frame(setting_type = c(location_types_random, location_types_targeted),
   mutate(rank = row_number()) |>
   mutate(
     chosen2 = ifelse(uvc == 1, "Yes", "No")
-  )|>
-  ggplot(aes(x = rank, y = riskiness, 
+  )
+
+ggplot(x, aes(x = rank, y = riskiness, 
              col = chosen2, fill = chosen2)) +
   geom_bar(stat = "identity", alpha = 1, position = position_dodge()) +
   facet_wrap(~ type) +
@@ -194,30 +195,49 @@ data.frame(setting_type = c(location_types_random, location_types_targeted),
        fill = "Far UVC Installed?") +
   theme(legend.position = "bottom")
 
-
 ```
-
-This is for an example where far UVC is installed to cover 50% of total School, Workplace and Leisure location area.
 
 # Assessing the impact of far UVC on the burden of endemic respiratory viruses {#assessing}
 
-Using the modelling framework described above, we conducted analyses to evaluate the potential impact of far UVC deployment on the transmission and disease burden of a hypothetical endemic respiratory virus (i.e. one which is consistently present in a population and maintained at a particular baseline prevalence level).
+Using the updated modelling framework described above, we conducted analyses evaluating the potential impact of far UVC deployment on the transmission and disease burden of a hypothetical respiratory virus. We considered two pathogen archetypes (described in detail below) and present analyses for both an endemic pathogen (i.e. one which is consistently present in a population and maintained at a particular baseline prevalence level) and an epidemic one (i.e. one which is previously not present in the population, and which emerges to cause an epidemic).
 
 ## Results
 
 We considered two pathogen archetypes for this hypothetical virus:
 
--   **"SARS-CoV-2-Like" Archetype** - $R_0$ of 2.5, a mean latent period of 2 days, a mean duration of infectiousness of 4 days, and a mean duration of immunity of 365 days. This gives an approximate infection prevalence of 1% (i.e. approximately 1 in 100 individuals are infected at any given timepoint).
+-   **"SARS-CoV-2-Like" Archetype** - $R_0$ of 2.5, a mean latent period of 2 days, a mean duration of infectiousness of 4 days.
 
--   **"Influenza-Like" Archetype** - $R_0$ of 1.5, a mean latent period of 1 day, a mean duration of infectiousness of 2 days, and a mean duration of immunity of 365 days. This gives an approximate infection prevalence of 0.3% (i.e. 1 in 330 individuals infected at any given timepoint).
+-   **"Influenza-Like" Archetype** - $R_0$ of 1.5, a mean latent period of 1 day, a mean duration of infectiousness of 2 days.
+
+For the epidemic pathogen, we assume that immunity arising from infection lasts for an individual's lifetime. Endemicity arises (in part) due to the finite nature of immunity arising from infection with a pathogen. For the endemic pathogen, we therefore assume a mean duration of immunity of 365 days. This gives an approximate infection prevalence of 1% for SARS-CoV-2 (i.e. approximately 1 in 100 individuals are infected at any given timepoint) and 0.3% for influenza (i.e. 1 in 330 individuals infected at any given timepoint).
 
 For each pathogen archetype, we investigated the effect of far UVC efficacy and far UVC coverage on the annual incidence of infection, varying:
 
--   **far UVC Coverage:** Either 10%, 25% or 50% - in all cases, far UVC was assumed to be installed in schools, workplaces and leisure locations only (i.e. not households), at a random set of locations within each Setting Type.
+-   **far UVC Coverage:** Between 0% and 80%, in increments of 10%. In all cases, far UVC was assumed to be installed in schools, workplaces and leisure locations only (i.e. not households), either at a random set of locations or based on their riskiness.
 
 -   **far UVC Efficacy:** Either 40%, 60% or 80%, with the assumption that far UVC efficacy was identical across all Settings and Locations where it had been installed.
 
-The results of these analyses are presented in Figure \@ref(fig:placeholder-1). In general, we estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
+All presented results are based on summary statistics (e.g. mean, range etc) calculated based on 20 stochastic replicates. 
+
+### Epidemic Pathogen Analyses
+
+The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in Figure \@ref(fig:epidemic-pathogen-figure-1) and Figure \@ref(fig:epidemic-pathogen-figure-2). We consider three metrics to evaluate the impact of far UVC in the case of an epidemic pathogen. The first is the number of infection individuals at the peak of transmission (hereafter referred to as "peak size", see Figure \@ref(fig:epidemic-pathogen-figure-1)); the second is the timing of this peak (hereafter referred to as "peak timing"); and the third is the total number of individuals infected over the course of the epidemic (hereafter referred to as "final epidemic size", see Figure \@ref(fig:epidemic-pathogen-figure-2). 
+
+In terms of "peak size", assuming 10% coverage and 60% efficacy, far UVC installation led to a A% (range B%-C%) reduction in annual infection incidence for "Influenza-Like" and X% (range Y%-Z%) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively. Increasing far UVC coverage led to progressively higher impact (i.e. greater reduction in peak size), with a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen. Under some scenarios (e.g. X% coverage and Y% efficacy), far UVC installation was sufficient to prevent the epidemic occurring entirely, though an important limitation here is that we do not explicitly model imported infections from other locations (which typically sustain an epidemic).
+
+In terms of "peak timing", assuming 10% coverage and 60% efficacy, far UVC installation led to the peak occurring A days (range B-C days) later for "Influenza-Like" and X days (range Y days-Z days) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are A days (range B - C days) and X days (range Y days - Z days) respectively.In terms of "epidemic final size", assuming 10% coverage and 60% efficacy, far UVC installation led to a total of A% (range B%-C%) of the population becoming infected for the "Influenza-Like" pathogen, and X% (range Y%-Z%) for the "SARS-CoV-2-Like" pathogen. At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively.
+
+
+An important point here is that there is significant value to far UVC in an epidemic pathogen situation, even when it does not achive complete suppression of the epidemic (i.e. reducing R < 1 and preventing it occurring). Reductions in transmission that fall short of full suppression arising from far UVC are still useful in that they 1) reduce the associated pressure on healthcare systems (by reducing peak size and spreading burden out over time - the so-called "flattening of the curve"); 2) push the epidemic later into the future (providing more time for other medical countermeasures such as vaccines to be developed); and 3) for the same disease burden, enable shorter and less stringent non-pharmaceutical interventions to be implemented compared to a scenario in which far UVC is not available. 
+
+
+
+We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
+
+
+### Endemic Pathogen Analyses
+
+The results of these analyses are presented in Figure \@ref(fig:placeholder-1). We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
 
 ```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
 
