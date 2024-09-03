@@ -15,11 +15,12 @@ library(hipercow)
 library(tidyverse)
 library(helios)
 library(patchwork)
+library(individual)
 
 #----- 1) hipercow Set-Up --------------------------------------------------------------------------
 
-# Set working directory (form main package directory:
-setwd("./inst/blueprint_output_3_Sep9/")
+# Set working directory to where provision.R is:
+setwd("./inst/blueprint_output_3_Sep9")
 
 ## Prepare for cluster use
 ## see https://mrc-ide.github.io/hipercow/
@@ -38,34 +39,8 @@ hipercow::hipercow_configuration()
 # Create the environment for hipercow
 hipercow_environment_create(packages = c("individual", "helios", "tidyverse", "dqrng", "EnvStats"))
 
-# Store the job IDs:
-job_ids <- c(sim_out_batch_1,
-             sim_out_batch_2,
-             sim_out_batch_3,
-             sim_out_batch_4,
-             sim_out_batch_5,
-             sim_out_batch_6,
-             sim_out_batch_7,
-             sim_out_batch_8,
-             sim_out_batch_9,
-             sim_out_batch_10,
-             sim_out_batch_11,
-             sim_out_batch_12,
-             sim_out_batch_13,
-             sim_out_batch_14,
-             sim_out_batch_15,
-             sim_out_batch_16,
-             sim_out_batch_17,
-             sim_out_batch_18,
-             sim_out_batch_19,
-             sim_out_batch_20)
-#saveRDS(object = job_ids, file = "./Report_3_Endemic/first_batch_job_ids.rds")
-
 # Load the job IDs:
 #job_ids <- readRDS("./Report_3_Endemic/first_batch_job_ids.rds")
-
-##' Last simulation set off at 01:41am on Friday 30th August 2024, all were completed by 10:50am on
-##' the following morning (~ 9 hours).
 
 # View the task statuses:
 task_status(sim_out_batch_2_1)
@@ -99,7 +74,7 @@ sim_out_batch_2_1 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_1_64.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_1_64.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -113,7 +88,7 @@ sim_out_batch_2_1 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_1,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_1.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_1.rds")
 
   }),
 
@@ -135,7 +110,7 @@ sim_out_batch_2_2 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_65_128.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_65_128.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -149,7 +124,7 @@ sim_out_batch_2_2 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_2,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_2.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_2.rds")
 
   }),
 
@@ -171,7 +146,7 @@ sim_out_batch_2_3 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_129_192.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_129_192.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -185,7 +160,7 @@ sim_out_batch_2_3 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_3,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_3.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_3.rds")
 
   }),
 
@@ -207,7 +182,7 @@ sim_out_batch_2_4 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_193_256.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_193_256.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -221,7 +196,7 @@ sim_out_batch_2_4 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_4,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_4.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_4.rds")
 
   }),
 
@@ -243,7 +218,7 @@ sim_out_batch_2_5 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_257_320.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_257_320.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -257,7 +232,7 @@ sim_out_batch_2_5 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_5,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_5.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_5.rds")
 
   }),
 
@@ -268,7 +243,7 @@ sim_out_batch_2_5 <- hipercow::task_create_explicit(
 
 # Check the task progress:
 task_status(sim_out_batch_2_5)
-task_result(sim_out_batch_2_5)
+#task_result(sim_out_batch_2_5)
 
 #----- 7) Batch 6: Simulations 321:384 -------------------------------------------------------------
 
@@ -279,7 +254,7 @@ sim_out_batch_2_6 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_321_384.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_321_384.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -293,7 +268,7 @@ sim_out_batch_2_6 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_6,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_6.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_6.rds")
 
   }),
 
@@ -315,7 +290,7 @@ sim_out_batch_2_7 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_385_448.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_385_448.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -329,7 +304,7 @@ sim_out_batch_2_7 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_7,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_7.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_7.rds")
 
   }),
 
@@ -351,7 +326,7 @@ sim_out_batch_2_8 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_449_512.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_449_512.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -365,7 +340,7 @@ sim_out_batch_2_8 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_8,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_8.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_8.rds")
 
   }),
 
@@ -387,7 +362,7 @@ sim_out_batch_2_9 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_513_576.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_513_576.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -401,7 +376,7 @@ sim_out_batch_2_9 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_9,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_9.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_9.rds")
 
   }),
 
@@ -423,7 +398,7 @@ sim_out_batch_2_10 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_577_640.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_577_640.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -437,7 +412,7 @@ sim_out_batch_2_10 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_10,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_10.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_10.rds")
 
   }),
 
@@ -459,7 +434,7 @@ sim_out_batch_2_11 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_641_704.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_641_704.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -473,7 +448,7 @@ sim_out_batch_2_11 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_11,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_11.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_11.rds")
 
   }),
 
@@ -495,7 +470,7 @@ sim_out_batch_2_12 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_705_768.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_705_768.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -509,7 +484,7 @@ sim_out_batch_2_12 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_12,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_12.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_12.rds")
 
   }),
 
@@ -531,7 +506,7 @@ sim_out_batch_2_13 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_769_832.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_769_832.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -545,7 +520,7 @@ sim_out_batch_2_13 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_13,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_13.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_13.rds")
 
   }),
 
@@ -567,7 +542,7 @@ sim_out_batch_2_14 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_833_896.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_833_896.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -581,7 +556,7 @@ sim_out_batch_2_14 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_14,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_14.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_14.rds")
 
   }),
 
@@ -603,7 +578,7 @@ sim_out_batch_2_15 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_897_960.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_897_960.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -617,7 +592,7 @@ sim_out_batch_2_15 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_15,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_15.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_15.rds")
 
   }),
 
@@ -639,7 +614,7 @@ sim_out_batch_2_16 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_961_1024.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_961_1024.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -653,7 +628,7 @@ sim_out_batch_2_16 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_16,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_16.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_16.rds")
 
   }),
 
@@ -675,7 +650,7 @@ sim_out_batch_2_17 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_1025_1088.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_1025_1088.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -689,7 +664,7 @@ sim_out_batch_2_17 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_17,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_17.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_17.rds")
 
   }),
 
@@ -711,7 +686,7 @@ sim_out_batch_2_18 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_1089_1152.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_1089_1152.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -725,7 +700,7 @@ sim_out_batch_2_18 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_18,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_18.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_18.rds")
 
   }),
 
@@ -747,7 +722,7 @@ sim_out_batch_2_19 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_1153_1216.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_1153_1216.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -761,7 +736,7 @@ sim_out_batch_2_19 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_19,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_19.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_19.rds")
 
   }),
 
@@ -783,7 +758,7 @@ sim_out_batch_2_20 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_1217_1280.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_1217_1280.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -797,7 +772,7 @@ sim_out_batch_2_20 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_20,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_20.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_20.rds")
 
   }),
 
@@ -819,7 +794,7 @@ sim_out_batch_2_21 <- hipercow::task_create_explicit(
   expr = quote({
 
     # Load in the parameter lists:
-    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_simulation_parameter_list_1281_1320.rds")
+    parameters <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_inputs/endemic_simulation_parameter_list_1281_1320.rds")
 
     # Load in the run_simulations_hipercow() function:
     source("Report_3_Endemic/run_simulations_hipercow.R")
@@ -833,7 +808,7 @@ sim_out_batch_2_21 <- hipercow::task_create_explicit(
 
     # Store the simulation outputs:
     saveRDS(object = scenario_output_batch_2_21,
-            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_outputs/scenario_output_batch_2_21.rds")
+            file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/scenario_output_batch_2_21.rds")
 
   }),
 
@@ -845,3 +820,30 @@ sim_out_batch_2_21 <- hipercow::task_create_explicit(
 # Check the task progress:
 task_status(sim_out_batch_2_21)
 #task_result(sim_out_batch_2_21)
+
+#----- 23) Save the job IDs for each batch ---------------------------------------------------------
+
+# Store the job IDs:
+job_ids <- c(sim_out_batch_2_1,
+             sim_out_batch_2_2,
+             sim_out_batch_2_3,
+             sim_out_batch_2_4,
+             sim_out_batch_2_5,
+             sim_out_batch_2_6,
+             sim_out_batch_2_7,
+             sim_out_batch_2_8,
+             sim_out_batch_2_9,
+             sim_out_batch_2_10,
+             sim_out_batch_2_11,
+             sim_out_batch_2_12,
+             sim_out_batch_2_13,
+             sim_out_batch_2_14,
+             sim_out_batch_2_15,
+             sim_out_batch_2_16,
+             sim_out_batch_2_17,
+             sim_out_batch_2_18,
+             sim_out_batch_2_19,
+             sim_out_batch_2_20,
+             sim_out_batch_2_21)
+saveRDS(object = job_ids, file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/batch_2_b_job_ids.rds")
+
