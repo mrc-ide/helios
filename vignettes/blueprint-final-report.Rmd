@@ -217,23 +217,31 @@ For each pathogen archetype, we investigated the effect of far UVC efficacy and 
 
 -   **far UVC Efficacy:** Either 40%, 60% or 80%, with the assumption that far UVC efficacy was identical across all Settings and Locations where it had been installed.
 
-All presented results are based on summary statistics (e.g. mean, range etc) calculated based on 20 stochastic replicates. 
+All presented results are based on summary statistics (e.g. mean, range etc) calculated based on 20 stochastic replicates.
 
 ### Epidemic Pathogen Analyses
 
-The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in Figure \@ref(fig:epidemic-pathogen-figure-1) and Figure \@ref(fig:epidemic-pathogen-figure-2). We consider three metrics to evaluate the impact of far UVC in the case of an epidemic pathogen. The first is the number of infection individuals at the peak of transmission (hereafter referred to as "peak size", see Figure \@ref(fig:epidemic-pathogen-figure-1)); the second is the timing of this peak (hereafter referred to as "peak timing"); and the third is the total number of individuals infected over the course of the epidemic (hereafter referred to as "final epidemic size", see Figure \@ref(fig:epidemic-pathogen-figure-2). 
+The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in Figure \@ref(fig:epidemic-pathogen-figure-1) and Figure \@ref(fig:epidemic-pathogen-figure-2). We consider three metrics to evaluate the impact of far UVC in the case of an epidemic pathogen. The first is the number of infection individuals at the peak of transmission (hereafter referred to as "peak size", see Figure \@ref(fig:epidemic-pathogen-figure-1)); the second is the timing of this peak (hereafter referred to as "peak timing"); and the third is the total number of individuals infected over the course of the epidemic (hereafter referred to as "final epidemic size", see Figure \@ref(fig:epidemic-pathogen-figure-2).
 
-In terms of "peak size", assuming 10% coverage and 60% efficacy, far UVC installation led to a A% (range B%-C%) reduction in annual infection incidence for "Influenza-Like" and X% (range Y%-Z%) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively. Increasing far UVC coverage led to progressively higher impact (i.e. greater reduction in peak size), with a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen. Under some scenarios (e.g. X% coverage and Y% efficacy), far UVC installation was sufficient to prevent the epidemic occurring entirely, though an important limitation here is that we do not explicitly model imported infections from other locations (which typically sustain an epidemic).
+#### Epidemic Peak Size
 
-In terms of "peak timing", assuming 10% coverage and 60% efficacy, far UVC installation led to the peak occurring A days (range B-C days) later for "Influenza-Like" and X days (range Y days-Z days) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are A days (range B - C days) and X days (range Y days - Z days) respectively.In terms of "epidemic final size", assuming 10% coverage and 60% efficacy, far UVC installation led to a total of A% (range B%-C%) of the population becoming infected for the "Influenza-Like" pathogen, and X% (range Y%-Z%) for the "SARS-CoV-2-Like" pathogen. At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively.
+Assuming 10% coverage and 60% efficacy, far UVC installation led to a A% (range B%-C%) reduction in the epidemic peak size the "Influenza-Like" archetype, and X% (range Y%-Z%) for the "SARS-CoV-2-Like" archetype. At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively. Increasing far UVC coverage led to progressively higher impact (i.e. greater reduction in peak size), with a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen. Under some scenarios (e.g. X% coverage and Y% efficacy), far UVC installation was sufficient to prevent the epidemic occurring entirely, though an important limitation here is that we do not explicitly model imported infections from other locations (which typically sustain an epidemic).
 
+#### Epidemic Peak Timing
 
-An important point here is that there is significant value to far UVC in an epidemic pathogen situation, even when it does not achive complete suppression of the epidemic (i.e. reducing R < 1 and preventing it occurring). Reductions in transmission that fall short of full suppression arising from far UVC are still useful in that they 1) reduce the associated pressure on healthcare systems (by reducing peak size and spreading burden out over time - the so-called "flattening of the curve"); 2) push the epidemic later into the future (providing more time for other medical countermeasures such as vaccines to be developed); and 3) for the same disease burden, enable shorter and less stringent non-pharmaceutical interventions to be implemented compared to a scenario in which far UVC is not available. 
+For 10% coverage and 60% efficacy, far UVC installation led to the epidmic peak occurring A days (range B-C days) later for the "Influenza-Like" archetype and X days (range Y days-Z days) for the "SARS-CoV-2-Like" archetype, compared to a situation in which far UVC has not been installed. At 10% coverage and 80% assumed efficacy, these are A days (range B - C days) and X days (range Y days - Z days) respectively. Increasing far UVC coverage and/or efficacy led to further delays in the timing of the peak.
 
+#### Epidemic Final Size
 
+For 10% coverage and 60% efficacy, far UVC installation led to a reduction in the total % of the population becoming infected by A% (range B%-C%) for the "Influenza-Like" archetype. Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. For the "SARS-CoV-2-Like" archetype, Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. This corresponds to a reduction in the total % of the population becoming infected by A% (range B%-C%).
 
-We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
+#### Discussion
 
+The above results highlight:
+
+-   Something here about generally higher (relative) impact on influenza than SARS-CoV-2 (because the former has a lower starting R0; and how this relates to the non-linear nature of the fraction of transmission you have to avert to reduce R0 to 1).
+
+An important point here is that there is significant value to far UVC in an epidemic pathogen situation, even when it does not achive complete suppression of the epidemic (i.e. reducing R \< 1 and preventing it occurring). Reductions in transmission that fall short of full suppression arising from far UVC are still useful in that they 1) reduce the associated pressure on healthcare systems (by reducing peak size and spreading burden out over time - the so-called "flattening of the curve"); 2) push the epidemic later into the future (providing more time for other medical countermeasures such as vaccines to be developed); and 3) for the same disease burden, enable shorter and less stringent non-pharmaceutical interventions to be implemented compared to a scenario in which far UVC is not available.
 
 ### Endemic Pathogen Analyses
 
@@ -442,6 +450,15 @@ b <- ggplot(durVary_infection_prevalence2, aes(x = `Duration of Infectiousness`,
 
 cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
 
+R0 <- seq(1, 4, 0.1)
+ggplot(overall_R0_df, aes(x = 1/R0, y = prevalence, col = archetype)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = 1/(c(4, 3, 2, 1)),
+                     labels = c(4, 3, 2, 1)) +
+  theme_bw() +
+  labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)",
+       col = "Pathogen\nArchetype")
 
 ```
 
