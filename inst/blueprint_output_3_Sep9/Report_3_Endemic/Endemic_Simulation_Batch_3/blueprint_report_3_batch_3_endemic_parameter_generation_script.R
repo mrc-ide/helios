@@ -5,8 +5,6 @@
 #+++ Introduction +++#
 #++++++++++++++++++++#
 
-
-
 #----- 1) Preamble ---------------------------------------------------------------------------------
 
 # Set the working directory in the Endemic_Simulation_Batch_3 folder:
@@ -220,8 +218,8 @@ for(i in 1:nrow(simulations_to_run)) {
 }
 
 # Save the parameter lists and the simulations dataframe:
-saveRDS(simulations_to_run, file = "./endemic_batch_3_inputs/endemic_simulations_table_batch_3.rds")
-saveRDS(parameter_lists, file = "./endemic_batch_3_inputs/endemic_simulations_parameter_lists_batch_3.rds")
+saveRDS(simulations_to_run, file = "./endemic_simulations_table_batch_3.rds")
+saveRDS(parameter_lists, file = "./endemic_simulations_parameter_lists_batch_3.rds")
 
 #----- 3) Batch Saving -----------------------------------------------------------------------------
 
@@ -232,7 +230,7 @@ number_of_simulations <- length(parameter_lists)
 nodes_to_use <- 30
 
 # Get the number of simulations per node:
-simulations_per_node <- number_of_simulations / nodes_to_use
+simulations_per_node <- number_of_simulations / nodes_to_use; simulations_per_node
 
 # Get the lower bound of each simulation batch:
 lower_bounds <- simulations_per_node * c(0, head(seq(nodes_to_use), -1)) + 1
@@ -247,8 +245,11 @@ for(i in 1:length(lower_bounds)) {
 
   # Save the parameter list as an object
   saveRDS(object = get(paste0("endemic_simulation_parameter_list_", lower_bounds[i], "_", upper_bounds[i])),
-          file = paste0("./endemic_batch_3_inputs/endemic_simulation_parameter_list_", lower_bounds[i], "_", upper_bounds[i], ".rds"))
+          file = paste0("./endemic_batch_3_inputs/endemic_simulation_parameter_list_", i, "_", lower_bounds[i], "_", upper_bounds[i], ".rds"))
 
 }
+
+# Store an object with the batch indices:
+saveRDS(1:nodes_to_use, "./batches.rds")
 
 #--------------------------------------------------------------------------------------------------#
