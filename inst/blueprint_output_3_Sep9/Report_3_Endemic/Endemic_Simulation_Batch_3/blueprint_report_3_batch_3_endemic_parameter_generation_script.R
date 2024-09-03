@@ -9,6 +9,9 @@
 
 #----- 1) Preamble ---------------------------------------------------------------------------------
 
+# Set the working directory in the Endemic_Simulation_Batch_3 folder:
+setwd("./inst/blueprint_output_3_Sep9/Report_3_Endemic/Endemic_Simulation_Batch_3/")
+
 # Load in the requisite packages:
 library(helios)
 library(tidyverse)
@@ -18,7 +21,7 @@ library(individual)
 #----- 2) Parameter Sweep Set-Up -------------------------------------------------------------------
 
 # Number of iterations to simulate for each parameterisation:
-iterations <- seq(20)
+iterations <- seq(25)
 
 # Calculate the simulation_time required to simulate a 2 year period:
 years_to_simulate <- 30
@@ -217,106 +220,35 @@ for(i in 1:nrow(simulations_to_run)) {
 }
 
 # Save the parameter lists and the simulations dataframe:
-saveRDS(simulations_to_run, file = "endemic_simulations_table_batch_2_c.rds")
-saveRDS(parameter_lists, file = "endemic_simulations_parameter_lists_batch_2_c.rds")
+saveRDS(simulations_to_run, file = "./endemic_batch_3_inputs/endemic_simulations_table_batch_3.rds")
+saveRDS(parameter_lists, file = "./endemic_batch_3_inputs/endemic_simulations_parameter_lists_batch_3.rds")
 
 #----- 3) Batch Saving -----------------------------------------------------------------------------
 
-##' I'm going to batch these simulations up into groups of 64 simulations so that each core runs two
-##' run in parallel.
+# Get the number of simulation parameter sets:
+number_of_simulations <- length(parameter_lists)
 
-# Calculate the number of simulations
-num_sims <- length(parameter_lists)
+# Get the number of 32 core nodes you want to distribute the work over
+nodes_to_use <- 30
 
-# View the upper and lower bounds of the parameter batches:
-lower_bounds <- c(1, seq(1, 20, 1) * 64 + 1)
-upper_bounds <- seq(1, 20, 1) * 64
+# Get the number of simulations per node:
+simulations_per_node <- number_of_simulations / nodes_to_use
 
-# Manually save the parameter lists into 21 batches (20 full, 1 remainder)
-endemic_simulation_parameter_list_1_64 <- parameter_lists[1:64]
-endemic_simulation_parameter_list_65_128 <- parameter_lists[65:128]
-endemic_simulation_parameter_list_129_192 <- parameter_lists[129:192]
-endemic_simulation_parameter_list_193_256 <- parameter_lists[193:256]
-endemic_simulation_parameter_list_257_320 <- parameter_lists[257:320]
-endemic_simulation_parameter_list_321_384 <- parameter_lists[321:384]
-endemic_simulation_parameter_list_385_448 <- parameter_lists[385:448]
-endemic_simulation_parameter_list_449_512 <- parameter_lists[449:512]
-endemic_simulation_parameter_list_513_576 <- parameter_lists[513:576]
-endemic_simulation_parameter_list_577_640 <- parameter_lists[577:640]
-endemic_simulation_parameter_list_641_704 <- parameter_lists[641:704]
-endemic_simulation_parameter_list_705_768 <- parameter_lists[705:768]
-endemic_simulation_parameter_list_769_832 <- parameter_lists[769:832]
-endemic_simulation_parameter_list_833_896 <- parameter_lists[833:896]
-endemic_simulation_parameter_list_897_960 <- parameter_lists[897:960]
-endemic_simulation_parameter_list_961_1024 <- parameter_lists[961:1024]
-endemic_simulation_parameter_list_1025_1088 <- parameter_lists[1025:1088]
-endemic_simulation_parameter_list_1089_1152 <- parameter_lists[1089:1152]
-endemic_simulation_parameter_list_1153_1216 <- parameter_lists[1153:1216]
-endemic_simulation_parameter_list_1217_1280 <- parameter_lists[1217:1280]
-endemic_simulation_parameter_list_1281_1320 <- parameter_lists[1281:1320]
+# Get the lower bound of each simulation batch:
+lower_bounds <- simulations_per_node * c(0, head(seq(nodes_to_use), -1)) + 1
+upper_bounds <- simulations_per_node * seq(nodes_to_use)
 
-# Save the independent simulation lists:
-saveRDS(object = endemic_simulation_parameter_list_1_64, file = "endemic_simulation_parameter_list_1_64.rds")
-saveRDS(object = endemic_simulation_parameter_list_65_128, file = "endemic_simulation_parameter_list_65_128.rds")
-saveRDS(object = endemic_simulation_parameter_list_129_192, file = "endemic_simulation_parameter_list_129_192.rds")
-saveRDS(object = endemic_simulation_parameter_list_193_256, file = "endemic_simulation_parameter_list_193_256.rds")
-saveRDS(object = endemic_simulation_parameter_list_257_320, file = "endemic_simulation_parameter_list_257_320.rds")
-saveRDS(object = endemic_simulation_parameter_list_321_384, file = "endemic_simulation_parameter_list_321_384.rds")
-saveRDS(object = endemic_simulation_parameter_list_385_448, file = "endemic_simulation_parameter_list_385_448.rds")
-saveRDS(object = endemic_simulation_parameter_list_449_512, file = "endemic_simulation_parameter_list_449_512.rds")
-saveRDS(object = endemic_simulation_parameter_list_513_576, file = "endemic_simulation_parameter_list_513_576.rds")
-saveRDS(object = endemic_simulation_parameter_list_577_640, file = "endemic_simulation_parameter_list_577_640.rds")
-saveRDS(object = endemic_simulation_parameter_list_641_704, file = "endemic_simulation_parameter_list_641_704.rds")
-saveRDS(object = endemic_simulation_parameter_list_705_768, file = "endemic_simulation_parameter_list_705_768.rds")
-saveRDS(object = endemic_simulation_parameter_list_769_832, file = "endemic_simulation_parameter_list_769_832.rds")
-saveRDS(object = endemic_simulation_parameter_list_833_896, file = "endemic_simulation_parameter_list_833_896.rds")
-saveRDS(object = endemic_simulation_parameter_list_897_960, file = "endemic_simulation_parameter_list_897_960.rds")
-saveRDS(object = endemic_simulation_parameter_list_961_1024, file = "endemic_simulation_parameter_list_961_1024.rds")
-saveRDS(object = endemic_simulation_parameter_list_1025_1088, file = "endemic_simulation_parameter_list_1025_1088.rds")
-saveRDS(object = endemic_simulation_parameter_list_1089_1152, file = "endemic_simulation_parameter_list_1089_1152.rds")
-saveRDS(object = endemic_simulation_parameter_list_1153_1216, file = "endemic_simulation_parameter_list_1153_1216.rds")
-saveRDS(object = endemic_simulation_parameter_list_1217_1280, file = "endemic_simulation_parameter_list_1217_1280.rds")
-saveRDS(object = endemic_simulation_parameter_list_1281_1320, file = "endemic_simulation_parameter_list_1281_1320.rds")
+# Assign each of the simulations to a sub-list:
+for(i in 1:length(lower_bounds)) {
 
-#----- 4) Charlie's Sanity Checks ------------------------------------------------------------------
+  # Store the parameter list batch into a sub-list with a name identifying the simulation set:
+  assign(x = paste0("endemic_simulation_parameter_list_", lower_bounds[i], "_", upper_bounds[i]),
+         value = parameter_lists[lower_bounds[i]:upper_bounds[i]])
 
-x <- results1[[1]]
-indices_prev_UVC <- round(((years_to_simulate - 4) * 365) / parameter_lists[[i]]$dt) : round(((years_to_simulate - 2) * 365) / parameter_lists[[i]]$dt)
-indices_post_UVC <- round(((years_to_simulate - 2) * 365) / parameter_lists[[i]]$dt):(simulation_time_days / parameter_lists[[i]]$dt)
+  # Save the parameter list as an object
+  saveRDS(object = get(paste0("endemic_simulation_parameter_list_", lower_bounds[i], "_", upper_bounds[i])),
+          file = paste0("./endemic_batch_3_inputs/endemic_simulation_parameter_list_", lower_bounds[i], "_", upper_bounds[i], ".rds"))
 
-proc_outputs <- lapply(results1, function(x) {
-  df <- data.frame(ID = unique(x$ID),
-                   avg_pre_UVC = sum(x$E_new[indices_prev_UVC]) / 3,
-                   avg_post_UVC = sum(x$E_new[indices_post_UVC]) / 3,
-                   avg_prev_pre_UVC = mean(x$I_count[indices_prev_UVC]),
-                   avg_prev_post_UVC = mean(x$I_count[indices_post_UVC])) %>%
-    mutate(reduction_incidence = 1 - avg_post_UVC / avg_pre_UVC) %>%
-    mutate(reduction_prevalence = 1 - avg_prev_post_UVC / avg_prev_pre_UVC)
-})
-proc_outputs2 <- bind_rows(proc_outputs)
-proc_outputs3 <- proc_outputs2 %>%
-  left_join(simulations_to_run, by = "ID") %>%
-  group_by(coverage, coverage_type, archetype, efficacy)
+}
 
-head(proc_outputs3)
-ggplot(proc_outputs3, aes(x = coverage, y = reduction_incidence, colour = coverage_type)) +
-  geom_line() +
-  facet_grid(archetype ~ efficacy)
-ggplot(proc_outputs3, aes(x = coverage, y = reduction_prevalence, colour = coverage_type)) +
-  geom_line() +
-  facet_grid(archetype ~ efficacy)
-
-
-num_cores <- 30
-tic()
-results1 <- mclapply(1:length(parameter_lists), mc.cores = num_cores, function(i) {
-  temp <- run_simulation(parameters_list = parameter_lists[[i]])
-  temp$ID <- simulations_to_run$ID[i]
-  return(temp)
-})
-toc()
-Sys.sleep(45)
-saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/full_epidemic_outputs.rds")
-Sys.sleep(15)
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+#--------------------------------------------------------------------------------------------------#
