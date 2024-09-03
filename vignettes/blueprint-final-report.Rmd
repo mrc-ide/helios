@@ -225,15 +225,15 @@ The results of analyses examining the impact of far UVC installation on an epide
 
 #### Epidemic Peak Size
 
-Assuming 10% coverage and 60% efficacy, far UVC installation led to a A% (range B%-C%) reduction in the epidemic peak size the "Influenza-Like" archetype, and X% (range Y%-Z%) for the "SARS-CoV-2-Like" archetype. At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively. Increasing far UVC coverage led to progressively higher impact (i.e. greater reduction in peak size), with a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen. Under some scenarios (e.g. X% coverage and Y% efficacy), far UVC installation was sufficient to prevent the epidemic occurring entirely, though an important limitation here is that we do not explicitly model imported infections from other locations (which typically sustain an epidemic).
+Assuming 10% coverage and 60% efficacy, far UVC installation led to a A% (range B%-C%) reduction in the epidemic peak size the "Influenza-Like" archetype, and X% (range Y%-Z%) for the "SARS-CoV-2-Like" archetype. At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively. Increasing far UVC coverage led to progressively higher impact (i.e. greater reduction in peak size), with a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen. Under some scenarios (e.g. X% coverage and Y% efficacy), far UVC installation was sufficient to prevent the epidemic occurring entirely, though an important limitation here is that we do not explicitly model imported infections from other locations (which typically sustain an epidemic). SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
 
 #### Epidemic Peak Timing
 
-For 10% coverage and 60% efficacy, far UVC installation led to the epidmic peak occurring A days (range B-C days) later for the "Influenza-Like" archetype and X days (range Y days-Z days) for the "SARS-CoV-2-Like" archetype, compared to a situation in which far UVC has not been installed. At 10% coverage and 80% assumed efficacy, these are A days (range B - C days) and X days (range Y days - Z days) respectively. Increasing far UVC coverage and/or efficacy led to further delays in the timing of the peak.
+For 10% coverage and 60% efficacy, far UVC installation led to the epidmic peak occurring A days (range B-C days) later for the "Influenza-Like" archetype and X days (range Y days-Z days) for the "SARS-CoV-2-Like" archetype, compared to a situation in which far UVC has not been installed. At 10% coverage and 80% assumed efficacy, these are A days (range B - C days) and X days (range Y days - Z days) respectively. Increasing far UVC coverage and/or efficacy led to further delays in the timing of the peak. SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
 
 #### Epidemic Final Size
 
-For 10% coverage and 60% efficacy, far UVC installation led to a reduction in the total % of the population becoming infected by A% (range B%-C%) for the "Influenza-Like" archetype. Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. For the "SARS-CoV-2-Like" archetype, Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. This corresponds to a reduction in the total % of the population becoming infected by A% (range B%-C%).
+For 10% coverage and 60% efficacy, far UVC installation led to a reduction in the total % of the population becoming infected by A% (range B%-C%) for the "Influenza-Like" archetype. Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. For the "SARS-CoV-2-Like" archetype, Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. This corresponds to a reduction in the total % of the population becoming infected by A% (range B%-C%). SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
 
 #### Discussion
 
@@ -241,11 +241,15 @@ The above results highlight:
 
 -   Something here about generally higher (relative) impact on influenza than SARS-CoV-2 (because the former has a lower starting R0; and how this relates to the non-linear nature of the fraction of transmission you have to avert to reduce R0 to 1).
 
-An important point here is that there is significant value to far UVC in an epidemic pathogen situation, even when it does not achive complete suppression of the epidemic (i.e. reducing R \< 1 and preventing it occurring). Reductions in transmission that fall short of full suppression arising from far UVC are still useful in that they 1) reduce the associated pressure on healthcare systems (by reducing peak size and spreading burden out over time - the so-called "flattening of the curve"); 2) push the epidemic later into the future (providing more time for other medical countermeasures such as vaccines to be developed); and 3) for the same disease burden, enable shorter and less stringent non-pharmaceutical interventions to be implemented compared to a scenario in which far UVC is not available.
+-   Something here about untargeted and targeted approaches.
+
+-   An important point here is that there is significant value to far UVC in an epidemic pathogen situation, even when it does not achieve complete suppression of the epidemic (i.e. reducing R \< 1 and preventing it occurring). Reductions in transmission that fall short of full suppression arising from far UVC are still useful in that they 1) reduce the associated pressure on healthcare systems (by reducing peak size and spreading burden out over time - the so-called "flattening of the curve"); 2) push the epidemic later into the future (providing more time for other medical countermeasures such as vaccines to be developed); and 3) for the same disease burden, enable shorter and less stringent non-pharmaceutical interventions to be implemented compared to a scenario in which far UVC is not available.
 
 ### Endemic Pathogen Analyses
 
-The results of these analyses are presented in Figure \@ref(fig:placeholder-1). We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
+The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in Figure Figure \@ref(fig:placeholder-1). We consider a single metric for evaluating the impact of far UVC on the endemic pathogen. This is the total estimated annual incidence of new infections with the pathogen.
+
+We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming A% coverage and B% efficacy, far UVC installation led to a C% (range D%-E%) reduction in annual infection incidence for "Influenza-Like" and F% (range G%-H%) for "SARS-CoV-2-Like". At I% coverage and J% assumed efficacy, these are K% (range L%-M%) and N% (range O%-P%) respectively. SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
 
 ```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
 
@@ -322,9 +326,17 @@ ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_
        y = "% Reduction in Annual Incidence of Infection")
 ```
 
-(ref:placeholder-1) The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for "Influenza-Like" and "SARS-CoV-2-Like" pathogen archetypes. The bars represent the mean percentage reduction in infection incidence averaged over the 10 stochastic model simulations run for each parametrisation, with the range of % reduction in incidence across those 10 simulations shown by the error bars.
+(ref:placeholder-1) The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for "Influenza-Like" and "SARS-CoV-2-Like" pathogen archetypes. The bars represent the mean percentage reduction in infection incidence averaged over the 20 stochastic model simulations run for each parametrisation, with the range of % reduction in incidence across those 20 simulations shown by the error bars.
 
-The results of these analyses are presented in Figure \@ref(fig:placeholder-1). In general, we estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
+#### Discussion
+
+The above results highlight:
+
+-   Something here about generally higher (relative) impact on influenza than SARS-CoV-2 (because the former has a lower starting R0; and how this relates to the non-linear nature of the fraction of transmission you have to avert to reduce R0 to 1).
+
+-   Something here about untargeted and targeted approaches.
+
+-   An important point here is that there is significant value to far UVC in an epidemic pathogen situation, even when it does not achieve complete suppression of the epidemic (i.e. reducing R \< 1 and preventing it occurring). Reductions in transmission that fall short of full suppression arising from far UVC are still useful in that they 1) reduce the associated pressure on healthcare systems (by reducing peak size and spreading burden out over time - the so-called "flattening of the curve"); 2) push the epidemic later into the future (providing more time for other medical countermeasures such as vaccines to be developed); and 3) for the same disease burden, enable shorter and less stringent non-pharmaceutical interventions to be implemented compared to a scenario in which far UVC is not available.
 
 We next compared these results to those produced by a simplistic, static multiplicative model of estimated impact calculated by multiplying the coverage and efficacy of the modelled far UVC together and then multiplying this by the proportion of transmission that is "targetable" by far UVC (i.e. the proportion of transmission that occurs outside households). The results of this analyses are plotted below in \@ref(fig:comparison-1). As you can see, this simplified model provides similar estimates to those generated by `helios` for SARS-CoV-2, but significantly underestimates the impact for Influenza.
 
@@ -463,3 +475,4 @@ ggplot(overall_R0_df, aes(x = 1/R0, y = prevalence, col = archetype)) +
 ```
 
 # Bibliography {.unnumbered}
+
