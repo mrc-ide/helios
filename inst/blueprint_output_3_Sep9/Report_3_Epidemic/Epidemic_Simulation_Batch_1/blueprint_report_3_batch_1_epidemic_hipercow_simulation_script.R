@@ -1,6 +1,6 @@
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
-#+++++ Blueprint Report 3: Endemic Simulations Hipercow Script (Batch 3) +++++#
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
+#+++++ Blueprint Report 3: Epidemic Simulations Hipercow Script (Batch 1) +++++#
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 
 #+++ ABOUT +++#
 #+++++++++++++#
@@ -23,7 +23,7 @@ library(stringr)
 ##' Set working directory to where provision.R is (helios/inst/blueprint_output_3_Sep9)
 
 # Read in the parameter table:
-#parameter_table <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_simulations_table_batch_3.rds")
+parameter_table <- readRDS("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_simulations_table_batch_1.rds")
 
 ## Prepare for cluster use
 ## see https://mrc-ide.github.io/hipercow/
@@ -45,29 +45,21 @@ hipercow_environment_create(packages = c("individual", "helios", "tidyverse", "d
 # Load the job IDs:
 #job_ids <- readRDS("./Report_3_Endemic/first_batch_job_ids.rds")
 
-#----- X) Auto-assigning batches to nodes ----------------------------------------------------------
-
-##' Re-runs:
-##' 2
-##' 6
-##' 10
-##' 11
-##' 14
-##' 17
-##' 20
-##' 27
-##'
+#----- 2) Auto-assigning batches to nodes ----------------------------------------------------------
 
 # Store the files to load:
-batches <- list.files("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_inputs/")
+batches <- list.files("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_inputs/")
 batches <- str_sort(batches, numeric = TRUE)
 
 # For each batch, run the simulations:
-n <- 27; for(i in n:n) {
+for(i in 1:length(batches)) {
+
+  # Set a delay
+  Sys.sleep(10)
 
   # Store i as the the batch number:
   batch_number <- i
-  saveRDS(object = batch_number, file = "./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_number.rds")
+  saveRDS(object = batch_number, file = "./Report_3_Epidemic/Epidemic_Simulation_Batch_1/batch_number.rds")
 
   # Print the iteration:
   print(batch_number)
@@ -76,7 +68,7 @@ n <- 27; for(i in n:n) {
   assign(
 
     # Name the object to save the simulation batch ID to:
-    x = paste0("sim_out_batch_3_", i),
+    x = paste0("sim_out_batch_1_", i),
 
     # Assign the object the hipercow ID:
     value = hipercow::task_create_explicit(
@@ -85,19 +77,19 @@ n <- 27; for(i in n:n) {
       expr = quote({
 
         # Store the files to load:
-        batches <- list.files("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_inputs/")
+        batches <- list.files("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_inputs/")
         batches <- str_sort(batches, numeric = TRUE)
 
         # Load the batch number to simulate:
-        batch_number <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_number.rds")
+        batch_number <- readRDS("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/batch_number.rds")
 
         # Load in the i-th batch of parameter lists:
         parameters <- readRDS(
-          file = paste0("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_inputs/", batches[batch_number])
+          file = paste0("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_inputs/", batches[batch_number])
         )
 
         # Load in the run_simulations_hipercow() function:
-        source("Report_3_Endemic/run_simulations_hipercow.R")
+        source("Report_3_Epidemic/run_simulations_hipercow.R")
 
         # Run through the parameter lists and run the hipercow helios script:
         scenario_outputs <- parallel::parLapply(
@@ -109,7 +101,7 @@ n <- 27; for(i in n:n) {
         # Store the simulation outputs:
         saveRDS(
           object = scenario_outputs,
-          file = paste0("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_outputs/scenario_output_batch_3_", batch_number, ".rds")
+          file = paste0("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_outputs/scenario_output_batch_1_", batch_number, ".rds")
         )
 
       }),
@@ -121,35 +113,23 @@ n <- 27; for(i in n:n) {
   )
 }
 
-# Set running at 22:33pm
-hipercow::task_status(sim_out_batch_3_2)
-hipercow::task_status(sim_out_batch_3_6)
-hipercow::task_status(sim_out_batch_3_10)
-hipercow::task_status(sim_out_batch_3_11)
-hipercow::task_status(sim_out_batch_3_14)
-hipercow::task_status(sim_out_batch_3_17)
-hipercow::task_status(sim_out_batch_3_20)
-hipercow::task_status(sim_out_batch_3_27)
-
+task_status(sim_out_batch_1_1)
 
 #----- 3) Save the job IDs for each batch ---------------------------------------------------------
 
 # Load the job IDS:
-job_IDS <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
+#job_IDS <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
 
 # Store the job IDs for each simulation in an object:
 job_IDS <- list()
 
-# Specify the re-run batch numbers
-reruns <- c(2, 6, 10, 11, 14, 17, 20, 27)
-
-for(i in 1:length(reruns)) {
-  job_IDS[[i]] <- get(paste0("sim_out_batch_3_", reruns[i]))
+for(i in 1:length(batches)) {
+  job_IDS[[i]] <- get(paste0("sim_out_batch_1_", i))
 }
 
 # View the current task statuses
-for(i in 1:length(reruns)) {
-  print(reruns[i])
+for(i in 1:length(batches)) {
+  print(batches[i])
   print(task_status(job_IDS[[i]]))
 }
 

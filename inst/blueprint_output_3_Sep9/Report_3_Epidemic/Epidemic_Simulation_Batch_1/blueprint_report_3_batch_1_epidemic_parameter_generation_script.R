@@ -24,7 +24,7 @@
 
 #----- 1) Preamble ---------------------------------------------------------------------------------
 
-# Set the working directory in the Endemic_Simulation_Batch_3 folder:
+# Set the working directory in the Epidemic_Simulation_Batch_3 folder:
 setwd("./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Epidemic_Simulation_Batch_1/")
 
 # Load in the requisite packages:
@@ -243,7 +243,7 @@ for(i in 1:length(lower_bounds)) {
 
   # Save the parameter list as an object
   saveRDS(object = get(paste0("epidemic_simulation_parameter_list_", lower_bounds[i], "_", upper_bounds[i])),
-          file = paste0("./epidemic_batch_1_inputs/endemic_simulation_parameter_list_", i, "_", lower_bounds[i], "_", upper_bounds[i], ".rds"))
+          file = paste0("./epidemic_batch_1_inputs/epidemic_simulation_parameter_list_", i, "_", lower_bounds[i], "_", upper_bounds[i], ".rds"))
 
 }
 
