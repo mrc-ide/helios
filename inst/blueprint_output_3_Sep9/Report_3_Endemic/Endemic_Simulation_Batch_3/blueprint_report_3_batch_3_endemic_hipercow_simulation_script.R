@@ -47,12 +47,23 @@ hipercow_environment_create(packages = c("individual", "helios", "tidyverse", "d
 
 #----- X) Auto-assigning batches to nodes ----------------------------------------------------------
 
+##' Re-runs:
+##' 2
+##' 6
+##' 10
+##' 11
+##' 14
+##' 17
+##' 20
+##' 27
+##'
+
 # Store the files to load:
 batches <- list.files("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_inputs/")
 batches <- str_sort(batches, numeric = TRUE)
 
 # For each batch, run the simulations:
-n <- 30; for(i in n:n) {
+n <- 27; for(i in n:n) {
 
   # Store i as the the batch number:
   batch_number <- i
@@ -110,20 +121,32 @@ n <- 30; for(i in n:n) {
   )
 }
 
-hipercow::task_status(sim_out_batch_3_1)
-hipercow::task_result(sim_out_batch_3_1)
+# Set running at 22:33pm
+hipercow::task_status(sim_out_batch_3_2)
+hipercow::task_status(sim_out_batch_3_6)
+hipercow::task_status(sim_out_batch_3_10)
+hipercow::task_status(sim_out_batch_3_11)
+hipercow::task_status(sim_out_batch_3_14)
+hipercow::task_status(sim_out_batch_3_17)
+hipercow::task_status(sim_out_batch_3_20)
+hipercow::task_status(sim_out_batch_3_27)
+
 
 #----- 3) Save the job IDs for each batch ---------------------------------------------------------
 
 # Store the job IDs for each simulation in an object:
 job_IDS <- list()
-for(i in 1:length(batches)) {
-  job_IDS[[i]] <- get(paste0("sim_out_batch_3_", i))
+
+# Specify the re-run batch numbers
+reruns <- c(2, 6, 10, 11, 14, 17, 20, 27)
+
+for(i in 1:length(reruns)) {
+  job_IDS[[i]] <- get(paste0("sim_out_batch_3_", reruns[i]))
 }
 
 # View the current task statuses
-for(i in 1:length(batches)) {
-  print(i)
+for(i in 1:length(reruns)) {
+  print(reruns[i])
   print(task_status(job_IDS[[i]]))
 }
 
@@ -138,7 +161,4 @@ saveRDS(object = job_IDS, file = "./Report_3_Endemic/Endemic_Simulation_Batch_3/
 
 #----- 3) Save the job IDs for each batch ---------------------------------------------------------
 
-
-
-
-
+length(list.files("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_outputs/"))
