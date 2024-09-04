@@ -127,10 +127,14 @@ for(i in 1:length(batches)) {
   print(task_status(job_IDS[[i]]))
 }
 
-task_result(job_IDS[[9]])
+# Check the status of all jobs running on the cluster:
+x <- sapply(job_IDS, hipercow::task_status); table(x)
+
+# View the failures:
+which(x == "failure")
 
 # Save the job IDs:
-saveRDS(object = job_ids, file = "./Report_3_Endemic/Endemic_Simulation_Batch_2/endemic_batch_2_b_outputs/batch_2_b_job_ids.rds")
+saveRDS(object = job_IDS, file = "./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_job_ids.rds")
 
 #----- 3) Save the job IDs for each batch ---------------------------------------------------------
 
