@@ -34,10 +34,10 @@ library(parallel)
 #----- 2) Parameter Sweep Set-Up -------------------------------------------------------------------
 
 # Number of iterations to simulate for each parameterisation:
-iterations <- seq(10)
+iterations <- seq(25)
 
 # Calculate the simulation_time required to simulate a 2 year period:
-years_to_simulate <- 5
+years_to_simulate <- 10
 simulation_time_days <- (365 * years_to_simulate)
 
 # Specify the timestep on which to switch far_UVC on:
@@ -53,19 +53,19 @@ archetypes <- c("flu", "sars_cov_2")
 riskiness <- c("setting_specific_riskiness")
 
 # Set up a vector of far-UVC efficacies to simulate
-far_uvc_efficacy <- c(0.6, 0.8)
+far_uvc_efficacy <- c(0.4, 0.6, 0.8)
 
 # Set up a vector of far-UVC coverages to simulate:
-far_uvc_joint_coverage <- seq(0, 0.5, by = 0.1)
+far_uvc_joint_coverage <- seq(0, 1, by = 0.1)
 
 # Specify joint far UVC coverage type (random vs targeted)
 uvc_joint_coverage_type <- c("random", "targeted_riskiness")
 
 # Specify the setting-specific sizes per individual:
-setting_size_per_ind_workplace <- 5
-setting_size_per_ind_school <- 2
-setting_size_per_ind_leisure <- 15
-setting_size_per_ind_household <-10
+setting_size_per_ind_workplace <- 10
+setting_size_per_ind_school <- 3.33
+setting_size_per_ind_leisure <- 2
+setting_size_per_ind_household <- 20
 
 # Set up the unique simulations to run
 simulations_to_run <- expand.grid("archetype" = archetypes,
@@ -212,8 +212,8 @@ for(i in 1:nrow(simulations_to_run)) {
   }
 }
 
-#saveRDS(simulations_to_run, file = "./inst/blueprint_output_3_Sep9/endemic_simulations_table.rds")
-#saveRDS(parameter_lists, file = "./inst/blueprint_output_3_Sep9/endemic_simulations_parameter_lists.rds")
+saveRDS(simulations_to_run, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/epidemic_simulations_table.rds")
+saveRDS(parameter_lists, file = "./inst/blueprint_output_3_Sep9/endemic_simulations_parameter_lists.rds")
 
 #----- 3) Simulation Runs --------------------------------------------------------------------------
 
@@ -236,68 +236,68 @@ for(i in 1:nrow(simulations_to_run)) {
 
 #----- 4) Simulation Runs In Parallel ---------------------------------------------------------------
 
-parameter_lists[[1]]
-test_indices <- which(simulations_to_run$iteration == 1)
-num_cores <- 48
-tic()
-results1 <- mclapply(test_indices, mc.cores = num_cores, function(i) {
-  temp <- run_simulation(parameters_list = parameter_lists[[i]])
-  temp$ID <- simulations_to_run$ID[i]
-  return(temp)
-})
-toc()
-Sys.sleep(45)
-saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/test_epidemic_outputs.rds")
-Sys.sleep(15)
-
-proc_outputs <- lapply(results1, function(x) {
-  df <- data.frame(ID = unique(x$ID),
-                   peak = max(x$I_count),
-                   peak_timing = which(x$I_count == max(x$I_count)),
-                   final_size = max(x$R_count))
-})
-proc_outputs2 <- bind_rows(proc_outputs)
-proc_outputs3 <- proc_outputs2 %>%
-  left_join(simulations_to_run, by = "ID")
-
-
-ggplot(proc_outputs3, aes(x = coverage, y = final_size, colour = coverage_type)) +
-  geom_line() +
-  facet_grid(archetype ~ efficacy)
-
-
-ggplot(proc_outputs3, aes(x = coverage, y = peak_timing, colour = coverage_type)) +
-  geom_line() +
-  facet_grid(archetype ~ efficacy)
-
-num_cores <- 30
-tic()
-results1 <- mclapply(1:length(parameter_lists), mc.cores = num_cores, function(i) {
-  temp <- run_simulation(parameters_list = parameter_lists[[i]])
-  temp$ID <- simulations_to_run$ID[i]
-  return(temp)
-})
-toc()
-Sys.sleep(45)
-saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/full_epidemic_outputs.rds")
-Sys.sleep(15)
-
-proc_outputs <- lapply(results1, function(x) {
-  df <- data.frame(ID = unique(x$ID),
-                   peak = max(x$I_count),
-                   peak_timing = which(x$I_count == max(x$I_count)),
-                   final_size = max(x$R_count))
-})
-proc_outputs2 <- bind_rows(proc_outputs)
-proc_outputs3 <- proc_outputs2 %>%
-  left_join(simulations_to_run, by = "ID") %>%
-  group_by(coverage, coverage_type, archetype, efficacy) %>%
-  summarise(peak_timing = mean(peak_timing),
-            final_size = mean(final_size))
-head(proc_outputs3)
-ggplot(proc_outputs3, aes(x = coverage, y = peak_timing, colour = coverage_type)) +
-  geom_line() +
-  facet_grid(archetype ~ efficacy)
-ggplot(proc_outputs3, aes(x = coverage, y = final_size, colour = coverage_type)) +
-  geom_line() +
-  facet_grid(archetype ~ efficacy)
+# parameter_lists[[1]]
+# test_indices <- which(simulations_to_run$iteration == 1)
+# num_cores <- 48
+# tic()
+# results1 <- mclapply(test_indices, mc.cores = num_cores, function(i) {
+#   temp <- run_simulation(parameters_list = parameter_lists[[i]])
+#   temp$ID <- simulations_to_run$ID[i]
+#   return(temp)
+# })
+# toc()
+# Sys.sleep(45)
+# saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/test_epidemic_outputs.rds")
+# Sys.sleep(15)
+#
+# proc_outputs <- lapply(results1, function(x) {
+#   df <- data.frame(ID = unique(x$ID),
+#                    peak = max(x$I_count),
+#                    peak_timing = which(x$I_count == max(x$I_count)),
+#                    final_size = max(x$R_count))
+# })
+# proc_outputs2 <- bind_rows(proc_outputs)
+# proc_outputs3 <- proc_outputs2 %>%
+#   left_join(simulations_to_run, by = "ID")
+#
+#
+# ggplot(proc_outputs3, aes(x = coverage, y = final_size, colour = coverage_type)) +
+#   geom_line() +
+#   facet_grid(archetype ~ efficacy)
+#
+#
+# ggplot(proc_outputs3, aes(x = coverage, y = peak_timing, colour = coverage_type)) +
+#   geom_line() +
+#   facet_grid(archetype ~ efficacy)
+#
+# num_cores <- 30
+# tic()
+# results1 <- mclapply(1:length(parameter_lists), mc.cores = num_cores, function(i) {
+#   temp <- run_simulation(parameters_list = parameter_lists[[i]])
+#   temp$ID <- simulations_to_run$ID[i]
+#   return(temp)
+# })
+# toc()
+# Sys.sleep(45)
+# saveRDS(object = results1, file = "./inst/blueprint_output_3_Sep9/Report_3_Epidemic/Report3_EpidemicSimulation_Outputs/full_epidemic_outputs.rds")
+# Sys.sleep(15)
+#
+# proc_outputs <- lapply(results1, function(x) {
+#   df <- data.frame(ID = unique(x$ID),
+#                    peak = max(x$I_count),
+#                    peak_timing = which(x$I_count == max(x$I_count)),
+#                    final_size = max(x$R_count))
+# })
+# proc_outputs2 <- bind_rows(proc_outputs)
+# proc_outputs3 <- proc_outputs2 %>%
+#   left_join(simulations_to_run, by = "ID") %>%
+#   group_by(coverage, coverage_type, archetype, efficacy) %>%
+#   summarise(peak_timing = mean(peak_timing),
+#             final_size = mean(final_size))
+# head(proc_outputs3)
+# ggplot(proc_outputs3, aes(x = coverage, y = peak_timing, colour = coverage_type)) +
+#   geom_line() +
+#   facet_grid(archetype ~ efficacy)
+# ggplot(proc_outputs3, aes(x = coverage, y = final_size, colour = coverage_type)) +
+#   geom_line() +
+#   facet_grid(archetype ~ efficacy)
