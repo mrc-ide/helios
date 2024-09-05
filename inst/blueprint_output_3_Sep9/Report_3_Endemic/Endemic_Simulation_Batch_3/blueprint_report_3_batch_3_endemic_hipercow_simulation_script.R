@@ -48,22 +48,14 @@ hipercow_environment_create(packages = c("individual", "helios", "tidyverse", "d
 #----- X) Auto-assigning batches to nodes ----------------------------------------------------------
 
 ##' Re-runs:
-##' 2
-##' 6
 ##' 10
-##' 11
-##' 14
-##' 17
-##' 20
-##' 27
-##'
 
 # Store the files to load:
 batches <- list.files("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_inputs/")
 batches <- str_sort(batches, numeric = TRUE)
 
 # For each batch, run the simulations:
-n <- 27; for(i in n:n) {
+n <- 10; for(i in n:n) {
 
   # Store i as the the batch number:
   batch_number <- i
@@ -137,15 +129,12 @@ hipercow::task_status(sim_out_batch_3_27)
 # Store the job IDs for each simulation in an object:
 job_IDS <- list()
 
-# Load the job IDS:
-job_IDS <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
-
-# Specify the re-run batch numbers
-reruns <- c(2, 6, 10, 11, 14, 17, 20, 27)
-
 for(i in 1:length(reruns)) {
   job_IDS[[i]] <- get(paste0("sim_out_batch_3_", reruns[i]))
 }
+
+# Load the job IDS:
+#job_IDS <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
 
 # View the current task statuses
 for(i in 1:length(reruns)) {
@@ -157,11 +146,10 @@ for(i in 1:length(reruns)) {
 x <- sapply(job_IDS, hipercow::task_status); table(x)
 
 # View the failures:
-which(x == "failure")
+which(x == "running")
 
 # Save the job IDs:
 #saveRDS(object = job_IDS, file = "./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
 
-#----- 3) Save the job IDs for each batch ---------------------------------------------------------
-
+# View the number of outputs saved:
 length(list.files("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_outputs/"))
