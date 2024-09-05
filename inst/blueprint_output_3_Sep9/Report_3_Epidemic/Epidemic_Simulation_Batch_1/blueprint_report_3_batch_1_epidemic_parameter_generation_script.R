@@ -212,6 +212,14 @@ for(i in 1:nrow(simulations_to_run)) {
                                      sd = 0.4278,
                                      min = 1/sqrt(5.5),
                                      max = sqrt(5.5)) -> parameter_lists[[i]]
+
+    # Append the simulation parameters
+    parameter_lists[[i]]$ID <- simulations_to_run$ID[i]
+    parameter_lists[[i]]$iteration <- simulations_to_run$iteration[i]
+    parameter_lists[[i]]$pathogen <- simulations_to_run$archetype[i]
+    parameter_lists[[i]]$years_to_simulate <- years_to_simulate
+    parameter_lists[[i]]$timestep_uvc_on <- timestep_uvc_on
+    parameter_lists[[i]]$years_uvc_on_for <- years_uvc_on_for
   }
 }
 
