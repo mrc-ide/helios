@@ -134,11 +134,11 @@ hipercow::task_status(sim_out_batch_3_27)
 
 #----- 3) Save the job IDs for each batch ---------------------------------------------------------
 
-# Load the job IDS:
-job_IDS <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
-
 # Store the job IDs for each simulation in an object:
 job_IDS <- list()
+
+# Load the job IDS:
+job_IDS <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
 
 # Specify the re-run batch numbers
 reruns <- c(2, 6, 10, 11, 14, 17, 20, 27)

@@ -146,7 +146,7 @@ task_status(as.character(job_IDS))
 
 # Save the job IDs:
 saveRDS(object = job_IDS, file = "./Report_3_Epidemic/Epidemic_Simulation_Batch_1/batch_1_rerun_job_ids.rds")
-job_IDS <- readRDS("./batch_1_rerun_job_ids.rds")
+job_IDS <- readRDS("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/batch_1_rerun_job_ids.rds")
 
 # Check the number of outputs saved:
 length(list.files("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_outputs/"))
