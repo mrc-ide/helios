@@ -52,7 +52,7 @@ batches <- list.files("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_
 batches <- str_sort(batches, numeric = TRUE)
 
 # For each batch, run the simulations:
-for(i in 1:length(batches)) {
+for(i in 15:15) {
 
   # Set a delay
   Sys.sleep(10)
@@ -113,16 +113,18 @@ for(i in 1:length(batches)) {
   )
 }
 
-task_status(sim_out_batch_1_1)
+# View
+task_status(sim_out_batch_1_15)
 
 #----- 3) Save the job IDs for each batch ---------------------------------------------------------
 
 # Load the job IDS:
-#job_IDS <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
+#job_IDS <- readRDS("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_job_IDs.rds")
 
 # Store the job IDs for each simulation in an object:
 job_IDS <- list()
 
+# Get the batch ID numbers:
 for(i in 1:length(batches)) {
   job_IDS[[i]] <- get(paste0("sim_out_batch_1_", i))
 }
@@ -139,9 +141,15 @@ x <- sapply(job_IDS, hipercow::task_status); table(x)
 # View the failures:
 which(x == "failure")
 
+# View the 15th rerun:
+task_status(as.character(job_IDS))
+
 # Save the job IDs:
-#saveRDS(object = job_IDS, file = "./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
+saveRDS(object = job_IDS, file = "./Report_3_Epidemic/Epidemic_Simulation_Batch_1/batch_1_rerun_job_ids.rds")
+job_IDS <- readRDS("./batch_1_rerun_job_ids.rds")
 
-#----- 3) Save the job IDs for each batch ---------------------------------------------------------
+# Check the number of outputs saved:
+length(list.files("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_outputs/"))
 
-length(list.files("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_outputs/"))
+# Check the Job IDs saved successfully:
+test <- readRDS("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/batch_1_rerun_job_ids.rds")
