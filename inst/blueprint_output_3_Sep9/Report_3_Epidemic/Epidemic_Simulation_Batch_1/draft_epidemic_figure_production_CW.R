@@ -6,8 +6,12 @@
 library(tidyverse)
 library(patchwork)
 
+# Turn off scientific notation:
+options(scipen = 666)
+
 # Specify the Blueprint colours:
 blueprint_colours <- colorRampPalette(c("#00AFFF", "#03113E"))(4)
+blueprint_colours <- c(blueprint_colours[1], blueprint_colours[4])
 
 ##' Simulations were run varying the following variables:
 ##'
@@ -90,16 +94,16 @@ saveRDS(object = avg_summary_outputs, file = "./Report_3_Epidemic/Epidemic_Simul
 
 #----- 3) Figure.2.1.a Mean Final Epidemic Size ----------------------------------------------------
 
-# Turn off scientific notation:
-options(scipen = 666)
-
 #+++ Figure 2.1.a: Mean final epidemic size +++#
 ggplot() +
   geom_line(data = subset(avg_summary_outputs, coverage_type == "random" & coverage <= 0.7),
-            aes(x = 100 * coverage, y = 100 * mean_final_size), col = blueprint_colours[1], linewidth = 1) +
+            aes(x = 100 * coverage, y = mean_final_size / 1000), col = blueprint_colours[1], linewidth = 1) +
   geom_line(data = subset(avg_summary_outputs, coverage_type == "targeted_riskiness" & coverage <= 0.7),
-            aes(x = 100 * coverage, y = 100 * mean_final_size), col = blueprint_colours[2], linewidth = 1) +
-  theme_bw() +
+            aes(x = 100 * coverage, y = mean_final_size / 1000), col = blueprint_colours[2], linewidth = 1) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Mean Final Epidemic Size \n (per 1000 individuals)",
+       colour = "Coverage\nType") +
   facet_grid(archetype ~ efficacy,
              scales = "free_y",
              labeller = as_labeller(c(`influenza` = "Influenza",
@@ -107,7 +111,30 @@ ggplot() +
                                      `0.4` = "40% Efficacy",
                                      `0.6` = "60% Efficacy",
                                      `0.8` = "80% Efficacy"))) +
-  theme(strip.background = )
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12)) +
+  lims(y = c(0, NA))
+
+# TB Version:
+avg_summary_outputs |>
+  filter(coverage <= 0.7, efficacy > 0) |>
+  ggplot(aes(x = 100 * coverage, y = mean_final_size / 1000, colour = coverage_type)) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Mean Final Epidemic Size \n (per 1000 individuals)",
+       colour = "Coverage\nType") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12)) +
   lims(y = c(0, NA))
 
 #----- 4) Figure.2.1.b Mean Peak Size --------------------------------------------------------------
@@ -115,11 +142,44 @@ ggplot() +
 #+++ Figure 2.1.b: +++#
 ggplot() +
   geom_line(data = subset(avg_summary_outputs, coverage_type == "random" & coverage <= 0.7),
-            aes(x = 100 * coverage, y = 100 * mean_peak), col = blueprint_colours[1]) +
+            aes(x = 100 * coverage, y = mean_peak / 1000), col = blueprint_colours[1], linewidth = 1) +
   geom_line(data = subset(avg_summary_outputs, coverage_type == "targeted_riskiness" & coverage <= 0.7),
-            aes(x = 100 * coverage, y = 100 * mean_peak), col = blueprint_colours[4]) +
+            aes(x = 100 * coverage, y = mean_peak / 1000), col = blueprint_colours[2], linewidth = 1) +
   facet_grid(archetype ~ efficacy, scales = "free_y") +
-  theme_bw()
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)", y = "Mean Peak Epidemic Size \n (per 1000 individuals)") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12)) +
+  lims(y = c(0, NA))
+
+# TB Version
+avg_summary_outputs |>
+  filter(coverage <= 0.7, efficacy > 0) |>
+  ggplot(aes(x = 100 * coverage, y = mean_peak / 1000, colour = coverage_type)) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Mean Final Epidemic Size \n (per 1000 individuals)",
+       colour = "Coverage\nType") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12),
+        legend.text  = element_text(size = 11)) +
   lims(y = c(0, NA))
 
 #----- 5) Figure.2.1.c Mean Peak Timing ------------------------------------------------------------
@@ -127,9 +187,44 @@ ggplot() +
 #+++ Figure 2.1.c: Mean Peak Timing +++#
 ggplot() +
   geom_line(data = subset(avg_summary_outputs, coverage_type == "random" & coverage <= 0.7),
-            aes(x = 100 * coverage, y = 100 * mean_peak_timing), col = blueprint_colours[1]) +
+            aes(x = 100 * coverage, y = mean_peak_timing), col = blueprint_colours[1], linewidth = 1) +
   geom_line(data = subset(avg_summary_outputs, coverage_type == "targeted_riskiness" & coverage <= 0.7),
-            aes(x = 100 * coverage, y = 100 * mean_peak_timing), col = blueprint_colours[4]) +
-  theme_bw() +
-  facet_grid(archetype ~ efficacy, scales = "free_y") +
+            aes(x = 100 * coverage, y = mean_peak_timing), col = blueprint_colours[2], linewidth = 1) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)", y = "Time to Peak Infections (days)") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12),
+        legend.text  = element_text(size = 11)) +
   lims(y = c(0, NA))
+
+# TB Version
+avg_summary_outputs |>
+  filter(coverage <= 0.7, efficacy > 0) |>
+  ggplot(aes(x = 100 * coverage, y = mean_peak_timing, colour = coverage_type)) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Time to Peak Infections (days)",
+       colour = "Coverage\nType") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12),
+        legend.text  = element_text(size = 11)) +
+  lims(y = c(0, NA))
+
+#--------------------------------------------------------------------------------------------------#

@@ -1,0 +1,557 @@
+---
+title: 'The Impact of Far UVC Interventions on the Burden of a Respiratory Virus'
+author:
+  - Charlie Whittaker^[Imperial College London], Tom Brewer^[Imperial College London], Adam Howes^[Independent]
+date: "September 2024"
+output: 
+  bookdown::html_document2:
+    fig_caption: yes
+    number_sections: yes
+pkgdown:
+  as_is: true
+vignette: >
+  %\VignetteIndexEntry{blueprint-july}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: REFERENCES.bib
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE,
+  dpi = 330,
+  out.width = "90%"
+)
+
+```
+
+```{r}
+library(helios)
+library(individual)
+library(ggplot2)
+library(dplyr, warn.conflicts = FALSE)
+library(purrr)
+theme_set(theme_minimal())
+blueprint_colours <- colorRampPalette(c("#00AFFF", "#03113E"))(4)
+blueprint_colours_min <- c(blueprint_colours[1], blueprint_colours[4])
+epidemic_summary_outputs <- readRDS("../inst/blueprint_output_3_Sep9/Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_avg_summary_outputs.rds")
+```
+
+# Overview {.unnumbered}
+
+In our [initial report](https://mrc-ide.github.io/helios/articles/blueprint.html) we introduced `helios`: an individual-based modelling framework for exploring the impact that installation of far UVC could have on the transmission and burden of respiratory infections. In a [follow-up report](https://mrc-ide.github.io/helios/articles/blueprint-july.html), we presented updates to that framework and a series of analyses evaluating the impact that the installation of far UVC in non-household settings could have on the burden of endemic respiratory pathogens. In this final report, we present updates to the framework made since the last report, and a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden of endemic respiratory pathogens.
+
+# Model Changes {#changes}
+
+Two updates to the model have been made since the last report. These are:
+
+1.  Explicitly representing the physical area of the locations we are modelling (rather than just the number of people the location hosts). (Section \@ref(square-footage))
+2.  Adding in the option to assign far UVC to the riskiest locations (rather than assigning it to locations at random, independently of riskiness). (Section \@ref(riskiness-targeting))
+
+## Explicitly representing the square meterage of each location {#square-footage}
+
+Previously, the modelling framework used the number of individuals occupying the location as a proxy for the size of the location. This approach makes the implicit and unrealistic assumption that all Setting Types (i.e. schools, workplaces, leisure settings and households) have the same occupant density.
+
+In response to this, we have updated the modelling framework to include occupant densities specific to each Setting Type, with these occupant densities selected to match those used for the calculation of transmission riskiness variation described in the [previous](https://mrc-ide.github.io/helios/articles/blueprint-july.html) report, which were:
+
+-   **Households:** 20m^2^ per person (5 people per 100m^2^, per ANSI/ASHRA Standard 62.1 Table 6.1)
+
+-   **Workplace:** 10m^2^ per person (10 people per 100m^2^)
+
+-   **Schools:** 3.33m^2^ per person(30 people per 100m^2^)
+
+-   **Leisure:** 2m^2^ per person(50 people per 100m^2^)
+
+Note that an assumption remaining here is that all Locations of a particular Setting Type (e.g. Schools) have the same assumed occupancy density. The density of occupants in Locations belonging to each Setting Type is therefore the same, but the overall area for each Location differs depending on the number of individuals who occupy that particular Location.
+
+## Targeting far UVC to locations based on riskiness {#riskiness-targeting}
+
+In a [previous report](https://mrc-ide.github.io/helios/articles/blueprint-july.html), we incorporated variation in riskiness between Locations belonging to the same Setting Type. This variation was estimated using empirical data on variation in ventilation rates and integrating this with a transient Wells-Riley equation. Previously assigning far UVC to individual locations was either done randomly or targeted to the largest settings (by number of people they contain). In this update to the model, we have enabled targeting of far UVC to locations based on their riskiness.
+
+As a reminder, here is what the distribution of riskiness across locations of the same Setting-Type looks like in our modelling framework Together, these imply an approximate "riskiness ratio" (the difference in riskiness between the 5th percentile risky and 95th percentile risky) of 2.5x for Households, 5.5x for Leisure locations, 4.75x for Schools and 6.35x for Workplaces:
+
+```{r riskiness-exemplar, fig.cap="(ref:riskiness-exemplar)", fig.fullwidth = TRUE, fig.height=5}
+
+scaling_factor <- 5
+parameter_list <- get_parameters(archetype = "flu",
+                                 overrides = list(
+                                   human_population = 200000 / scaling_factor,
+                                   number_initial_S = 190000 / scaling_factor,
+                                   number_initial_E = 10000 / scaling_factor,
+                                   number_initial_I = 0,
+                                   number_initial_R = 0,
+                                   simulation_time = 150)) |>
+      set_setting_specific_riskiness(setting = "school",
+                                     mean = 0,
+                                     sd = 0.3544,
+                                     min = 1/sqrt(4.75),
+                                     max = sqrt(4.75)) |>
+      set_setting_specific_riskiness(setting = "workplace",
+                                     mean = 0,
+                                     sd = 0.5072,
+                                     min = 1/sqrt(6.35),
+                                     max = sqrt(6.35)) |>
+      set_setting_specific_riskiness(setting = "household",
+                                     mean = 0,
+                                     sd = 0.0871,
+                                     min = 1/sqrt(2.5),
+                                     max = sqrt(2.5)) |>
+      set_setting_specific_riskiness(setting = "leisure",
+                                     mean = 0,
+                                     sd = 0.4278,
+                                     min = 1/sqrt(5.5),
+                                     max = sqrt(5.5))
+variables_list <- create_variables(parameter_list)
+parameters <- variables_list$parameters_list
+variables_list <- variables_list$variables_list
+
+riskiness <- data.frame(location = 
+                          c(rep("Households", length(parameters$household_specific_riskiness)), 
+                            rep("Leisure Settings", length(parameters$leisure_specific_riskiness)),
+                            rep("Schools", length(parameters$school_specific_riskiness)),
+                            rep("Workplaces", length(parameters$workplace_specific_riskiness))),
+                        riskiness = c(parameters$household_specific_riskiness,
+                                      parameters$leisure_specific_riskiness,
+                                      parameters$school_specific_riskiness,
+                                      parameters$workplace_specific_riskiness))
+
+ggplot(riskiness, aes(riskiness)) +
+  geom_histogram(fill = "grey", col = "black") +
+  facet_wrap(.~location, nrow = 2, scales = "free_y") +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = "white")) +
+  labs(x = "Variation in Riskiness (1 = Average)", y = "Frequency")
+
+```
+
+The modelling framework is now able to accommodate targeting of far UVC in a manner based on the riskiness of a location. Below we show how assignment of far UVC works for the two targeting strategies for an example where far UVC is installed to cover 50% of total School, Workplace and Leisure location area. The two strategies are "random" (far UVC assigned randomly to locations, irrespective of their riskiness) and "targeted riskiness" (far UVC assigned to locations based on the rank ordered riskiness of each setting).
+
+```{r riskiness-coverage-exemplar, fig.cap="(ref:riskiness-coverage-exemplar)", fig.fullwidth = TRUE, fig.height=5}
+
+## Setting this up for Random
+parameters_square_footage_random <- set_uvc(parameters_list = parameters,
+                                            setting = "joint",
+                                            coverage = 0.5,
+                                            coverage_target = "square_footage",
+                                            coverage_type = "random",
+                                            efficacy = 0.8,
+                                            timestep = 1)
+switches_square_footage_random <- generate_far_uvc_switches(parameters_list = parameters_square_footage_random, 
+                                                            variables_list = variables_list)
+location_types_random <- c(rep("school", length(switches_square_footage_random$school_specific_riskiness)),
+                           rep("leisure", length(switches_square_footage_random$leisure_specific_riskiness)),
+                           rep("workplace", length(switches_square_footage_random$workplace_specific_riskiness)))
+riskiness_square_footage_random <- c(switches_square_footage_random$school_specific_riskiness,
+                                     switches_square_footage_random$leisure_specific_riskiness,
+                                     switches_square_footage_random$workplace_specific_riskiness)
+uvc_square_footage_random <- c(switches_square_footage_random$uvc_school,
+                               switches_square_footage_random$uvc_leisure,
+                               switches_square_footage_random$uvc_workplace)
+
+## Setting this up for targeted Riskiness
+parameters_square_footage_targeted <- set_uvc(parameters_list = parameters,
+                                              setting = "joint",
+                                              coverage = 0.5,
+                                              coverage_target = "square_footage",
+                                              coverage_type = "targeted_riskiness",
+                                              efficacy = 0.8,
+                                              timestep = 1)
+switches_square_footage_targeted <- generate_far_uvc_switches(parameters_list = parameters_square_footage_targeted, 
+                                                              variables_list = variables_list)
+location_types_targeted <- c(rep("school", length(switches_square_footage_targeted$school_specific_riskiness)),
+                           rep("leisure", length(switches_square_footage_targeted$leisure_specific_riskiness)),
+                           rep("workplace", length(switches_square_footage_targeted$workplace_specific_riskiness)))
+riskiness_square_footage_targeted <- c(switches_square_footage_targeted$school_specific_riskiness,
+                                     switches_square_footage_targeted$leisure_specific_riskiness,
+                                     switches_square_footage_targeted$workplace_specific_riskiness)
+uvc_square_footage_targeted <- c(switches_square_footage_targeted$uvc_school,
+                               switches_square_footage_targeted$uvc_leisure,
+                               switches_square_footage_targeted$uvc_workplace)
+
+## Plotting
+x <- data.frame(setting_type = c(location_types_random, location_types_targeted), 
+           riskiness = c(riskiness_square_footage_random, riskiness_square_footage_targeted),
+           uvc = c(uvc_square_footage_random, uvc_square_footage_targeted),
+           type = c(rep("Random Targeting of Far UVC", length(riskiness_square_footage_random)), 
+                    rep("Targeting Far UVC Based on Riskiness", length(riskiness_square_footage_random)))) %>%
+  arrange(desc(riskiness)) |>
+  mutate(rank = row_number()) |>
+  mutate(
+    chosen2 = ifelse(uvc == 1, "Yes", "No")
+  )
+
+ggplot(x, aes(x = rank, y = riskiness, 
+             col = chosen2, fill = chosen2)) +
+  geom_bar(stat = "identity", alpha = 1, position = position_dodge()) +
+  facet_wrap(~ type) +
+  scale_colour_manual(values = c("grey", "#03113E")) + 
+  scale_fill_manual(values = c("grey", "#03113E")) +
+  labs(x = "Rank Order of Riskiness", y = "Relative riskiness", 
+       col = "Far UVC Installed?",
+       fill = "Far UVC Installed?") +
+  theme(legend.position = "bottom")
+
+```
+
+# Assessing the impact of far UVC on the burden of endemic respiratory viruses {#assessing}
+
+Using the updated modelling framework described above, we conducted analyses evaluating the potential impact of far UVC deployment on the transmission and disease burden of a hypothetical respiratory virus. We considered two pathogen archetypes (described in detail below) and present analyses for both an endemic pathogen (i.e. one which is consistently present in a population and maintained at a particular baseline prevalence level) and an epidemic one (i.e. one which is previously not present in the population, and which emerges to cause an epidemic).
+
+## Results
+
+We considered two pathogen archetypes for this hypothetical virus:
+
+-   **"SARS-CoV-2-Like" Archetype** - $R_0$ of 2.5, a mean latent period of 2 days, a mean duration of infectiousness of 4 days.
+
+-   **"Influenza-Like" Archetype** - $R_0$ of 1.5, a mean latent period of 1 day, a mean duration of infectiousness of 2 days.
+
+For the epidemic pathogen, we assume that immunity arising from infection lasts for an individual's lifetime. Endemicity arises (in part) due to the finite nature of immunity arising from infection with a pathogen. For the endemic pathogen, we therefore assume a mean duration of immunity of 365 days. This gives an approximate infection prevalence of 1% for SARS-CoV-2 (i.e. approximately 1 in 100 individuals are infected at any given timepoint) and 0.3% for influenza (i.e. 1 in 330 individuals infected at any given timepoint).
+
+For each pathogen archetype, we investigated the effect of far UVC efficacy and far UVC coverage on the annual incidence of infection, varying:
+
+-   **far UVC Coverage:** Between 0% and 80%, in increments of 10%. In all cases, far UVC was assumed to be installed in schools, workplaces and leisure locations only (i.e. not households), either at a random set of locations or based on their riskiness.
+
+-   **far UVC Efficacy:** Either 40%, 60% or 80%, with the assumption that far UVC efficacy was identical across all Settings and Locations where it had been installed.
+
+All presented results are based on summary statistics (e.g. mean, range etc) calculated based on 20 stochastic replicates.
+
+### Epidemic Pathogen Analyses
+
+The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in Figure \@ref(fig:epidemic-pathogen-figure-1) and Figure \@ref(fig:epidemic-pathogen-figure-2). We consider three metrics to evaluate the impact of far UVC in the case of an epidemic pathogen. The first is the number of infection individuals at the peak of transmission (hereafter referred to as "peak size", see Figure \@ref(fig:epidemic-pathogen-figure-1)); the second is the timing of this peak (hereafter referred to as "peak timing"); and the third is the total number of individuals infected over the course of the epidemic (hereafter referred to as "final epidemic size", see Figure \@ref(fig:epidemic-pathogen-figure-2).
+
+#### Epidemic Peak Size
+
+Assuming 10% coverage and 60% efficacy, far UVC installation led to a A% (range B%-C%) reduction in the epidemic peak size the "Influenza-Like" archetype, and X% (range Y%-Z%) for the "SARS-CoV-2-Like" archetype. At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively. Increasing far UVC coverage led to progressively higher impact (i.e. greater reduction in peak size), with a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen. Under some scenarios (e.g. X% coverage and Y% efficacy), far UVC installation was sufficient to prevent the epidemic occurring entirely, though an important limitation here is that we do not explicitly model imported infections from other locations (which typically sustain an epidemic). SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
+
+```{r epidemic-peak-size, fig.cap="(ref:epidemic-peak-size)", fig.fullwidth = TRUE, fig.height=5}
+
+epidemic_summary_outputs |>
+  filter(coverage <= 0.7, efficacy > 0) |>
+  ggplot(aes(x = 100 * coverage, y = mean_peak / 1000, colour = coverage_type)) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = blueprint_colours_min, labels = c("Random", "Targeted")) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Mean Final Epidemic Size \n (per 1000 individuals)",
+       colour = "Coverage\nType") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12),
+        legend.text  = element_text(size = 11)) +
+  lims(y = c(0, NA))
+
+```
+
+#### Epidemic Peak Timing
+
+For 10% coverage and 60% efficacy, far UVC installation led to the epidmic peak occurring A days (range B-C days) later for the "Influenza-Like" archetype and X days (range Y days-Z days) for the "SARS-CoV-2-Like" archetype, compared to a situation in which far UVC has not been installed. At 10% coverage and 80% assumed efficacy, these are A days (range B - C days) and X days (range Y days - Z days) respectively. Increasing far UVC coverage and/or efficacy led to further delays in the timing of the peak. SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
+
+```{r epidemic-peak-timing, fig.cap="(ref:epidemic-peak-timing)", fig.fullwidth = TRUE, fig.height=5}
+
+avg_summary_outputs |>
+  filter(coverage <= 0.7, efficacy > 0) |>
+  ggplot(aes(x = 100 * coverage, y = mean_peak_timing, colour = coverage_type)) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Time to Peak Infections (days)",
+       colour = "Coverage\nType") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12),
+        legend.text  = element_text(size = 11)) +
+  lims(y = c(0, NA))
+
+```
+
+#### Epidemic Final Size
+
+For 10% coverage and 60% efficacy, far UVC installation led to a reduction in the total % of the population becoming infected by A% (range B%-C%) for the "Influenza-Like" archetype. Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. For the "SARS-CoV-2-Like" archetype, Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. This corresponds to a reduction in the total % of the population becoming infected by A% (range B%-C%). SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
+
+```{r epidemic-final-size, fig.cap="(ref:epidemic-final-size)", fig.fullwidth = TRUE, fig.height=5}
+
+epidemic_summary_outputs |>
+  filter(coverage <= 0.7, efficacy > 0) |>
+  ggplot(aes(x = 100 * coverage, y = mean_final_size / 1000, colour = coverage_type)) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = blueprint_colours_min, labels = c("Random", "Targeted")) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Mean Final Epidemic Size \n (per 1000 individuals)",
+       colour = "Coverage\nType") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12)) +
+  lims(y = c(0, NA))
+
+```
+
+#### Discussion
+
+The above results highlight:
+
+-   Something here about generally higher (relative) impact on influenza than SARS-CoV-2 (because the former has a lower starting R0; and how this relates to the non-linear nature of the fraction of transmission you have to avert to reduce R0 to 1).
+
+-   Something here about untargeted and targeted approaches.
+
+-   An important point here is that there is significant value to far UVC in an epidemic pathogen situation, even when it does not achieve complete suppression of the epidemic (i.e. reducing R \< 1 and preventing it occurring). Reductions in transmission that fall short of full suppression arising from far UVC are still useful in that they 1) reduce the associated pressure on healthcare systems (by reducing peak size and spreading burden out over time - the so-called "flattening of the curve"); 2) push the epidemic later into the future (providing more time for other medical countermeasures such as vaccines to be developed); and 3) for the same disease burden, enable shorter and less stringent non-pharmaceutical interventions to be implemented compared to a scenario in which far UVC is not available.
+
+### Endemic Pathogen Analyses
+
+The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in Figure Figure \@ref(fig:placeholder-1). We consider a single metric for evaluating the impact of far UVC on the endemic pathogen. This is the total estimated annual incidence of new infections with the pathogen.
+
+We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming A% coverage and B% efficacy, far UVC installation led to a C% (range D%-E%) reduction in annual infection incidence for "Influenza-Like" and F% (range G%-H%) for "SARS-CoV-2-Like". At I% coverage and J% assumed efficacy, these are K% (range L%-M%) and N% (range O%-P%) respectively. SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
+
+```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
+
+# Loading in the outputs
+outputs1 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results1.rds"))
+outputs2 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results2.rds"))
+outputs3 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results3.rds"))
+outputs4 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results4.rds"))
+outputs <- c(outputs1, outputs2, outputs3, outputs4)
+simulations_to_run <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/simulations_to_run.rds"))
+parameter_lists <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/parameter_lists.rds"))
+
+dt <- parameter_lists[[1]]$dt
+population <- parameter_lists[[1]]$human_population
+years_to_simulate <- parameter_lists[[1]]$simulation_time / 365
+timestep_baseline_start <- ((years_to_simulate - 6) * 365) / dt
+timestep_baseline_end <- ((years_to_simulate - 2) * 365) / dt
+timestep_uvc_start <- ((years_to_simulate - 2) * 365 + 1) / dt
+timestep_uvc_end <- (years_to_simulate * 365) / dt
+
+## Removing the burnin whilst the model reaches equilibrium
+outputs_processed <- outputs
+index_start <- which(outputs_processed[[1]]$timestep == timestep_baseline_start)
+index_end <- which(outputs_processed[[1]]$timestep == timestep_uvc_end)
+for (i in 1:length(outputs)) {
+  outputs_processed[[i]] <- outputs_processed[[i]][index_start:index_end, ]
+  outputs_processed[[i]]$archetype <- simulations_to_run[i, "archetype"]
+  outputs_processed[[i]]$coverage <- simulations_to_run[i, "coverage"]
+  outputs_processed[[i]]$efficacy <- simulations_to_run[i, "efficacy"]
+  outputs_processed[[i]]$iteration <- simulations_to_run[i, "iteration"]
+  outputs_processed[[i]]$new_timestep <- outputs_processed[[i]]$timestep - min(outputs_processed[[i]]$timestep)
+}
+
+subset_index <- 4 * 365
+overall <- dplyr::bind_rows(outputs_processed) |>
+  mutate(daily_timestep = floor(new_timestep * dt)) |>
+  group_by(iteration, archetype, efficacy, coverage, daily_timestep) |>
+  summarise(S_count = mean(S_count),
+            E_count = mean(E_count),
+            I_count = mean(I_count),
+            R_count = mean(R_count),
+            E_new = sum(E_new),
+            n_external_infections = sum(n_external_infections))
+end <- length(unique(overall$daily_timestep))
+
+overall5 <- overall |>
+  group_by(iteration, daily_timestep, archetype, efficacy, coverage) |>
+  summarise(S_count = mean(S_count), E_new = mean(E_new)) |>
+  ungroup() |>
+  group_by(iteration, archetype, efficacy, coverage) |>
+  summarise(incidence_pre_uvc = sum(E_new[1:subset_index]) / 4,
+            incidence_after_uvc = sum(E_new[(subset_index + 1):end]) / 2) |>
+  mutate(incidence_reduction = incidence_pre_uvc - incidence_after_uvc,
+         incidence_percentage_reduction = incidence_reduction / incidence_pre_uvc) |>
+  ungroup() |>
+  group_by(archetype, efficacy, coverage) |>
+  summarise(incidence_percentage_reduction_mean = mean(incidence_percentage_reduction),
+            incidence_percentage_reduction_lower = min(incidence_percentage_reduction),
+            incidence_percentage_reduction_upper = max(incidence_percentage_reduction))
+ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_reduction_mean)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "#324A5F", col = "black") +
+  geom_errorbar(aes(ymin = 100 * incidence_percentage_reduction_lower,
+                    ymax = 100 * incidence_percentage_reduction_upper),
+                width = 0.5) +
+  theme_bw() +
+  facet_grid(archetype ~ coverage, 
+             labeller = as_labeller(c(`0` = "0% Coverage",
+                                      `0.1` = "10% Coverage",
+                                      `0.25` = "25% Coverage",
+                                      `0.5` = "50% Coverage",
+                                      `flu` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2"))) +
+  labs(fill = "Time\nPeriod", x = "Far UVC Efficacy (%)",
+       y = "% Reduction in Annual Incidence of Infection")
+```
+
+(ref:placeholder-1) The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for "Influenza-Like" and "SARS-CoV-2-Like" pathogen archetypes. The bars represent the mean percentage reduction in infection incidence averaged over the 20 stochastic model simulations run for each parametrisation, with the range of % reduction in incidence across those 20 simulations shown by the error bars.
+
+#### Discussion
+
+The above results highlight:
+
+-   Something here about generally higher (relative) impact on influenza than SARS-CoV-2 (because the former has a lower starting R0; and how this relates to the non-linear nature of the fraction of transmission you have to avert to reduce R0 to 1).
+
+-   Something here about untargeted and targeted approaches.
+
+-   An important point here is that there is significant value to far UVC in an epidemic pathogen situation, even when it does not achieve complete suppression of the epidemic (i.e. reducing R \< 1 and preventing it occurring). Reductions in transmission that fall short of full suppression arising from far UVC are still useful in that they 1) reduce the associated pressure on healthcare systems (by reducing peak size and spreading burden out over time - the so-called "flattening of the curve"); 2) push the epidemic later into the future (providing more time for other medical countermeasures such as vaccines to be developed); and 3) for the same disease burden, enable shorter and less stringent non-pharmaceutical interventions to be implemented compared to a scenario in which far UVC is not available.
+
+We next compared these results to those produced by a simplistic, static multiplicative model of estimated impact calculated by multiplying the coverage and efficacy of the modelled far UVC together and then multiplying this by the proportion of transmission that is "targetable" by far UVC (i.e. the proportion of transmission that occurs outside households). The results of this analyses are plotted below in \@ref(fig:comparison-1). As you can see, this simplified model provides similar estimates to those generated by `helios` for SARS-CoV-2, but significantly underestimates the impact for Influenza.
+
+```{r comparison-1, fig.cap="(ref:comparison-1)"}
+
+targetable_transmission <- 0.6
+df_comparison <- overall5 %>%
+  rowwise() %>%
+  mutate(hypothetical_reduction = targetable_transmission * coverage * efficacy)
+  
+ggplot() + 
+  geom_ribbon(aes(x = 0:26, ymin = seq(0:26) - 1, ymax = rep(60, 27)),
+                alpha = 0.1) +
+  geom_point(data = df_comparison, aes(x = 100 * hypothetical_reduction, 
+                          y = 100 * incidence_percentage_reduction_mean, 
+                          col = archetype), size = 3) +
+  geom_errorbar(data = df_comparison, aes(x = 100 * hypothetical_reduction, 
+                          ymin = 100 * incidence_percentage_reduction_lower,
+                          ymax = 100 * incidence_percentage_reduction_upper, 
+                          col = archetype), linewidth = 1) +
+  geom_abline(slope = 1, linetype = "dashed") +
+  labs(x = "Hypothetical Reduction in Annual Incidence\nBased On Simple, Multiplicative Model",
+       y = "Reduction in Annual Incidence\nPredicted by helios (%)",
+       col = "Pathogen\nArchetype") +
+  theme_bw()
+
+```
+
+(ref:comparison-1) Comparing the estimates of impact for `helios` and a simplified multiplicative model. x-axis indicates the reduction estimated by the simple model; y-axis the estimate produced by `helios` . Points are coloured according to pathogen archetype. Dashed line indicates the line of `y = x` (i.e. any points lying on that line have the same impact estimate from `helios` and the simplified model). Grey shaded area indicates range where the simple model predicts lower impact than `helios`.
+
+## Discussion
+
+The observed differences in predicted far UVC impact between the two pathogen archetypes arise primarily because of their different $R_0$ values. In Figure \@ref(fig:analytical-relationship) we show the analytical relationship between $R_0$ and prevalence of infection, derived for a SEIRS compartmental model (see [here](https://www.nature.com/articles/s41592-020-0856-2) and [here](https://shiny.bcgsc.ca/posepi2/)) that shares a similar representation of a disease's natural history to `helios`. We note that the results presented in \@ref(fig:analytical-relationship) are not results from running `helios` (instead they are the analytical solution of a significantly more tractable mathematical model that is simpler than but similar to `helios`) and are displayed here solely for the purpose of illustrating a generally-held non-linearity between transmissibility ($R_{0}$) and infection prevalence.
+
+There is a non-linear influence of $R_{0}$ on prevalence of infection (and hence disease burden). For lower values of $R_{0}$, there is a near-linear relationship between the two quantities. At higher values of $R_{0}$ however, infection prevalence saturates and the rate at which increasing values of $R_0$ increases infection prevalence diminishes. When $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. due to far UVC) will have only a slight impact on infection prevalence. By contrast, when baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence will decrease more (in relative terms) for the same reduction in $R_0$. Increasing duration of infectiousness increases the prevalence of infection in a linear manner
+
+(ref:analytical-relationship) The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`. The vertical dashed lines indicate the value of $R_0$ used for each archetype in the analyses carried out.
+
+```{r analytical-relationship, fig.cap="(ref:analytical-relationship)", , fig.height=5.5}
+## R0 - infection prevalence relationship for Influenza archetype
+R0 <- seq(1, 4, 0.1)
+gamma <- 1 / 2
+sigma <- 1 / 1
+omega <- 1 / 365
+mu <- 1 / 100000
+alpha <- 0
+influenza_infection_prevalence <- c()
+for (i in 1:length(R0)) {
+  beta <- R0[i] * ((sigma + mu) / sigma) * (gamma + mu)
+  S <- 1 / R0[i]
+  I <- (mu * (1 - S)) / ((beta * S) - ((omega * gamma)/(omega + mu)))
+  E <- (gamma + mu + alpha) * I / sigma
+  influenza_infection_prevalence <- c(influenza_infection_prevalence, (E + I) * 100)
+}
+influenza_R0 <- data.frame(archetype = "Influenza-Like", R0 = R0, prevalence = influenza_infection_prevalence)
+
+## R0 - infection prevalence relationship for SC2 archetype
+R0 <- seq(1, 4, 0.1)
+gamma <- 1 / 4
+sigma <- 1 / 2
+omega <- 1 / 365
+mu <- 1 / 100000
+sc2_infection_prevalence <- c()
+for (i in 1:length(R0)) {
+  beta <- R0[i] * ((sigma + mu) / sigma) * (gamma + mu)
+  S <- 1 / R0[i]
+  I <- (mu * (1 - S)) / ((beta * S) - ((omega * gamma)/(omega + mu)))
+  E <- (gamma + mu + alpha) * I / sigma
+  sc2_infection_prevalence <- c(sc2_infection_prevalence, (E + I) * 100)
+}
+sc2_R0 <- data.frame(archetype = "SARS-CoV-2-Like", R0 = R0, prevalence = sc2_infection_prevalence)
+
+overall_R0_df <- rbind(influenza_R0, sc2_R0)
+
+a <- ggplot(overall_R0_df, aes(x = R0, y = prevalence, col = archetype)) +
+  geom_point() +
+  geom_line() +
+  geom_vline(xintercept = c(1.5, 3), linetype = "dashed") +
+  theme_bw() +
+  labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)",
+       col = "Pathogen\nArchetype")
+
+
+## R0 - infection prevalence relationship for limited R0 and varied duration of infectiousness
+R0 <- c(1.5, 2, 3)
+gamma <- 1 / seq(1:15)
+sigma <- 1 / 2
+omega <- 1 / 365
+mu <- 1 / 100000
+durVary_infection_prevalence <- matrix(nrow = length(R0),
+                                       ncol = length(gamma))
+for (i in 1:length(R0)) {
+  for (j in 1:length(gamma)) {
+    beta <- R0[i] * ((sigma + mu) / sigma) * (gamma[j] + mu)
+    S <- 1 / R0[i]
+    I <- (mu * (1 - S)) / ((beta * S) - ((omega * gamma[j])/(omega + mu)))
+    E <- (gamma[j] + mu + alpha) * I / sigma
+    durVary_infection_prevalence[i, j] <- (E + I) * 100
+  }
+}
+colnames(durVary_infection_prevalence) <- 1/gamma
+row.names(durVary_infection_prevalence) <- R0
+
+durVary_infection_prevalence2 <- reshape2::melt(durVary_infection_prevalence)
+colnames(durVary_infection_prevalence2) <- c("R0", "Duration of Infectiousness", "Prevalence of Infection")
+
+# b <- ggplot(durVary_infection_prevalence2, aes(x = `Duration of Infectiousness`, y = `Prevalence of Infection`)) +
+#   geom_point() +
+#   geom_line() +
+#   facet_grid(. ~ R0,
+#              labeller = as_labeller(c(`1.5` = "R0 = 1.5", `2` = "R0 = 2", `3` = "R0 = 3"))) +
+#   theme_bw() +
+#   lims(y = c(0, 4)) +
+#   labs(x = "Duration of Infectiousness (Days)", y = "Prevalence of Infection (%)")
+
+b <- ggplot(durVary_infection_prevalence2, aes(x = `Duration of Infectiousness`, y = `Prevalence of Infection`, col = factor(R0))) +
+  geom_point() +
+  geom_line() +
+  theme_bw() +
+  lims(y = c(0, 4)) +
+  labs(x = "Duration of Infectiousness (Days)", y = "Prevalence of Infection (%)",
+       col = "R0 Value")
+
+cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
+
+R0 <- seq(1, 4, 0.1)
+ggplot(overall_R0_df, aes(x = 1/R0, y = prevalence, col = archetype)) +
+  geom_point() +
+  geom_line() +
+  scale_x_continuous(breaks = 1/(c(4, 3, 2, 1)),
+                     labels = c(4, 3, 2, 1)) +
+  theme_bw() +
+  labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)",
+       col = "Pathogen\nArchetype")
+
+```
+
+# Bibliography {.unnumbered}
+
