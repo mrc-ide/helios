@@ -114,24 +114,18 @@ n <- 10; for(i in n:n) {
 }
 
 # Set running at 22:33pm
-hipercow::task_status(sim_out_batch_3_2)
-hipercow::task_status(sim_out_batch_3_6)
 hipercow::task_status(sim_out_batch_3_10)
-hipercow::task_status(sim_out_batch_3_11)
-hipercow::task_status(sim_out_batch_3_14)
-hipercow::task_status(sim_out_batch_3_17)
-hipercow::task_status(sim_out_batch_3_20)
-hipercow::task_status(sim_out_batch_3_27)
-
 
 #----- 3) Save the job IDs for each batch ---------------------------------------------------------
 
 # Store the job IDs for each simulation in an object:
 job_IDS <- list()
-
 for(i in 1:length(reruns)) {
   job_IDS[[i]] <- get(paste0("sim_out_batch_3_", reruns[i]))
 }
+
+# Store individual job ID:
+job_IDS$`10` <- sim_out_batch_3_10
 
 # Load the job IDS:
 #job_IDS <- readRDS("./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
@@ -149,7 +143,7 @@ x <- sapply(job_IDS, hipercow::task_status); table(x)
 which(x == "running")
 
 # Save the job IDs:
-#saveRDS(object = job_IDS, file = "./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_job_ids.rds")
+saveRDS(object = job_IDS, file = "./Report_3_Endemic/Endemic_Simulation_Batch_3/batch_3_reruns_2_job_ids.rds")
 
 # View the number of outputs saved:
 length(list.files("./Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_outputs/"))
