@@ -201,7 +201,7 @@ ggplot(x, aes(x = rank, y = riskiness,
 
 # Assessing the impact of far UVC on the burden of endemic respiratory viruses {#assessing}
 
-Using the updated modelling framework described above, we conducted analyses evaluating the potential impact of far UVC deployment on the transmission and disease burden of a hypothetical respiratory virus. We considered two pathogen archetypes (described in detail below) and present analyses for both an endemic pathogen (i.e. one which is consistently present in a population and maintained at a particular baseline prevalence level) and an epidemic one (i.e. one which is previously not present in the population, and which emerges to cause an epidemic).
+Using the updated modelling framework described above, we conducted analyses evaluating the potential impact of far UVC deployment on the transmission and disease burden of a hypothetical respiratory virus. We considered two pathogen archetypes (described in detail below) and present analyses for both an endemic pathogen (i.e. one which is consistently present in a population and maintained at a particular baseline prevalence) and an epidemic one (i.e. one which is previously not present in the population, and which emerges to cause an epidemic).
 
 ## Results
 
