@@ -226,9 +226,10 @@ All presented results are based on summary statistics (e.g. mean, range etc) cal
 The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in figures \@ref(fig:epidemic-peak-size), Figure \@ref(fig:epidemic-peak-timing), and Figure \@ref(fig:epidemic-final-size). We consider three metrics to evaluate the impact of far UVC in the case of an epidemic pathogen. The first is the number of infected individuals at the peak of transmission (hereafter referred to as "peak size", see Figure \@ref(fig:epidemic-peak-size)); the second is the timing of this peak (hereafter referred to as "peak timing"), see Figure \@ref(fig:epidemic-peak-timing); and the third is the total number of individuals infected over the course of the epidemic (hereafter referred to as "final epidemic size", see Figure \@ref(fig:epidemic-final-size).
 
 #### Epidemic Peak Size
-Figure \@ref(fig:epidemic-peak-size) shows the impact of far UVC deployment on the peak size of the simulated epidemic. For the "influenza-like" pathogen and random coverage, increasing far UVC coverage from 10% to 50% and the efficacy from 40% to 80% reduced the mean final epidemic size from 5502 (4780-6047) to 1967 (1456-2468), while targeting coverage at the riskiest locations decreased the mean peak size from 5179 (4760-5712) to 293 (148-536) for the same parameters. For the "SARS-CoV-2-like" pathogen, doubling the efficacy from 40% to 80% and increasing the coverage from 10% to 70% decreased the peak size from 19669 (18862-21018) to 9106 (8334-10222) for random coverage and 19511 (18741 - 20610) for targeted coverage. Across all far UVC coverages, efficacies, and archetypes simulated, targeting far UVC deployment at the riskiest locations provided greater reductions in the peak epidemic size than random allocation. Increasing far UVC coverage led to progressively greater reductions in peak size, with a larger (proportional) impact on disease burden observed for an "influenza-like" pathogen than a "SARS-CoV-2-like" pathogen. Under some scenarios (e.g. $\geq$ 60% coverage and $\geq$ 80% efficacy, coverage targeted at riskiest settings), far UVC installation was sufficient to prevent the epidemic occurring entirely. While far UVC deployment failed to prevent an epidemic for the "SARS-CoV-2-Like" pathogen at even the highest coverage and efficacy combinations simulated, the targeted deployment of far UVC reduced the peak epidemic size up to ~60%.
 
-(ref:epidemic-peak-size) The impact of far UVC coverage type, coverage, and efficacy on the mean final epidemic size per 1000 individuals, defined as the maximum total number of recovered individuals in the population averaged across 25 stochastic model simulations, for influenza-like and SARs-CoV-2-like pathogens. The light blue lines represent simulations where was far UVC deployed at random, and the dark blue lines simulations where far UVC was targeted at the riskiest settings. The ribbons show 25% and 75% lower and upper quartiles respectively.   
+Figure \@ref(fig:epidemic-peak-size) shows the impact of far UVC deployment on the peak size of the simulated epidemic. For the "influenza-like" pathogen and random coverage, increasing far UVC coverage from 10% to 50% and the efficacy from 40% to 80% reduced the mean final epidemic size from 5502 (4780-6047) to 1967 (1456-2468), while targeting coverage at the riskiest locations decreased the mean peak size from 5179 (4760-5712) to 293 (148-536) for the same parameters. For the "SARS-CoV-2-like" pathogen, doubling the efficacy from 40% to 80% and increasing the coverage from 10% to 70% decreased the peak size from 19669 (18862-21018) to 9106 (8334-10222) for random coverage and 19511 (18741 - 20610) for targeted coverage. Across all far UVC coverages, efficacies, and archetypes simulated, targeting far UVC deployment at the riskiest locations provided greater reductions in the peak epidemic size than random allocation. Increasing far UVC coverage led to progressively greater reductions in peak size, with a larger (proportional) impact on disease burden observed for an "influenza-like" pathogen than a "SARS-CoV-2-like" pathogen. Under some scenarios (e.g. $\geq$ 60% coverage and $\geq$ 80% efficacy, coverage targeted at riskiest settings), far UVC installation was sufficient to prevent the epidemic occurring entirely. While far UVC deployment failed to prevent an epidemic for the "SARS-CoV-2-Like" pathogen at even the highest coverage and efficacy combinations simulated, the targeted deployment of far UVC reduced the peak epidemic size up to \~60%.
+
+(ref:epidemic-peak-size) The impact of far UVC coverage type, coverage, and efficacy on the mean final epidemic size per 1000 individuals, defined as the maximum total number of recovered individuals in the population averaged across 25 stochastic model simulations, for influenza-like and SARs-CoV-2-like pathogens. The light blue lines represent simulations where was far UVC deployed at random, and the dark blue lines simulations where far UVC was targeted at the riskiest settings. The ribbons show minimum and maximum values across 25 stochastic replicates for each parameter set.
 
 ```{r epidemic-peak-size, fig.cap="(ref:epidemic-peak-size)", fig.fullwidth = TRUE, fig.height=5}
 
@@ -240,12 +241,12 @@ epidemic_summary_outputs |>
   geom_line(linewidth = 1) +
   scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
   scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
-  geom_ribbon(aes(ymin = lq_peak / 1000, ymax = uq_peak / 1000, fill = coverage_type),
+  geom_ribbon(aes(ymin = min_peak / 1000, ymax = max_peak / 1000, fill = coverage_type),
               colour = NA, alpha = 0.3, show.legend = FALSE) +
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw(base_size = 12) +
   labs(x = "Far UVC Coverage (%)",
-       y = "Mean Peak Epidemic Size \n (per 1000 individuals)",
+       y = "Mean Peak Epidemic Size \n (per 1,000 individuals)",
        colour = "Coverage\nType") +
   facet_grid(archetype ~ efficacy,
              scales = "free_y",
@@ -265,7 +266,7 @@ epidemic_summary_outputs |>
 
 Figure \@ref(fig:epidemic-peak-timing) shows the impact of far UVC deployment on the timing of the epidemic peak. The deployment of far UVC increased the time taken for the epidemic peak timing for both the "influnza-like" and the "SARS-CoV-2-like" pathogens. Increasing far UVC coverage and/or efficacy increased the epidemic peak time. Increasing targeted far UVC efficacy from 40% to 80% and the coverage from 10% to 50% for the "influenza-like" pathogen increased the peak time from 138 days (131-154) to 395 days (233-834), while increasing far UVC efficacy from 40% to 80% and the coverage from 10% to 70% increased the peak time from 109 days (106-116) to 195 days (180-218) for the SARS-CoV-2-like pathogen. Targeting far UVC coverage at the riskiest settings provided greater delays in epidemic peak timing relative to the random allocation of far UVC across all combinations of efficacy and coverage, with the difference in epidemic peak time between targeted and random coverage types increasing with both far UVC coverage and efficacy. The peak time observed for the "influenza-like" pathogen decreased rapidly at 80% efficacy when coverage \> 50%, as far UVC prevented the epidemic from occurring (Figure \@ref(fig:epidemic-peak-size)).
 
-(ref:epidemic-peak-timing) The impact of far UVC coverage type, coverage, and efficacy on the mean number of days until the peak of the epidemic wave (in days), defined as the average timestep on which the number of infected individuals in the population peaked across 25 stochastic simulations for each parameterisation, for influenza-like and SARs-CoV-2-like pathogens. The light blue lines represent simulations where was far UVC deployed at random across setting-types (excluding households), and the dark blue lines simulations where far UVC was targeted at the riskiest locations across all setting types (excluding households). The ribbons show 25% and 75% lower and upper quartiles respectively.
+(ref:epidemic-peak-timing) The impact of far UVC coverage type, coverage, and efficacy on the mean number of days until the peak of the epidemic wave (in days), defined as the average timestep on which the number of infected individuals in the population peaked across 25 stochastic simulations for each parameterisation, for influenza-like and SARs-CoV-2-like pathogens. The light blue lines represent simulations where was far UVC deployed at random across setting-types (excluding households), and the dark blue lines simulations where far UVC was targeted at the riskiest locations across all setting types (excluding households). The ribbons show minimum and maximum values across 25 stochastic replicates for each parameter set.
 
 ```{r epidemic-peak-timing, fig.cap="(ref:epidemic-peak-timing)", fig.fullwidth = TRUE, fig.height=5}
 
@@ -273,11 +274,12 @@ Figure \@ref(fig:epidemic-peak-timing) shows the impact of far UVC deployment on
 
 epidemic_summary_outputs |>
   filter(coverage < 0.8, efficacy > 0) |>
+  filter(!(coverage > 0.5 & efficacy == 0.8 & coverage_type == "targeted_riskiness" & archetype == "influenza")) |>
   ggplot(aes(x = 100 * coverage, y = mean_peak_timing, colour = coverage_type)) +
   geom_line(linewidth = 1) +
   scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
   scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
-  geom_ribbon(aes(ymin = lq_peak_timing, ymax = uq_peak_timing, fill = coverage_type),
+  geom_ribbon(aes(ymin = min_peak_timing, ymax = max_peak_timing, fill = coverage_type),
               colour = NA, alpha = 0.3, show.legend = FALSE) +
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw(base_size = 12) +
@@ -300,9 +302,9 @@ epidemic_summary_outputs |>
 
 #### Epidemic Final Size
 
-Figure \@ref(fig:epidemic-final-size) shows the impact of far UVC deployment on the final size of the simulated epidemics. For the "influenza-like" pathogen, far UVC deployment provided substantial reductions in the final epidemic size. Increasing both far UVC coverage and efficacy resulted in substantial reductions in final epidemic size, and targeting far UVC deployment in the riskiest locations provided notable reductions in final epidemic size across all simulated parameter combinations. The reductions in final epidemic size observed for the "SARS-CoV-2" like pathogen were more moderate than for the "influenza-like" pathogen, and targeted far UVC coverage only provided reductions in epidemic final size for the "SARS-CoV-2" like pathogen only when efficacy $\>geq$ 60% and $\>geq$ 30%.
+Figure \@ref(fig:epidemic-final-size) shows the impact of far UVC deployment on the final size of the simulated epidemics. For the "influenza-like" pathogen, far UVC deployment provided substantial reductions in the final epidemic size. Increasing both far UVC coverage and efficacy resulted in substantial reductions in final epidemic size, and targeting far UVC deployment in the riskiest locations provided notable reductions in final epidemic size across all simulated parameter combinations. The reductions in final epidemic size observed for the "SARS-CoV-2" like pathogen were more moderate than for the "influenza-like" pathogen, and targeted far UVC coverage only provided reductions in epidemic final size for the "SARS-CoV-2" like pathogen only when efficacy $\geq$ 60% and coverage $\geq$ 30%.
 
-(ref:epidemic-final-size) The impact of far UVC coverage type, coverage, and efficacy on the mean final epidemic size per 1000 individuals, defined as the average maximum total number of recovered individuals in the population across 25 stochastic simulation runs for each parameterisation, for influenza-like and SARs-CoV-2-like pathogens. The light blue lines represent simulations where was far UVC deployed at random, and the dark blue lines simulations where far UVC was targeted at the riskiest settings. The ribbons show 25% and 75% lower and upper quartiles respectively.
+(ref:epidemic-final-size) The impact of far UVC coverage type, coverage, and efficacy on the mean final epidemic size per 1000 individuals, defined as the average maximum total number of recovered individuals in the population across 25 stochastic simulation runs for each parameterisation, for influenza-like and SARs-CoV-2-like pathogens. The light blue lines represent simulations where was far UVC deployed at random, and the dark blue lines simulations where far UVC was targeted at the riskiest settings. The ribbons show minimum and maximum values across 25 stochastic replicates for each parameter set.
 
 ```{r epidemic-final-size, fig.cap="(ref:epidemic-final-size)", fig.fullwidth = TRUE, fig.height=5}
 
@@ -310,7 +312,7 @@ Figure \@ref(fig:epidemic-final-size) shows the impact of far UVC deployment on 
 
 epidemic_summary_outputs |>
   filter(coverage < 0.8, efficacy > 0) |>
-  ggplot(aes(x = 100 * coverage, y = mean_final_size / 1000, colour = coverage_type)) +
+  ggplot(aes(x = 100 * coverage, y = 100 * mean_final_size / 1e5, colour = coverage_type)) +
   geom_line(linewidth = 1.2) +
   scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
   scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
@@ -319,7 +321,7 @@ epidemic_summary_outputs |>
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw(base_size = 12) +
   labs(x = "Far UVC Coverage (%)",
-       y = "Mean Final Epidemic Size \n (per 1000 individuals)",
+       y = "Mean Final Epidemic Size \n (% of population)",
        colour = "Coverage\nType") +
   facet_grid(archetype ~ efficacy,
              scales = "free_y",
@@ -338,10 +340,9 @@ epidemic_summary_outputs |>
 
 When highly efficacious and/or installed at high coverage, the deployment of far UVC provided substantial reductions in both the size of the epidemic, in terms of the peak number of individuals infected at any one time and the total number of individuals in the population who were infected. Targeting the deployment of far UVC towards the riskiest locations provided additional reductions in epidemic size and speed, but appreciable improvements were also observed when far UVC was installed at random and reductions in performance relative to targeted deployment could generally be overcome with increased efficacy and coverage. Far UVC deployment typically had a greater relative impact on the control of an "influenza-like" pathogen than the "SARS-CoV-2-like" pathogen.
 
-For the low $R0$ pathogen, the targeted installation of far UVC at very high coverage and efficacy ($\geq$ 80%) achieved complete suppression of the epidemic (i.e. reduced R \< 1 and prevented the pathogen from spreading from low initial frequency). However, far UVC provided significant value in the epidemic scenarios even when it does not achieve complete suppression of the epidemic. Reductions in transmission that fall short of full suppression arising from far UVC can still reduce the associated pressure on healthcare systems by reducing the peak size (and therefore burden) on the healthcare system, and spreading that burden out over time - the so-called "flattening of the curve"). Delaying the epidemic peak also provides more time for other medical countermeasures, such as vaccines, to be developed. Furthermore, for the same disease burden, flattening the curve enables shorter and less stringent non-pharmaceutical interventions to be implemented relative to scenarios in which far UVC is not available. However, it is important to recognise that the epidemic simulations did not consider imported infections from external locations, which typically sustain an epidemic, and could increase the intensity of the far UVC deployment required to prevent an epidemic from occurring, or erode the capacity of far UVC to prevent an epidemic entirely. 
+For the low $R0$ pathogen, the targeted installation of far UVC at very high coverage and efficacy ($\geq$ 80%) achieved complete suppression of the epidemic (i.e. reduced R \< 1 and prevented the pathogen from spreading from low initial frequency). However, far UVC provided significant value in the epidemic scenarios even when it does not achieve complete suppression of the epidemic. Reductions in transmission that fall short of full suppression arising from far UVC can still reduce the associated pressure on healthcare systems by reducing the peak size (and therefore burden) on the healthcare system, and spreading that burden out over time - the so-called "flattening of the curve"). Delaying the epidemic peak also provides more time for other medical countermeasures, such as vaccines, to be developed. Furthermore, for the same disease burden, flattening the curve enables shorter and less stringent non-pharmaceutical interventions to be implemented relative to scenarios in which far UVC is not available. However, it is important to recognise that the epidemic simulations did not consider imported infections from external locations, which typically sustain an epidemic, and could increase the intensity of the far UVC deployment required to prevent an epidemic from occurring, or erode the capacity of far UVC to prevent an epidemic entirely.
 
-The increased impact of far UVC on the "influenza-like" when compared to the "SARS-CoV-2-like" pathogen occurs because the former has a lower starting R0. As the initial R0 of the pathogen increases,  the non-linear nature of the fraction of transmission you have to avert to reduce the R below 1 increasingly reduces the impact of far UVC on the epidemic outbreak.
-
+The increased impact of far UVC on the "influenza-like" when compared to the "SARS-CoV-2-like" pathogen occurs because the former has a lower starting R0. As the initial R0 of the pathogen increases, the non-linear nature of the fraction of transmission you have to avert to reduce the R below 1 increasingly reduces the impact of far UVC on the epidemic outbreak.
 
 ### Endemic Pathogen Analyses
 
@@ -573,4 +574,3 @@ ggplot(overall_R0_df, aes(x = 1/R0, y = prevalence, col = archetype)) +
 ```
 
 # Bibliography {.unnumbered}
-
