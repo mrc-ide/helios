@@ -54,6 +54,8 @@ for(i in 1: length(output_files)) {
 }
 
 head(summary_outputs)
+endemic_summary_output <- summary_outputs
+saveRDS(endemic_summary_output, file = "inst/blueprint_output_3_Sep9/Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_summary_outputs.rds")
 
 avg_summary_outputs <- summary_outputs %>%
   group_by(archetype, coverage_type, coverage, efficacy, disease_status) %>%

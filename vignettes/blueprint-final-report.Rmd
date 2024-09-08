@@ -39,6 +39,7 @@ library(dplyr, warn.conflicts = FALSE)
 library(purrr)
 theme_set(theme_minimal())
 blueprint_colours <- colorRampPalette(c("#00AFFF", "#03113E"))(4)
+endemic_summary_outputs <- readRDS("../inst/blueprint_output_3_Sep9/Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_summary_outputs.rds")
 ```
 
 # Overview {.unnumbered}
@@ -217,7 +218,7 @@ For each pathogen archetype, we investigated the effect of far UVC efficacy and 
 
 -   **far UVC Efficacy:** Either 40%, 60% or 80%, with the assumption that far UVC efficacy was identical across all Settings and Locations where it had been installed.
 
-All presented results are based on summary statistics (e.g. mean, range etc) calculated based on 20 stochastic replicates.
+All presented results are based on summary statistics (e.g. mean, range etc) calculated based on 25 stochastic replicates.
 
 ### Epidemic Pathogen Analyses
 
@@ -247,86 +248,78 @@ The above results highlight:
 
 ### Endemic Pathogen Analyses
 
-The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in Figure Figure \@ref(fig:placeholder-1). We consider a single metric for evaluating the impact of far UVC on the endemic pathogen. This is the total estimated annual incidence of new infections with the pathogen.
+The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in Figure \@ref(fig:endemic-impact). We consider a single metric for evaluating the impact of far UVC on the endemic pathogen. This is the total estimated annual incidence of new infections with the pathogen.
 
-We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming A% coverage and B% efficacy, far UVC installation led to a C% (range D%-E%) reduction in annual infection incidence for "Influenza-Like" and F% (range G%-H%) for "SARS-CoV-2-Like". At I% coverage and J% assumed efficacy, these are K% (range L%-M%) and N% (range O%-P%) respectively. SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
+We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming 10% coverage and 80% efficacy, random far UVC installation led to a 8.8% (range 6.1%-12.1%) reduction in annual infection incidence for the "Influenza-Like" pathogen, while targeting far UVC to locations in order of riskiness increased the reduction in transmission to 15.8% on average (range 12.5%-19.7%), an approximately 1.8x increase in impact. For the "SARS-CoV-2-like" pathogen, random far UVC coverage assuming 10% coverage and 80% efficacy were asociated with a 3.7% (range 2.6%-4.8%) reduction in the annual incidence of infection. Targeting far UVC to locations in order of riskiness led to a 5.5% average reduction, a 1.5x increase compared to the randomly targeted scenario.
 
-```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
+```{r endemic-impact, fig.cap="(ref:endemic-impact)"}
 
-# Loading in the outputs
-outputs1 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results1.rds"))
-outputs2 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results2.rds"))
-outputs3 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results3.rds"))
-outputs4 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results4.rds"))
-outputs <- c(outputs1, outputs2, outputs3, outputs4)
-simulations_to_run <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/simulations_to_run.rds"))
-parameter_lists <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/parameter_lists.rds"))
+avg_summary_outputs <- endemic_summary_outputs %>%
+  group_by(archetype, coverage_type, coverage, efficacy, disease_status) %>%
+  summarise(mean_reduction_incidence = mean(reduction_incidence),
+            mean_reduction_prevalence = mean(reduction_prevalence),
+            lower_reduction_incidence = min(reduction_incidence),
+            upper_reduction_incidence = max(reduction_incidence)) %>%
+  ungroup() %>%
+  mutate(new_ID = 1:n())
 
-dt <- parameter_lists[[1]]$dt
-population <- parameter_lists[[1]]$human_population
-years_to_simulate <- parameter_lists[[1]]$simulation_time / 365
-timestep_baseline_start <- ((years_to_simulate - 6) * 365) / dt
-timestep_baseline_end <- ((years_to_simulate - 2) * 365) / dt
-timestep_uvc_start <- ((years_to_simulate - 2) * 365 + 1) / dt
-timestep_uvc_end <- (years_to_simulate * 365) / dt
-
-## Removing the burnin whilst the model reaches equilibrium
-outputs_processed <- outputs
-index_start <- which(outputs_processed[[1]]$timestep == timestep_baseline_start)
-index_end <- which(outputs_processed[[1]]$timestep == timestep_uvc_end)
-for (i in 1:length(outputs)) {
-  outputs_processed[[i]] <- outputs_processed[[i]][index_start:index_end, ]
-  outputs_processed[[i]]$archetype <- simulations_to_run[i, "archetype"]
-  outputs_processed[[i]]$coverage <- simulations_to_run[i, "coverage"]
-  outputs_processed[[i]]$efficacy <- simulations_to_run[i, "efficacy"]
-  outputs_processed[[i]]$iteration <- simulations_to_run[i, "iteration"]
-  outputs_processed[[i]]$new_timestep <- outputs_processed[[i]]$timestep - min(outputs_processed[[i]]$timestep)
-}
-
-subset_index <- 4 * 365
-overall <- dplyr::bind_rows(outputs_processed) |>
-  mutate(daily_timestep = floor(new_timestep * dt)) |>
-  group_by(iteration, archetype, efficacy, coverage, daily_timestep) |>
-  summarise(S_count = mean(S_count),
-            E_count = mean(E_count),
-            I_count = mean(I_count),
-            R_count = mean(R_count),
-            E_new = sum(E_new),
-            n_external_infections = sum(n_external_infections))
-end <- length(unique(overall$daily_timestep))
-
-overall5 <- overall |>
-  group_by(iteration, daily_timestep, archetype, efficacy, coverage) |>
-  summarise(S_count = mean(S_count), E_new = mean(E_new)) |>
-  ungroup() |>
-  group_by(iteration, archetype, efficacy, coverage) |>
-  summarise(incidence_pre_uvc = sum(E_new[1:subset_index]) / 4,
-            incidence_after_uvc = sum(E_new[(subset_index + 1):end]) / 2) |>
-  mutate(incidence_reduction = incidence_pre_uvc - incidence_after_uvc,
-         incidence_percentage_reduction = incidence_reduction / incidence_pre_uvc) |>
-  ungroup() |>
-  group_by(archetype, efficacy, coverage) |>
-  summarise(incidence_percentage_reduction_mean = mean(incidence_percentage_reduction),
-            incidence_percentage_reduction_lower = min(incidence_percentage_reduction),
-            incidence_percentage_reduction_upper = max(incidence_percentage_reduction))
-ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_reduction_mean)) +
-  geom_bar(stat = "identity", position = "dodge", fill = "#324A5F", col = "black") +
-  geom_errorbar(aes(ymin = 100 * incidence_percentage_reduction_lower,
-                    ymax = 100 * incidence_percentage_reduction_upper),
-                width = 0.5) +
+ggplot(data = subset(avg_summary_outputs, coverage_type == "random" & coverage <= 0.7),
+       aes(x = 100 * coverage, y = 100 * mean_reduction_incidence)) +
+  geom_bar(data = subset(avg_summary_outputs, coverage_type == "targeted_riskiness" & coverage <= 0.7),
+           aes(x = 100 * coverage, y = 100 * mean_reduction_incidence),
+           col = "black", fill ="#03113E" , stat = "identity") +
+  geom_bar(stat = "identity", position = "dodge", fill = "#00AFFF", col = "black") +
+  geom_errorbar(aes(ymin = 100 * lower_reduction_incidence,
+                    ymax = 100 * upper_reduction_incidence),
+                width = 5) +
+  geom_errorbar(data = subset(avg_summary_outputs, coverage_type == "targeted_riskiness" & coverage <= 0.7),
+                aes(ymin = 100 * lower_reduction_incidence,
+                    ymax = 100 * upper_reduction_incidence),
+                width = 5) +
   theme_bw() +
-  facet_grid(archetype ~ coverage, 
-             labeller = as_labeller(c(`0` = "0% Coverage",
-                                      `0.1` = "10% Coverage",
-                                      `0.25` = "25% Coverage",
-                                      `0.5` = "50% Coverage",
+  facet_grid(archetype ~ efficacy, # scales = "free_y",
+             labeller = as_labeller(c(`0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy",
                                       `flu` = "Influenza",
                                       `sars_cov_2` = "SARS-CoV-2"))) +
-  labs(fill = "Time\nPeriod", x = "Far UVC Efficacy (%)",
-       y = "% Reduction in Annual Incidence of Infection")
+  scale_x_continuous(breaks = c(0, 10, 20, 30, 40, 50, 60, 80, 100)) +
+  labs(fill = "Time\nPeriod", x = "Far UVC Coverage (%)",
+       y = "% Reduction in Annual Infection Incidence")
 ```
 
-(ref:placeholder-1) The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for "Influenza-Like" and "SARS-CoV-2-Like" pathogen archetypes. The bars represent the mean percentage reduction in infection incidence averaged over the 20 stochastic model simulations run for each parametrisation, with the range of % reduction in incidence across those 20 simulations shown by the error bars.
+(ref:endemic-impact) The impact of far UVC coverage type, coverage, and efficacy on the reduction in average annual incidence of infection compared to situations where far UVC is not installed. The light blue bars represent the average for simulations where was far UVC deployed at random, and the dark blue bars stacked on top represent the average extra impact that arises when far UVC was targeted at the riskiest settings. The error bars for both show the minimum and maximum values across 25 stochastic replicates for each parameter set.
+
+```{r endemic-figure2, fig.cap="(ref:endemic-figure2)"}
+
+avg_summary_outputs_diff <- endemic_summary_outputs %>%
+  mutate(diff = avg_inc_pre_UVC - avg_inc_post_UVC) %>%
+  select(iteration, archetype, coverage_type, coverage, efficacy, disease_status, diff) %>%
+  pivot_wider(id_cols = c(iteration, archetype, coverage, efficacy, disease_status),
+              names_from = coverage_type,
+              values_from = diff) %>%
+  group_by(archetype, coverage, efficacy, disease_status) %>%
+  mutate(diff_rel = targeted_riskiness / random - 1) %>%
+  summarise(mean_diff_rel = median(diff_rel, na.rm = TRUE),
+            lower_diff_rel = quantile(diff_rel, 0.25, na.rm = TRUE),
+            upper_diff_rel = quantile(diff_rel, 0.75, na.rm = TRUE))
+
+ggplot(data = subset(avg_summary_outputs_diff, coverage <= 0.9),
+       aes(x = 100 * coverage, y = 100 * mean_diff_rel)) +
+  geom_bar(stat = "identity", position = "dodge", fill = "#08BDBD", col = "black") +
+  geom_errorbar(aes(ymin = 100 * lower_diff_rel, ymax = 100 * upper_diff_rel)) +
+  theme_bw() +
+  facet_grid(archetype ~ efficacy, scales = "free_y",
+             labeller = as_labeller(c(`0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy",
+                                      `flu` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2"))) +
+  scale_x_continuous(breaks = c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100)) +
+  labs(fill = "Time\nPeriod", x = "Far UVC Coverage (%)",
+       y = "Relative Extra Impact (%)")
+
+```
 
 #### Discussion
 
@@ -475,4 +468,3 @@ ggplot(overall_R0_df, aes(x = 1/R0, y = prevalence, col = archetype)) +
 ```
 
 # Bibliography {.unnumbered}
-
