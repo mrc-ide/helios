@@ -92,9 +92,9 @@ As a reminder, here is what the distribution of riskiness across locations of th
 scaling_factor <- 5
 parameter_list <- get_parameters(archetype = "flu",
                                  overrides = list(
-                                   human_population = 200000 / scaling_factor,
+                                   human_population = 350000 / scaling_factor,
                                    number_initial_S = 190000 / scaling_factor,
-                                   number_initial_E = 10000 / scaling_factor,
+                                   number_initial_E = 160000 / scaling_factor,
                                    number_initial_I = 0,
                                    number_initial_R = 0,
                                    simulation_time = 150)) |>
@@ -216,14 +216,14 @@ Using the updated modelling framework described above, we conducted analyses eva
 
 ## Methods
 
-Here, we provide a (very) brief summary of the way in which we generated the results presented here. \@ref(fig:methods-figure-endemic) shows how the average reduction in annual infection incidence was calculated for the endemic pathogen scenarios. Briefly, we ran the model for a period of time without far UVC (referred to in the figure as the "pre-UVC" period), and calculated the average annual incidence of infection over this period. We then introduced far-UVC at a certain point and ran the model for a further 10 years (referred to in the figure as "post-UVC"). We then calculated the average annual incidence of infection across this decade, and the difference in annual incidence of infection between the "pre-UVC" and "post-UVC" periods.
+Here, we provide a (very) brief summary of the way in which we generated the results presented here. Figure \@ref(fig:methods-figure-endemic) shows how the average reduction in annual infection incidence was calculated for the endemic pathogen scenarios. Briefly, we ran the model for a period of time without far UVC (referred to in the figure as the "pre-UVC" period), and calculated the average annual incidence of infection over this period. We then introduced far-UVC at a certain point and ran the model for a further 10 years (referred to in the figure as "post-UVC"). We then calculated the average annual incidence of infection across this decade, and the difference in annual incidence of infection between the "pre-UVC" and "post-UVC" periods.
 
-```{r methods-figure-endemic, fig.cap="(ref:methods-figure-endemic)", fig.fullwidth = TRUE, fig.height=5}
+ref(fig:methods-figure-endemic) shows how the average reduction in annual infection incidence was calculated for the endemic pathogen scenarios. Grey colouring indicates pre-UVC period, and orange colouring indicates period following introduction of far UVC. Far UVC is installed at year 5 in this exemplar scenario (indicated by vertical dashed line). Horizontal dashed lines indicate the average incidence of infection in the pre and post UVC periods. 
+
+```{r methods-figure-endemic, fig.cap="(ref:methods-figure-endemic)"}
 # Load in the output file:
-temp_obj <- readRDS(file = paste0(here::here(), "/inst/blueprint_output_3_Sep9/Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_outputs/", output_files[20]))
+temp_obj <- readRDS(file = paste0(here::here(), "/inst/blueprint_output_3_Sep9/Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_outputs/scenario_output_batch_3_27.rds"))
 temp_df <- temp_obj[[65]]
-temp_df$parameters$far_uvc_joint_coverage
-temp_df$parameters$far_uvc_joint_efficacy
 
 for_plot <- subset(temp_df[[2]], timestep >= 10730) %>%
   mutate(time_period = ifelse(((timestep - 10730) * temp_df$parameters$dt) / 365 > 5, "Pre-UVC", "Post-UVC"))
@@ -252,12 +252,12 @@ ggplot() +
 
 ```
 
-\@ref(fig:methods-figure-endemic) shows how the average reduction in annual infection incidence was calculated for the endemic pathogen scenarios. Grey colouring indicates pre-UVC period, and orange colouring indicates period following introduction of far UVC. Far UVC is installed at year 5 in this exemplar scenario (indicated by vertical dashed line). Horizontal dashed lines indicate the average incidence of infection in the pre and post UVC periods. 
 
+Figure \@ref(fig:methods-figure-epidemic) shows the basis for how we calculated the different metrics used to asses far UVC impact in an epidemic pathogen scenario. We considered 3 metrics - the final epidemic size (i.e. the total number of individuals infected during the epidemic as a fraction of total population size), timing of the epidemic peak, and the size of the peak (i.e. the number of individuals infected when the epidemic is at its largest). For each metric, we ran a scenario with and without far UVC installed separately, and then compared each of the metrics in each case. 
 
-\@ref(fig:methods-figure-epidemic) shows the basis for how we calculated the different metrics used to asses far UVC impact in an epidemic pathogen scenario. We considered 3 metrics - the final epidemic size (i.e. the total number of individuals infected during the epidemic as a fraction of total population size), timing of the epidemic peak, and the size of the peak (i.e. the number of individuals infected when the epidemic is at its largest). For each metric, we ran a scenario with and without far UVC installed separately, and then compared each of the metrics in each case. 
+ref(fig:methods-figure-epidemic) shows the basis for calculating the various epidemic pathogen disease metrics used in this report. Grey colouring indicates the scenario without far UVC installed, orange indicates the scenario with far UVC. 
 
-```{r methods-figure-epidemic, fig.cap="(ref:methods-figure-epidemic)", fig.fullwidth = TRUE, fig.height=5}
+```{r methods-figure-epidemic, fig.cap="(ref:methods-figure-epidemic)"}
 # Load in the output file:
 temp_obj <- readRDS(file = paste0(here::here(), "/inst/blueprint_output_3_Sep9/Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_outputs/scenario_output_batch_1_1.rds"))
 temp_df <- temp_obj[[1]]$simulation %>%
@@ -282,7 +282,6 @@ ggplot(subset(temp_df3, timestep < 350)) +
 
 
 ```
-\@ref(fig:methods-figure-epidemic) shows the basis for calculating the various epidemic pathogen disease metrics used in this report. Grey colouring indicates the scenario without far UVC installed, orange indicates the scenario with far UVC. 
 
 
 ## Results
@@ -541,5 +540,3 @@ For the "Influenza-like" pathogen archetype (approximate $R_0$ of 1.35), targete
 In the context of an endemic pathogen, installation of far UVC to a random 10% of location space led to average reductions of approximately X% and Y% for the "Influenza-like" and "SARS-CoV-2-like" archetypes respectively. The increased impact of far UVC on the "Influenza-like" pathogen (something also observed in the epidemic scenarios) is primarily dirven by differences in the starting $R_0$ of each pathogen (\~1.35 for "Influenza-like" and \~2.5 for "SARS-CoV-2-Like"). In general, there is a non-linear influence of $R_{0}$ on the final size of an epidemic (for an epidemic pathogen) and the average prevalence of infection (in the case of an persistently endemic pathogen). For lower values of $R_{0}$ which are near to the critical threshold of $R_0=1$, small increases to $R_0$ translate to (relatively) large increases in the above quantities. At higher values of $R_{0}$ however, saturation occurs (e.g. the final size of an epidemic with robust and sterilising immunity post infection can never be \>100%) and the rate at which increasing values of $R_0$ increases infection prevalence or epidemic final size diminishes. By the same logic, when $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. due to far UVC) will have only a slight impact on infection prevalence or epidemic final size. By contrast, when baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence (or final epidemic size) will decrease more (in relative terms) for the same (relative) reduction in $R_0$.
 
 Our results also highlight that the added value of targeting far UVC coverage based on riskiness (rather than at random) is greatest when the total percentage of covered space is low (e.g. 10% considered in the analyses presented in this report). As the proportion of space covered increases, there is increasing convergence between the two strategies (as a greater number of total spaces are covered). At 100% coverage, the two strategies are identical. Our results suggest that in instances where only a low fraction of spaces are likely to be covered (for instance during initial adoption of the technology), the value of information that enables installation to be targeted at the riskiest spaces is likely to be substantial.
-
-# Bibliography {.unnumbered}
