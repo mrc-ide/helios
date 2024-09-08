@@ -46,7 +46,15 @@ endemic_summary_outputs <- readRDS("../inst/blueprint_output_3_Sep9/Report_3_End
 
 In our [initial report](https://mrc-ide.github.io/helios/articles/blueprint.html) we introduced `helios`: an individual-based modelling framework for exploring the impact that installation of far UVC could have on the transmission and burden of respiratory infections. In a [follow-up report](https://mrc-ide.github.io/helios/articles/blueprint-july.html), we presented updates to that framework and a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden of endemic respiratory pathogens. In this final report, we present updates to the framework made since the last report, and a series of analyses evaluating the impact that installation of far UVC in non-household settings could have on the burden of endemic respiratory pathogens.
 
-# Model Changes {#changes}
+# Summary of Key Results {#changes}
+
+-   Quote the 10% coverage and 80% efficacy results for random and targeted far UVC strategies.
+
+-   Highlight random vs targeted riskiness strategy differences.
+
+-   Highlight difference in impact between SARS-CoV-2 and Influenza (R0-driven).
+
+# Model Changes
 
 Two updates to the model have been made since the last report. These are:
 
@@ -250,7 +258,9 @@ The above results highlight:
 
 The results of analyses examining the impact of far UVC installation on an epidemic pathogen are presented in Figure \@ref(fig:endemic-impact). We consider a single metric for evaluating the impact of far UVC on the endemic pathogen. This is the total estimated annual incidence of new infections with the pathogen.
 
-We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming 10% coverage and 80% efficacy, random far UVC installation led to a 8.8% (range 6.1%-12.1%) reduction in annual infection incidence for the "Influenza-Like" pathogen, while targeting far UVC to locations in order of riskiness increased the reduction in transmission to 15.8% on average (range 12.5%-19.7%), an approximately 1.8x increase in impact. For the "SARS-CoV-2-like" pathogen, random far UVC coverage assuming 10% coverage and 80% efficacy were asociated with a 3.7% (range 2.6%-4.8%) reduction in the annual incidence of infection. Targeting far UVC to locations in order of riskiness led to a 5.5% average reduction, a 1.5x increase compared to the randomly targeted scenario.
+We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen. Assuming 10% coverage and 80% efficacy, random far UVC installation led to a 8.8% (range 6.1%-12.1%) reduction in annual infection incidence for the "Influenza-Like" pathogen, while targeting far UVC to locations in order of riskiness increased the reduction in transmission to 15.8% on average (range 12.5%-19.7%), an approximately 1.8x increase in impact. For the "SARS-CoV-2-like" pathogen, random far UVC coverage assuming 10% coverage and 80% efficacy were asociated with a 3.7% (range 2.6%-4.8%) reduction in the annual incidence of infection. Targeting far UVC to locations in order of riskiness led to a 5.5% average reduction, a 1.5x increase compared to the randomly targeted scenario.
+
+Our results also highlight that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact, though the degree to which this is the case varies across pathogen archetypes. For the "Influenza-like" pathogen, increasing far UVC coverage from 10% to 30% led to the average annual reduction in incidence increasing from X% to Y%, a Zx increase. For the "SARS-CoV-2-like" pathogen, increasing far UVC coverage from 10% to 30% led to the average annual reduction in incidence increasing from X% to Y%, a Zx increase.
 
 ```{r endemic-impact, fig.cap="(ref:endemic-impact)"}
 
@@ -290,6 +300,8 @@ ggplot(data = subset(avg_summary_outputs, coverage_type == "random" & coverage <
 
 (ref:endemic-impact) The impact of far UVC coverage type, coverage, and efficacy on the reduction in average annual incidence of infection compared to situations where far UVC is not installed. The light blue bars represent the average for simulations where was far UVC deployed at random, and the dark blue bars stacked on top represent the average extra impact that arises when far UVC was targeted at the riskiest settings. The error bars for both show the minimum and maximum values across 25 stochastic replicates for each parameter set.
 
+In Figure \@ref(fig:endemic-figure2), we show the relative extra impact achieved under each scenario by targeting far UVC to locations based on riskiness, rather than at random. In general, the relative gain in transmission reduction was greatest at low coverage - when only a small fraction of locations are covered, choosing to cover those that are most conducive to transmission has a substantial (relative) effect. As the % of locations covered increases, the random and targeted approaches become increasingly similar (when 100% of locations are covered, they are identical), and so the relative difference in impact decreases.
+
 ```{r endemic-figure2, fig.cap="(ref:endemic-figure2)"}
 
 avg_summary_outputs_diff <- endemic_summary_outputs %>%
@@ -321,15 +333,7 @@ ggplot(data = subset(avg_summary_outputs_diff, coverage <= 0.9),
 
 ```
 
-#### Discussion
-
-The above results highlight:
-
--   Something here about generally higher (relative) impact on influenza than SARS-CoV-2 (because the former has a lower starting R0; and how this relates to the non-linear nature of the fraction of transmission you have to avert to reduce R0 to 1).
-
--   Something here about untargeted and targeted approaches.
-
--   An important point here is that there is significant value to far UVC in an epidemic pathogen situation, even when it does not achieve complete suppression of the epidemic (i.e. reducing R \< 1 and preventing it occurring). Reductions in transmission that fall short of full suppression arising from far UVC are still useful in that they 1) reduce the associated pressure on healthcare systems (by reducing peak size and spreading burden out over time - the so-called "flattening of the curve"); 2) push the epidemic later into the future (providing more time for other medical countermeasures such as vaccines to be developed); and 3) for the same disease burden, enable shorter and less stringent non-pharmaceutical interventions to be implemented compared to a scenario in which far UVC is not available.
+### Comparison
 
 We next compared these results to those produced by a simplistic, static multiplicative model of estimated impact calculated by multiplying the coverage and efficacy of the modelled far UVC together and then multiplying this by the proportion of transmission that is "targetable" by far UVC (i.e. the proportion of transmission that occurs outside households). The results of this analyses are plotted below in \@ref(fig:comparison-1). As you can see, this simplified model provides similar estimates to those generated by `helios` for SARS-CoV-2, but significantly underestimates the impact for Influenza.
 
@@ -360,111 +364,24 @@ ggplot() +
 
 (ref:comparison-1) Comparing the estimates of impact for `helios` and a simplified multiplicative model. x-axis indicates the reduction estimated by the simple model; y-axis the estimate produced by `helios` . Points are coloured according to pathogen archetype. Dashed line indicates the line of `y = x` (i.e. any points lying on that line have the same impact estimate from `helios` and the simplified model). Grey shaded area indicates range where the simple model predicts lower impact than `helios`.
 
-## Discussion
+# Discussion
+
+Our results highlight the impact that deployment of far UVC could have in reducing disease transmission across a range of pathogen archetypes and disese metrics. Targeting the deployment of far UVC towards the riskiest locations provided additional reductions in epidemic size and speed, but appreciable reductions were still observed when far UVC was installed at random and reductions in performance relative to targeted deployment could generally be overcome with increased efficacy and coverage. Far UVC deployment typically had a greater relative impact on the control of an "Influenza-Like" pathogen than the "SARS-CoV-2-Like" pathogen considered in our analyses.
+
+For the "Influenza-like" pathogen archetype (approximate $R_0$ of 1.35), targeted installation of far UVC at very high coverage and efficacy ($\geq$ 80%) achieved complete suppression in the epidemic instance (i.e. reduced R \< 1 and prevented the pathogen from spreading from low initial frequency). This was not achieved under any circumstances for the "SARS-CoV-2-like" pathogen archetype (approximate $R_0$ of 2.5). However, far UVC provided significant value in the epidemic scenarios even when it does not achieve complete suppression of the epidemic, as measured by the range of metrics considered in this report. Reductions in transmission that fall short of full suppression arising from far UVC can still reduce the associated pressure on healthcare systems by reducing the peak size (and therefore burden) on the healthcare system, and spreading that burden out over time - the so-called "flattening of the curve"). Delaying the epidemic peak also provides more time for other medical countermeasures, such as vaccines, to be developed. Furthermore, for the same disease burden, flattening the curve enables shorter and less stringent non-pharmaceutical interventions to be implemented relative to scenarios in which far UVC is not available. 
+
+In the context of an endemic pathogen, installation of far UVC to a random 10% of location space led to average reductions of approximately X% and Y% for the "Influenza-like" and "SARS-CoV-2-like" archetypes respectively. The increased impact of far UVC on the "Influenza-like" pathogen (something also observed in the epidemic scenarios) is primarily dirven by differences in the starting $R_0$ of each pathogen (~1.35 for "Influenza-like" and ~2.5 for SARS)
+when compared to the "SARS-CoV-2-like" pathogen occurs because the former has a lower starting R0. As the initial R0 of the pathogen increases, the non-linear nature of the fraction of transmission you have to avert to reduce the R below 1 increasingly reduces the impact of far UVC on the epidemic outbreak.
+
+
+
+
+Importantly, our results highlight that the added value of targeting far UVC coverage based on riskiness (rather than at random) is greatest when the total percentage of covered space is likely to be low (e.g. 10% considered in the analyses presented in this report). Whilst 
+
+
 
 The observed differences in predicted far UVC impact between the two pathogen archetypes arise primarily because of their different $R_0$ values. In Figure \@ref(fig:analytical-relationship) we show the analytical relationship between $R_0$ and prevalence of infection, derived for a SEIRS compartmental model (see [here](https://www.nature.com/articles/s41592-020-0856-2) and [here](https://shiny.bcgsc.ca/posepi2/)) that shares a similar representation of a disease's natural history to `helios`. We note that the results presented in \@ref(fig:analytical-relationship) are not results from running `helios` (instead they are the analytical solution of a significantly more tractable mathematical model that is simpler than but similar to `helios`) and are displayed here solely for the purpose of illustrating a generally-held non-linearity between transmissibility ($R_{0}$) and infection prevalence.
 
-There is a non-linear influence of $R_{0}$ on prevalence of infection (and hence disease burden). For lower values of $R_{0}$, there is a near-linear relationship between the two quantities. At higher values of $R_{0}$ however, infection prevalence saturates and the rate at which increasing values of $R_0$ increases infection prevalence diminishes. When $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. due to far UVC) will have only a slight impact on infection prevalence. By contrast, when baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence will decrease more (in relative terms) for the same reduction in $R_0$. Increasing duration of infectiousness increases the prevalence of infection in a linear manner
-
-(ref:analytical-relationship) The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`. The vertical dashed lines indicate the value of $R_0$ used for each archetype in the analyses carried out.
-
-```{r analytical-relationship, fig.cap="(ref:analytical-relationship)", , fig.height=5.5}
-## R0 - infection prevalence relationship for Influenza archetype
-R0 <- seq(1, 4, 0.1)
-gamma <- 1 / 2
-sigma <- 1 / 1
-omega <- 1 / 365
-mu <- 1 / 100000
-alpha <- 0
-influenza_infection_prevalence <- c()
-for (i in 1:length(R0)) {
-  beta <- R0[i] * ((sigma + mu) / sigma) * (gamma + mu)
-  S <- 1 / R0[i]
-  I <- (mu * (1 - S)) / ((beta * S) - ((omega * gamma)/(omega + mu)))
-  E <- (gamma + mu + alpha) * I / sigma
-  influenza_infection_prevalence <- c(influenza_infection_prevalence, (E + I) * 100)
-}
-influenza_R0 <- data.frame(archetype = "Influenza-Like", R0 = R0, prevalence = influenza_infection_prevalence)
-
-## R0 - infection prevalence relationship for SC2 archetype
-R0 <- seq(1, 4, 0.1)
-gamma <- 1 / 4
-sigma <- 1 / 2
-omega <- 1 / 365
-mu <- 1 / 100000
-sc2_infection_prevalence <- c()
-for (i in 1:length(R0)) {
-  beta <- R0[i] * ((sigma + mu) / sigma) * (gamma + mu)
-  S <- 1 / R0[i]
-  I <- (mu * (1 - S)) / ((beta * S) - ((omega * gamma)/(omega + mu)))
-  E <- (gamma + mu + alpha) * I / sigma
-  sc2_infection_prevalence <- c(sc2_infection_prevalence, (E + I) * 100)
-}
-sc2_R0 <- data.frame(archetype = "SARS-CoV-2-Like", R0 = R0, prevalence = sc2_infection_prevalence)
-
-overall_R0_df <- rbind(influenza_R0, sc2_R0)
-
-a <- ggplot(overall_R0_df, aes(x = R0, y = prevalence, col = archetype)) +
-  geom_point() +
-  geom_line() +
-  geom_vline(xintercept = c(1.5, 3), linetype = "dashed") +
-  theme_bw() +
-  labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)",
-       col = "Pathogen\nArchetype")
-
-
-## R0 - infection prevalence relationship for limited R0 and varied duration of infectiousness
-R0 <- c(1.5, 2, 3)
-gamma <- 1 / seq(1:15)
-sigma <- 1 / 2
-omega <- 1 / 365
-mu <- 1 / 100000
-durVary_infection_prevalence <- matrix(nrow = length(R0),
-                                       ncol = length(gamma))
-for (i in 1:length(R0)) {
-  for (j in 1:length(gamma)) {
-    beta <- R0[i] * ((sigma + mu) / sigma) * (gamma[j] + mu)
-    S <- 1 / R0[i]
-    I <- (mu * (1 - S)) / ((beta * S) - ((omega * gamma[j])/(omega + mu)))
-    E <- (gamma[j] + mu + alpha) * I / sigma
-    durVary_infection_prevalence[i, j] <- (E + I) * 100
-  }
-}
-colnames(durVary_infection_prevalence) <- 1/gamma
-row.names(durVary_infection_prevalence) <- R0
-
-durVary_infection_prevalence2 <- reshape2::melt(durVary_infection_prevalence)
-colnames(durVary_infection_prevalence2) <- c("R0", "Duration of Infectiousness", "Prevalence of Infection")
-
-# b <- ggplot(durVary_infection_prevalence2, aes(x = `Duration of Infectiousness`, y = `Prevalence of Infection`)) +
-#   geom_point() +
-#   geom_line() +
-#   facet_grid(. ~ R0,
-#              labeller = as_labeller(c(`1.5` = "R0 = 1.5", `2` = "R0 = 2", `3` = "R0 = 3"))) +
-#   theme_bw() +
-#   lims(y = c(0, 4)) +
-#   labs(x = "Duration of Infectiousness (Days)", y = "Prevalence of Infection (%)")
-
-b <- ggplot(durVary_infection_prevalence2, aes(x = `Duration of Infectiousness`, y = `Prevalence of Infection`, col = factor(R0))) +
-  geom_point() +
-  geom_line() +
-  theme_bw() +
-  lims(y = c(0, 4)) +
-  labs(x = "Duration of Infectiousness (Days)", y = "Prevalence of Infection (%)",
-       col = "R0 Value")
-
-cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
-
-R0 <- seq(1, 4, 0.1)
-ggplot(overall_R0_df, aes(x = 1/R0, y = prevalence, col = archetype)) +
-  geom_point() +
-  geom_line() +
-  scale_x_continuous(breaks = 1/(c(4, 3, 2, 1)),
-                     labels = c(4, 3, 2, 1)) +
-  theme_bw() +
-  labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)",
-       col = "Pathogen\nArchetype")
-
-```
+In general, there is a non-linear influence of $R_{0}$ on the final size of an epidemic (for an epidemic pathogen) or the average prevalence of infection (in the case of an persistently endemic pathogen). For lower values of $R_{0}$ near to the critical threshold of $R_0=1$, small increases to $R_0$ translate to (relatively) large increases in the above quantities. At higher values of $R_{0}$ however, they saturate and the rate at which increasing values of $R_0$ increases infection prevalence or epidemic final size diminishes. By the same logic, when $R_0$ is high (as for the "SARS-CoV-2-Like" archetype), small reductions in $R_0$ (e.g. due to far UVC) will have only a slight impact on infection prevalence or epidemic final size. By contrast, when baseline $R_0$ is lower (as for the "Influenza-Like" archetype"), the infection prevalence will decrease more (in relative terms) for the same (relative) reduction in $R_0$.
 
 # Bibliography {.unnumbered}
