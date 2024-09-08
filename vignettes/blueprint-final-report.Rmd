@@ -216,7 +216,41 @@ Using the updated modelling framework described above, we conducted analyses eva
 
 ## Methods
 
-aaaa
+Here, we provide a (very) brief summary of the way in which we generated the results presented here. \@ref(fig:methods-figure-endemic) shows how the average reduction in annual infection incidence was calculated for the endemic pathogen scenarios. Briefly, we ran the model for a period of time without far UVC (referred to in the figure as the "pre-UVC" period), and calculated the average annual incidence of infection over this period. We then introduced far-UVC at a certain point and ran the model for a further 10 years (referred to in the figure as "post-UVC"). We then calculated the average annual incidence of infection across this decade, and the difference in annual incidence of infection between the "pre-UVC" and "post-UVC" periods.
+
+```{r methods-figure-endemic, fig.cap="(ref:methods-figure-endemic)", fig.fullwidth = TRUE, fig.height=5}
+# Load in the output file:
+temp_obj <- readRDS(file = paste0(here::here(), "/inst/blueprint_output_3_Sep9/Report_3_Endemic/Endemic_Simulation_Batch_3/endemic_batch_3_outputs/", output_files[20]))
+temp_df <- temp_obj[[65]]
+temp_df$parameters$far_uvc_joint_coverage
+temp_df$parameters$far_uvc_joint_efficacy
+
+for_plot <- subset(temp_df[[2]], timestep >= 10730) %>%
+  mutate(time_period = ifelse(((timestep - 10730) * temp_df$parameters$dt) / 365 > 5, "Pre-UVC", "Post-UVC"))
+for_plot_avg <- for_plot %>%
+  group_by(time_period) %>%
+  summarise(time_period_avg = mean(1000 * E_new / 100000),
+            start = min((timestep - 10730) * temp_df$parameters$dt) / 365,
+            end = max((timestep - 10730) * temp_df$parameters$dt) / 365)
+
+ggplot() +
+  geom_line(data = for_plot,
+            aes(x = ((timestep - 10730) * temp_df$parameters$dt) / 365,
+                y = 1000 * E_new / 100000,
+                col = ifelse(((timestep - 10730) * temp_df$parameters$dt) / 365 > 5, "Pre-UVC", "Post-UVC"))) +
+  geom_vline(xintercept = 5, linetype = "dashed") +
+  scale_colour_manual(values = c("lightgrey", "orange"),
+                      labels = c("Pre-UVC", "Post-UVC"),
+                      name = "Time Period") +
+  geom_segment(data = for_plot_avg,
+               aes(x = start, xend = end,
+                   y = time_period_avg, yend = time_period_avg),
+               linetype = "dashed", color = "black") +
+  theme_bw() +
+  labs(x = "Year (far UVC on at Year 5)", y = "Daily Incidence Per 1,000 Population")
+
+
+```
 
 ## Results
 
@@ -246,7 +280,35 @@ Figure \@ref(fig:epidemic-peak-size) shows the impact of far UVC deployment on t
 
 (ref:epidemic-peak-size) The impact of far UVC coverage type, coverage, and efficacy on the mean final epidemic size per 1000 individuals, defined as the maximum total number of recovered individuals in the population averaged across 25 stochastic model simulations, for influenza-like and SARs-CoV-2-like pathogens. The light blue lines represent simulations where was far UVC deployed at random, and the dark blue lines simulations where far UVC was targeted at the riskiest settings. The ribbons show minimum and maximum values across 25 stochastic replicates for each parameter set.
 
-```{r epidemic-peak-size, fig.cap="(ref:epidemic-peak-size)", fig.fullwidth = TRUE, fig.height=5}  # Assuming 10% coverage and 60% efficacy, far UVC installation led to a A% (range B%-C%) reduction in the epidemic peak size the "Influenza-Like" archetype, and X% (range Y%-Z%) for the "SARS-CoV-2-Like" archetype. At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively.  epidemic_summary_outputs |>   filter(coverage < 0.8, efficacy > 0) |>   ggplot(aes(x = 100 * coverage, y = mean_peak / 1000, colour = coverage_type)) +   geom_line(linewidth = 1) +   scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +   scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +   geom_ribbon(aes(ymin = min_peak / 1000, ymax = max_peak / 1000, fill = coverage_type),               colour = NA, alpha = 0.3, show.legend = FALSE) +   scale_x_continuous(expand = c(0, 0)) +   theme_bw(base_size = 12) +   labs(x = "Far UVC Coverage (%)",        y = "Mean Peak Epidemic Size \n (per 1,000 individuals)",        colour = "Coverage\nType") +   facet_grid(archetype ~ efficacy,              scales = "free_y",              labeller = as_labeller(c(`influenza` = "Influenza",                                       `sars_cov_2` = "SARS-CoV-2",                                       `0.4` = "40% Efficacy",                                       `0.6` = "60% Efficacy",                                       `0.8` = "80% Efficacy"))) +   theme(axis.text = element_text(colour = "black"),         axis.title = element_text(size = 12),         legend.text  = element_text(size = 11)) +   lims(y = c(0, NA))}
+```{r epidemic-peak-size, fig.cap="(ref:epidemic-peak-size)", fig.fullwidth = TRUE, fig.height=5}
+
+# Assuming 10% coverage and 60% efficacy, far UVC installation led to a A% (range B%-C%) reduction in the epidemic peak size the "Influenza-Like" archetype, and X% (range Y%-Z%) for the "SARS-CoV-2-Like" archetype. At 10% coverage and 80% assumed efficacy, these are A% (range B%-C%) and X% (range Y%-Z%) respectively.
+
+epidemic_summary_outputs |>
+  filter(coverage < 0.8, efficacy > 0) |>
+  ggplot(aes(x = 100 * coverage, y = mean_peak / 1000, colour = coverage_type)) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  geom_ribbon(aes(ymin = min_peak / 1000, ymax = max_peak / 1000, fill = coverage_type),
+              colour = NA, alpha = 0.3, show.legend = FALSE) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Mean Peak Epidemic Size \n (per 1,000 individuals)",
+       colour = "Coverage\nType") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12),
+        legend.text  = element_text(size = 11)) +
+  lims(y = c(0, NA))
+
 ```
 
 #### Epidemic Peak Timing
@@ -255,7 +317,36 @@ Figure \@ref(fig:epidemic-peak-timing) shows the impact of far UVC deployment on
 
 (ref:epidemic-peak-timing) The impact of far UVC coverage type, coverage, and efficacy on the mean number of days until the peak of the epidemic wave (in days), defined as the average timestep on which the number of infected individuals in the population peaked across 25 stochastic simulations for each parameterisation, for influenza-like and SARs-CoV-2-like pathogens. The light blue lines represent simulations where was far UVC deployed at random across setting-types (excluding households), and the dark blue lines simulations where far UVC was targeted at the riskiest locations across all setting types (excluding households). The ribbons show minimum and maximum values across 25 stochastic replicates for each parameter set.
 
-```{r epidemic-peak-timing, fig.cap="(ref:epidemic-peak-timing)", fig.fullwidth = TRUE, fig.height=5}  # For 10% coverage and 60% efficacy, far UVC installation led to the epidmic peak occurring A days (range B-C days) later for the "Influenza-Like" archetype and X days (range Y days-Z days) for the "SARS-CoV-2-Like" archetype, compared to a situation in which far UVC has not been installed. At 10% coverage and 80% assumed efficacy, these are A days (range B - C days) and X days (range Y days - Z days) respectively.  epidemic_summary_outputs |>   filter(coverage < 0.8, efficacy > 0) |>   filter(!(coverage > 0.5 & efficacy == 0.8 & coverage_type == "targeted_riskiness" & archetype == "influenza")) |>   ggplot(aes(x = 100 * coverage, y = mean_peak_timing, colour = coverage_type)) +   geom_line(linewidth = 1) +   scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +   scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +   geom_ribbon(aes(ymin = min_peak_timing, ymax = max_peak_timing, fill = coverage_type),               colour = NA, alpha = 0.3, show.legend = FALSE) +   scale_x_continuous(expand = c(0, 0)) +   theme_bw(base_size = 12) +   labs(x = "Far UVC Coverage (%)",        y = "Time to Peak Infections (days)",        colour = "Coverage\nType") +   facet_grid(archetype ~ efficacy,              scales = "free_y",              labeller = as_labeller(c(`influenza` = "Influenza",                                       `sars_cov_2` = "SARS-CoV-2",                                       `0.4` = "40% Efficacy",                                       `0.6` = "60% Efficacy",                                       `0.8` = "80% Efficacy"))) +   theme(axis.text = element_text(colour = "black"),         axis.title = element_text(size = 12),         legend.text  = element_text(size = 11)) +   lims(y = c(0, NA))}
+```{r epidemic-peak-timing, fig.cap="(ref:epidemic-peak-timing)", fig.fullwidth = TRUE, fig.height=5}
+
+# For 10% coverage and 60% efficacy, far UVC installation led to the epidmic peak occurring A days (range B-C days) later for the "Influenza-Like" archetype and X days (range Y days-Z days) for the "SARS-CoV-2-Like" archetype, compared to a situation in which far UVC has not been installed. At 10% coverage and 80% assumed efficacy, these are A days (range B - C days) and X days (range Y days - Z days) respectively.
+
+epidemic_summary_outputs |>
+  filter(coverage < 0.8, efficacy > 0) |>
+  filter(!(coverage > 0.5 & efficacy == 0.8 & coverage_type == "targeted_riskiness" & archetype == "influenza")) |>
+  ggplot(aes(x = 100 * coverage, y = mean_peak_timing, colour = coverage_type)) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  geom_ribbon(aes(ymin = min_peak_timing, ymax = max_peak_timing, fill = coverage_type),
+              colour = NA, alpha = 0.3, show.legend = FALSE) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Time to Peak Infections (days)",
+       colour = "Coverage\nType") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12),
+        legend.text  = element_text(size = 11)) +
+  lims(y = c(0, NA))
+
 ```
 
 #### Epidemic Final Size
@@ -264,16 +355,35 @@ Figure \@ref(fig:epidemic-final-size) shows the impact of far UVC deployment on 
 
 (ref:epidemic-final-size) The impact of far UVC coverage type, coverage, and efficacy on the mean final epidemic size per 1000 individuals, defined as the average maximum total number of recovered individuals in the population across 25 stochastic simulation runs for each parameterisation, for influenza-like and SARs-CoV-2-like pathogens. The light blue lines represent simulations where was far UVC deployed at random, and the dark blue lines simulations where far UVC was targeted at the riskiest settings. The ribbons show minimum and maximum values across 25 stochastic replicates for each parameter set.
 
-```{r epidemic-final-size, fig.cap="(ref:epidemic-final-size)", fig.fullwidth = TRUE, fig.height=5}  # For 10% coverage and 60% efficacy, far UVC installation led to a reduction in the total % of the population becoming infected by A% (range B%-C%) for the "Influenza-Like" archetype. Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. For the "SARS-CoV-2-Like" archetype, Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. This corresponds to a reduction in the total % of the population becoming infected by A% (range B%-C%). SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES  epidemic_summary_outputs |>   filter(coverage < 0.8, efficacy > 0) |>   ggplot(aes(x = 100 * coverage, y = 100 * mean_final_size / 1e5, colour = coverage_type)) +   geom_line(linewidth = 1.2) +   scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +   scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +   geom_ribbon(aes(ymin = lq_final_size / 1000, ymax = uq_final_size / 1000, fill = coverage_type),               colour = NA, alpha = 0.3, show.legend = FALSE) +   scale_x_continuous(expand = c(0, 0)) +   theme_bw(base_size = 12) +   labs(x = "Far UVC Coverage (%)",        y = "Mean Final Epidemic Size \n (% of population)",        colour = "Coverage\nType") +   facet_grid(archetype ~ efficacy,              scales = "free_y",              labeller = as_labeller(c(`influenza` = "Influenza",                                       `sars_cov_2` = "SARS-CoV-2",                                       `0.4` = "40% Efficacy",                                       `0.6` = "60% Efficacy",                                       `0.8` = "80% Efficacy"))) +   theme(axis.text = element_text(colour = "black"),         axis.title = element_text(size = 12)) +   lims(y = c(0, NA))}
+```{r epidemic-final-size, fig.cap="(ref:epidemic-final-size)", fig.fullwidth = TRUE, fig.height=5}
+
+# For 10% coverage and 60% efficacy, far UVC installation led to a reduction in the total % of the population becoming infected by A% (range B%-C%) for the "Influenza-Like" archetype. Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. For the "SARS-CoV-2-Like" archetype, Without far UVC, X% (Y%-Z%) of individuals were infected, compared to X% (Y%-Z%) when with far UVC installed at 10% coverage and 60% efficacy. This corresponds to a reduction in the total % of the population becoming infected by A% (range B%-C%). SOMETHING COMPARING TARGETED AND UNTARGETED APPROACHES
+
+epidemic_summary_outputs |>
+  filter(coverage < 0.8, efficacy > 0) |>
+  ggplot(aes(x = 100 * coverage, y = 100 * mean_final_size / 1e5, colour = coverage_type)) +
+  geom_line(linewidth = 1.2) +
+  scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  geom_ribbon(aes(ymin = lq_final_size / 1000, ymax = uq_final_size / 1000, fill = coverage_type),
+              colour = NA, alpha = 0.3, show.legend = FALSE) +
+  scale_x_continuous(expand = c(0, 0)) +
+  theme_bw(base_size = 12) +
+  labs(x = "Far UVC Coverage (%)",
+       y = "Mean Final Epidemic Size \n (% of population)",
+       colour = "Coverage\nType") +
+  facet_grid(archetype ~ efficacy,
+             scales = "free_y",
+             labeller = as_labeller(c(`influenza` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2",
+                                      `0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy"))) +
+  theme(axis.text = element_text(colour = "black"),
+        axis.title = element_text(size = 12)) +
+  lims(y = c(0, NA))
+
 ```
-
-#### Discussion
-
-When highly efficacious and/or installed at high coverage, the deployment of far UVC provided substantial reductions in both the size of the epidemic, in terms of the peak number of individuals infected at any one time and the total number of individuals in the population who were infected. Targeting the deployment of far UVC towards the riskiest locations provided additional reductions in epidemic size and speed, but appreciable improvements were also observed when far UVC was installed at random and reductions in performance relative to targeted deployment could generally be overcome with increased efficacy and coverage. Far UVC deployment typically had a greater relative impact on the control of an "influenza-like" pathogen than the "SARS-CoV-2-like" pathogen.
-
-For the low $R0$ pathogen, the targeted installation of far UVC at very high coverage and efficacy ($\geq$ 80%) achieved complete suppression of the epidemic (i.e. reduced R \< 1 and prevented the pathogen from spreading from low initial frequency). However, far UVC provided significant value in the epidemic scenarios even when it does not achieve complete suppression of the epidemic. Reductions in transmission that fall short of full suppression arising from far UVC can still reduce the associated pressure on healthcare systems by reducing the peak size (and therefore burden) on the healthcare system, and spreading that burden out over time - the so-called "flattening of the curve"). Delaying the epidemic peak also provides more time for other medical countermeasures, such as vaccines, to be developed. Furthermore, for the same disease burden, flattening the curve enables shorter and less stringent non-pharmaceutical interventions to be implemented relative to scenarios in which far UVC is not available. However, it is important to recognise that the epidemic simulations did not consider imported infections from external locations, which typically sustain an epidemic, and could increase the intensity of the far UVC deployment required to prevent an epidemic from occurring, or erode the capacity of far UVC to prevent an epidemic entirely.
-
-The increased impact of far UVC on the "influenza-like" when compared to the "SARS-CoV-2-like" pathogen occurs because the former has a lower starting R0. As the initial R0 of the pathogen increases, the non-linear nature of the fraction of transmission you have to avert to reduce the R below 1 increasingly reduces the impact of far UVC on the epidemic outbreak.
 
 ### Endemic Pathogen Analyses
 
@@ -354,28 +464,32 @@ ggplot(data = subset(avg_summary_outputs_diff, coverage <= 0.9),
 
 ```
 
-### Comparison
+### Comparison to simple multiplicative model
 
-We next compared these results to those produced by a simplistic, static multiplicative model of estimated impact calculated by multiplying the coverage and efficacy of the modelled far UVC together and then multiplying this by the proportion of transmission that is "targetable" by far UVC (i.e. the proportion of transmission that occurs outside households). The results of this analyses are plotted below in \@ref(fig:comparison-1). As you can see, this simplified model provides similar estimates to those generated by `helios` for SARS-CoV-2, but significantly underestimates the impact for Influenza.
+We next compared these results to those produced by a simplistic, static multiplicative model of estimated impact calculated by multiplying the coverage and efficacy of the modelled far UVC together and then multiplying this by the proportion of transmission that is "targetable" by far UVC (i.e. the proportion of transmission that occurs outside households). The implicit assumption of this simple multiplication is that for every 1% of targetable transmission "covered", there is a 1% reduction in transmission. The results of this analyses are plotted below in \@ref(fig:comparison-1). As you can see, this simplified model provides similar estimates to those generated by `helios` for SARS-CoV-2, but significantly underestimates the impact for Influenza.
 
 ```{r comparison-1, fig.cap="(ref:comparison-1)"}
 
 targetable_transmission <- 0.6
-df_comparison <- overall5 %>%
+df_comparison <- endemic_summary_outputs %>%
   rowwise() %>%
-  mutate(hypothetical_reduction = targetable_transmission * coverage * efficacy)
+  mutate(hypothetical_reduction = targetable_transmission * coverage * efficacy) %>%
+  group_by(archetype, coverage, efficacy, coverage_type) %>%
+  summarise(incidence_percentage_reduction_mean = mean(reduction_incidence),
+            incidence_percentage_reduction_lower = min(reduction_incidence),
+            incidence_percentage_reduction_upper = max(reduction_incidence),
+            hypothetical_reduction = mean(hypothetical_reduction))
   
-ggplot() + 
-  geom_ribbon(aes(x = 0:26, ymin = seq(0:26) - 1, ymax = rep(60, 27)),
-                alpha = 0.1) +
-  geom_point(data = df_comparison, aes(x = 100 * hypothetical_reduction, 
-                          y = 100 * incidence_percentage_reduction_mean, 
-                          col = archetype), size = 3) +
-  geom_errorbar(data = df_comparison, aes(x = 100 * hypothetical_reduction, 
-                          ymin = 100 * incidence_percentage_reduction_lower,
-                          ymax = 100 * incidence_percentage_reduction_upper, 
-                          col = archetype), linewidth = 1) +
+ggplot(data = df_comparison, aes(x = 100 * hypothetical_reduction, 
+                                 y = 100 * incidence_percentage_reduction_mean, 
+                                 col = coverage_type)) + 
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = 100 * incidence_percentage_reduction_lower,
+                    ymax = 100 * incidence_percentage_reduction_upper, 
+                    col = coverage_type), linewidth = 1) +
   geom_abline(slope = 1, linetype = "dashed") +
+  facet_grid(.~archetype) +
+  scale_colour_manual(values = c("#00AFFF", "#03113E")) + 
   labs(x = "Hypothetical Reduction in Annual Incidence\nBased On Simple, Multiplicative Model",
        y = "Reduction in Annual Incidence\nPredicted by helios (%)",
        col = "Pathogen\nArchetype") +
