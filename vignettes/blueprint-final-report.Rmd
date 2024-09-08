@@ -252,6 +252,39 @@ ggplot() +
 
 ```
 
+\@ref(fig:methods-figure-endemic) shows how the average reduction in annual infection incidence was calculated for the endemic pathogen scenarios. Grey colouring indicates pre-UVC period, and orange colouring indicates period following introduction of far UVC. Far UVC is installed at year 5 in this exemplar scenario (indicated by vertical dashed line). Horizontal dashed lines indicate the average incidence of infection in the pre and post UVC periods. 
+
+
+\@ref(fig:methods-figure-epidemic) shows the basis for how we calculated the different metrics used to asses far UVC impact in an epidemic pathogen scenario. We considered 3 metrics - the final epidemic size (i.e. the total number of individuals infected during the epidemic as a fraction of total population size), timing of the epidemic peak, and the size of the peak (i.e. the number of individuals infected when the epidemic is at its largest). For each metric, we ran a scenario with and without far UVC installed separately, and then compared each of the metrics in each case. 
+
+```{r methods-figure-epidemic, fig.cap="(ref:methods-figure-epidemic)", fig.fullwidth = TRUE, fig.height=5}
+# Load in the output file:
+temp_obj <- readRDS(file = paste0(here::here(), "/inst/blueprint_output_3_Sep9/Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_outputs/scenario_output_batch_1_1.rds"))
+temp_df <- temp_obj[[1]]$simulation %>%
+  mutate(uvc = "No UVC")
+
+temp_obj2 <- readRDS(file = paste0(here::here(), "/inst/blueprint_output_3_Sep9/Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_outputs/scenario_output_batch_1_12.rds"))
+temp_df2 <- temp_obj2[[1]]$simulation %>%
+  mutate(uvc = "Yes UVC") %>%
+  select(colnames(temp_df))
+
+temp_df3 <- rbind(temp_df, temp_df2)
+
+ggplot(subset(temp_df3, timestep < 350)) +
+  geom_line(aes(x = timestep * 0.5,
+                y = 1000 * E_new / 100000,
+                col = uvc)) +
+  scale_colour_manual(values = c("lightgrey", "orange"),
+                      labels = c("No Far UVC", "Yes Far UVC"),
+                      name = "Far UVC") +
+  theme_bw() +
+  labs(x = "Year (far UVC on at Year 5)", y = "Daily Incidence Per 1,000 Population")
+
+
+```
+\@ref(fig:methods-figure-epidemic) shows the basis for calculating the various epidemic pathogen disease metrics used in this report. Grey colouring indicates the scenario without far UVC installed, orange indicates the scenario with far UVC. 
+
+
 ## Results
 
 We considered two pathogen archetypes for this hypothetical virus:
