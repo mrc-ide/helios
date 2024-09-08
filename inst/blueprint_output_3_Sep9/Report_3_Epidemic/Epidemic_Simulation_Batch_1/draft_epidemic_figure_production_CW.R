@@ -79,8 +79,20 @@ for(i in 1: length(output_files)) {
 avg_summary_outputs <- summary_outputs |>
   group_by(archetype, coverage_type, coverage, efficacy, disease_status) |>
   summarise(mean_peak_timing = mean(peak_timing),
+            min_peak_timing = min(peak_timing),
+            max_peak_timing = max(peak_timing),
+            lq_peak_timing = quantile(peak_timing, 0.25, na.rm = TRUE),
+            uq_peak_timing = quantile(peak_timing, 0.75, na.rm = TRUE),
             mean_peak = mean(peak),
-            mean_final_size = mean(final_size))
+            min_peak = min(peak),
+            max_peak = max(peak),
+            lq_peak = quantile(peak, 0.25, na.rm = TRUE),
+            uq_peak = quantile(peak, 0.75, na.rm = TRUE),
+            mean_final_size = mean(final_size),
+            min_final_size = min(final_size),
+            max_final_size = max(final_size),
+            lq_final_size = quantile(final_size, 0.25, na.rm = TRUE),
+            uq_final_size = quantile(final_size, 0.75, na.rm = TRUE))
 
 # Save the dataframes:
 saveRDS(object = summary_outputs, file = "./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_summary_outputs.rds")
@@ -119,8 +131,11 @@ ggplot() +
 avg_summary_outputs |>
   filter(coverage <= 0.7, efficacy > 0) |>
   ggplot(aes(x = 100 * coverage, y = mean_final_size / 1000, colour = coverage_type)) +
-  geom_line(linewidth = 1) +
+  geom_line(linewidth = 1.2) +
   scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  geom_ribbon(aes(ymin = min_final_size / 1000, ymax = max_final_size / 1000, fill = coverage_type),
+              colour = NA, alpha = 0.3, show.legend = FALSE) +
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw(base_size = 12) +
   labs(x = "Far UVC Coverage (%)",
@@ -165,6 +180,9 @@ avg_summary_outputs |>
   ggplot(aes(x = 100 * coverage, y = mean_peak / 1000, colour = coverage_type)) +
   geom_line(linewidth = 1) +
   scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  geom_ribbon(aes(ymin = min_peak / 1000, ymax = max_peak / 1000, fill = coverage_type),
+              colour = NA, alpha = 0.3, show.legend = FALSE) +
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw(base_size = 12) +
   labs(x = "Far UVC Coverage (%)",
@@ -210,6 +228,9 @@ avg_summary_outputs |>
   ggplot(aes(x = 100 * coverage, y = mean_peak_timing, colour = coverage_type)) +
   geom_line(linewidth = 1) +
   scale_colour_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  scale_fill_manual(values = blueprint_colours, labels = c("Random", "Targeted")) +
+  geom_ribbon(aes(ymin = min_peak_timing, ymax = max_peak_timing, fill = coverage_type),
+              colour = NA, alpha = 0.3, show.legend = FALSE) +
   scale_x_continuous(expand = c(0, 0)) +
   theme_bw(base_size = 12) +
   labs(x = "Far UVC Coverage (%)",
@@ -226,5 +247,50 @@ avg_summary_outputs |>
         axis.title = element_text(size = 12),
         legend.text  = element_text(size = 11)) +
   lims(y = c(0, NA))
+
+#----- 5) Figure.2.1.d Epidemic Exemplar -----------------------------------------------------------
+
+##' sars_cov_2
+##' targeted_riskiness
+##' coverage = 60%
+##' efficacy = 60%
+
+# Read in the epidemic parameters table:
+epidemic_parameter_table <- readRDS("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_simulations_table_batch_1.rds")
+
+# Determine which batch the exemplar simulation is in:
+epidemic_parameter_table |>
+  mutate(coverage = round(coverage, 2)) |>
+  filter(archetype == "sars_cov_2",
+         coverage_type == "targeted_riskiness",
+         efficacy == 0.6,
+         coverage == 0.6) |>
+  select(ID) -> batch_of_interest; min(batch_of_interest); max(batch_of_interest)
+
+##' The IDs are 2951-2975
+
+# View the input file names to see which batch we need:
+str_sort(list.files("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_inputs/"), numeric = TRUE)
+
+##' The IDs are split across two batches, 27 and 28, so lets load the 27th:
+exemplar_batch <- readRDS("./Report_3_Epidemic/Epidemic_Simulation_Batch_1/epidemic_batch_1_outputs/scenario_output_batch_1_27.rds")
+
+# Store the exemplar simulation:
+exemplar_simulation <- exemplar_batch[[110]][[2]]
+
+# Plot the exemplar simulation:
+exemplar_simulation |>
+  filter(timestep <= 365) |>
+  ggplot(aes(x = timestep, y = 1000 * E_new / 100000)) + geom_line(linewidth = 1, colour = "orange") +
+  theme_bw(base_size = 12) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(expand = c(0, 0)) +
+  labs(y = "Daily Incidence Per 1,000 Population", x = "Time")
+
+#----- 6) Relative differences between coverage types ----------------------------------------------
+
+##' We want a bar plot that plots the differences in mean peak size, mean peak timing, and mean final
+##' size
+
 
 #--------------------------------------------------------------------------------------------------#
