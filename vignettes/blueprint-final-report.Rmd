@@ -298,7 +298,7 @@ annual <- ggplot(for_plot_annual,
 cowplot::plot_grid(daily, annual, nrow = 2)
 ```
 
-ref(methods-figure-epidemic) shows the basis for calculating the various epidemic pathogen disease metrics used in this report. Grey colouring indicates the scenario without far UVC installed, orange indicates the scenario with far UVC.
+ref(methods-figure-epidemic) Calculation of the metrics summarising far UVC impact for for the epidemic pathogen scenarios. Grey colouring indicates the scenario with far UVC installed, and orange colouring indicates the scenario with far UVC. Solid arrow indicates the difference in epidemic peak size (vertical arrow) and timing (horizontal) arrow, which were used to summarise impact.
 
 ```{r methods-figure-epidemic, fig.cap="(ref:methods-figure-epidemic)"}
 # Load in the output file:
@@ -320,9 +320,16 @@ ggplot(subset(temp_df3, timestep < 350)) +
   scale_colour_manual(values = c("lightgrey", "orange"),
                       labels = c("No Far UVC", "Yes Far UVC"),
                       name = "Far UVC") +
+    geom_segment(data = for_plot_avg,
+               aes(x = 87.5, xend = 87.5,
+                   y = 9.75, yend = 4),
+               color = "black", arrow = arrow(length = unit(0.02, "npc"), ends = "both")) +
+      geom_segment(data = for_plot_avg,
+               aes(x = 52, xend = 87.5,
+                   y = 10.2, yend = 10.2),
+               color = "black", arrow = arrow(length = unit(0.02, "npc"), ends = "both")) +
   theme_bw() +
-  labs(x = "Year (far UVC on at Year 5)", y = "Daily Incidence Per 1,000 Population")
-
+  labs(x = "Day", y = "Daily Incidence Per 1,000 Population")
 
 ```
 
