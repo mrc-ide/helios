@@ -248,7 +248,7 @@ avg_summary_outputs |>
         legend.text  = element_text(size = 11)) +
   lims(y = c(0, NA))
 
-#----- 5) Figure.2.1.d Epidemic Exemplar -----------------------------------------------------------
+#----- 6) Figure.2.1.d Epidemic Exemplar -----------------------------------------------------------
 
 ##' sars_cov_2
 ##' targeted_riskiness
@@ -287,10 +287,205 @@ exemplar_simulation |>
   scale_y_continuous(expand = c(0, 0)) +
   labs(y = "Daily Incidence Per 1,000 Population", x = "Time")
 
-#----- 6) Relative differences between coverage types ----------------------------------------------
+#----- 7) Relative differences between coverage types ----------------------------------------------
 
-##' We want a bar plot that plots the differences in mean peak size, mean peak timing, and mean final
-##' size
+# View the column names for reference:
+colnames(avg_summary_outputs)
+
+# Peak Size
+avg_summary_outputs |>
+  mutate(coverage = round(coverage, 2)) |>
+  filter(coverage %in% c(0.1, 0.7), efficacy %in% c(0.4, 0.8)) |>
+  select(archetype, coverage_type, coverage, efficacy, mean_peak, min_peak, max_peak)
+
+# Peak timing
+avg_summary_outputs |>
+  mutate(coverage = round(coverage, 2)) |>
+  filter(coverage %in% c(0.1, 0.7), efficacy %in% c(0.4, 0.8)) |>
+  select(archetype, coverage_type, coverage, efficacy, mean_peak_timing, min_peak_timing, max_peak_timing)
+
+# Final size
+avg_summary_outputs |>
+  mutate(coverage = round(coverage, 2)) |>
+  filter(coverage %in% c(0.1, 0.7), efficacy %in% c(0.4, 0.8)) |>
+  select(archetype, coverage_type, coverage, efficacy, mean_final_size, min_final_size, max_final_size)
+
+#----- 8) 10% Coverage Comparison (peak size) ------------------------------------------------------
+
+##' In the absence of far UVC, the epidemic peaked at 6135 (5411-7678) people for influenza and
+##' 20407 (19310-21351) for SARS-CoV-2.
+
+# Flu
+
+##' At 10% coverage and 60% efficacy, influenza epidemic peaked at 5426 (4671-6293) (an 11.6% (13.7-18.0%)
+##' reduction) for random coverage and 4798 (4363-5695) (an 21.8% (19.4-25.8%) decrease) for targeted.
+100 - (100 * (5426/6135))
+100 - (100 * (4671/5411))
+100 - (100 * (6293/7678))
+
+100 - (100 * (4798/6135))
+100 - (100 * (4363/5411))
+100 - (100 * (5695/7678))
+
+##' At 10% coverage and 80% efficacy, influenza epidemic peaked at 5274 (4691-5810) (an 14.0% (13.3-24.3%)
+##' reduction) for random coverage and 4338 (3859-5416) for targeted (29.3% (28.7-29.5%)).
+100 - (100 * (5274/6135))
+100 - (100 * (4691/5411))
+100 - (100 * (5810/7678))
+
+100 - (100 * (4338/6135))
+100 - (100 * (3859/5411))
+100 - (100 * (5416/7678))
+
+# SARS
+
+##' At 10% coverage and 60% efficacy, SARS epidemic peaked at 19485 (18946-20153) for random coverage
+##' (an 4.5% (1.9-5.6%) reduction) and  18831 (18093-19523) for targeted (an 7.7% (6.3-8.6%) decrease.
+100 - (100 * (19485/20407))
+100 - (100 * (18946/19310))
+100 - (100 * (20153/21351))
+
+100 - (100 * (18831/20407))
+100 - (100 * (18093/19310))
+100 - (100 * (19523/21351))
+
+##' At 10% coverage and 80% efficacy, SARS epidemic peaked at 19028 (18440-19748) for random coverage
+##' (an 6.8% (4.5-7.5%) reduction) and 18151 (17645-19149) for targeted (an 11.1% (8.6-10.3%) reduction).
+100 - (100 * (19028/20407))
+100 - (100 * (18440/19310))
+100 - (100 * (19748/21351))
+
+100 - (100 * (18151/20407))
+100 - (100 * (17645/19310))
+100 - (100 * (19149/21351))
+
+
+# Peak Size:
+avg_summary_outputs |>
+  mutate(coverage = round(coverage, 2)) |>
+  filter(coverage == 0.1, efficacy == 0.8) |>
+  select(archetype, coverage_type, coverage, efficacy, mean_peak, min_peak, max_peak)
+
+#----- 9) 10% Coverage Comparison (peak timing) ----------------------------------------------------
+
+##' In the absence of far UVC, the epidemic peaked on day 125 (104-145) people for influenza and
+##' 104 (98-110) for SARS-CoV-2.
+
+# Peak Size:
+avg_summary_outputs |>
+  mutate(coverage = round(coverage, 2)) |>
+  filter(coverage == 0) |>
+  select(archetype, coverage_type, coverage, efficacy, mean_peak_timing, min_peak_timing, max_peak_timing)
+
+# Flu
+
+##' At 10% coverage and 60% efficacy, the influenza epidemic peaked 5 (1-10) days earlier for random coverage
+##' and 16 (9-25) for targeted.
+
+130 - 125
+114 - 104
+146 - 145
+
+141 - 125
+129 - 104
+154 - 145
+
+##' At 10% coverage and 80% efficacy, influenza epidemic peaked at 7 (3-16) days
+##' for random coverage and 20 (17-25) for targeted
+
+132 - 125
+120 - 104
+142 - 145
+
+145 - 125
+129 - 104
+162 - 145
+
+# SARS
+
+##' At 10% coverage and 60% efficacy, SARS epidemic peaked at 2 (1-4) for random coverage
+##' and 6 (5-8) for targeted
+
+106 - 104
+102 - 98
+111 - 110
+
+110 - 104
+106 - 98
+115 - 110
+
+##' At 10% coverage and 80% efficacy, SARS epidemic peaked at 5 (3-6) days for random coverage
+##' and 8 (6-9) for targeted
+
+109 - 104
+104 - 98
+113 - 110
+
+112 - 104
+104 - 98
+119 - 110
+
+# Peak Size:
+avg_summary_outputs |>
+  mutate(coverage = round(coverage, 2)) |>
+  filter(coverage == 0.1, efficacy == 0.8) |>
+  select(archetype, coverage_type, coverage, efficacy, mean_peak_timing, min_peak_timing, max_peak_timing)
+
+#----- 10) 10% Coverage Comparison (final size) ----------------------------------------------------
+
+##' In the absence of far UVC, the epidemic reached a final size of X (range - ) for influenza and
+##' Y (range - ) for SARS.
+
+# Flu
+
+##' At 10% coverage and 60% efficacy, influenza epidemic peaked at 5426 (4671-6293) (an 11.6% (13.7-18.0%)
+##' reduction) for random coverage and 4798 (4363-5695) (an 21.8% (19.4-25.8%) decrease) for targeted.
+100 - (100 * (/))
+100 - (100 * (/))
+100 - (100 * (/))
+
+100 - (100 * (/))
+100 - (100 * (/))
+100 - (100 * (/))
+
+##' At 10% coverage and 80% efficacy, influenza epidemic peaked at 5274 (4691-5810) (an 14.0% (13.3-24.3%)
+##' reduction) for random coverage and 4338 (3859-5416) for targeted (29.3% (28.7-29.5%)).
+100 - (100 * (/))
+100 - (100 * (/))
+100 - (100 * (/))
+
+100 - (100 * (/))
+100 - (100 * (/))
+100 - (100 * (/))
+
+# SARS
+
+##' At 10% coverage and 60% efficacy, SARS epidemic peaked at 19485 (18946-20153) for random coverage
+##' (an 4.5% (1.9-5.6%) reduction) and  18831 (18093-19523) for targeted (an 7.7% (6.3-8.6%) decrease.
+100 - (100 * (/))
+100 - (100 * (/))
+100 - (100 * (/))
+
+100 - (100 * (/))
+100 - (100 * (/))
+100 - (100 * (/))
+
+##' At 10% coverage and 80% efficacy, SARS epidemic peaked at 19028 (18440-19748) for random coverage
+##' (an 6.8% (4.5-7.5%) reduction) and 18151 (17645-19149) for targeted (an 11.1% (8.6-10.3%) reduction).
+100 - (100 * (/))
+100 - (100 * (/))
+100 - (100 * (/))
+
+100 - (100 * (/))
+100 - (100 * (/))
+100 - (100 * (/))
+
+
+# Peak Size:
+avg_summary_outputs |>
+  mutate(coverage = round(coverage, 2)) |>
+  filter(coverage == 0.1, efficacy == 0.8) |>
+  select(archetype, coverage_type, coverage, efficacy, mean_peak, min_peak, max_peak)
 
 
 #--------------------------------------------------------------------------------------------------#
