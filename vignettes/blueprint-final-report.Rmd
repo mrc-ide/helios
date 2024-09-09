@@ -216,9 +216,21 @@ Using the updated modelling framework described above, we conducted analyses eva
 
 ## Methods
 
-Here, we provide a (very) brief summary of the way in which we generated the results presented here. Figure \@ref(fig:methods-figure-endemic) shows how the average reduction in annual infection incidence was calculated for the endemic pathogen scenarios. Briefly, we ran the model for a period of time without far UVC (referred to in the figure as the "pre-UVC" period), and calculated the average annual incidence of infection over this period. We then introduced far-UVC at a certain point and ran the model for a further 10 years (referred to in the figure as "post-UVC"). We then calculated the average annual incidence of infection across this decade, and the difference in annual incidence of infection between the "pre-UVC" and "post-UVC" periods.
+Here, we provide a (very) brief summary of the way in which we generated the results presented here. For both endemic and epidemic pathogen archetypes, we run the `helios` model with a range of parameter combinations varying far UVC coverage, far UVC efficacy, how the far UVC is targeted to locations (at random or by riskiness), and for two pathogen archetypes:
 
-ref(methods-figure-endemic) Calculation of the average reduction in annual infection incidence for the endemic pathogen scenarios. Grey colouring indicates pre-UVC period, and orange colouring indicates period following introduction of far UVC. Far UVC is installed at year 5 in this exemplar scenario (indicated by vertical dashed line). Horizontal dashed lines indicate the average incidence of infection in the pre and post UVC periods. Solid arrow indicates the difference in infection incidence between pre-UVC and post-UVC periods.
+-   **"SARS-CoV-2-Like" Archetype** - $R_0$ of 2.5, a mean latent period of 2 days, a mean duration of infectiousness of 4 days.
+
+-   **"Influenza-Like" Archetype** - $R_0$ of 1.5, a mean latent period of 1 day, a mean duration of infectiousness of 2 days.
+
+We also varied our assumption about whether the pathogen was "endemic" or "epidemic". For the epidemic pathogen, we assume that immunity arising from infection lasts for an individual's lifetime. Endemicity arises (in part) due to the finite nature of immunity arising from infection with a pathogen. For the endemic pathogen, we therefore assume a mean duration of immunity of 365 days. This gives an approximate infection prevalence of 1% for SARS-CoV-2 (i.e. approximately 1 in 100 individuals are infected at any given timepoint) and 0.3% for influenza (i.e. 1 in 330 individuals infected at any given timepoint). For each pathogen archetype, we investigated the effect of far UVC efficacy and far UVC coverage on the annual incidence of infection, varying:
+
+-   **far UVC Coverage:** Between 0% and 80%, in increments of 10%. In all cases, far UVC was assumed to be installed in schools, workplaces and leisure locations only (i.e. not households), either at a random set of locations or based on their riskiness.
+
+-   **far UVC Efficacy:** Either 40%, 60% or 80%, with the assumption that far UVC efficacy was identical across all Settings and Locations where it had been installed.
+
+All presented results are based on summary statistics (e.g. mean, range etc) calculated from 25 stochastic replicates. For the endemic pathogen, we used the reduction in annual infection incidence to summarise far UVC impact. Figure \@ref(fig:methods-figure-endemic) shows how this reduction in annual infection incidence was calculated. We ran the model for a period of time without far UVC (referred to in the figure as the "pre-UVC" period), and calculated the average annual incidence of infection over this period. We then introduced far-UVC at a certain point and ran the model for a further 10 years (referred to in the figure as "post-UVC"). We then calculated the average annual incidence of infection across this decade, and the difference in annual incidence of infection between the "pre-UVC" and "post-UVC" periods. For the epidemic pathogen, we considered 3 metrics that together summarise far UVC impact. These are the final epidemic size (i.e. the total number of individuals infected during the epidemic as a fraction of total population size), timing of the epidemic peak, and the size of the peak (i.e. the number of individuals infected when the epidemic is at its largest). For each metric, we ran a scenario with and without far UVC installed separately, and then compared each of the metrics in each case. Figure \@ref(fig:methods-figure-epidemic) shows the basis for how we calculated the different metrics used to asses far UVC impact in an epidemic pathogen scenario.
+
+ref(methods-figure-endemic) Calculation of the average reduction in annual infection incidence for the endemic pathogen scenarios. Grey colouring indicates pre-UVC period, and orange colouring indicates period following introduction of far UVC. Far UVC is installed at year 5 in this exemplar scenario (indicated by vertical dashed line). Horizontal dashed lines indicate the average incidence of infection in the pre and post UVC periods. Solid arrow indicates the difference in infection incidence between pre-UVC and post-UVC periods. Top panel shows daily incidence, bottom panel shows annual incidence.
 
 ```{r methods-figure-endemic, fig.cap="(ref:methods-figure-endemic)"}
 # Load in the output file:
@@ -286,9 +298,7 @@ annual <- ggplot(for_plot_annual,
 cowplot::plot_grid(daily, annual, nrow = 2)
 ```
 
-Figure \@ref(fig:methods-figure-epidemic) shows the basis for how we calculated the different metrics used to asses far UVC impact in an epidemic pathogen scenario. We considered 3 metrics - the final epidemic size (i.e. the total number of individuals infected during the epidemic as a fraction of total population size), timing of the epidemic peak, and the size of the peak (i.e. the number of individuals infected when the epidemic is at its largest). For each metric, we ran a scenario with and without far UVC installed separately, and then compared each of the metrics in each case.
-
-ref(fig:methods-figure-epidemic) shows the basis for calculating the various epidemic pathogen disease metrics used in this report. Grey colouring indicates the scenario without far UVC installed, orange indicates the scenario with far UVC.
+ref(methods-figure-epidemic) shows the basis for calculating the various epidemic pathogen disease metrics used in this report. Grey colouring indicates the scenario without far UVC installed, orange indicates the scenario with far UVC.
 
 ```{r methods-figure-epidemic, fig.cap="(ref:methods-figure-epidemic)"}
 # Load in the output file:
@@ -317,22 +327,6 @@ ggplot(subset(temp_df3, timestep < 350)) +
 ```
 
 ## Results
-
-We considered two pathogen archetypes for this hypothetical virus:
-
--   **"SARS-CoV-2-Like" Archetype** - $R_0$ of 2.5, a mean latent period of 2 days, a mean duration of infectiousness of 4 days.
-
--   **"Influenza-Like" Archetype** - $R_0$ of 1.5, a mean latent period of 1 day, a mean duration of infectiousness of 2 days.
-
-For the epidemic pathogen, we assume that immunity arising from infection lasts for an individual's lifetime. Endemicity arises (in part) due to the finite nature of immunity arising from infection with a pathogen. For the endemic pathogen, we therefore assume a mean duration of immunity of 365 days. This gives an approximate infection prevalence of 1% for SARS-CoV-2 (i.e. approximately 1 in 100 individuals are infected at any given timepoint) and 0.3% for influenza (i.e. 1 in 330 individuals infected at any given timepoint).
-
-For each pathogen archetype, we investigated the effect of far UVC efficacy and far UVC coverage on the annual incidence of infection, varying:
-
--   **far UVC Coverage:** Between 0% and 80%, in increments of 10%. In all cases, far UVC was assumed to be installed in schools, workplaces and leisure locations only (i.e. not households), either at a random set of locations or based on their riskiness.
-
--   **far UVC Efficacy:** Either 40%, 60% or 80%, with the assumption that far UVC efficacy was identical across all Settings and Locations where it had been installed.
-
-All presented results are based on summary statistics (e.g. mean, range etc) calculated based on 20 stochastic replicates.
 
 ### Epidemic Pathogen Analyses
 
