@@ -230,7 +230,7 @@ We also varied our assumption about whether the pathogen was "endemic" or "epide
 
 All presented results are based on summary statistics (e.g. mean, range etc) calculated from 25 stochastic replicates. For the endemic pathogen, we used the reduction in annual infection incidence to summarise far UVC impact. Figure \@ref(fig:methods-figure-endemic) shows how this reduction in annual infection incidence was calculated. We ran the model for a period of time without far UVC (referred to in the figure as the "pre-UVC" period), and calculated the average annual incidence of infection over this period. We then introduced far-UVC at a certain point and ran the model for a further 10 years (referred to in the figure as "post-UVC"). We then calculated the average annual incidence of infection across this decade, and the difference in annual incidence of infection between the "pre-UVC" and "post-UVC" periods. For the epidemic pathogen, we considered 3 metrics that together summarise far UVC impact. These are the final epidemic size (i.e. the total number of individuals infected during the epidemic as a fraction of total population size), timing of the epidemic peak, and the size of the peak (i.e. the number of individuals infected when the epidemic is at its largest). For each metric, we ran a scenario with and without far UVC installed separately, and then compared each of the metrics in each case. Figure \@ref(fig:methods-figure-epidemic) shows the basis for how we calculated the different metrics used to asses far UVC impact in an epidemic pathogen scenario.
 
-ref(methods-figure-endemic) Calculation of the average reduction in annual infection incidence for the endemic pathogen scenarios. Grey colouring indicates pre-UVC period, and orange colouring indicates period following introduction of far UVC. Far UVC is installed at year 5 in this exemplar scenario (indicated by vertical dashed line). Horizontal dashed lines indicate the average incidence of infection in the pre and post UVC periods. Solid arrow indicates the difference in infection incidence between pre-UVC and post-UVC periods. Top panel shows daily incidence, bottom panel shows annual incidence.
+(ref:methods-figure-endemic) Calculation of the average reduction in annual infection incidence for the endemic pathogen scenarios. Grey colouring indicates pre-UVC period, and orange colouring indicates period following introduction of far UVC. Far UVC is installed at year 5 in this exemplar scenario (indicated by vertical dashed line). Horizontal dashed lines indicate the average incidence of infection in the pre and post UVC periods. Solid arrow indicates the difference in infection incidence between pre-UVC and post-UVC periods. Top panel shows daily incidence, bottom panel shows annual incidence.
 
 ```{r methods-figure-endemic, fig.cap="(ref:methods-figure-endemic)"}
 # Load in the output file:
@@ -298,7 +298,7 @@ annual <- ggplot(for_plot_annual,
 cowplot::plot_grid(daily, annual, nrow = 2)
 ```
 
-ref(methods-figure-epidemic) Calculation of the metrics summarising far UVC impact for for the epidemic pathogen scenarios. Grey colouring indicates the scenario with far UVC installed, and orange colouring indicates the scenario with far UVC. Solid arrow indicates the difference in epidemic peak size (vertical arrow) and timing (horizontal) arrow, which were used to summarise impact.
+(ref:methods-figure-epidemic) Calculation of the metrics summarising far UVC impact for for the epidemic pathogen scenarios. Grey colouring indicates the scenario with far UVC installed, and orange colouring indicates the scenario with far UVC. Solid arrow indicates the difference in epidemic peak size (vertical arrow) and timing (horizontal) arrow, which were used to summarise impact.
 
 ```{r methods-figure-epidemic, fig.cap="(ref:methods-figure-epidemic)"}
 # Load in the output file:
@@ -456,9 +456,11 @@ The results of analyses examining the impact of far UVC installation on an epide
 
 We estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen. Assuming 10% coverage and 80% efficacy, random far UVC installation led to a 8.8% (range 6.1%-12.1%) reduction in annual infection incidence for the "Influenza-Like" pathogen, while targeting far UVC to locations in order of riskiness increased the reduction in transmission to 15.8% on average (range 12.5%-19.7%), an approximately 1.8x increase in impact. For the "SARS-CoV-2-like" pathogen, random far UVC coverage assuming 10% coverage and 80% efficacy were asociated with a 3.7% (range 2.6%-4.8%) reduction in the annual incidence of infection. Targeting far UVC to locations in order of riskiness led to a 5.5% average reduction, a 1.5x increase compared to the randomly targeted scenario.
 
-Our results also highlight that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact, though the degree to which this is the case varies across pathogen archetypes. For the "Influenza-like" pathogen, increasing far UVC coverage from 10% to 30% led to the average annual reduction in incidence increasing from X% to Y%, a Zx increase. For the "SARS-CoV-2-like" pathogen, increasing far UVC coverage from 10% to 30% led to the average annual reduction in incidence increasing from X% to Y%, a Zx increase.
+Our results also highlight that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact, though the degree to which this is the case varies across pathogen archetypes. For the "Influenza-like" pathogen, when efficacy is 80%, increasing far UVC coverage from 10% to 30% led to the average annual reduction in incidence increasing from 8.8% to 26.3%, a 3x increase. For the "SARS-CoV-2-like" pathogen, increasing far UVC coverage from 10% to 30% led to the average annual reduction in incidence increasing from 3.7% to 9.8%, a 2.65x increase.
 
-```{r endemic-impact, fig.cap="(ref:endemic-impact)"}
+(ref:endemic-impact) The impact of far UVC coverage type, coverage, and efficacy on the reduction in average annual incidence of infection compared to situations where far UVC is not installed. The light blue bars represent the average for simulations where was far UVC deployed at random, and the dark blue bars stacked on top represent the average extra impact that arises when far UVC was targeted at the riskiest settings. The error bars for both show the minimum and maximum values across 25 stochastic replicates for each parameter set.
+
+```{r endemic-impact, fig.cap="(ref:endemic-impact)", fig.height=8}
 
 avg_summary_outputs <- endemic_summary_outputs %>%
   group_by(archetype, coverage_type, coverage, efficacy, disease_status) %>%
@@ -469,11 +471,11 @@ avg_summary_outputs <- endemic_summary_outputs %>%
   ungroup() %>%
   mutate(new_ID = 1:n())
 
-ggplot(data = subset(avg_summary_outputs, coverage_type == "random" & coverage <= 0.7),
+raw_impact <- ggplot(data = subset(avg_summary_outputs, coverage_type == "random" & coverage <= 0.7),
        aes(x = 100 * coverage, y = 100 * mean_reduction_incidence)) +
   geom_bar(data = subset(avg_summary_outputs, coverage_type == "targeted_riskiness" & coverage <= 0.7),
            aes(x = 100 * coverage, y = 100 * mean_reduction_incidence),
-           col = "black", fill ="#03113E" , stat = "identity") +
+           col = "black", fill ="#017ABE" , stat = "identity") +
   geom_bar(stat = "identity", position = "dodge", fill = "#00AFFF", col = "black") +
   geom_errorbar(aes(ymin = 100 * lower_reduction_incidence,
                     ymax = 100 * upper_reduction_incidence),
@@ -492,11 +494,31 @@ ggplot(data = subset(avg_summary_outputs, coverage_type == "random" & coverage <
   scale_x_continuous(breaks = c(0, 10, 20, 30, 40, 50, 60, 80, 100)) +
   labs(fill = "Time\nPeriod", x = "Far UVC Coverage (%)",
        y = "% Reduction in Annual Infection Incidence")
+
+x <- avg_summary_outputs %>%
+  group_by(archetype, coverage_type, efficacy, disease_status) %>%
+  mutate(baseline_reduction = mean(mean_reduction_incidence[coverage == 0.1])) %>%
+  group_by(archetype, coverage, coverage_type, efficacy, disease_status) %>%
+  summarise(inc_reduction_rel = mean(mean_reduction_incidence / baseline_reduction, na.rm = TRUE))
+
+rel_impact <- ggplot(subset(x, coverage <= 0.7), aes(x = coverage, y = inc_reduction_rel, col = coverage_type)) +
+  geom_line() +
+  facet_grid(archetype ~ efficacy, # scales = "free_y",
+             labeller = as_labeller(c(`0.4` = "40% Efficacy",
+                                      `0.6` = "60% Efficacy",
+                                      `0.8` = "80% Efficacy",
+                                      `flu` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2"))) +  scale_colour_manual(values = blueprint_colours,
+                                                                                            labels = c("Random", "Targeted/nRiskiness")) +
+  theme_bw() +
+  labs(x = "Coverage", y = "Fold-increase impact relative to 10% coverage")
+
+cowplot::plot_grid(raw_impact, rel_impact, nrow = 2)
 ```
 
-(ref:endemic-impact) The impact of far UVC coverage type, coverage, and efficacy on the reduction in average annual incidence of infection compared to situations where far UVC is not installed. The light blue bars represent the average for simulations where was far UVC deployed at random, and the dark blue bars stacked on top represent the average extra impact that arises when far UVC was targeted at the riskiest settings. The error bars for both show the minimum and maximum values across 25 stochastic replicates for each parameter set.
-
 In Figure \@ref(fig:endemic-figure2), we show the relative extra impact achieved under each scenario by targeting far UVC to locations based on riskiness, rather than at random. In general, the relative gain in transmission reduction was greatest at low coverage - when only a small fraction of locations are covered, choosing to cover those that are most conducive to transmission has a substantial (relative) effect. As the % of locations covered increases, the random and targeted approaches become increasingly similar (when 100% of locations are covered, they are identical), and so the relative difference in impact decreases.
+
+(ref:endemic-figure2) The relative extra impact of far UVC coverage targeted based on riskiness compared to targeting at random. The error bars for both show the inter-quartile range across 25 stochastic replicates for each parameter set.
 
 ```{r endemic-figure2, fig.cap="(ref:endemic-figure2)"}
 
@@ -553,7 +575,10 @@ ggplot(data = df_comparison, aes(x = 100 * hypothetical_reduction,
                     ymax = 100 * incidence_percentage_reduction_upper, 
                     col = coverage_type), linewidth = 1) +
   geom_abline(slope = 1, linetype = "dashed") +
-  facet_grid(.~archetype) +
+  facet_grid(. ~ archetype,
+             scales = "free_y",
+             labeller = as_labeller(c(`flu` = "Influenza",
+                                      `sars_cov_2` = "SARS-CoV-2"))) +
   scale_colour_manual(values = c("#00AFFF", "#03113E")) + 
   labs(x = "Hypothetical Reduction in Annual Incidence\nBased On Simple, Multiplicative Model",
        y = "Reduction in Annual Incidence\nPredicted by helios (%)",
