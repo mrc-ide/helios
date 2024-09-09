@@ -87,6 +87,8 @@ In a [previous report](https://mrc-ide.github.io/helios/articles/blueprint-july.
 
 As a reminder, here is what the distribution of riskiness across locations of the same Setting-Type looks like in our modelling framework Together, these imply an approximate "riskiness ratio" (the difference in riskiness between the 5th percentile risky and 95th percentile risky) of 2.5x for Households, 5.5x for Leisure locations, 4.75x for Schools and 6.35x for Workplaces:
 
+(ref:riskiness-exemplar) The distribution of riskiness for the household, leisure, school, and workplace Setting Types.
+
 ```{r riskiness-exemplar, fig.cap="(ref:riskiness-exemplar)", fig.fullwidth = TRUE, fig.height=5}
 
 scaling_factor <- 5
@@ -142,6 +144,9 @@ ggplot(riskiness, aes(riskiness)) +
 ```
 
 The modelling framework is now able to target the deployment of far UVC in Locations based on their riskiness. Below we show how assignment of far UVC works for the two targeting strategies for an example where far UVC is installed to cover 50% of total School, Workplace and Leisure location area. The two strategies are "random" (far UVC assigned randomly to locations, irrespective of their riskiness) and "targeted riskiness" (far UVC assigned to locations based on the rank ordered riskiness of each setting).
+
+(ref:riskiness-coverage-exemplar) An illustrative comparison of the random targeting and riskiness-specific targeting methods for selecting locations in which far UVC is to be deployed. The grey bars represent locations in which far UVC has not been installed, and the dark blue bars those in which it has. In the left-hand plot, far UVC is deployed, at random (i.e. irrespective of setting-specific riskiness), to a 50% of all locations, across setting types. In the right-hand plot, far UVC is deployed in the riskiest 50% of locations.
+
 
 ```{r riskiness-coverage-exemplar, fig.cap="(ref:riskiness-coverage-exemplar)", fig.fullwidth = TRUE, fig.height=5}
 
