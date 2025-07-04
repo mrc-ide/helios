@@ -2,13 +2,14 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
+    branches: [main]
   release:
     types: [published]
   workflow_dispatch:
 
-name: pkgdown.yaml
+name: pkgdown
 
 permissions: read-all
 
@@ -40,9 +41,16 @@ jobs:
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
+      - name: Upload website
+        uses: actions/upload-artifact@v4
+        with:
+          name: website
+          retention-days: 5
+          path: docs
+
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
-        uses: JamesIves/github-pages-deploy-action@v4.5.0
+        uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
           clean: false
           branch: gh-pages
