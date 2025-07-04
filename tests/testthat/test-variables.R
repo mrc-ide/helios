@@ -1,11 +1,3 @@
-#============================#
-#===== create_variables =====#
-#============================#
-
-#===========================================#
-#===== generate_initial_disease_states =====#
-#===========================================#
-
 test_that("generate_initial_disease_states errors if parameter list does not contain number_initially_exposed parameter", {
   # Establish the list of model parameters:
   parameters_list <- get_parameters()
