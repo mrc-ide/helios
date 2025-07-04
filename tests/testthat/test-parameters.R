@@ -57,15 +57,6 @@ test_that("get_parameters() assigns correct parameters for flu archetype", {
   # Generate the parameter list for the fly archetype:
   parameters_list <- get_parameters(archetype = "flu")
 
-  # We are expecting the following flu-specific parameters:
-  # duration_exposed = 1
-  # duration_infectious = 2
-  # beta_household = 0.132
-  # beta_school = 0.132
-  # beta_workplace = 0.132
-  # beta_leisure = 0.132
-  # beta_community = 0.044
-
   # Check that the archetype-specific parameters match the expected values:
   expect_identical(object = parameters_list$duration_exposed, expected = 1)
   expect_identical(object = parameters_list$duration_infectious, expected = 2)
@@ -80,15 +71,6 @@ test_that("get_parameters() assigns correct parameters for SARS-CoV-2 archetype"
   # Generate the parameter list for the fly archetype:
   parameters_list <- get_parameters(archetype = "sars_cov_2")
 
-  # We are expecting the following flu-specific parameters:
-  # duration_exposed = 2
-  # duration_infectious = 4
-  # beta_household = 0.24
-  # beta_school = 0.24
-  # beta_workplace = 0.24
-  # beta_leisure = 0.24
-  # beta_community = 0.08
-
   # Check that the archetype-specific parameters match the expected values:
   expect_identical(object = parameters_list$duration_exposed, expected = 2)
   expect_identical(object = parameters_list$duration_infectious, expected = 4)
@@ -102,15 +84,6 @@ test_that("get_parameters() assigns correct parameters for SARS-CoV-2 archetype"
 test_that("get_parameters() assigns correct parameters for measles archetype", {
   # Generate the parameter list for the fly archetype:
   parameters_list <- get_parameters(archetype = "measles")
-
-  # We are expecting the following flu-specific parameters:
-  # duration_exposed = 8
-  # duration_infectious = 5
-  # beta_household = 1.26
-  # beta_school = 1.26
-  # beta_workplace = 1.26
-  # beta_leisure = 1.26
-  # beta_community = 0.044
 
   # Check that the archetype-specific parameters match the expected values:
   expect_identical(object = parameters_list$duration_exposed, expected = 8)
