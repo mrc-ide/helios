@@ -35,7 +35,8 @@ Imports:
     individual,
     dplyr,
     EnvStats,
-    dqrng
+    dqrng,
+    tidyr
 Remotes:
     mrc-ide/individual@feat/logi_size
 Roxygen: list(markdown = TRUE)
