@@ -1,20 +1,20 @@
 
 # Also use the ncov-ic universe
-repo::https://ncov-ic.r-universe.dev
+# repo::https://ncov-ic.r-universe.dev
 
 # Specific version of individual, via a tag
-mrc-ide/individual
+# mrc-ide/individual
 
 # Local version of helios
 # local::./helios_0.1.0.tar.gz
 
 # Specific version of malariasimulation
-mrc-ide/site@site2
-mrc-ide/postie@postie2
-mrc-ide/scene@scene2
+# mrc-ide/site@site2
+# mrc-ide/postie@postie2
+# mrc-ide/scene@scene2
 # mrc-ide/netz@netz2
-mrc-ide/malariasimulation@dev
-sf
+# mrc-ide/malariasimulation@dev
+# sf
 
 ###################################################
 ## Loading hipercow
