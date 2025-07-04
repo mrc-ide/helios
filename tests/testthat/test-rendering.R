@@ -69,7 +69,7 @@ test_that("run_simulations() correctly renders diagnostic outputs when render_di
 test_that("Disease state counts sum to parameters$human population", {
   # Get a list of model parameters:
   parameters <- get_parameters(
-    overrides = list(human_population = 137, simulation_time = 10)
+    overrides = list(human_population = 137, number_initial_S = 132, simulation_time = 10)
   )
 
   # Run the simulation:
@@ -94,6 +94,7 @@ test_that("Renderer renders the number of externally sourced infections when end
   parameters_list <- get_parameters(
     overrides = list(
       human_population = 1000,
+      number_initial_S = 995,
       endemic_or_epidemic = 'endemic',
       duration_immune = 14,
       prob_inf_external = 0.05,
@@ -111,7 +112,7 @@ test_that("Renderer renders the number of externally sourced infections when end
 test_that("Renderer does not render the number of externally sourced infections when endemic switched off", {
   # Generate the model variables:
   parameters_list <- get_parameters(
-    overrides = list(human_population = 1000, simulation_time = 10)
+    overrides = list(human_population = 1000, number_initial_S = 995, simulation_time = 10)
   )
 
   # Run the simulation:

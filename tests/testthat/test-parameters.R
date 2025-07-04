@@ -64,7 +64,7 @@ test_that("get_parameters() assigns correct parameters for flu archetype", {
   expect_identical(object = pl$beta_school, expected = 0.207)
   expect_identical(object = pl$beta_workplace, expected = 0.207)
   expect_identical(object = pl$beta_leisure, expected = 0.207)
-  expect_identical(object = pl$beta_community, expected = 0.044)
+  expect_identical(object = pl$beta_community, expected = 0.069)
 })
 
 test_that("get_parameters() assigns correct parameters for SARS-CoV-2 archetype", {
