@@ -30,7 +30,8 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     bookdown,
-    here
+    here,
+    cowplot
 Config/testthat/edition: 3
 Imports: 
     individual,
