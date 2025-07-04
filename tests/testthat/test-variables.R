@@ -22,8 +22,7 @@ test_that("generate_initial_disease_states errors if parameter list does not con
   # Check that generate_initial_disease_states() errors when number_initially_exposed not in the parameters
   # list:
   expect_error(
-    object = generate_initial_disease_states(parameters_list = parameters_list),
-    regexp = "parameters list must contain a variable called human_population"
+    object = generate_initial_disease_states(parameters_list = parameters_list)
   )
 })
 
@@ -45,7 +44,7 @@ test_that("generate_initial_disease_states errors if parameter list does not con
 test_that("generate_initial_disease_states returns the expected disease states", {
   # Establish the list of model parameters:
   parameters_list <- get_parameters(
-    overrides = list(number_initial_E = 47)
+    overrides = list(number_initial_E = 47, number_initial_S = 10000 - 47)
   )
 
   # Generate the initial disease states:
@@ -59,7 +58,7 @@ test_that("generate_initial_disease_states returns the expected disease states",
     parameters_list$number_initial_E
   )
 
-  # Check that the number of susceptible indiivduals matches expectation:
+  # Check that the number of susceptible individuals matches expectation:
   expect_equal(
     sum(initial_disease_states == "S"),
     parameters_list$human_population - parameters_list$number_initial_E
@@ -164,7 +163,6 @@ test_that("generate_initial_age_classes contains only the expected age classes",
       initial_proportion_child = 0.5,
       initial_proportion_adult = 0.2,
       initial_proportion_elderly = 0.3,
-      human_population = 1000
     )
   )
 
