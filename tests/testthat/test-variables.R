@@ -82,10 +82,6 @@ test_that("generate_initial_disease_states returns vector containing only suscep
   expect_contains(initial_disease_states, disease_states)
 })
 
-#========================================#
-#===== generate_initial_age_classes =====#
-#========================================#
-
 test_that("generate_initial_age_classes errors if parameter list does not contain initial_proportion_child parameter", {
   # Establish the list of model parameters:
   parameters_list <- get_parameters()
