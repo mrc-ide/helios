@@ -39,7 +39,7 @@ test_that("get_parameters() errors when the endemic setting is switched on witho
 
 test_that("get_parameters() successfully creates parameter list for endemic setting when all required parameters are parsed", {
   expect_no_error(
-    parameters_list <- get_parameters(
+    pl <- get_parameters(
       overrides = list(
         endemic_or_epidemic = 'endemic',
         duration_immune = 14,
@@ -55,55 +55,55 @@ test_that("get_parameters() errors when an unrecognised archetype is input", {
 
 test_that("get_parameters() assigns correct parameters for flu archetype", {
   # Generate the parameter list for the fly archetype:
-  parameters_list <- get_parameters(archetype = "flu")
+  pl <- get_parameters(archetype = "flu")
 
   # Check that the archetype-specific parameters match the expected values:
-  expect_identical(object = parameters_list$duration_exposed, expected = 1)
-  expect_identical(object = parameters_list$duration_infectious, expected = 2)
-  expect_identical(object = parameters_list$beta_household, expected = 0.132)
-  expect_identical(object = parameters_list$beta_school, expected = 0.132)
-  expect_identical(object = parameters_list$beta_workplace, expected = 0.132)
-  expect_identical(object = parameters_list$beta_leisure, expected = 0.132)
-  expect_identical(object = parameters_list$beta_community, expected = 0.044)
+  expect_identical(object = pl$duration_exposed, expected = 1)
+  expect_identical(object = pl$duration_infectious, expected = 2)
+  expect_identical(object = pl$beta_household, expected = 0.207)
+  expect_identical(object = pl$beta_school, expected = 0.207)
+  expect_identical(object = pl$beta_workplace, expected = 0.207)
+  expect_identical(object = pl$beta_leisure, expected = 0.207)
+  expect_identical(object = pl$beta_community, expected = 0.044)
 })
 
 test_that("get_parameters() assigns correct parameters for SARS-CoV-2 archetype", {
   # Generate the parameter list for the fly archetype:
-  parameters_list <- get_parameters(archetype = "sars_cov_2")
+  pl <- get_parameters(archetype = "sars_cov_2")
 
   # Check that the archetype-specific parameters match the expected values:
-  expect_identical(object = parameters_list$duration_exposed, expected = 2)
-  expect_identical(object = parameters_list$duration_infectious, expected = 4)
-  expect_identical(object = parameters_list$beta_household, expected = 0.24)
-  expect_identical(object = parameters_list$beta_school, expected = 0.24)
-  expect_identical(object = parameters_list$beta_workplace, expected = 0.24)
-  expect_identical(object = parameters_list$beta_leisure, expected = 0.24)
-  expect_identical(object = parameters_list$beta_community, expected = 0.08)
+  expect_identical(object = pl$duration_exposed, expected = 2)
+  expect_identical(object = pl$duration_infectious, expected = 4)
+  expect_identical(object = pl$beta_household, expected = 0.24)
+  expect_identical(object = pl$beta_school, expected = 0.24)
+  expect_identical(object = pl$beta_workplace, expected = 0.24)
+  expect_identical(object = pl$beta_leisure, expected = 0.24)
+  expect_identical(object = pl$beta_community, expected = 0.08)
 })
 
 test_that("get_parameters() assigns correct parameters for measles archetype", {
   # Generate the parameter list for the fly archetype:
-  parameters_list <- get_parameters(archetype = "measles")
+  pl <- get_parameters(archetype = "measles")
 
   # Check that the archetype-specific parameters match the expected values:
-  expect_identical(object = parameters_list$duration_exposed, expected = 8)
-  expect_identical(object = parameters_list$duration_infectious, expected = 5)
-  expect_identical(object = parameters_list$beta_household, expected = 1.26)
-  expect_identical(object = parameters_list$beta_school, expected = 1.26)
-  expect_identical(object = parameters_list$beta_workplace, expected = 1.26)
-  expect_identical(object = parameters_list$beta_leisure, expected = 1.26)
-  expect_identical(object = parameters_list$beta_community, expected = 0.42)
+  expect_identical(object = pl$duration_exposed, expected = 8)
+  expect_identical(object = pl$duration_infectious, expected = 5)
+  expect_identical(object = pl$beta_household, expected = 1.26)
+  expect_identical(object = pl$beta_school, expected = 1.26)
+  expect_identical(object = pl$beta_workplace, expected = 1.26)
+  expect_identical(object = pl$beta_leisure, expected = 1.26)
+  expect_identical(object = pl$beta_community, expected = 0.42)
 })
 
 test_that("run_simulation() works when a parameter archetype specified", {
   # Generate the parameter list for the fly archetype:
-  parameters_list <- get_parameters(
+  pl <- get_parameters(
     overrides = list(simulation_time = 3),
     archetype = "flu"
   )
 
   # Run the simulation:
-  simulation_example <- run_simulation(parameters_list = parameters_list)
+  simulation_example <- run_simulation(parameters_list = pl)
 
   # Check that the output contains some expected column names and that it is a data.frame:
   expect_true(all(
