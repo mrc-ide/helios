@@ -17,7 +17,11 @@
 
 ###################################################
 ## Loading hipercow
-library(hipercow); library(pkgdepends); library(individual); library(malariasimulation); library(sf)
+library(hipercow)
+library(pkgdepends)
+library(individual)
+library(malariasimulation)
+library(sf)
 
 ## Set working directory to network path
 setwd("Q:/")
@@ -32,8 +36,12 @@ hipercow_provision(method = "pkgdepends") # note we're getting some weird depend
 
 ## Loading in file and setting up the hipercow environment
 ?hipercow_cluster_info()
-site_file <- readRDS(file = "C:/Users/cw1716/Documents/Q_Drive_Copy2/Active_Research_Projects/estimating_stephensi_density/data/tester_malariasimulation_siteFiles/ETH_calibrated_scaled_site.rds")
-hipercow_environment_create(packages = c("individual", "malariasimulation", "site", "postie", "scene", "netz", "sf"))
+site_file <- readRDS(
+  file = "C:/Users/cw1716/Documents/Q_Drive_Copy2/Active_Research_Projects/estimating_stephensi_density/data/tester_malariasimulation_siteFiles/ETH_calibrated_scaled_site.rds"
+)
+hipercow_environment_create(
+  packages = c("individual", "malariasimulation", "site", "postie", "scene", "netz", "sf")
+)
 # globals = "site_file") # don't forget to tell Rich and Wes this doesn't work
 hipercow_configuration()
 
@@ -52,7 +60,8 @@ id5 <- hipercow::task_create_explicit(
         overrides = list(human_population = 10000),
         species = "pf",
         burnin = 5,
-        eir = sub_site$eir$eir[sub_site$eir$sp == "pf"])
+        eir = sub_site$eir$eir[sub_site$eir$sp == "pf"]
+      )
       malariasimulation::run_simulation(p$timesteps, p)
     })
   }),

@@ -1,5 +1,7 @@
 # Loading required libraries
-library(EnvStats); library(reshape2); library(tidyverse)
+library(EnvStats)
+library(reshape2)
+library(tidyverse)
 
 ### Sensitivity Analysis examining how variation in air-changes per hour
 ### influences riskiness of a room. We vary:
@@ -11,14 +13,12 @@ air_changes_per_hour <- seq(1, 25, 1)
 m2_per_person <- seq(2, 8, 2)
 setting_sizes <- 100
 room_height <- 2.5
-output_matrix <- array(dim = c(length(air_changes_per_hour),
-                               length(infection_prevalence),
-                               length(m2_per_person),
-                               4))
+output_matrix <- array(
+  dim = c(length(air_changes_per_hour), length(infection_prevalence), length(m2_per_person), 4)
+)
 for (i in 1:length(air_changes_per_hour)) {
   for (j in 1:length(infection_prevalence)) {
     for (k in 1:length(m2_per_person)) {
-
       ## Calculating the steady state concentration of virus
       I <- setting_sizes * infection_prevalence[j]
       room_vol <- setting_sizes * m2_per_person[k] * room_height
@@ -48,13 +48,24 @@ for (i in 1:length(infection_prevalence)) {
   for (j in 1:length(m2_per_person)) {
     for (k in 1:length(air_changes_per_hour)) {
       if (k == 1) {
-        plot(c(2, 4, 6, 8), output_matrix[k, i, j, ], type = "l",
-             xlab = "Time (hours)", ylab = "Prob. infected",
-             ylim = c(0, max(output_matrix[, i, j, ])), col = colours[i],
-             main = paste0("Prev=", round(100 * infection_prevalence[i], 2), "%,",
-                           "Dens=", m2_per_person[j]))
+        plot(
+          c(2, 4, 6, 8),
+          output_matrix[k, i, j, ],
+          type = "l",
+          xlab = "Time (hours)",
+          ylab = "Prob. infected",
+          ylim = c(0, max(output_matrix[, i, j, ])),
+          col = colours[i],
+          main = paste0(
+            "Prev=",
+            round(100 * infection_prevalence[i], 2),
+            "%,",
+            "Dens=",
+            m2_per_person[j]
+          )
+        )
       } else {
-        lines(c(2, 4, 6, 8), output_matrix[k, i, j, ], type = "l", col  = colours[i])
+        lines(c(2, 4, 6, 8), output_matrix[k, i, j, ], type = "l", col = colours[i])
       }
     }
   }
@@ -64,12 +75,16 @@ for (i in 1:length(infection_prevalence)) {
 par(mfrow = c(length(infection_prevalence), length(m2_per_person)))
 for (i in 1:length(infection_prevalence)) {
   for (j in 1:length(m2_per_person)) {
-      plot(c(2, 4, 6, 8),
-           output_matrix[1, i, j, ] / output_matrix[length(air_changes_per_hour), i, j, ],
-           type = "l", xlab = "time", ylab = "p_inf",
-           ylim = c(0, 15),
-           col = colours[i],
-           main = paste0(infection_prevalence[i], " ", m2_per_person[j]))
+    plot(
+      c(2, 4, 6, 8),
+      output_matrix[1, i, j, ] / output_matrix[length(air_changes_per_hour), i, j, ],
+      type = "l",
+      xlab = "time",
+      ylab = "p_inf",
+      ylim = c(0, 15),
+      col = colours[i],
+      main = paste0(infection_prevalence[i], " ", m2_per_person[j])
+    )
   }
 }
 
@@ -81,36 +96,36 @@ dimnames(output_matrix) <- list(
 )
 
 
-melted_df <- melt(output_matrix,
-                  varnames = c("airchanges_per_hour", "infection_prevalence", "m2_per_person", "time"),
-                  value.name = "value")
+melted_df <- melt(
+  output_matrix,
+  varnames = c("airchanges_per_hour", "infection_prevalence", "m2_per_person", "time"),
+  value.name = "value"
+)
 
-a <- ggplot(subset(melted_df,infection_prevalence == "0.01% Prev." & m2_per_person == "2m^2 per person"),
-       aes(x = as.numeric(time), y = value, col = factor(airchanges_per_hour))) +
+a <- ggplot(
+  subset(melted_df, infection_prevalence == "0.01% Prev." & m2_per_person == "2m^2 per person"),
+  aes(x = as.numeric(time), y = value, col = factor(airchanges_per_hour))
+) +
   geom_line() +
   geom_point() +
-  facet_grid(infection_prevalence~m2_per_person,
-             scales = "free_y") +
+  facet_grid(infection_prevalence ~ m2_per_person, scales = "free_y") +
   theme_bw() +
-  labs(x = "Time (Hours)", y = "Prob. Infected (Wells Riley)",
-       col = "Air Changes\nPer Hour")
+  labs(x = "Time (Hours)", y = "Prob. Infected (Wells Riley)", col = "Air Changes\nPer Hour")
 
 colnames(melted_df)
 melted_df2 <- melted_df %>%
-  filter(time == 8) %>%  # time == 4 |
+  filter(time == 8) %>% # time == 4 |
   group_by(infection_prevalence, m2_per_person, time)
 
-b <- ggplot(subset(melted_df2, infection_prevalence == "0.01% Prev." & m2_per_person == "2m^2 per person"),
-       aes(x = as.numeric(airchanges_per_hour),
-           y = value,
-           col = factor(time))) +
+b <- ggplot(
+  subset(melted_df2, infection_prevalence == "0.01% Prev." & m2_per_person == "2m^2 per person"),
+  aes(x = as.numeric(airchanges_per_hour), y = value, col = factor(time))
+) +
   geom_line() +
   geom_point() +
-  facet_grid(infection_prevalence~m2_per_person,
-             scales = "free_y") +
+  facet_grid(infection_prevalence ~ m2_per_person, scales = "free_y") +
   theme_bw() +
-  labs(x = "ACH", y = "Prob. Infected (Wells Riley)",
-       col = "Time Spent In Room") +
+  labs(x = "ACH", y = "Prob. Infected (Wells Riley)", col = "Time Spent In Room") +
   theme(legend.position = "none")
 
 melted_df3 <- melted_df2 %>%
@@ -118,28 +133,23 @@ melted_df3 <- melted_df2 %>%
   mutate(efficacy = 1 - (value / value[airchanges_per_hour == 1])) %>%
   mutate(efficacy2 = 1 - (value / value[airchanges_per_hour == 2]))
 
-c <- ggplot(subset(melted_df3, infection_prevalence == "0.01% Prev." & m2_per_person == "2m^2 per person"),
-       aes(x = as.numeric(airchanges_per_hour),
-           y = efficacy,
-           col = factor(time))) +
+c <- ggplot(
+  subset(melted_df3, infection_prevalence == "0.01% Prev." & m2_per_person == "2m^2 per person"),
+  aes(x = as.numeric(airchanges_per_hour), y = efficacy, col = factor(time))
+) +
   geom_line() +
   geom_point() +
-  geom_line(aes(x = as.numeric(airchanges_per_hour),
-                y = 0.3787860 + efficacy2),
-                col = "blue") +
-  facet_grid(infection_prevalence~m2_per_person,
-             scales = "free_y") +
+  geom_line(aes(x = as.numeric(airchanges_per_hour), y = 0.3787860 + efficacy2), col = "blue") +
+  facet_grid(infection_prevalence ~ m2_per_person, scales = "free_y") +
   theme_bw() +
-  labs(x = "ACH", y = "Efficacy",
-       col = "Time Spent In Room") +
+  labs(x = "ACH", y = "Efficacy", col = "Time Spent In Room") +
   theme(legend.position = "none")
 
 cowplot::plot_grid(b, c, nrow = 1)
 
-starters  <- 1:10
-step_max  <- 15
-pair_grid <- expand_grid(ach_start  = starters,
-                         step       = 1:step_max) %>%
+starters <- 1:10
+step_max <- 15
+pair_grid <- expand_grid(ach_start = starters, step = 1:step_max) %>%
   mutate(ach_target = ach_start + step) %>%
   select(-step)
 
@@ -149,61 +159,38 @@ efficacy_df <- melted_df2 %>%
   right_join(pair_grid, by = "ach_target") %>%
   left_join(
     melted_df2 %>%
-      rename(ach_start = airchanges_per_hour,
-             value_start = value),
-    by = c("infection_prevalence",
-           "m2_per_person",
-           "time",
-           "ach_start")
+      rename(ach_start = airchanges_per_hour, value_start = value),
+    by = c("infection_prevalence", "m2_per_person", "time", "ach_start")
   ) %>%
   group_by(infection_prevalence, m2_per_person) %>%
   mutate(
-    efficacy = 1 - value / value_start   # the definition you gave
+    efficacy = 1 - value / value_start # the definition you gave
   ) %>%
-  arrange(infection_prevalence, m2_per_person, time,
-          ach_start, ach_target) %>%
+  arrange(infection_prevalence, m2_per_person, time, ach_start, ach_target) %>%
   filter(time == 8) %>%
   mutate(ach_increase = ach_target - ach_start)
 
 # ggplot(subset(efficacy_df, infection_prevalence == "0.01% Prev." & m2_per_person == "2m^2 per person"),
-ggplot(efficacy_df,
-       aes(x = as.numeric(ach_increase),
-           y = efficacy,
-           col = factor(ach_start))) +
-  facet_grid(infection_prevalence~m2_per_person,
-             scales = "free_y") +
+ggplot(efficacy_df, aes(x = as.numeric(ach_increase), y = efficacy, col = factor(ach_start))) +
+  facet_grid(infection_prevalence ~ m2_per_person, scales = "free_y") +
   geom_line() +
   geom_point() +
   theme_bw() +
-  labs(x = "ACH Increase", y = "Efficacy",
-       col = "Baseline ACH") +
-  lims(y = c(0, 1),
-       x = c(0, 15))
+  labs(x = "ACH Increase", y = "Efficacy", col = "Baseline ACH") +
+  lims(y = c(0, 1), x = c(0, 15))
 
-ggplot(efficacy_df,
-       aes(x = as.numeric(ach_increase),
-           y = efficacy,
-           col = infection_prevalence)) +
-  facet_grid(factor(ach_start)~m2_per_person,
-             scales = "free_y") +
+ggplot(efficacy_df, aes(x = as.numeric(ach_increase), y = efficacy, col = infection_prevalence)) +
+  facet_grid(factor(ach_start) ~ m2_per_person, scales = "free_y") +
   geom_line() +
   geom_point() +
   theme_bw() +
-  labs(x = "ACH Increase", y = "Efficacy",
-       col = "Baseline ACH") +
-  lims(y = c(0, 1),
-       x = c(0, 15))
+  labs(x = "ACH Increase", y = "Efficacy", col = "Baseline ACH") +
+  lims(y = c(0, 1), x = c(0, 15))
 
-ggplot(efficacy_df,
-       aes(x = as.numeric(ach_increase),
-           y = efficacy,
-           col = m2_per_person)) +
-  facet_grid(factor(ach_start)~infection_prevalence,
-             scales = "free_y") +
+ggplot(efficacy_df, aes(x = as.numeric(ach_increase), y = efficacy, col = m2_per_person)) +
+  facet_grid(factor(ach_start) ~ infection_prevalence, scales = "free_y") +
   geom_line() +
   geom_point() +
   theme_bw() +
-  labs(x = "ACH Increase", y = "Efficacy",
-       col = "Baseline ACH") +
-  lims(y = c(0, 1),
-       x = c(0, 15))
+  labs(x = "ACH Increase", y = "Efficacy", col = "Baseline ACH") +
+  lims(y = c(0, 1), x = c(0, 15))
