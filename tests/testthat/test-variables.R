@@ -421,14 +421,6 @@ test_that("generate_initial_schools assigns no elderly individuals to any school
   )
 })
 
-#==============================================#
-#===== generate_initial_schools_bootstrap =====#
-#==============================================#
-
-#=======================================#
-#===== generate_initial_workplaces =====#
-#=======================================#
-
 test_that("generate_initial_workplaces errors if parameter_list does not contain human_population", {
   # Establish the list of model parameters:
   parameters_list <- get_parameters()
@@ -563,15 +555,3 @@ test_that("generate_initial_workplaces errors if parameter_list does not contain
     regexp = "parameters list must contain a variable called workplace_c"
   )
 })
-
-#====================================#
-#===== generate_initial_leisure =====#
-#====================================#
-
-#=======================================#
-#===== generate_initial_households =====#
-#=======================================#
-
-#=================================================#
-#===== generate_initial_households_bootstrap =====#
-#=================================================#
