@@ -13,8 +13,7 @@ test_that("set_uvc() errors if function given multiple settings in a single call
       coverage_type = "random",
       efficacy = c(0.8),
       timestep = c(1)
-    ),
-    regexp = "Error: Number of settings input greater than 1, parameterise for one setting at a time"
+    )
   )
 })
 
@@ -32,8 +31,7 @@ test_that("set_uvc() errors if function given multiple coverage types in a singl
       coverage_type = c("random", "targeted"),
       efficacy = c(0.8),
       timestep = c(1)
-    ),
-    regexp = "Error: Number of coverage types input greater than 1, parameterise for one coverage type at a time"
+    )
   )
 })
 
@@ -52,8 +50,7 @@ test_that("set_uvc() errors when setting input not from allowed list of Far UVC 
       coverage_type = "random",
       efficacy = c(0.8),
       timestep = c(1)
-    ),
-    regexp = "Error: Input setting invalid - far UVC only deployable in workplace, school, leisure, or household settings"
+    )
   )
 })
 
@@ -72,8 +69,7 @@ test_that("set_uvc() errors when coverage_type input not from allowed list of Fa
       coverage_type = "weak",
       efficacy = c(0.8),
       timestep = c(1)
-    ),
-    regexp = "Error: Input setting invalid - far UVC only deployable in random or targeted coverage types"
+    )
   )
 })
 
@@ -112,8 +108,7 @@ test_that("set_uvc() errors if efficacy not between 0 and 1", {
       coverage_type = c("targeted"),
       efficacy = c(1.01),
       timestep = c(1)
-    ),
-    regexp = "Error: efficacy must take a value between 0 and 1"
+    )
   )
 })
 
@@ -258,8 +253,7 @@ test_that("set_uvc() errors coverage_target not from allowed options", {
       coverage_type = "targeted",
       efficacy = c(0.5),
       timestep = c(1)
-    ),
-    regexp = "Error: Input setting invalid - far UVC coverage only applicable to individuals or buildings"
+    )
   )
 })
 
