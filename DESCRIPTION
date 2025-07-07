@@ -33,7 +33,8 @@ Suggests:
     here,
     cowplot,
     reshape2,
-    tictoc
+    tictoc,
+    gt
 Config/testthat/edition: 3
 Imports: 
     individual,
