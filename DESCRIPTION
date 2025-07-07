@@ -32,7 +32,8 @@ Suggests:
     bookdown,
     here,
     cowplot,
-    reshape2
+    reshape2,
+    tictoc
 Config/testthat/edition: 3
 Imports: 
     individual,
