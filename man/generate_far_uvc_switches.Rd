@@ -4,7 +4,7 @@
 \alias{generate_far_uvc_switches}
 \title{Update model parameters with far UVC switches}
 \usage{
-generate_far_uvc_switches(parameters_list, variables_list)
+generate_far_uvc_switches(parameters_list, setting_sizes)
 }
 \arguments{
 \item{parameters_list}{A list of model parameters as generated using \code{get_parameters()}}

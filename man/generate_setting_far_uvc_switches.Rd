@@ -4,14 +4,14 @@
 \alias{generate_setting_far_uvc_switches}
 \title{Generate far UVC switches for particular setting}
 \usage{
-generate_setting_far_uvc_switches(parameters_list, variables_list, setting)
+generate_setting_far_uvc_switches(parameters_list, setting_size, setting)
 }
 \arguments{
 \item{parameters_list}{A list of model parameters as generated using \code{get_parameters()}}
 
-\item{variables_list}{A list of model variables as generated using \code{create_variables()}}
-
 \item{setting}{One of \code{"workplace"}, \code{"school"}, \code{"household"}, or \code{"leisure"}}
+
+\item{variables_list}{A list of model variables as generated using \code{create_variables()}}
 }
 \description{
 This is a helper function to generate the far UVC switches for each given
