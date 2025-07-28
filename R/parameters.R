@@ -428,5 +428,5 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   ## ADD MORE CHECKS IN HERE FOR PARAMETERS ##
 
   # Return the list of parameters
-  parameters
+  as_strict_list(parameters, name = "parameters")
 }

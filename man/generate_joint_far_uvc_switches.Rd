@@ -4,12 +4,12 @@
 \alias{generate_joint_far_uvc_switches}
 \title{Generate joint far UVC switches}
 \usage{
-generate_joint_far_uvc_switches(parameters_list, variables_list)
+generate_joint_far_uvc_switches(parameters_list, setting_sizes)
 }
 \arguments{
 \item{parameters_list}{A list of model parameters as generated using \code{get_parameters()}}
 
-\item{variables_list}{A list of model variables as generated using \code{create_variables()}}
+\item{setting_sizes}{The size of each setting, in number of individuals, grouped by type.}
 }
 \description{
 This is a helper function to generate the joint far UVC switches across all
