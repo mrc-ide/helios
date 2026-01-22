@@ -37,7 +37,7 @@ set_uvc <- function(
 
   if (!(setting %in% c("workplace", "school", "leisure", "household", "joint"))) {
     stop(
-      "Error: Input setting invalid - far UVC only deployable in workplace, school, leisure, household, or joint settings"
+      "Error: Input setting invalid -far UVC only deployable in workplace, school, leisure, household, or joint settings"
     )
   }
 
