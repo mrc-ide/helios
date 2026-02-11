@@ -189,7 +189,7 @@ create_SE_process <- function(
             spec_household_FOI <- parameters_list$household_specific_riskiness[
               i
             ] *
-              (1 - parameters_list$household_specific_riskiness[i]) *
+              (1 - parameters_list$household_specific_efficacy[i]) *
               (parameters_list$beta_household *
                 spec_household_I_size /
                 household_size_list[[i]])
@@ -241,7 +241,7 @@ create_SE_process <- function(
           spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[
             i
           ] *
-            (1 - parameters_list$workplace_specific_riskiness[i]) *
+            (1 - parameters_list$workplace_specific_efficacy[i]) *
             (parameters_list$beta_workplace *
               spec_workplace_I_size /
               workplace_size_list[[i]])

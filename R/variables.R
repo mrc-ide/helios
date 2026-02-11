@@ -219,7 +219,7 @@ create_variables <- function(parameters_list) {
     parameters_list$school_specific_ach
   )
 
-  num_leisure <- max(as.numeric(variables_list$leisure$get_categories()))
+  num_leisure <- length(parameters_list$setting_sizes$leisure)
   parameters_list$leisure_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "leisure",
@@ -260,6 +260,18 @@ create_variables <- function(parameters_list) {
         setting_types,
         "_timestep"
       )] <- parameters_list$far_uvc_joint_timestep
+    }
+  }
+
+  ## getting specific efficacies for each location based on the ACH, rather than single efficacy
+  setting_types <- c("workplace", "school", "leisure", "household") #need to double check this
+  for (setting in setting_types) {
+    if (parameters_list[[paste0("far_uvc_", setting)]]) {
+      parameters_list[[paste0(setting, "_specific_efficacy")]] <- calculate_efficacy_from_ach(
+        ach_values = parameters_list[[paste0(setting, "_specific_ach")]],
+        parameters_list = parameters_list,
+        setting = setting
+      )
     }
   }
 
@@ -320,17 +332,7 @@ create_variables <- function(parameters_list) {
   ))
 }
 
-## getting specific efficacies for each location based on the ACH, rather than single efficacy
-setting_types <- c("workplace", "school", "leisure", "household") #need to double check this
-for (setting in setting_types) {
-  if (parameters_list[[paste0("far_uvc_", setting)]]) {
-    parameters_list[[paste0(setting, "_specific_efficacy")]] <- calculate_efficacy_from_ach(
-      ach_values = parameters_list[[paste0(setting, "_specific_ach")]],
-      parameters_list = parameters_list,
-      setting = setting
-    )
-  }
-}
+
 #' Generate a vector of the initial disease states of all individuals in the population
 #'
 #' @inheritParams create_variables

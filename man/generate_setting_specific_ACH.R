@@ -1,6 +1,7 @@
 #Generating ACH values for locations in a setting
 
 generate_setting_specific_ach <- function(parameters_list, setting, number_of_locations) {
+  #TODO: establish a baseline value for ACH if not specified by user
 
   #retrieve mean and sd values from parameters.R
   mu <- parameters_list[[paste0("setting_specific_ach_", setting, "_mean")]]
