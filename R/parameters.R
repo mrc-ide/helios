@@ -106,6 +106,27 @@
 #' * `setting_specific_riskiness_household_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.4472
 #' * `setting_specific_riskiness_household_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
 #'
+#' Setting-Specific ACH Parameters: #default values need to be adjusted
+#' * `setting_specific_ach_workplace`: boolean switch set to TRUE if setting-specific ACH parameterised in the workplace setting using `set_setting_specific_ach()`; default = FALSE
+#' * `setting_specific_ach_workplace_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific ACH of individual workplaces is drawn; default = 0
+#' * `setting_specific_ach_workplace_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific ACH of individual workplaces is drawn; default = 0.37
+#' * `setting_specific_ach_workplace_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific ACH of individual workplaces is drawn; default = 0.4472
+#' * `setting_specific_ach_workplace_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific ACH of individual workplaces is drawn; default = 2.236
+#' * `setting_specific_ach_school`: boolean switch set to TRUE if setting-specific ACH parameterised in the school setting using `set_setting_specific_ach()`; default = FALSE
+#' * `setting_specific_ach_school_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific ACH of individual schools is drawn; default = 0
+#' * `setting_specific_ach_school_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific ACH of individual schools is drawn; default = 0.37
+#' * `setting_specific_ach_school_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific ACH of individual schools is drawn; default = 0.4472
+#' * `setting_specific_ach_school_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific ACH of individual schools is drawn; default = 2.236
+#' * `setting_specific_ach_leisure`: boolean switch set to TRUE if setting-specific ACH parameterised in the leisure setting using `set_setting_specific_ach()`; default = FALSE
+#' * `setting_specific_ach_leisure_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific ACH of individual leisure locations is drawn; default = 0
+#' * `setting_specific_ach_leisure_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific ACH of individual leisure settings is drawn; default = 0.37
+#' * `setting_specific_ach_leisure_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific ACH of individual leisure settings is drawn; default = 0.4472
+#' * `setting_specific_ach_leisure_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific ACH of individual leisure settings is drawn; default = 2.236
+#' * `setting_specific_ach_household`: boolean switch set to TRUE if setting-specific ACH parameterised in the household setting using `set_setting_specific_ach()`; default = FALSE
+#' * `setting_specific_ach_household_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific ACH of individual households is drawn; default = 0
+#' * `setting_specific_ach_household_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific ACH of individual households is drawn;
+#' * `setting_specific_ach_household_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.4472
+#' * `setting_specific_ach_household_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific ACH of individual households is drawn; default = 2.236
 #' Setting-Specific Room Size Per Individual Parameters:
 #' * `size_per_individual_workplace`: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
 #' * `size_per_individual_school`: The volume or surface area for each individual in the school setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
@@ -185,6 +206,81 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     setting_specific_riskiness_household_sdlog = NULL,
     setting_specific_riskiness_household_min = NULL,
     setting_specific_riskiness_household_max = NULL,
+
+
+    # Setting-Specific Riskiness Parameters: Workplace
+    setting_specific_riskiness_workplace = FALSE,
+    setting_specific_riskiness_workplace_meanlog = NULL,
+    setting_specific_riskiness_workplace_sdlog = NULL,
+    setting_specific_riskiness_workplace_min = NULL,
+    setting_specific_riskiness_workplace_max = NULL,
+
+    # Setting-Specific Riskiness Parameters: School
+    setting_specific_riskiness_school = FALSE,
+    setting_specific_riskiness_school_meanlog = NULL,
+    setting_specific_riskiness_school_sdlog = NULL,
+    setting_specific_riskiness_school_min = NULL,
+    setting_specific_riskiness_school_max = NULL,
+
+    # Setting-Specific Riskiness Parameters: Leisure
+    setting_specific_riskiness_leisure = FALSE,
+    setting_specific_riskiness_leisure_meanlog = NULL,
+    setting_specific_riskiness_leisure_sdlog = NULL,
+    setting_specific_riskiness_leisure_min = NULL,
+    setting_specific_riskiness_leisure_max = NULL,
+
+    # Setting-Specific Riskiness Parameters: Household
+    setting_specific_riskiness_household = FALSE,
+    setting_specific_riskiness_household_meanlog = NULL,
+    setting_specific_riskiness_household_sdlog = NULL,
+    setting_specific_riskiness_household_min = NULL,
+    setting_specific_riskiness_household_max = NULL,
+
+    # Setting-Specific ACH Parameters: Workplace
+    setting_specific_ach_workplace = FALSE,
+    setting_specific_ach_workplace_meanlog = NULL,
+    setting_specific_ach_workplace_sdlog = NULL,
+
+
+    # Setting-Specific ACH Parameters: School
+    setting_specific_ach_school = FALSE,
+    setting_specific_ach_school_meanlog = NULL,
+    setting_specific_ach_school_sdlog = NULL,
+
+    # Setting-Specific ACH Parameters: Leisure
+    setting_specific_ach_leisure = FALSE,
+    setting_specific_ach_leisure_meanlog = NULL,
+    setting_specific_ach_leisure_sdlog = NULL,
+
+    # Setting-Specific ACH Parameters: Household
+    setting_specific_ach_household = FALSE,
+    setting_specific_ach_household_meanlog = NULL,
+    setting_specific_ach_household_sdlog = NULL,
+
+    # Setting-Specific ACH Parameters: Workplace
+    setting_specific_ach_workplace = FALSE,
+    setting_specific_ach_workplace_meanlog = NULL,
+    setting_specific_ach_workplace_sdlog = NULL,
+
+    wells_riley_emission_rate = 27,  # FFU/hour
+    wells_riley_decay_rate = 0.64, # k_D, natural decay rate (1/hr)
+    wells_riley_infection_prob_per_ffu = 1.37e-2, # r, infection probability per FFU
+    wells_riley_respiratory_rate_factor = 0.45, # RR_tv
+    wells_riley_time_in_room = 4,# t, hours spent in room
+    wells_riley_reference_ach = NULL,
+
+    # Setting-Specific Room Volume? right now inputting volume directly to calculate Css
+    room_volume_workplace = 150,
+    room_volume_school = 150,
+    room_volume_leisure = 150,
+    room_volume_household = 150,
+
+    # Far UVC Efficacy Parameters (function of ACH)
+    far_uvc_efficacy_function = "?", #unsure what the shape looks like
+    far_uvc_efficacy_max_workplace = NULL,
+    far_uvc_efficacy_max_school = NULL,
+    far_uvc_efficacy_max_leisure = NULL,
+    far_uvc_efficacy_max_household = NULL,
 
     # Far UVC Parameters: Joint
     far_uvc_joint = FALSE,

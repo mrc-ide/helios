@@ -189,7 +189,7 @@ create_SE_process <- function(
             spec_household_FOI <- parameters_list$household_specific_riskiness[
               i
             ] *
-              (1 - parameters_list$far_uvc_household_efficacy) *
+              (1 - parameters_list$household_specific_riskiness[i]) *
               (parameters_list$beta_household *
                 spec_household_I_size /
                 household_size_list[[i]])
@@ -241,7 +241,7 @@ create_SE_process <- function(
           spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[
             i
           ] *
-            (1 - parameters_list$far_uvc_workplace_efficacy) *
+            (1 - parameters_list$workplace_specific_riskiness[i]) *
             (parameters_list$beta_workplace *
               spec_workplace_I_size /
               workplace_size_list[[i]])
@@ -288,7 +288,7 @@ create_SE_process <- function(
             t > parameters_list$far_uvc_school_timestep
         ) {
           spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-            (1 - parameters_list$far_uvc_school_efficacy) *
+            (1 - parameters_list$school_specific_efficacy[i]) *
             (parameters_list$beta_school *
               spec_school_I_size /
               school_size_list[[i]])
@@ -374,7 +374,7 @@ create_SE_process <- function(
               t > parameters_list$far_uvc_leisure_timestep
           ) {
             spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-              (1 - parameters_list$far_uvc_leisure_efficacy) *
+              (1 - parameters_list$leisure_specific_efficacy[i]) *
               (parameters_list$beta_leisure *
                 spec_leisure_I_size /
                 spec_leisure$size()) ## this calculation needs more in it

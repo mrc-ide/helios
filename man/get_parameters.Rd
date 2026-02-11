@@ -112,6 +112,8 @@ Setting-Specific Riskiness Parameters:
 \item \code{setting_specific_riskiness_household_max}: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
 }
 
+Setting-Specific ACH Parameters
+
 Setting-Specific Room Size Per Individual Parameters:
 \itemize{
 \item \code{size_per_individual_workplace}: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)

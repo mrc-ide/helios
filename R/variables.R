@@ -185,30 +185,49 @@ create_variables <- function(parameters_list) {
   # Append setting sizes to variables_list:
   parameters_list$setting_sizes <- setting_sizes
 
-  # Creating vector of setting-specific riskinesses for each setting type
+  # Creating vector of setting-specific ACH for each setting type
   num_households <- max(as.numeric(variables_list$household$get_categories()))
-  parameters_list$household_specific_riskiness <- generate_setting_specific_riskinesses(
+  parameters_list$household_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "household",
     number_of_locations = num_households
   )
+
+  parameters_list$household_specific_riskiness <- convert_ach_to_riskiness(
+    parameters_list$household_specific_ach
+  )
+
   num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
-  parameters_list$workplace_specific_riskiness <- generate_setting_specific_riskinesses(
+  parameters_list$workplace_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "workplace",
     number_of_locations = num_workplaces
   )
+
+  parameters_list$workplace_specific_riskiness <- convert_ach_to_riskiness(
+    parameters_list$workplace_specific_ach
+  )
+
   num_schools <- max(as.numeric(variables_list$school$get_categories()))
-  parameters_list$school_specific_riskiness <- generate_setting_specific_riskinesses(
+  parameters_list$school_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "school",
     number_of_locations = num_schools
   )
-  num_leisure <- length(parameters_list$setting_sizes$leisure)
-  parameters_list$leisure_specific_riskiness <- generate_setting_specific_riskinesses(
+
+  parameters_list$school_specific_riskiness <- convert_ach_to_riskiness(
+    parameters_list$school_specific_ach
+  )
+
+  num_leisure <- max(as.numeric(variables_list$leisure$get_categories()))
+  parameters_list$leisure_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "leisure",
     number_of_locations = num_leisure
+  )
+
+  parameters_list$leisure_specific_riskiness <- convert_ach_to_riskiness(
+    parameters_list$leisure_specific_ach
   )
 
   # If any setting has UVC installed, retrieve the sizes of all of the settings:
@@ -244,6 +263,56 @@ create_variables <- function(parameters_list) {
     }
   }
 
+  #if any setting has uvc installed, get sizes of settings
+  if (any(parameters_list$far_uvc_joint,
+          parameters_list$far_uvc_workplace,
+          parameters_list$far_uvc_school,
+          parameters_list$far_uvc_leisure,
+          parameters_list$far_uvc_household)) {
+    #generate far uvc switches for settings where its turned on
+    parameters_list <- generate_far_uvc_switches(parameters_list, variables_list)
+
+    #if joint, updates setting specific uvc params
+    setting_types <- c("workplace", "school", "leisure") # , "household")
+    if (parameters_list$far_uvc_joint) {
+      parameters_list[paste0("far_uvc_", setting_types)] <- TRUE
+      parameters_list[paste0("far_uvc_", setting_types, "_efficacy")] <- parameters_list$far_uvc_joint_efficacy
+      parameters_list[paste0("far_uvc_", setting_types, "_timestep")] <- parameters_list$far_uvc_joint_timestep
+    }
+
+    #calculate location specific ACH-based efficacy
+    if (parameters_list$far_uvc_workplace) {
+      parameters_list$workplace_specific_efficacy <- calculate_efficacy_from_ach(
+        ach_values = parameters_list$workplace_specific_ach,
+        parameters_list = parameters_list,
+        setting = "workplace"
+      )
+    }
+
+    if (parameters_list$far_uvc_school) {
+      parameters_list$school_specific_efficacy <- calculate_efficacy_from_ach(
+        ach_values = parameters_list$school_specific_ach,
+        parameters_list = parameters_list,
+        setting = "school"
+      )
+    }
+
+    if (parameters_list$far_uvc_leisure) {
+      parameters_list$leisure_specific_efficacy <- calculate_efficacy_from_ach(
+        ach_values = parameters_list$leisure_specific_ach,
+        parameters_list = parameters_list,
+        setting = "leisure"
+      )
+    }
+
+    if (parameters_list$far_uvc_household) {
+      parameters_list$household_specific_efficacy <- calculate_efficacy_from_ach(
+        ach_values = parameters_list$household_specific_ach,
+        parameters_list = parameters_list,
+        setting = "household"
+      )
+    }
+  }
   # Return the list of model variables:
   return(list(
     variables_list = variables_list,
@@ -251,6 +320,17 @@ create_variables <- function(parameters_list) {
   ))
 }
 
+## getting specific efficacies for each location based on the ACH, rather than single efficacy
+setting_types <- c("workplace", "school", "leisure", "household") #need to double check this
+for (setting in setting_types) {
+  if (parameters_list[[paste0("far_uvc_", setting)]]) {
+    parameters_list[[paste0(setting, "_specific_efficacy")]] <- calculate_efficacy_from_ach(
+      ach_values = parameters_list[[paste0(setting, "_specific_ach")]],
+      parameters_list = parameters_list,
+      setting = setting
+    )
+  }
+}
 #' Generate a vector of the initial disease states of all individuals in the population
 #'
 #' @inheritParams create_variables
