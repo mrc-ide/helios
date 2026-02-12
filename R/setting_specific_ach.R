@@ -7,7 +7,7 @@ generate_setting_specific_ach <- function(parameters_list, setting, number_of_lo
   mu <- parameters_list[[paste0("setting_specific_ach_", setting, "_mean")]]
   sigma <- parameters_list[[paste0("setting_specific_ach_", setting, "_sd")]]
 
-  #Draw values from distribution, draw double(?) than what you need because we are cutting off negatives
+  #Draw values from distribution, draw double(?) than what you need because we are cutting off negatives (replace this with trunc norm) 
   raw_draws <- rnorm(n = number_of_locations * 2, mean = mu, sd = sigma)
 
   #Remove negative values
