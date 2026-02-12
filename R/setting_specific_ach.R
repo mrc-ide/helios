@@ -29,7 +29,7 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
   r <- parameters_list$wells_riley_infection_prob_per_ffu
   RRtv <- parameters_list$wells_riley_respiratory_rate_factor
   t <- parameters_list$wells_riley_time_in_room
-  room_vol <- parameters_list[[paste0("room_volume_", setting)]]
+  room_vol <- parameters_list[[paste0("room_volume_", setting)]]  #currently calculated by pop size of specific location * setting-specific density, adjust ach formula to be calulated like this)
 
   # alpha values
   alpha_values <- ach_values + kD
