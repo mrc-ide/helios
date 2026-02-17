@@ -14,13 +14,10 @@ Each element of this list indicates which settings each individual visits on
 which day. The value 0 indicates that the person stays in on that day.
 }
 \seealso{
-Other variables: 
+Other variables:
 \code{\link{create_variables}()},
-\code{\link{generate_initial_age_classes}()},
 \code{\link{generate_initial_disease_states}()},
-\code{\link{generate_initial_households}()},
 \code{\link{generate_initial_households_bootstrap}()},
-\code{\link{generate_initial_schools}()},
 \code{\link{generate_initial_schools_bootstrap}()},
 \code{\link{generate_initial_workplaces}()}
 }

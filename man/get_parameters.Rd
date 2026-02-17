@@ -11,21 +11,14 @@ get_parameters(overrides = list(), archetype = "none")
 These parameters are:
 \itemize{
 \item \code{human_population}: the number of humans to include in the model
-\item \code{initial_proportion_child}: proportion of population initially in the 'child' age class
-\item \code{initial_proportion_adult}: proportion of population initially in the 'adult' age class
-\item \code{initial_proportion_elderly}: proportion of population initially in the 'elderly' age class
 \item \code{number_initial_S}: number of humans initially Susceptible (state = S)
 \item \code{number_initial_E}: number of humans initially Exposed (state = E)
 \item \code{number_initial_I}: number of humans initially Infectious (state = I)
 \item \code{number_initial_R}: number of humans initially Recovered (state = R)
 \item \code{seed}: a seed to run the simulation with
-\item \code{mean_household_size}: TBD
 \item \code{workplace_prop_max}: maximum size of a workplace as a proportion of total adult population size
 \item \code{workplace_a}: the a parameter for the Zipf-like distribution on workplace size
 \item \code{workplace_c}: the c parameter for the Zipf-like distribution on workplace size
-\item \code{school_prop_max}: maximum size of a school as a proporiton of total child population size
-\item \code{school_meanlog}: the meanlog parameter for the log-normal distribution on school size
-\item \code{school_sdlog}: the sdlog parameter for the log-normal distribution on school size
 \item \code{school_student_staff_ratio}: the number of students to each adult staff member
 \item \code{leisure_mean_number_settings}: TBD
 \item \code{leisure_mean_size}: TBD

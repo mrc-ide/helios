@@ -8,21 +8,14 @@
 #' These parameters are:
 #'
 #' * `human_population`: the number of humans to include in the model
-#' * `initial_proportion_child`: proportion of population initially in the 'child' age class
-#' * `initial_proportion_adult`: proportion of population initially in the 'adult' age class
-#' * `initial_proportion_elderly`: proportion of population initially in the 'elderly' age class
 #' * `number_initial_S`: number of humans initially Susceptible (state = S)
 #' * `number_initial_E`: number of humans initially Exposed (state = E)
 #' * `number_initial_I`: number of humans initially Infectious (state = I)
 #' * `number_initial_R`: number of humans initially Recovered (state = R)
 #' * `seed`: a seed to run the simulation with
-#' * `mean_household_size`: TBD
 #' * `workplace_prop_max`: maximum size of a workplace as a proportion of total adult population size
 #' * `workplace_a`: the a parameter for the Zipf-like distribution on workplace size
 #' * `workplace_c`: the c parameter for the Zipf-like distribution on workplace size
-#' * `school_prop_max`: maximum size of a school as a proporiton of total child population size
-#' * `school_meanlog`: the meanlog parameter for the log-normal distribution on school size
-#' * `school_sdlog`: the sdlog parameter for the log-normal distribution on school size
 #' * `school_student_staff_ratio`: the number of students to each adult staff member
 #' * `leisure_mean_number_settings`: TBD
 #' * `leisure_mean_size`: TBD
@@ -119,21 +112,14 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   # Open a list of parameters to store
   parameters <- list(
     human_population = 10000,
-    initial_proportion_child = 0.2,
-    initial_proportion_adult = 0.6,
-    initial_proportion_elderly = 0.2,
     number_initial_S = 9995,
     number_initial_E = 5,
     number_initial_I = 0,
     number_initial_R = 0,
     seed = NULL,
-    mean_household_size = 3,
     workplace_prop_max = 0.1,
     workplace_a = 5.36,
     workplace_c = 1.34,
-    school_prop_max = 0.1,
-    school_meanlog = 5.49,
-    school_sdlog = 1.02,
     school_student_staff_ratio = 20,
     leisure_prob_visit = 0.6,
     leisure_mean_number_settings = 3,
@@ -351,9 +337,9 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   }
 
   # Checking distribution country is either UK, USA or custom
-  if (!(parameters$household_distribution_country %in% c("UK", "USA", "custom"))) {
+  if (!(parameters$household_distribution_country %in% c("UK", "USA"))) {
     stop(
-      "household_distribution_country must be set to either UK, USA or custom"
+      "household_distribution_country must be set to either UK or USA"
     )
   }
   if (!(parameters$workplace_distribution_country %in% c("UK", "USA", "custom"))) {
@@ -361,8 +347,8 @@ get_parameters <- function(overrides = list(), archetype = "none") {
       "workplace_distribution_country must be set to either UK, USA or custom"
     )
   }
-  if (!(parameters$school_distribution_country %in% c("UK", "USA", "custom"))) {
-    stop("school_distribution_country must be set to either UK, USA or custom")
+  if (!(parameters$school_distribution_country %in% c("UK", "USA"))) {
+    stop("school_distribution_country must be set to either UK or USA")
   }
 
   # Overwrite parameters if archetype specified:

@@ -16,68 +16,33 @@ create_variables <- function(parameters_list) {
   )
 
   # Initialise and populate the age and household variables
+  # Bootstrap sampling of households from either ONS 2011 Census reference panel of household sizes and age composition
+  # or RTI synthetic population of household sizes and age composition for San Francisco
+  household_age_list <- generate_initial_households_bootstrap(
+    parameters_list = parameters_list
+  )
 
-  # If user wants to use empirical distribution of households and ages from ONS (UK) or RTI synth pop (USA)
-  if (parameters_list$household_distribution_country %in% c("UK", "USA")) {
-    # Bootstrap sampling of households from either ONS 2011 Census reference panel of household sizes and age composition
-    # or RTI synthetic population of household sizes and age composition for San Francisco
-    household_age_list <- generate_initial_households_bootstrap(
-      parameters_list = parameters_list
-    )
+  # Age class variable
+  age_classes <- c("child", "adult", "elderly")
+  age_class_variable <- individual::CategoricalVariable$new(
+    categories = age_classes,
+    initial_values = household_age_list$age_class_vector
+  )
 
-    # Age class variable
-    age_classes <- c("child", "adult", "elderly")
-    age_class_variable <- individual::CategoricalVariable$new(
-      categories = age_classes,
-      initial_values = household_age_list$age_class_vector
-    )
-
-    # Household variable
-    household_variable <- individual::CategoricalVariable$new(
-      categories = sprintf(
-        "%d",
-        1:max(household_age_list$individual_households)
-      ),
-      initial_values = sprintf("%d", household_age_list$individual_households)
-    )
-
-    # If user wants to specify age-class proportions and associated households manually
-  } else {
-    # Specify age-class proportions manually
-
-    # Age class variable:
-    age_classes <- c("child", "adult", "elderly")
-    initial_age_classes <- generate_initial_age_classes(
-      parameters_list = parameters_list
-    )
-    age_class_variable <- individual::CategoricalVariable$new(
-      categories = age_classes,
-      initial_values = initial_age_classes
-    )
-
-    # Household variable
-    initial_households <- generate_initial_households(
-      parameters_list = parameters_list,
-      age_class_variable = age_class_variable
-    )
-    household_variable <- individual::CategoricalVariable$new(
-      categories = sprintf("%d", 1:max(initial_households)),
-      initial_values = sprintf("%d", initial_households)
-    )
-  }
+  # Household variable
+  household_variable <- individual::CategoricalVariable$new(
+    categories = sprintf(
+      "%d",
+      1:max(household_age_list$individual_households)
+    ),
+    initial_values = sprintf("%d", household_age_list$individual_households)
+  )
 
   # School setting variable
-  if (parameters_list$household_distribution_country %in% c("UK", "USA")) {
-    initial_school_settings <- generate_initial_schools_bootstrap(
-      parameters_list = parameters_list,
-      age_class_variable = age_class_variable
-    )
-  } else {
-    initial_school_settings <- generate_initial_schools(
-      parameters_list = parameters_list,
-      age_class_variable = age_class_variable
-    )
-  }
+  initial_school_settings <- generate_initial_schools_bootstrap(
+    parameters_list = parameters_list,
+    age_class_variable = age_class_variable
+  )
   num_schools <- max(as.numeric(initial_school_settings))
   if (num_schools <= 2) {
     message(
@@ -319,145 +284,13 @@ generate_initial_disease_states <- function(parameters_list) {
   return(initial_disease_states)
 }
 
-#' Generates a vector of the age classes of all individuals in the population
-#'
-#' @inheritParams create_variables
-#'
-#' @family variables
-#' @export
-generate_initial_age_classes <- function(parameters_list) {
-  # Check the parameters required are present in the parameters list:
-  if (!("initial_proportion_child" %in% names(parameters_list))) {
-    stop(
-      "parameters list must contain a variable called initial_proportion_child"
-    )
-  }
-  if (!("initial_proportion_adult" %in% names(parameters_list))) {
-    stop(
-      "parameters list must contain a variable called initial_proportion_adult"
-    )
-  }
-  if (!("initial_proportion_elderly" %in% names(parameters_list))) {
-    stop(
-      "parameters list must contain a variable called initial_proportion_elderly"
-    )
-  }
-  if (!("human_population" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called human_population")
-  }
-  if (!("seed" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called seed")
-  }
-
-  # Check the initial age class proportions sum to 1:
-  if (
-    sum(
-      parameters_list$initial_proportion_child,
-      parameters_list$initial_proportion_adult,
-      parameters_list$initial_proportion_elderly
-    ) !=
-      1
-  ) {
-    stop("initial age class proportions do not sum to 1")
-  }
-
-  # Set the seed stored in the parameter list:
-  set.seed(parameters_list$seed)
-
-  # Store age group proportions in a single vector:
-  age_group_proportions <- c(
-    parameters_list$initial_proportion_child,
-    parameters_list$initial_proportion_adult,
-    parameters_list$initial_proportion_elderly
-  )
-
-  # Use the initial age class proportions to sample and create a vector of initial age classes:
-  age_classes <- sample(
-    c("child", "adult", "elderly"),
-    size = parameters_list$human_population,
-    replace = TRUE,
-    prob = age_group_proportions
-  )
-
-  # Return the vector of initial age classes:
-  return(age_classes)
-}
-
 #' Generate a vector of school assignments for all individuals in the population
+#'
+#' Uses sampling with replacement from a reference dataset. This is known as
+#' bootstrapping. The dataset used is [`schools_uk`] or [`schools_usa`].
 #'
 #' @inheritParams create_variables
 #' @param age_class_variable An `individual::CategoricalVariable` for the age classes
-#'
-#' @family variables
-#' @export
-generate_initial_schools <- function(parameters_list, age_class_variable) {
-  # Check that the requisite parameters are present:
-  if (!("human_population" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called human_population")
-  }
-  if (!("seed" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called seed")
-  }
-  if (!("school_meanlog" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called school_meanlog")
-  }
-  if (!("school_sdlog" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called school_sdlog")
-  }
-  if (!("school_student_staff_ratio" %in% names(parameters_list))) {
-    stop(
-      "parameters list must contain a variable called school_student_staff_ratio"
-    )
-  }
-
-  set.seed(parameters_list$seed)
-
-  # Assign children to schools
-  num_children <- age_class_variable$get_size_of("child")
-  index_children <- age_class_variable$get_index_of("child")$to_vector()
-  school_sizes <- sample_log_normal(
-    N = num_children,
-    prop_max = parameters_list$school_prop_max,
-    meanlog = parameters_list$school_meanlog,
-    sdlog = parameters_list$school_sdlog
-  )
-  child_school_indices <- unlist(sapply(
-    1:length(school_sizes),
-    function(i) rep(as.character(i), school_sizes[i])
-  ))
-  child_school_assignments <- sample(child_school_indices, replace = FALSE)
-
-  # Assign staff to schools
-  staff_sizes <- ceiling(
-    school_sizes / parameters_list$school_student_staff_ratio
-  )
-  staff_school_indices <- unlist(sapply(
-    1:length(staff_sizes),
-    function(i) rep(as.character(i), staff_sizes[i])
-  ))
-  index_adults <- age_class_variable$get_index_of("adult")$to_vector()
-  index_staff <- sample(index_adults, size = sum(staff_sizes), replace = FALSE)
-  staff_school_assignments <- sample(staff_school_indices, replace = FALSE)
-
-  # School assignments for all individuals
-  schools_vector <- vector(
-    mode = "character",
-    length = parameters_list$human_population
-  )
-  schools_vector[index_children] <- child_school_assignments
-  schools_vector[schools_vector == ""] <- "0"
-  schools_vector[index_staff] <- staff_school_assignments
-
-  return(schools_vector)
-}
-
-#' Generate a vector of school assignments for all individuals in the population
-#'
-#' Alternative to `generate_initial_schools`. Rather than using a parametric
-#' distribution, this function uses sampling with replacement from a reference
-#' dataset. This is known as bootstrapping. The dataset used is [`schools_uk`].
-#'
-#' @inheritParams generate_initial_schools
 #'
 #' @family variables
 #' @export
@@ -716,126 +549,10 @@ generate_initial_leisure <- function(parameters_list, leisure_setting_sizes) {
 
 #' Generates a vector of households for all individuals in the population
 #'
-#' @inheritParams generate_initial_schools
-#'
-#' @family variables
-#' @export
-generate_initial_households <- function(parameters_list, age_class_variable) {
-  # Check that the requisite parameters are present:
-  if (!("human_population" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called human_population")
-  }
-  if (!("seed" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called seed")
-  }
-  if (!("mean_household_size" %in% names(parameters_list))) {
-    stop("parameters list must contain a variable called mean_household_size")
-  }
-
-  # Setting seed
-  set.seed(parameters_list$seed)
-
-  ## Checking population size N is the same as implied by age_class_variable
-  if (
-    parameters_list$human_population !=
-      age_class_variable$get_size_of(age_class_variable$get_categories())
-  ) {
-    stop("Human population and age_class_vector are different lengths")
-  }
-
-  ## Extracting out the vector of underlying values from age_class_variable
-  age_class_vector <- rep("", parameters_list$human_population)
-  age_class_vector[age_class_variable$get_index_of(
-    "child"
-  )$to_vector()] <- "child"
-  age_class_vector[age_class_variable$get_index_of(
-    "adult"
-  )$to_vector()] <- "adult"
-  age_class_vector[age_class_variable$get_index_of(
-    "elderly"
-  )$to_vector()] <- "elderly"
-
-  ## Track which individuals are assigned
-  assigned <- rep(FALSE, parameters_list$human_population)
-  individual_households <- rep(NA, parameters_list$human_population)
-  household_counter <- 1
-
-  ## Looping over this whilst there still remain any unassigned individuals
-  while (sum(assigned) < parameters_list$human_population) {
-    # Check if only children are left unassigned - if this is the case, then we just distribute
-    # them randomly across households
-    unassigned_indices <- which(!assigned)
-    if (all(age_class_vector[unassigned_indices] == "child")) {
-      # Distribute remaining children across existing households randomly
-      for (child_idx in unassigned_indices) {
-        selected_household <- sample(household_counter, 1)
-        assigned[child_idx] <- TRUE
-        individual_households[child_idx] <- selected_household
-      }
-      break # Exit the main loop as all remaining unassigned individuals are children and have been assigned
-    }
-
-    # Draw household size
-    household_size <- rpois(n = 1, lambda = parameters_list$mean_household_size)
-
-    # Initialize temporary household storage
-    temp_household <- c()
-
-    ## Looping over this whilst current household isn't full
-    while (
-      length(temp_household) < household_size &&
-        sum(assigned) < parameters_list$human_population
-    ) {
-      # Randomly select an unassigned individual
-      candidates <- which(!assigned)
-      selected <- sample(x = candidates, size = 1)
-
-      # Ensure selected individual meets the household formation criteria (i.e. children have to have at least 1 adult in household)
-      if (age_class_vector[selected] == "child") {
-        ## Check whether current household has an adult - if it does, just add the child
-        if (sum(age_class_vector[temp_household] == "adult") >= 1) {
-          temp_household <- c(temp_household, selected)
-          assigned[selected] <- TRUE
-        } else {
-          # if not, get an adult to be added to the household
-          # Ensure there is at least one unassigned adult to pair with
-          unassigned_adults <- which(age_class_vector == "adult" & !assigned)
-          if (length(unassigned_adults) < 1) {
-            # No available adults to pair with the child, break from the inner loop
-            break
-          }
-          # Pair child with adult(s)
-          num_adults_to_add <- 1
-          adults_to_add <- sample(unassigned_adults, num_adults_to_add)
-          temp_household <- c(temp_household, selected, adults_to_add)
-          assigned[c(selected, adults_to_add)] <- TRUE
-        }
-      } else {
-        # Add the individual to the household if there's enough space
-        if ((length(temp_household) + 1) <= household_size) {
-          temp_household <- c(temp_household, selected)
-          assigned[selected] <- TRUE
-        }
-      }
-    }
-    # Add the completed household to the list of households, if any members were added
-    if (length(temp_household) > 0) {
-      individual_households[temp_household] <- household_counter
-      household_counter <- household_counter + 1
-    }
-    # print(sum(assigned))
-  }
-
-  return(individual_households = individual_households)
-}
-
-#' Generates a vector of households for all individuals in the population
-#'
-#' Alternative to [generate_initial_households()]. Rather than using a parametric
-#' distribution, this function uses sampling with replacement from a reference
-#' dataset. This is known as bootstrapping. The dataset used is
-#' [`baseline_household_demographics`]. Unlike [generate_initial_households()],
-#' this function generates both the household and age class assignments together.
+#' Uses sampling with replacement from a reference dataset. This is known as
+#' bootstrapping. The dataset used is [`baseline_household_demographics_uk`] or
+#' [`baseline_household_demographics_usa`]. This function generates both the
+#' household and age class assignments together.
 #'
 #' @inheritParams create_variables
 #'

@@ -12,19 +12,15 @@ generate_initial_schools_bootstrap(parameters_list, age_class_variable)
 \item{age_class_variable}{An \code{individual::CategoricalVariable} for the age classes}
 }
 \description{
-Alternative to \code{generate_initial_schools}. Rather than using a parametric
-distribution, this function uses sampling with replacement from a reference
-dataset. This is known as bootstrapping. The dataset used is \code{\link{schools_uk}}.
+Uses sampling with replacement from a reference dataset. This is known as
+bootstrapping. The dataset used is \code{\link{schools_uk}} or \code{\link{schools_usa}}.
 }
 \seealso{
-Other variables: 
+Other variables:
 \code{\link{create_variables}()},
-\code{\link{generate_initial_age_classes}()},
 \code{\link{generate_initial_disease_states}()},
-\code{\link{generate_initial_households}()},
 \code{\link{generate_initial_households_bootstrap}()},
 \code{\link{generate_initial_leisure}()},
-\code{\link{generate_initial_schools}()},
 \code{\link{generate_initial_workplaces}()}
 }
 \concept{variables}

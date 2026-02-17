@@ -13,13 +13,10 @@ create_variables(parameters_list)
 Generate a list of the model variables
 }
 \seealso{
-Other variables: 
-\code{\link{generate_initial_age_classes}()},
+Other variables:
 \code{\link{generate_initial_disease_states}()},
-\code{\link{generate_initial_households}()},
 \code{\link{generate_initial_households_bootstrap}()},
 \code{\link{generate_initial_leisure}()},
-\code{\link{generate_initial_schools}()},
 \code{\link{generate_initial_schools_bootstrap}()},
 \code{\link{generate_initial_workplaces}()}
 }
