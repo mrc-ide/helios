@@ -1,11 +1,14 @@
 #!/usr/bin/env Rscript
 #
-# Benchmark: tabulate-gather SE process vs original loop-based SE process
+# Benchmark: NEW (IntegerVariable + tabulate-gather SE process)
+#        vs  OLD (CategoricalVariable + loop-based SE process)
 #
-# This script compares the performance of the refactored create_SE_process()
-# (using vectorised tabulate-gather pattern) against the original loop-based
-# implementation. It runs both versions on a 100k population for 365 timesteps
-# and reports timing, speedup, and a basic comparison of epidemic outputs.
+# This script compares the performance of the full optimised pipeline
+# (IntegerVariable variables + vectorised tabulate-gather SE process) against
+# the original main-branch implementation (CategoricalVariable variables +
+# loop-based SE process with bitset_count_and). It runs both versions on a
+# 100k population for 365 timesteps and reports timing, speedup, and a basic
+# comparison of epidemic outputs.
 #
 # Usage:
 #   Rscript inst/benchmark_SE_process.R
@@ -42,7 +45,50 @@ params <- get_parameters(overrides = list(
 ))
 
 # ============================================================================
-# Original (loop-based) create_SE_process — preserved verbatim for comparison
+# convert_to_categorical: convert IntegerVariable-based variables_list back
+# to CategoricalVariable-based (reproducing main-branch variable types)
+# ============================================================================
+convert_to_categorical <- function(variables_list, parameters_list) {
+  N <- parameters_list$human_population
+
+  # Household: IntegerVariable -> CategoricalVariable
+  hh_vals <- variables_list$household$get_values()
+  num_hh <- max(hh_vals)
+  variables_list$household <- individual::CategoricalVariable$new(
+    categories = sprintf("%d", 1:num_hh),
+    initial_values = sprintf("%d", hh_vals)
+  )
+
+  # School: IntegerVariable -> CategoricalVariable (includes "0" for unassigned)
+  sc_vals <- variables_list$school$get_values()
+  num_sc <- max(sc_vals)
+  variables_list$school <- individual::CategoricalVariable$new(
+    categories = as.character(0:num_sc),
+    initial_values = as.character(sc_vals)
+  )
+
+  # Workplace: IntegerVariable -> CategoricalVariable (includes "0" for unassigned)
+  wp_vals <- variables_list$workplace$get_values()
+  num_wp <- max(wp_vals)
+  variables_list$workplace <- individual::CategoricalVariable$new(
+    categories = as.character(0:num_wp),
+    initial_values = as.character(wp_vals)
+  )
+
+  # Restore specific_leisure CategoricalVariable (removed from create_variables)
+  assigned_leisure <- sort(parameters_list$leisure_indices)
+  variables_list$specific_leisure <- individual::CategoricalVariable$new(
+    categories = as.character(assigned_leisure),
+    initial_values = rep(as.character(0), N)
+  )
+
+  variables_list
+}
+
+# ============================================================================
+# Original (loop-based) create_SE_process — verbatim from master branch
+# Uses CategoricalVariable API: $get_categories(), $get_index_of(as.character()),
+# specific_leisure$initialize(), bitset_count_and()
 # ============================================================================
 create_SE_process_original <- function(
   variables_list,
@@ -51,83 +97,66 @@ create_SE_process_original <- function(
   renderer
 ) {
   ## Pre-calculating the things that only have to be calculated once
-  N <- parameters_list$human_population
 
   ##### HOUSEHOLDS #####
-  # Uses IntegerVariable: $get_index_of(set = i) returns a Bitset
-  num_households <- parameters_list$num_households
+  num_households <- max(as.numeric(variables_list$household$get_categories()))
   household_bitset_list <- vector(mode = "list", length = num_households)
   household_index_list <- vector(mode = "list", length = num_households)
   household_size_list <- vector(mode = "list", length = num_households)
   for (i in seq(num_households)) {
     household_bitset_list[[i]] <- variables_list$household$get_index_of(
-      set = i
+      as.character(i)
     )
     household_index_list[[i]] <- household_bitset_list[[i]]$to_vector()
     household_size_list[[i]] <- length(household_index_list[[i]])
   }
 
   ##### WORKPLACES #####
-  num_workplaces <- parameters_list$num_workplaces
+  num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
   workplace_bitset_list <- vector(mode = "list", length = num_workplaces)
   workplace_index_list <- vector(mode = "list", length = num_workplaces)
   workplace_size_list <- vector(mode = "list", length = num_workplaces)
   for (i in seq(num_workplaces)) {
     workplace_bitset_list[[i]] <- variables_list$workplace$get_index_of(
-      set = i
+      as.character(i)
     )
     workplace_index_list[[i]] <- workplace_bitset_list[[i]]$to_vector()
     workplace_size_list[[i]] <- length(workplace_index_list[[i]])
   }
 
   ##### SCHOOLS #####
-  num_schools <- parameters_list$num_schools
+  num_schools <- max(as.numeric(variables_list$school$get_categories()))
   school_bitset_list <- vector(mode = "list", length = num_schools)
   school_index_list <- vector(mode = "list", length = num_schools)
   school_size_list <- vector(mode = "list", length = num_schools)
   for (i in seq(num_schools)) {
     school_bitset_list[[i]] <- variables_list$school$get_index_of(
-      set = i
+      as.character(i)
     )
     school_index_list[[i]] <- school_bitset_list[[i]]$to_vector()
     school_size_list[[i]] <- length(school_index_list[[i]])
   }
 
   ##### LEISURE #####
-  # Build per-individual possible visits list from RaggedInteger (unchanged)
+  num_leisure <- length(parameters_list$setting_sizes$leisure)
   leisure_indvidual_possible_visits_list <- vector(
     mode = "list",
-    length = N
+    length = parameters_list$human_population
   )
-  for (i in seq(N)) {
+  for (i in seq(parameters_list$human_population)) {
     leisure_indvidual_possible_visits_list[[i]] <- unlist(
       variables_list$leisure$get_values(i)
     )
   }
 
-  # Leisure location metadata for loop-based FOI computation
-  actual_leisure_ids <- sort(
-    parameters_list$leisure_indices[parameters_list$leisure_indices > 0]
-  )
-  num_leisure <- length(actual_leisure_ids)
-  max_leisure_id <- max(actual_leisure_ids)
-
-  # Build lookup from leisure index position to actual ID
-  leisure_id_to_pos <- integer(max_leisure_id)
-  leisure_id_to_pos[actual_leisure_ids] <- seq_along(actual_leisure_ids)
-
-  # Plain integer vector for today's leisure assignment (replaces specific_leisure CategoricalVariable)
-  leisure_today <- integer(N)
-
   ## Process Function
   function(t) {
     I <- variables_list$disease_state$get_index_of("I")
-    I_vec <- I$to_vector()
 
     #=== Household FOI ===#
     household_FOI <- vector(
       mode = "numeric",
-      length = N
+      length = parameters_list$human_population
     )
     for (i in seq(num_households)) {
       if (household_size_list[[i]] > 1) {
@@ -158,7 +187,7 @@ create_SE_process_original <- function(
     #=== Workplace FOI ===#
     workplace_FOI <- vector(
       mode = "numeric",
-      length = N
+      length = parameters_list$human_population
     )
     for (i in seq(num_workplaces)) {
       spec_workplace_I_size <- individual:::bitset_count_and(
@@ -187,7 +216,7 @@ create_SE_process_original <- function(
     #=== School FOI ===#
     school_FOI <- vector(
       mode = "numeric",
-      length = N
+      length = parameters_list$human_population
     )
     for (i in seq(num_schools)) {
       spec_school_I_size <- individual:::bitset_count_and(
@@ -214,51 +243,60 @@ create_SE_process_original <- function(
     }
 
     #=== Leisure FOI ===#
-    # Daily reassignment using per-individual loop (original approach)
     if ((t * parameters_list$dt) == floor((t * parameters_list$dt))) {
-      for (i in seq(N)) {
-        leisure_today[i] <<- leisure_indvidual_possible_visits_list[[i]][
+      leisure_visit <- vector(
+        mode = "numeric",
+        length = parameters_list$human_population
+      )
+      for (i in seq(parameters_list$human_population)) {
+        leisure_visit[i] <- leisure_indvidual_possible_visits_list[[i]][
           dqrng::dqsample.int(n = 7, size = 1)
         ]
       }
+      variables_list$specific_leisure$initialize(
+        categories = as.character(parameters_list$leisure_indices),
+        initial_values = as.character(leisure_visit)
+      )
     }
 
-    # Loop over active leisure locations and compute FOI per venue
     leisure_FOI <- vector(
       mode = "numeric",
-      length = N
+      length = parameters_list$human_population
     )
-    for (j in seq_along(actual_leisure_ids)) {
-      lid <- actual_leisure_ids[j]
-      visitors <- which(leisure_today == lid)
-      num_visitors <- length(visitors)
-      if (num_visitors > 0) {
-        # Count infected among visitors
-        spec_leisure_I_size <- sum(leisure_today[I_vec] == lid)
+    leisure_locations <- variables_list$specific_leisure$get_categories()
+    leisure_locations <- leisure_locations[leisure_locations != "0"]
+    for (i in 1:length(leisure_locations)) {
+      spec_leisure_location <- as.numeric(leisure_locations[i])
+      if (spec_leisure_location != 0) {
+        spec_leisure <- variables_list$specific_leisure$get_index_of(
+          as.character(spec_leisure_location)
+        )
+        spec_leisure_I_size <- individual:::bitset_count_and(I, spec_leisure)
         if (parameters_list$far_uvc_leisure) {
-          if (parameters_list$uvc_leisure[j] == 1 &
+          if (parameters_list$uvc_leisure[i] == 1 &
                 t > parameters_list$far_uvc_leisure_timestep) {
-            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[j] *
+            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
               (1 - parameters_list$far_uvc_leisure_efficacy) *
               (parameters_list$beta_leisure * spec_leisure_I_size /
-                 num_visitors)
+                 spec_leisure$size())
           } else {
-            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[j] *
+            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
               parameters_list$beta_leisure * spec_leisure_I_size /
-              num_visitors
+              spec_leisure$size()
           }
         } else {
-          spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[j] *
+          spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
             parameters_list$beta_leisure * spec_leisure_I_size /
-            num_visitors
+            spec_leisure$size()
         }
-        leisure_FOI[visitors] <- spec_leisure_FOI
+        leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
       }
     }
 
     #=== Community FOI ===#
     community_FOI <- parameters_list$beta_community *
-      length(I_vec) / N
+      variables_list$disease_state$get_size_of("I") /
+      parameters_list$human_population
 
     #=== Total FOI ===#
     total_FOI <- household_FOI + workplace_FOI + school_FOI +
@@ -285,10 +323,16 @@ create_SE_process_original <- function(
 # ============================================================================
 # Helper: run simulation with a specified SE process constructor
 # ============================================================================
-run_with_SE_process <- function(parameters_list, se_process_fn) {
+run_with_SE_process <- function(parameters_list, se_process_fn,
+                                convert_vars_fn = NULL) {
   variables_list <- create_variables(parameters_list)
   parameters_list <- variables_list$parameters_list
   variables_list <- variables_list$variables_list
+
+  # Optionally convert variables (e.g. back to CategoricalVariable for old benchmark)
+  if (!is.null(convert_vars_fn)) {
+    variables_list <- convert_vars_fn(variables_list, parameters_list)
+  }
 
   events_list <- create_events(
     variables_list = variables_list,
@@ -339,20 +383,24 @@ run_with_SE_process <- function(parameters_list, se_process_fn) {
 }
 
 # ============================================================================
-# Run NEW (tabulate-gather) version
+# Run NEW (IntegerVariable + tabulate-gather) version
 # ============================================================================
-cat("--- Running NEW (tabulate-gather) version ---\n")
+cat("--- Running NEW (IntegerVariable + tabulate-gather) version ---\n")
 t_new <- system.time({
   output_new <- run_with_SE_process(params, create_SE_process)
 })
 cat(sprintf("  Elapsed: %.1f seconds\n\n", t_new["elapsed"]))
 
 # ============================================================================
-# Run OLD (loop-based) version
+# Run OLD (CategoricalVariable + loop-based) version
 # ============================================================================
-cat("--- Running OLD (loop-based) version ---\n")
+cat("--- Running OLD (CategoricalVariable + loop-based) version ---\n")
 t_old <- system.time({
-  output_old <- run_with_SE_process(params, create_SE_process_original)
+  output_old <- run_with_SE_process(
+    params,
+    create_SE_process_original,
+    convert_vars_fn = convert_to_categorical
+  )
 })
 cat(sprintf("  Elapsed: %.1f seconds\n\n", t_old["elapsed"]))
 
@@ -361,9 +409,9 @@ cat(sprintf("  Elapsed: %.1f seconds\n\n", t_old["elapsed"]))
 # ============================================================================
 speedup <- t_old["elapsed"] / t_new["elapsed"]
 cat("=== Timing Results ===\n")
-cat(sprintf("  OLD (loop-based):       %7.1f s\n", t_old["elapsed"]))
-cat(sprintf("  NEW (tabulate-gather):  %7.1f s\n", t_new["elapsed"]))
-cat(sprintf("  Speedup:                %7.1fx\n\n", speedup))
+cat(sprintf("  OLD (CategoricalVariable + loop):       %7.1f s\n", t_old["elapsed"]))
+cat(sprintf("  NEW (IntegerVariable + tabulate):       %7.1f s\n", t_new["elapsed"]))
+cat(sprintf("  Speedup:                                %7.1fx\n\n", speedup))
 
 # ============================================================================
 # Output comparison (epidemic dynamics)
@@ -395,7 +443,7 @@ summarise_output(output_old, "OLD")
 # ============================================================================
 results <- list(
   timing = data.frame(
-    version = c("old_loop", "new_tabulate"),
+    version = c("old_categorical_loop", "new_integer_tabulate"),
     elapsed_s = c(t_old["elapsed"], t_new["elapsed"]),
     user_s = c(t_old["user.self"], t_new["user.self"]),
     system_s = c(t_old["sys.self"], t_new["sys.self"])
