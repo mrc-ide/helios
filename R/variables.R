@@ -194,8 +194,11 @@ create_variables <- function(parameters_list) {
   )
 
   parameters_list$household_specific_riskiness <- convert_ach_to_riskiness(
-    parameters_list$household_specific_ach
+    ach_values = parameters_list$household_specific_ach,
+    parameters_list = parameters_list,
+    setting = "household"
   )
+
 
   num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
   parameters_list$workplace_specific_ach <- generate_setting_specific_ach(
@@ -205,8 +208,9 @@ create_variables <- function(parameters_list) {
   )
 
   parameters_list$workplace_specific_riskiness <- convert_ach_to_riskiness(
-    parameters_list$workplace_specific_ach
-  )
+    ach_values = parameters_list$workplace_specific_ach,
+    parameters_list = parameters_list,
+    setting = "workplace"
 
   num_schools <- max(as.numeric(variables_list$school$get_categories()))
   parameters_list$school_specific_ach <- generate_setting_specific_ach(
@@ -216,8 +220,9 @@ create_variables <- function(parameters_list) {
   )
 
   parameters_list$school_specific_riskiness <- convert_ach_to_riskiness(
-    parameters_list$school_specific_ach
-  )
+    ach_values = parameters_list$school_specific_ach,
+    parameters_list = parameters_list,
+    setting = "school"
 
   num_leisure <- length(parameters_list$setting_sizes$leisure)
   parameters_list$leisure_specific_ach <- generate_setting_specific_ach(
@@ -227,8 +232,9 @@ create_variables <- function(parameters_list) {
   )
 
   parameters_list$leisure_specific_riskiness <- convert_ach_to_riskiness(
-    parameters_list$leisure_specific_ach
-  )
+    ach_values = parameters_list$leisure_specific_ach,
+    parameters_list = parameters_list,
+    setting = "leisure"
 
   # If any setting has UVC installed, retrieve the sizes of all of the settings:
   if (

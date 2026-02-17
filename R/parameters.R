@@ -230,14 +230,14 @@ get_parameters <- function(overrides = list(), archetype = "none") {
 
     # Setting-Specific ACH Parameters: Workplace
     setting_specific_ach_workplace = FALSE,
-    setting_specific_ach_workplace_meanlog = NULL,
-    setting_specific_ach_workplace_sdlog = NULL,
+    setting_specific_ach_workplace_mean = NULL,
+    setting_specific_ach_workplace_sd = NULL,
 
 
     # Setting-Specific ACH Parameters: School
     setting_specific_ach_school = FALSE,
-    setting_specific_ach_school_meanlog = NULL,
-    setting_specific_ach_school_sdlog = NULL,
+    setting_specific_ach_school_mean = NULL,
+    setting_specific_ach_school_sd = NULL,
 
     # Setting-Specific ACH Parameters: Leisure
     setting_specific_ach_leisure = FALSE,
@@ -246,13 +246,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
 
     # Setting-Specific ACH Parameters: Household
     setting_specific_ach_household = FALSE,
-    setting_specific_ach_household_meanlog = NULL,
-    setting_specific_ach_household_sdlog = NULL,
+    setting_specific_ach_household_mean = NULL,
+    setting_specific_ach_household_sd = NULL,
 
     # Setting-Specific ACH Parameters: Workplace
     setting_specific_ach_workplace = FALSE,
-    setting_specific_ach_workplace_meanlog = NULL,
-    setting_specific_ach_workplace_sdlog = NULL,
+    setting_specific_ach_workplace_mean = NULL,
+    setting_specific_ach_workplace_sd = NULL,
 
     wells_riley_emission_rate = 27,  # FFU/hour
     wells_riley_decay_rate = 0.64, # k_D, natural decay rate (1/hr)

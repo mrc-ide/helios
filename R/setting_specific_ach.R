@@ -57,12 +57,39 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
 
 #Getting AQI efficacy from ACH
 calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
-  #increasing ACH can increase efficacy or intervention due to mixing
+  #determine which ach -> efficacy relationship is being used (need to make sure these are all defined for each setting)
+  relationship_type <- parameters_list[[paste0("far_uvc", setting, "_ach_efficacy_relationship")]]
 
+  #use constant as default
+  if (is.null(relationship_type)) {
+    relationship_type <- "constant"
+  }
+
+  #functions for constant
+  if (relationship_type == "constant") {
+    efficacy <- parameters_list[[paste0("far_uvc_", setting, "_efficacy")]]
+  }
+
+  #same efficacy for each location in a setting
+  efficacy_values <- rep(efficacy, length(ach_values))
+
+
+} else if (relationship_type =="sigmoid") {
+
+  #efficacy = max_eff/(1+ exp(-k(x - x0))),
+  #need to define all of these in the parameter list
+  max_eff <- parameters_list[[paste0("far_uvc_", setting, "_max_efficacy")]]
+  k <- parameters_list[[paste0("far_uvc_", setting, "_sigmoid_k")]]
+  x0 <- parameters_list[[paste0("far_uvc_", setting, "_sigmoid_x0")]]
 }
 
-#Set ACH distribution for a setting type
+  efficacy_values <- max_eff / (1 + exp(-k * (ach_values - x0)))
+}
 
+return(efficacy_values)
+
+#Set ACH distribution for a setting type
+#need to add validation
 set_setting_specific_ach <- function(parameters_list, setting, mean, sd) {
   parameters_list[[paste0("setting_specific_ach_", setting)]] <- TRUE
   parameters_list[[paste0("setting_specific_ach_", setting, "_mean")]] <- mean
