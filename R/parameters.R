@@ -108,17 +108,17 @@
 #'
 #' Setting-Specific ACH Parameters: #default values need to be adjusted
 #' * `setting_specific_ach_workplace`: boolean switch set to TRUE if setting-specific ACH parameterised in the workplace setting using `set_setting_specific_ach()`; default = FALSE
-#' * `setting_specific_ach_workplace_mean`: The mean of the truncated log-normal distribution from which the setting-specific ACH of individual workplaces is drawn; default = 0
-#' * `setting_specific_ach_workplace_sd`: The standard deviation of the truncated log-normal distribution from which the setting-specific ACH of individual workplaces is drawn; default = 0.37
+#' * `setting_specific_ach_workplace_mean`: The mean of the normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =
+#' * `setting_specific_ach_workplace_sd`: The standard deviation of the normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =
 #' * `setting_specific_ach_school`: boolean switch set to TRUE if setting-specific ACH parameterised in the school setting using `set_setting_specific_ach()`; default = FALSE
-#' * `setting_specific_ach_school_mean`: The mean of the truncated log-normal distribution from which the setting-specific ACH of individual schools is drawn; default = 0
-#' * `setting_specific_ach_school_sd`: The standard deviation of the truncated log-normal distribution from which the setting-specific ACH of individual schools is drawn; default = 0.37
+#' * `setting_specific_ach_school_mean`: The mean of the normal distribution from which the setting-specific ACH of individual schools is drawn; default = 0
+#' * `setting_specific_ach_school_sd`: The standard deviation of the normal distribution from which the setting-specific ACH of individual schools is drawn; default = 0.37
 #' * `setting_specific_ach_leisure`: boolean switch set to TRUE if setting-specific ACH parameterised in the leisure setting using `set_setting_specific_ach()`; default = FALSE
-#' * `setting_specific_ach_leisure_mean`: The mean of the truncated log-normal distribution from which the setting-specific ACH of individual leisure locations is drawn; default = 0
-#' * `setting_specific_ach_leisure_sd`: The standard deviation of the truncated log-normal distribution from which the setting-specific ACH of individual leisure settings is drawn; default = 0.37
+#' * `setting_specific_ach_leisure_mean`: The mean of the normal distribution from which the setting-specific ACH of individual leisure locations is drawn; default = 0
+#' * `setting_specific_ach_leisure_sd`: The standard deviation of the normal distribution from which the setting-specific ACH of individual leisure settings is drawn; default = 0.37
 #' * `setting_specific_ach_household`: boolean switch set to TRUE if setting-specific ACH parameterised in the household setting using `set_setting_specific_ach()`; default = FALSE
-#' * `setting_specific_ach_household_mean`: The mean of the truncated log-normal distribution from which the setting-specific ACH of individual households is drawn; default = 0
-#' * `setting_specific_ach_household_sd`: The standard deviation of the truncated log-normal distribution from which the setting-specific ACH of individual households is drawn;
+#' * `setting_specific_ach_household_mean`: The mean of the normal distribution from which the setting-specific ACH of individual households is drawn; default = 0
+#' * `setting_specific_ach_household_sd`: The standard deviation of the normal distribution from which the setting-specific ACH of individual households is drawn;
 #' Setting-Specific Room Size Per Individual Parameters:
 #' * `size_per_individual_workplace`: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
 #' * `size_per_individual_school`: The volume or surface area for each individual in the school setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
@@ -313,6 +313,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_household_coverage_type = NULL,
     far_uvc_household_efficacy = NULL,
     far_uvc_household_timestep = NULL,
+
+    #ach to efficacy parameters_workplace
+    far_uvc_workplace_ach_efficacy_relationship = "constant",
+    far_uvc_workplace_efficacy = NULL, #constant
+    far_uvc_workplace_max_efficacy = NULL,  # sigmoid
+    far_uvc_workplace_sigmoid_k = NULL,
+    far_uvc_workplace_sigmoid_x0 = NULL,
 
     # Room Size Per Individual Parameters:
     size_per_individual_workplace = 1,
