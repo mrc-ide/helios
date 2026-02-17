@@ -15,27 +15,16 @@ create_processes <- function(
   renderer
 ) {
   # Open a list of processes to store the model processes in:
+  # NOTE: EI_process, IR_process, and RS_process have been replaced by inline
+  # event scheduling via listeners in create_events(). Transitions are now
+  # scheduled at the point of infection/transition rather than polling every
+  # timestep.
   processes_list <- list(
-    # ===============================
-    # Disease State Progression
-    # ===============================
     SE_process = create_SE_process(
       variables_list = variables_list,
       events_list = events_list,
       parameters_list = parameters_list,
       renderer = renderer
-    ),
-
-    EI_process = create_EI_process(
-      variables_list = variables_list,
-      events_list = events_list,
-      parameters_list = parameters_list
-    ),
-
-    IR_process = create_IR_process(
-      variables_list = variables_list,
-      events_list = events_list,
-      parameters_list = parameters_list
     )
   )
 
@@ -45,13 +34,6 @@ create_processes <- function(
   if (parameters_list$endemic_or_epidemic == "endemic") {
     processes_list <- c(
       processes_list,
-      list(
-        RS_process = create_RS_process(
-          variables_list = variables_list,
-          events_list = events_list,
-          parameters_list = parameters_list
-        )
-      ),
       list(
         external_source_process = create_external_source_process(
           variables_list = variables_list,
@@ -93,329 +75,212 @@ create_SE_process <- function(
   renderer
 ) {
   ## Pre-calculating the things that only have to be calculated once
+  N <- parameters_list$human_population
 
   ##### HOUSEHOLDS #####
-  # Calculate the number of households:
-  num_households <- max(as.numeric(variables_list$household$get_categories()))
-
-  # Retrieve and store the indices of individuals in the i-th household
-  household_bitset_list <- vector(mode = "list", length = num_households)
-  household_index_list <- vector(mode = "list", length = num_households)
-  household_size_list <- vector(mode = "list", length = num_households)
-  for (i in seq(num_households)) {
-    household_bitset_list[[
-      i
-    ]] <- variables_list$household$get_index_of(as.character(i))
-    household_index_list[[i]] <- household_bitset_list[[i]]$to_vector()
-    household_size_list[[i]] <- length(household_index_list[[i]])
-  }
+  # Get integer vector mapping each individual to their household ID
+  num_households <- parameters_list$num_households
+  household_of <- variables_list$household$get_values()
+  household_sizes <- tabulate(household_of, nbins = num_households)
 
   ##### WORKPLACES #####
-  # Calculate the number of workplaces:
-  num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
-
-  # Retrieve and store the indices of individuals in the i-th household
-  workplace_bitset_list <- vector(mode = "list", length = num_workplaces)
-  workplace_index_list <- vector(mode = "list", length = num_workplaces)
-  workplace_size_list <- vector(mode = "list", length = num_workplaces)
-  for (i in seq(num_workplaces)) {
-    workplace_bitset_list[[
-      i
-    ]] <- variables_list$workplace$get_index_of(as.character(i))
-    workplace_index_list[[i]] <- workplace_bitset_list[[i]]$to_vector()
-    workplace_size_list[[i]] <- length(workplace_index_list[[i]])
-  }
+  # Get integer vector mapping each individual to their workplace ID (0 = not in a workplace)
+  num_workplaces <- parameters_list$num_workplaces
+  workplace_of <- variables_list$workplace$get_values()
+  workplace_sizes <- tabulate(workplace_of, nbins = num_workplaces)
 
   ##### SCHOOLS #####
-  # Calculate the number of schools:
-  num_schools <- max(as.numeric(variables_list$school$get_categories()))
+  # Get integer vector mapping each individual to their school ID (0 = not in a school)
+  num_schools <- parameters_list$num_schools
+  school_of <- variables_list$school$get_values()
+  school_sizes <- tabulate(school_of, nbins = num_schools)
 
-  # Retrieve and store the indices of individuals in the i-th household
-  school_bitset_list <- vector(mode = "list", length = num_schools)
-  school_index_list <- vector(mode = "list", length = num_schools)
-  school_size_list <- vector(mode = "list", length = num_schools)
-  for (i in seq(num_schools)) {
-    school_bitset_list[[i]] <- variables_list$school$get_index_of(as.character(
-      i
-    ))
-    school_index_list[[i]] <- school_bitset_list[[i]]$to_vector()
-    school_size_list[[i]] <- length(school_index_list[[i]])
+  ##### EFFECTIVE MULTIPLIERS #####
+  # Precompute per-group multiplier: riskiness * beta / group_size
+  # Per-timestep FOI for group g = multiplier[g] * num_infected_in_g
+  hh_multiplier <- parameters_list$household_specific_riskiness *
+    parameters_list$beta_household / household_sizes
+  # Match original behaviour: single-person households get zero FOI
+  hh_multiplier[household_sizes <= 1] <- 0
+
+  wp_multiplier <- parameters_list$workplace_specific_riskiness *
+    parameters_list$beta_workplace / workplace_sizes
+
+  sc_multiplier <- parameters_list$school_specific_riskiness *
+    parameters_list$beta_school / school_sizes
+
+  ##### FAR UVC: HOUSEHOLDS #####
+  # Precompute two multiplier vectors (pre- and post-UVC activation) and swap once
+  if (parameters_list$far_uvc_household) {
+    hh_multiplier_pre_uvc <- hh_multiplier
+    hh_multiplier_post_uvc <- hh_multiplier
+    uvc_groups <- which(parameters_list$uvc_household == 1)
+    hh_multiplier_post_uvc[uvc_groups] <- hh_multiplier[uvc_groups] *
+      (1 - parameters_list$far_uvc_household_efficacy)
+    hh_uvc_timestep <- parameters_list$far_uvc_household_timestep
+    hh_uvc_active <- FALSE
+  } else {
+    hh_multiplier_pre_uvc <- hh_multiplier
+    hh_multiplier_post_uvc <- hh_multiplier
+    hh_uvc_active <- TRUE  # treat as already activated so we never check
+  }
+  hh_current_multiplier <- hh_multiplier_pre_uvc
+
+  ##### FAR UVC: WORKPLACES #####
+  if (parameters_list$far_uvc_workplace) {
+    wp_multiplier_pre_uvc <- wp_multiplier
+    wp_multiplier_post_uvc <- wp_multiplier
+    uvc_groups <- which(parameters_list$uvc_workplace == 1)
+    wp_multiplier_post_uvc[uvc_groups] <- wp_multiplier[uvc_groups] *
+      (1 - parameters_list$far_uvc_workplace_efficacy)
+    wp_uvc_timestep <- parameters_list$far_uvc_workplace_timestep
+    wp_uvc_active <- FALSE
+  } else {
+    wp_multiplier_pre_uvc <- wp_multiplier
+    wp_multiplier_post_uvc <- wp_multiplier
+    wp_uvc_active <- TRUE
+  }
+  wp_current_multiplier <- wp_multiplier_pre_uvc
+
+  ##### FAR UVC: SCHOOLS #####
+  if (parameters_list$far_uvc_school) {
+    sc_multiplier_pre_uvc <- sc_multiplier
+    sc_multiplier_post_uvc <- sc_multiplier
+    uvc_groups <- which(parameters_list$uvc_school == 1)
+    sc_multiplier_post_uvc[uvc_groups] <- sc_multiplier[uvc_groups] *
+      (1 - parameters_list$far_uvc_school_efficacy)
+    sc_uvc_timestep <- parameters_list$far_uvc_school_timestep
+    sc_uvc_active <- FALSE
+  } else {
+    sc_multiplier_pre_uvc <- sc_multiplier
+    sc_multiplier_post_uvc <- sc_multiplier
+    sc_uvc_active <- TRUE
+  }
+  sc_current_multiplier <- sc_multiplier_pre_uvc
+
+  ##### LEISURE SETUP #####
+  # Build a 7 x N matrix of possible leisure visits
+  # Each column is one individual's 7-day pattern (0 = stay home)
+  leisure_possible <- matrix(0L, nrow = 7, ncol = N)
+  for (i in seq(N)) {
+    leisure_possible[, i] <- as.integer(
+      unlist(variables_list$leisure$get_values(i))
+    )
   }
 
-  ##### LEISURE #####
-  # Leisure occupancy is dynamically updated each day, so we don't calculate that here.
-  num_leisure <- length(parameters_list$setting_sizes$leisure)
+  # Plain integer vector for today's leisure assignment (updated daily)
+  leisure_today <- integer(N)
 
-  # Create vector to store all the possible leisure visits
-  leisure_indvidual_possible_visits_list <- vector(
-    mode = "list",
-    length = parameters_list$human_population
+  # Handle non-contiguous leisure IDs
+  actual_leisure_ids <- sort(
+    parameters_list$leisure_indices[parameters_list$leisure_indices > 0]
   )
-  for (i in seq(parameters_list$human_population)) {
-    leisure_indvidual_possible_visits_list[[
-      i
-    ]] <- unlist(variables_list$leisure$get_values(i))
+  num_leisure <- length(actual_leisure_ids)
+  max_leisure_id <- max(actual_leisure_ids)
+
+  # Build lookup: le_riskiness_beta[original_id] = riskiness * beta
+  # The denominator (visitor count) is computed dynamically each day to match original semantics
+  le_riskiness_beta_lookup <- numeric(max_leisure_id)
+  le_riskiness_beta_lookup[actual_leisure_ids] <-
+    parameters_list$leisure_specific_riskiness * parameters_list$beta_leisure
+
+  # Initialise visitor count vectors (updated daily within the closure)
+  le_visitor_counts <- integer(max_leisure_id)
+  le_safe_visitors <- rep(1L, max_leisure_id)
+
+  ##### FAR UVC: LEISURE #####
+  if (parameters_list$far_uvc_leisure) {
+    le_rb_pre_uvc <- le_riskiness_beta_lookup
+    le_rb_post_uvc <- le_riskiness_beta_lookup
+    uvc_leisure_groups <- which(parameters_list$uvc_leisure == 1)
+    uvc_leisure_ids <- actual_leisure_ids[uvc_leisure_groups]
+    le_rb_post_uvc[uvc_leisure_ids] <-
+      le_riskiness_beta_lookup[uvc_leisure_ids] *
+      (1 - parameters_list$far_uvc_leisure_efficacy)
+    le_uvc_timestep <- parameters_list$far_uvc_leisure_timestep
+    le_uvc_active <- FALSE
+  } else {
+    le_rb_pre_uvc <- le_riskiness_beta_lookup
+    le_rb_post_uvc <- le_riskiness_beta_lookup
+    le_uvc_active <- TRUE
   }
+  le_current_rb <- le_rb_pre_uvc
 
   ## Process Function
   function(t) {
-    ## Bitset for all infectious individuals
+
+    ## UVC activation (each block runs at most once across the simulation)
+    if (!hh_uvc_active && t > hh_uvc_timestep) {
+      hh_current_multiplier <<- hh_multiplier_post_uvc
+      hh_uvc_active <<- TRUE
+    }
+    if (!wp_uvc_active && t > wp_uvc_timestep) {
+      wp_current_multiplier <<- wp_multiplier_post_uvc
+      wp_uvc_active <<- TRUE
+    }
+    if (!sc_uvc_active && t > sc_uvc_timestep) {
+      sc_current_multiplier <<- sc_multiplier_post_uvc
+      sc_uvc_active <<- TRUE
+    }
+    if (!le_uvc_active && t > le_uvc_timestep) {
+      le_current_rb <<- le_rb_post_uvc
+      le_uvc_active <<- TRUE
+    }
+
+    ## Get indices of all currently infected individuals
     I <- variables_list$disease_state$get_index_of("I")
+    I_vec <- I$to_vector()
+    num_infected <- length(I_vec)
 
     #=== Household FOI ===#
-    #=====================#
-    # Open vector to store household FOIs experienced by each individual
-    household_FOI <- vector(
-      mode = "numeric",
-      length = parameters_list$human_population
-    )
-
-    # Calculate the household FOI for each individual (if HH size = 1, FOI = 0)
-    for (i in seq(num_households)) {
-      ## Only calculate FOI is household size is greater than 1
-      if (household_size_list[[i]] > 1) {
-        # Count the number of infectious individuals in the i-th household
-        spec_household_I_size <- individual:::bitset_count_and(
-          I,
-          household_bitset_list[[i]]
-        )
-
-        #  Calculate the FOI for the i-th household - with and without farUVC installed
-        if (parameters_list$far_uvc_household) {
-          if (
-            parameters_list$uvc_household[i] == 1 &
-              t > parameters_list$far_uvc_household_timestep
-          ) {
-            spec_household_FOI <- parameters_list$household_specific_riskiness[
-              i
-            ] *
-              (1 - parameters_list$far_uvc_household_efficacy) *
-              (parameters_list$beta_household *
-                spec_household_I_size /
-                household_size_list[[i]])
-          } else {
-            spec_household_FOI <- parameters_list$household_specific_riskiness[
-              i
-            ] *
-              parameters_list$beta_household *
-              spec_household_I_size /
-              household_size_list[[i]]
-          }
-        } else {
-          spec_household_FOI <- parameters_list$household_specific_riskiness[
-            i
-          ] *
-            parameters_list$beta_household *
-            spec_household_I_size /
-            household_size_list[[i]]
-        }
-
-        # Assign the i-th households FOI to the indices of the individuals residing in that household
-        household_FOI[household_index_list[[i]]] <- spec_household_FOI
-      }
-    }
+    # Count infected per household, compute per-group FOI, gather to per-individual
+    hh_I_counts <- tabulate(household_of[I_vec], nbins = num_households)
+    hh_group_foi <- hh_current_multiplier * hh_I_counts
+    household_FOI <- hh_group_foi[household_of]
 
     #=== Workplace FOI ===#
-    #=====================#
-
-    # Open an empty vector for the workplace FOI for each individual:
-    workplace_FOI <- vector(
-      mode = "numeric",
-      length = parameters_list$human_population
-    )
-
-    # For each workplace:
-    for (i in seq(num_workplaces)) {
-      # Count the number of infectious individuals in the i-th workplace
-      spec_workplace_I_size <- individual:::bitset_count_and(
-        I,
-        workplace_bitset_list[[i]]
-      )
-
-      # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
-      if (parameters_list$far_uvc_workplace) {
-        if (
-          parameters_list$uvc_workplace[i] == 1 &
-            t > parameters_list$far_uvc_workplace_timestep
-        ) {
-          spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[
-            i
-          ] *
-            (1 - parameters_list$far_uvc_workplace_efficacy) *
-            (parameters_list$beta_workplace *
-              spec_workplace_I_size /
-              workplace_size_list[[i]])
-        } else {
-          spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[
-            i
-          ] *
-            parameters_list$beta_workplace *
-            spec_workplace_I_size /
-            workplace_size_list[[i]]
-        }
-      } else {
-        spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[i] *
-          parameters_list$beta_workplace *
-          spec_workplace_I_size /
-          workplace_size_list[[i]]
-      }
-
-      # Store the workplace-specific FOR in the indices of all individuals that work there:
-      workplace_FOI[workplace_index_list[[i]]] <- spec_workplace_FOI
-    }
+    # Prepend 0 and shift indices by 1 to handle workplace_of == 0 (unassigned)
+    wp_I_counts <- tabulate(workplace_of[I_vec], nbins = num_workplaces)
+    wp_group_foi <- c(0, wp_current_multiplier * wp_I_counts)
+    workplace_FOI <- wp_group_foi[workplace_of + 1L]
 
     #=== School FOI ===#
-    #==================#
-
-    # Open empty vector to store each individuals school-specific FOI:
-    school_FOI <- vector(
-      mode = "numeric",
-      length = parameters_list$human_population
-    )
-
-    # For each school:
-    for (i in seq(num_schools)) {
-      # Count the number of infectious individuals in the i-th school
-      spec_school_I_size <- individual:::bitset_count_and(
-        I,
-        school_bitset_list[[i]]
-      )
-
-      # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
-      if (parameters_list$far_uvc_school) {
-        if (
-          parameters_list$uvc_school[i] == 1 &
-            t > parameters_list$far_uvc_school_timestep
-        ) {
-          spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-            (1 - parameters_list$far_uvc_school_efficacy) *
-            (parameters_list$beta_school *
-              spec_school_I_size /
-              school_size_list[[i]])
-        } else {
-          spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-            parameters_list$beta_school *
-            spec_school_I_size /
-            school_size_list[[i]]
-        }
-      } else {
-        spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-          parameters_list$beta_school *
-          spec_school_I_size /
-          school_size_list[[i]]
-      }
-
-      # Store the school-specific FOI at the indices of all children that attend it:
-      school_FOI[school_index_list[[i]]] <- spec_school_FOI
-    }
+    # Same zero-handling pattern as workplaces
+    sc_I_counts <- tabulate(school_of[I_vec], nbins = num_schools)
+    sc_group_foi <- c(0, sc_current_multiplier * sc_I_counts)
+    school_FOI <- sc_group_foi[school_of + 1L]
 
     #=== Leisure FOI ===#
-    #=====================#
-    if ((t * parameters_list$dt) == floor((t * parameters_list$dt))) {
-      # Creating vector to store which leisure location individuals visit on a given day
-      leisure_visit <- vector(
-        mode = "numeric",
-        length = parameters_list$human_population
-      )
-
-      # For each individual, work out which leisure location they go to that particular day. 0 = they don't go to any
-      for (i in seq(parameters_list$human_population)) {
-        # Sampling which leisure location actually visited (0 = visit none and staying home) from the leisure locations individuals have associated with them (and could visit)
-        leisure_visit[i] <- leisure_indvidual_possible_visits_list[[
-          i
-        ]][dqrng::dqsample.int(n = 7, size = 1)]
-      }
-
-      # Updating the leisure setting visited that day
-      ## Note that we include all leisure locations as categories irrespective of whether they're visited on a particular day
-      ## Doesn't affect the FOI calculation, as places with no visits on a day don't update the FOI vector
-      ## Also note that parameters_list$leisure_indices aren't 1:num_leisure as i) it includes 0 (no leisure visited); and
-      ## 2) as part of the leisure variable creation in variables.R, some initially created leisure locations
-      ##    don't feature in the RaggedInteger vector, and so these locations are removed as indices.
-      variables_list$specific_leisure$initialize(
-        categories = as.character(parameters_list$leisure_indices),
-        initial_values = as.character(leisure_visit)
-      ) #  update the states with leisure_visit for that day
+    # Daily reassignment (only on whole-day boundaries)
+    if ((t * parameters_list$dt) == floor(t * parameters_list$dt)) {
+      day_indices <- dqrng::dqsample.int(n = 7, size = N, replace = TRUE)
+      leisure_today <<- leisure_possible[cbind(day_indices, seq_len(N))]
+      # Compute visitor counts for the day (used as denominator in FOI)
+      le_visitor_counts <<- tabulate(leisure_today, nbins = max_leisure_id)
+      le_safe_visitors <<- pmax(le_visitor_counts, 1L)
     }
 
-    # Open empty vector to store each individuals leisure-specific FOI:
-    leisure_FOI <- vector(
-      mode = "numeric",
-      length = parameters_list$human_population
-    )
+    # Count infected per leisure venue (tabulate ignores 0s automatically)
+    le_I_counts <- tabulate(leisure_today[I_vec], nbins = max_leisure_id)
 
-    # Calculating leisure-specific FOI for each individual
-    ## Note that we include all possible leisure locations as categories irrespective of whether they're visited on a particular day
-    ## Doesn't affect the FOI calculation, as places with no visits on a day don't update the FOI vector (FOI is NaN which doesn't index in a vector)
-    ## And note that we're specifically looping through the indices of each leisure locations (for reasons described above)
-    leisure_locations <- variables_list$specific_leisure$get_categories()
-    leisure_locations <- leisure_locations[leisure_locations != "0"] # removing the "0" category which is not visited
-    for (i in 1:length(leisure_locations)) {
-      # Access the index of the specific leisure locations being considered
-      spec_leisure_location <- as.numeric(leisure_locations[i])
+    # Compute per-venue FOI: riskiness * beta * I_count / visitor_count
+    le_group_foi <- le_current_rb * le_I_counts / le_safe_visitors
 
-      # Only going through below steps if a leisure location is actually visited (i.e. != 0)
-      if (spec_leisure_location != 0) {
-        # Retrieve the indices of individuals visiting the specific leisure location
-        spec_leisure <- variables_list$specific_leisure$get_index_of(as.character(
-          spec_leisure_location
-        ))
-
-        # Count the number of infectious individuals in the relevant leisure setting
-        spec_leisure_I_size <- individual:::bitset_count_and(I, spec_leisure)
-
-        # Calculate the leisure-specific FOI for the i-th leisure location - with and without farUVC installed
-        ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure locations
-        ## (this is in contrast to leisure_indices, which uses the original indices from their generation,
-        ##  and which span 1 to max(leisure_indices) with some gaps)
-        if (parameters_list$far_uvc_leisure) {
-          if (
-            parameters_list$uvc_leisure[i] == 1 &
-              t > parameters_list$far_uvc_leisure_timestep
-          ) {
-            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-              (1 - parameters_list$far_uvc_leisure_efficacy) *
-              (parameters_list$beta_leisure *
-                spec_leisure_I_size /
-                spec_leisure$size()) ## this calculation needs more in it
-          } else {
-            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-              parameters_list$beta_leisure *
-              spec_leisure_I_size /
-              spec_leisure$size() ## this calculation needs more in it
-          }
-        } else {
-          spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-            parameters_list$beta_leisure *
-            spec_leisure_I_size /
-            spec_leisure$size() ## this calculation needs more in it
-        }
-
-        # Store the leisure location-specific FOI at the indices of all individuals that attend it:
-        leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
-      }
-    }
+    # Gather to per-individual, handling leisure_today == 0 (not visiting)
+    le_group_foi_shifted <- c(0, le_group_foi)
+    leisure_FOI <- le_group_foi_shifted[leisure_today + 1L]
 
     #=== Community FOI ===#
-    #=====================#
-    ### Calculate Community FOI (real-valued for all individuals)
-    #### NOTE: Double check whether the "/N" is correct here - not sure currently
-    community_FOI <- parameters_list$beta_community *
-      variables_list$disease_state$get_size_of("I") /
-      parameters_list$human_population
+    community_FOI <- parameters_list$beta_community * num_infected / N
 
     #=== Total FOI ===#
-    #=================#
-
-    # Sum the household, workplace, school leisure, and community FOIs to get the total FOI for each
-    # individual:
     total_FOI <- household_FOI +
       workplace_FOI +
       school_FOI +
       leisure_FOI +
       community_FOI
 
-    # Render the setting-specific FOIs is diagnostic rendering turned on:
+    # Render the setting-specific FOIs if diagnostic rendering turned on:
     if (parameters_list$render_diagnostics) {
       renderer$render('FOI_household', max(household_FOI), t)
       renderer$render('FOI_workplace', max(workplace_FOI), t)
@@ -442,6 +307,19 @@ create_SE_process <- function(
 
     # Queue an update to the infectious state of the newly infected susceptible individuals to Exposed:
     variables_list$disease_state$queue_update(value = "E", index = S)
+
+    # Schedule the E->I transition inline (replaces EI_process)
+    if (S$size() > 0) {
+      I_times <- round(
+        (rgamma(
+          n = S$size(),
+          shape = 2,
+          rate = 2 / parameters_list$duration_exposed
+        ) + 1) /
+          parameters_list$dt
+      )
+      events_list$EI_event$schedule(target = S, delay = I_times)
+    }
   }
 }
 
@@ -569,6 +447,19 @@ create_external_source_process <- function(
 
     # Queue an update to the infectious state of the newly infected susceptible individuals to Exposed:
     variables_list$disease_state$queue_update(value = "E", index = S_endemic)
+
+    # Schedule the E->I transition inline (replaces EI_process)
+    if (S_endemic$size() > 0) {
+      I_times <- round(
+        (rgamma(
+          n = S_endemic$size(),
+          shape = 2,
+          rate = 2 / parameters_list$duration_exposed
+        ) + 1) /
+          parameters_list$dt
+      )
+      events_list$EI_event$schedule(target = S_endemic, delay = I_times)
+    }
 
     # Render the number of individuals infected through the external mechanism
     renderer$render('n_external_infections', S_endemic$size(), t)
