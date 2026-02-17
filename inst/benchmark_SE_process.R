@@ -6,9 +6,10 @@
 # This script compares the performance of the full optimised pipeline
 # (IntegerVariable variables + vectorised tabulate-gather SE process) against
 # the original main-branch implementation (CategoricalVariable variables +
-# loop-based SE process with bitset_count_and). It runs both versions on a
-# 100k population for 365 timesteps and reports timing, speedup, and a basic
-# comparison of epidemic outputs.
+# loop-based SE process with bitset_count_and).
+#
+# Part 1: Memory comparison across population sizes (25k, 50k, 100k)
+# Part 2: Timing comparison at 100k population for 365 timesteps
 #
 # Usage:
 #   Rscript inst/benchmark_SE_process.R
@@ -21,28 +22,30 @@ library(individual)
 # Configuration
 # ============================================================================
 POP_SIZE <- 100000
+MEMORY_POP_SIZES <- c(25000, 50000, 100000)
 SIM_TIME <- 365
 DT <- 1 # 1 day per timestep => 365 timesteps
 SEED <- 42
 NUM_INITIAL_E <- 5
 
-cat("=== SE Process Benchmark ===\n")
-cat(sprintf("Population: %s | Timesteps: %d | dt: %s | Seed: %d\n\n",
-            format(POP_SIZE, big.mark = ","), round(SIM_TIME / DT), DT, SEED))
-
 # ============================================================================
-# Parameters (shared between both runs)
+# Memory measurement helper
 # ============================================================================
-params <- get_parameters(overrides = list(
-  human_population = POP_SIZE,
-  number_initial_S = POP_SIZE - NUM_INITIAL_E,
-  number_initial_E = NUM_INITIAL_E,
-  number_initial_I = 0,
-  number_initial_R = 0,
-  simulation_time = SIM_TIME,
-  dt = DT,
-  seed = SEED
-))
+# Read process RSS from /proc/self/status (Linux).
+# Falls back to gc()-based estimate on other platforms.
+get_rss_mb <- function() {
+  proc_file <- "/proc/self/status"
+  if (file.exists(proc_file)) {
+    status <- readLines(proc_file, warn = FALSE)
+    vmrss_line <- grep("^VmRSS:", status, value = TRUE)
+    if (length(vmrss_line) == 1) {
+      return(as.numeric(gsub("[^0-9]", "", vmrss_line)) / 1024) # kB -> MB
+    }
+  }
+  # Fallback: sum of R heap memory (won't capture C++ bitset allocations)
+  gc_info <- gc()
+  sum(gc_info[, 2])
+}
 
 # ============================================================================
 # convert_to_categorical: convert IntegerVariable-based variables_list back
@@ -383,17 +386,118 @@ run_with_SE_process <- function(parameters_list, se_process_fn,
 }
 
 # ============================================================================
-# Run NEW (IntegerVariable + tabulate-gather) version
+# PART 1: Memory comparison across population sizes
 # ============================================================================
+cat("=== Part 1: Memory Comparison ===\n")
+cat(sprintf("Population sizes: %s\n\n",
+            paste(format(MEMORY_POP_SIZES, big.mark = ","), collapse = ", ")))
+
+memory_results <- data.frame(
+  pop_size = integer(),
+  new_rss_mb = numeric(),
+  old_rss_mb = numeric(),
+  stringsAsFactors = FALSE
+)
+
+for (n in MEMORY_POP_SIZES) {
+  cat(sprintf("  N = %s ...\n", format(n, big.mark = ",")))
+  mem_params <- get_parameters(overrides = list(
+    human_population = n,
+    number_initial_S = n - NUM_INITIAL_E,
+    number_initial_E = NUM_INITIAL_E,
+    number_initial_I = 0,
+    number_initial_R = 0,
+    seed = SEED
+  ))
+
+  # --- NEW (IntegerVariable) ---
+  invisible(gc(full = TRUE))
+  baseline_new <- get_rss_mb()
+  vars_new <- create_variables(mem_params)
+  new_rss <- get_rss_mb()
+  new_delta <- new_rss - baseline_new
+  rm(vars_new)
+  invisible(gc(full = TRUE))
+  cat(sprintf("    NEW (IntegerVariable):    %7.1f MB (delta from baseline)\n", new_delta))
+
+  # --- OLD (CategoricalVariable) ---
+  invisible(gc(full = TRUE))
+  baseline_old <- get_rss_mb()
+  vars_old <- create_variables(mem_params)
+  vars_old$variables_list <- convert_to_categorical(
+    vars_old$variables_list, vars_old$parameters_list
+  )
+  old_rss <- get_rss_mb()
+  old_delta <- old_rss - baseline_old
+  rm(vars_old)
+  invisible(gc(full = TRUE))
+  cat(sprintf("    OLD (CategoricalVariable): %6.1f MB (delta from baseline)\n", old_delta))
+
+  memory_results <- rbind(memory_results, data.frame(
+    pop_size = n,
+    new_rss_mb = new_delta,
+    old_rss_mb = old_delta,
+    stringsAsFactors = FALSE
+  ))
+}
+
+# Memory summary table
+cat("\n  --- Memory Summary ---\n")
+cat(sprintf("  %-12s  %12s  %12s  %10s\n",
+            "Pop. size", "NEW (MB)", "OLD (MB)", "Ratio"))
+for (i in seq_len(nrow(memory_results))) {
+  r <- memory_results[i, ]
+  ratio <- if (r$new_rss_mb > 0) r$old_rss_mb / r$new_rss_mb else NA
+  cat(sprintf("  %-12s  %12.1f  %12.1f  %9.1fx\n",
+              format(r$pop_size, big.mark = ","),
+              r$new_rss_mb, r$old_rss_mb, ratio))
+}
+
+# Check scaling: ratio of memory increase vs ratio of population increase
+if (nrow(memory_results) >= 2) {
+  cat("\n  --- Scaling Analysis ---\n")
+  cat("  (If OLD scales ~quadratically, doubling N should ~4x memory;\n")
+  cat("   if NEW scales ~linearly, doubling N should ~2x memory.)\n\n")
+  for (i in 2:nrow(memory_results)) {
+    n_ratio <- memory_results$pop_size[i] / memory_results$pop_size[i - 1]
+    old_mem_ratio <- memory_results$old_rss_mb[i] / memory_results$old_rss_mb[i - 1]
+    new_mem_ratio <- memory_results$new_rss_mb[i] / memory_results$new_rss_mb[i - 1]
+    cat(sprintf("  N: %s -> %s (%.1fx pop):\n",
+                format(memory_results$pop_size[i - 1], big.mark = ","),
+                format(memory_results$pop_size[i], big.mark = ","),
+                n_ratio))
+    cat(sprintf("    OLD memory: %.1fx    NEW memory: %.1fx\n",
+                old_mem_ratio, new_mem_ratio))
+  }
+}
+cat("\n")
+
+# ============================================================================
+# PART 2: Timing comparison at full population size
+# ============================================================================
+params <- get_parameters(overrides = list(
+  human_population = POP_SIZE,
+  number_initial_S = POP_SIZE - NUM_INITIAL_E,
+  number_initial_E = NUM_INITIAL_E,
+  number_initial_I = 0,
+  number_initial_R = 0,
+  simulation_time = SIM_TIME,
+  dt = DT,
+  seed = SEED
+))
+
+cat("=== Part 2: Timing Comparison ===\n")
+cat(sprintf("Population: %s | Timesteps: %d | dt: %s | Seed: %d\n\n",
+            format(POP_SIZE, big.mark = ","), round(SIM_TIME / DT), DT, SEED))
+
+# --- Run NEW version ---
 cat("--- Running NEW (IntegerVariable + tabulate-gather) version ---\n")
 t_new <- system.time({
   output_new <- run_with_SE_process(params, create_SE_process)
 })
 cat(sprintf("  Elapsed: %.1f seconds\n\n", t_new["elapsed"]))
 
-# ============================================================================
-# Run OLD (CategoricalVariable + loop-based) version
-# ============================================================================
+# --- Run OLD version ---
 cat("--- Running OLD (CategoricalVariable + loop-based) version ---\n")
 t_old <- system.time({
   output_old <- run_with_SE_process(
@@ -404,19 +508,17 @@ t_old <- system.time({
 })
 cat(sprintf("  Elapsed: %.1f seconds\n\n", t_old["elapsed"]))
 
-# ============================================================================
-# Timing comparison
-# ============================================================================
+# Timing summary
 speedup <- t_old["elapsed"] / t_new["elapsed"]
-cat("=== Timing Results ===\n")
+cat("  --- Timing Summary ---\n")
 cat(sprintf("  OLD (CategoricalVariable + loop):       %7.1f s\n", t_old["elapsed"]))
 cat(sprintf("  NEW (IntegerVariable + tabulate):       %7.1f s\n", t_new["elapsed"]))
 cat(sprintf("  Speedup:                                %7.1fx\n\n", speedup))
 
 # ============================================================================
-# Output comparison (epidemic dynamics)
+# PART 3: Output comparison (epidemic dynamics)
 # ============================================================================
-cat("=== Epidemic Output Comparison ===\n")
+cat("=== Part 3: Epidemic Output Comparison ===\n")
 cat("(Outputs differ due to different RNG sequences in leisure sampling,\n")
 cat(" but epidemic dynamics should be qualitatively similar.)\n\n")
 
@@ -439,9 +541,10 @@ cat("\n")
 summarise_output(output_old, "OLD")
 
 # ============================================================================
-# Optional: save outputs for further analysis
+# Save all results
 # ============================================================================
 results <- list(
+  memory = memory_results,
   timing = data.frame(
     version = c("old_categorical_loop", "new_integer_tabulate"),
     elapsed_s = c(t_old["elapsed"], t_new["elapsed"]),
@@ -452,6 +555,7 @@ results <- list(
   output_old = output_old,
   params = list(
     pop_size = POP_SIZE,
+    memory_pop_sizes = MEMORY_POP_SIZES,
     sim_time = SIM_TIME,
     dt = DT,
     seed = SEED
