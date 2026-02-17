@@ -22,14 +22,29 @@ create_events <- function(variables_list, parameters_list) {
     )
   )
 
-  # Add listener to the EI event:
+  # Add listener to the EI event (state transition E -> I):
   events_list$EI_event$add_listener(
     function(t, target) {
       variables_list$disease_state$queue_update("I", target)
     }
   )
 
-  # Add listener to the IR event:
+  # Chain: when EI fires (E->I), schedule the onward I->R transition inline
+  events_list$EI_event$add_listener(function(t, target) {
+    if (target$size() > 0) {
+      R_times <- round(
+        (rgamma(
+          n = target$size(),
+          shape = 2,
+          rate = 2 / parameters_list$duration_infectious
+        ) + 1) /
+          parameters_list$dt
+      )
+      events_list$IR_event$schedule(target = target, delay = R_times)
+    }
+  })
+
+  # Add listener to the IR event (state transition I -> R):
   events_list$IR_event$add_listener(
     function(t, target) {
       variables_list$disease_state$queue_update("R", target)
@@ -48,6 +63,65 @@ create_events <- function(variables_list, parameters_list) {
         variables_list$disease_state$queue_update("S", target)
       }
     )
+
+    # Chain: when IR fires (I->R), schedule the onward R->S transition inline
+    events_list$IR_event$add_listener(function(t, target) {
+      if (target$size() > 0) {
+        S_times <- round(
+          rgamma(
+            n = target$size(),
+            shape = 1,
+            rate = 1 / parameters_list$duration_immune
+          ) /
+            parameters_list$dt
+        )
+        events_list$RS_event$schedule(target = target, delay = S_times)
+      }
+    })
+  }
+
+  # Schedule transitions for initially-exposed individuals
+  E_initial <- variables_list$disease_state$get_index_of("E")
+  if (E_initial$size() > 0) {
+    I_times_initial <- round(
+      (rgamma(
+        n = E_initial$size(),
+        shape = 2,
+        rate = 2 / parameters_list$duration_exposed
+      ) + 1) /
+        parameters_list$dt
+    )
+    events_list$EI_event$schedule(target = E_initial, delay = I_times_initial)
+  }
+
+  # Schedule transitions for initially-infectious individuals
+  I_initial <- variables_list$disease_state$get_index_of("I")
+  if (I_initial$size() > 0) {
+    R_times_initial <- round(
+      (rgamma(
+        n = I_initial$size(),
+        shape = 2,
+        rate = 2 / parameters_list$duration_infectious
+      ) + 1) /
+        parameters_list$dt
+    )
+    events_list$IR_event$schedule(target = I_initial, delay = R_times_initial)
+  }
+
+  # For endemic mode, initially-recovered individuals also need RS scheduling
+  if (parameters_list$endemic_or_epidemic == "endemic") {
+    R_initial <- variables_list$disease_state$get_index_of("R")
+    if (R_initial$size() > 0) {
+      S_times_initial <- round(
+        rgamma(
+          n = R_initial$size(),
+          shape = 1,
+          rate = 1 / parameters_list$duration_immune
+        ) /
+          parameters_list$dt
+      )
+      events_list$RS_event$schedule(target = R_initial, delay = S_times_initial)
+    }
   }
 
   # Return the list of model events:

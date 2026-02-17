@@ -15,27 +15,16 @@ create_processes <- function(
   renderer
 ) {
   # Open a list of processes to store the model processes in:
+  # NOTE: EI_process, IR_process, and RS_process have been replaced by inline
+  # event scheduling via listeners in create_events(). Transitions are now
+  # scheduled at the point of infection/transition rather than polling every
+  # timestep.
   processes_list <- list(
-    # ===============================
-    # Disease State Progression
-    # ===============================
     SE_process = create_SE_process(
       variables_list = variables_list,
       events_list = events_list,
       parameters_list = parameters_list,
       renderer = renderer
-    ),
-
-    EI_process = create_EI_process(
-      variables_list = variables_list,
-      events_list = events_list,
-      parameters_list = parameters_list
-    ),
-
-    IR_process = create_IR_process(
-      variables_list = variables_list,
-      events_list = events_list,
-      parameters_list = parameters_list
     )
   )
 
@@ -45,13 +34,6 @@ create_processes <- function(
   if (parameters_list$endemic_or_epidemic == "endemic") {
     processes_list <- c(
       processes_list,
-      list(
-        RS_process = create_RS_process(
-          variables_list = variables_list,
-          events_list = events_list,
-          parameters_list = parameters_list
-        )
-      ),
       list(
         external_source_process = create_external_source_process(
           variables_list = variables_list,
@@ -325,6 +307,19 @@ create_SE_process <- function(
 
     # Queue an update to the infectious state of the newly infected susceptible individuals to Exposed:
     variables_list$disease_state$queue_update(value = "E", index = S)
+
+    # Schedule the E->I transition inline (replaces EI_process)
+    if (S$size() > 0) {
+      I_times <- round(
+        (rgamma(
+          n = S$size(),
+          shape = 2,
+          rate = 2 / parameters_list$duration_exposed
+        ) + 1) /
+          parameters_list$dt
+      )
+      events_list$EI_event$schedule(target = S, delay = I_times)
+    }
   }
 }
 
@@ -452,6 +447,19 @@ create_external_source_process <- function(
 
     # Queue an update to the infectious state of the newly infected susceptible individuals to Exposed:
     variables_list$disease_state$queue_update(value = "E", index = S_endemic)
+
+    # Schedule the E->I transition inline (replaces EI_process)
+    if (S_endemic$size() > 0) {
+      I_times <- round(
+        (rgamma(
+          n = S_endemic$size(),
+          shape = 2,
+          rate = 2 / parameters_list$duration_exposed
+        ) + 1) /
+          parameters_list$dt
+      )
+      events_list$EI_event$schedule(target = S_endemic, delay = I_times)
+    }
 
     # Render the number of individuals infected through the external mechanism
     renderer$render('n_external_infections', S_endemic$size(), t)

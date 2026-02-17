@@ -327,7 +327,8 @@ create_SE_process_original <- function(
 # Helper: run simulation with a specified SE process constructor
 # ============================================================================
 run_with_SE_process <- function(parameters_list, se_process_fn,
-                                convert_vars_fn = NULL) {
+                                convert_vars_fn = NULL,
+                                include_transition_processes = FALSE) {
   variables_list <- create_variables(parameters_list)
   parameters_list <- variables_list$parameters_list
   variables_list <- variables_list$variables_list
@@ -352,18 +353,23 @@ run_with_SE_process <- function(parameters_list, se_process_fn,
       events_list = events_list,
       parameters_list = parameters_list,
       renderer = renderer
-    ),
-    EI_process = create_EI_process(
-      variables_list = variables_list,
-      events_list = events_list,
-      parameters_list = parameters_list
-    ),
-    IR_process = create_IR_process(
+    )
+  )
+
+  # For the OLD benchmark: include the polling-based EI/IR processes.
+  # The NEW version uses inline scheduling via event listeners instead.
+  if (include_transition_processes) {
+    processes_list$EI_process <- create_EI_process(
       variables_list = variables_list,
       events_list = events_list,
       parameters_list = parameters_list
     )
-  )
+    processes_list$IR_process <- create_IR_process(
+      variables_list = variables_list,
+      events_list = events_list,
+      parameters_list = parameters_list
+    )
+  }
 
   # Add rendering process
   processes_list <- c(
@@ -490,20 +496,21 @@ cat("=== Part 2: Timing Comparison ===\n")
 cat(sprintf("Population: %s | Timesteps: %d | dt: %s | Seed: %d\n\n",
             format(POP_SIZE, big.mark = ","), round(SIM_TIME / DT), DT, SEED))
 
-# --- Run NEW version ---
-cat("--- Running NEW (IntegerVariable + tabulate-gather) version ---\n")
+# --- Run NEW version (inline scheduling via listeners, no EI/IR/RS processes) ---
+cat("--- Running NEW (IntegerVariable + tabulate-gather + inline scheduling) ---\n")
 t_new <- system.time({
   output_new <- run_with_SE_process(params, create_SE_process)
 })
 cat(sprintf("  Elapsed: %.1f seconds\n\n", t_new["elapsed"]))
 
-# --- Run OLD version ---
-cat("--- Running OLD (CategoricalVariable + loop-based) version ---\n")
+# --- Run OLD version (polling-based EI/IR processes) ---
+cat("--- Running OLD (CategoricalVariable + loop-based + polling processes) ---\n")
 t_old <- system.time({
   output_old <- run_with_SE_process(
     params,
     create_SE_process_original,
-    convert_vars_fn = convert_to_categorical
+    convert_vars_fn = convert_to_categorical,
+    include_transition_processes = TRUE
   )
 })
 cat(sprintf("  Elapsed: %.1f seconds\n\n", t_old["elapsed"]))
