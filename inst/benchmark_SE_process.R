@@ -51,66 +51,83 @@ create_SE_process_original <- function(
   renderer
 ) {
   ## Pre-calculating the things that only have to be calculated once
+  N <- parameters_list$human_population
 
   ##### HOUSEHOLDS #####
-  num_households <- max(as.numeric(variables_list$household$get_categories()))
+  # Uses IntegerVariable: $get_index_of(set = i) returns a Bitset
+  num_households <- parameters_list$num_households
   household_bitset_list <- vector(mode = "list", length = num_households)
   household_index_list <- vector(mode = "list", length = num_households)
   household_size_list <- vector(mode = "list", length = num_households)
   for (i in seq(num_households)) {
     household_bitset_list[[i]] <- variables_list$household$get_index_of(
-      as.character(i)
+      set = i
     )
     household_index_list[[i]] <- household_bitset_list[[i]]$to_vector()
     household_size_list[[i]] <- length(household_index_list[[i]])
   }
 
   ##### WORKPLACES #####
-  num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
+  num_workplaces <- parameters_list$num_workplaces
   workplace_bitset_list <- vector(mode = "list", length = num_workplaces)
   workplace_index_list <- vector(mode = "list", length = num_workplaces)
   workplace_size_list <- vector(mode = "list", length = num_workplaces)
   for (i in seq(num_workplaces)) {
     workplace_bitset_list[[i]] <- variables_list$workplace$get_index_of(
-      as.character(i)
+      set = i
     )
     workplace_index_list[[i]] <- workplace_bitset_list[[i]]$to_vector()
     workplace_size_list[[i]] <- length(workplace_index_list[[i]])
   }
 
   ##### SCHOOLS #####
-  num_schools <- max(as.numeric(variables_list$school$get_categories()))
+  num_schools <- parameters_list$num_schools
   school_bitset_list <- vector(mode = "list", length = num_schools)
   school_index_list <- vector(mode = "list", length = num_schools)
   school_size_list <- vector(mode = "list", length = num_schools)
   for (i in seq(num_schools)) {
     school_bitset_list[[i]] <- variables_list$school$get_index_of(
-      as.character(i)
+      set = i
     )
     school_index_list[[i]] <- school_bitset_list[[i]]$to_vector()
     school_size_list[[i]] <- length(school_index_list[[i]])
   }
 
   ##### LEISURE #####
-  num_leisure <- length(parameters_list$setting_sizes$leisure)
+  # Build per-individual possible visits list from RaggedInteger (unchanged)
   leisure_indvidual_possible_visits_list <- vector(
     mode = "list",
-    length = parameters_list$human_population
+    length = N
   )
-  for (i in seq(parameters_list$human_population)) {
+  for (i in seq(N)) {
     leisure_indvidual_possible_visits_list[[i]] <- unlist(
       variables_list$leisure$get_values(i)
     )
   }
 
+  # Leisure location metadata for loop-based FOI computation
+  actual_leisure_ids <- sort(
+    parameters_list$leisure_indices[parameters_list$leisure_indices > 0]
+  )
+  num_leisure <- length(actual_leisure_ids)
+  max_leisure_id <- max(actual_leisure_ids)
+
+  # Build lookup from leisure index position to actual ID
+  leisure_id_to_pos <- integer(max_leisure_id)
+  leisure_id_to_pos[actual_leisure_ids] <- seq_along(actual_leisure_ids)
+
+  # Plain integer vector for today's leisure assignment (replaces specific_leisure CategoricalVariable)
+  leisure_today <- integer(N)
+
   ## Process Function
   function(t) {
     I <- variables_list$disease_state$get_index_of("I")
+    I_vec <- I$to_vector()
 
     #=== Household FOI ===#
     household_FOI <- vector(
       mode = "numeric",
-      length = parameters_list$human_population
+      length = N
     )
     for (i in seq(num_households)) {
       if (household_size_list[[i]] > 1) {
@@ -141,7 +158,7 @@ create_SE_process_original <- function(
     #=== Workplace FOI ===#
     workplace_FOI <- vector(
       mode = "numeric",
-      length = parameters_list$human_population
+      length = N
     )
     for (i in seq(num_workplaces)) {
       spec_workplace_I_size <- individual:::bitset_count_and(
@@ -170,7 +187,7 @@ create_SE_process_original <- function(
     #=== School FOI ===#
     school_FOI <- vector(
       mode = "numeric",
-      length = parameters_list$human_population
+      length = N
     )
     for (i in seq(num_schools)) {
       spec_school_I_size <- individual:::bitset_count_and(
@@ -197,60 +214,51 @@ create_SE_process_original <- function(
     }
 
     #=== Leisure FOI ===#
+    # Daily reassignment using per-individual loop (original approach)
     if ((t * parameters_list$dt) == floor((t * parameters_list$dt))) {
-      leisure_visit <- vector(
-        mode = "numeric",
-        length = parameters_list$human_population
-      )
-      for (i in seq(parameters_list$human_population)) {
-        leisure_visit[i] <- leisure_indvidual_possible_visits_list[[i]][
+      for (i in seq(N)) {
+        leisure_today[i] <<- leisure_indvidual_possible_visits_list[[i]][
           dqrng::dqsample.int(n = 7, size = 1)
         ]
       }
-      variables_list$specific_leisure$initialize(
-        categories = as.character(parameters_list$leisure_indices),
-        initial_values = as.character(leisure_visit)
-      )
     }
 
+    # Loop over active leisure locations and compute FOI per venue
     leisure_FOI <- vector(
       mode = "numeric",
-      length = parameters_list$human_population
+      length = N
     )
-    leisure_locations <- variables_list$specific_leisure$get_categories()
-    leisure_locations <- leisure_locations[leisure_locations != "0"]
-    for (i in 1:length(leisure_locations)) {
-      spec_leisure_location <- as.numeric(leisure_locations[i])
-      if (spec_leisure_location != 0) {
-        spec_leisure <- variables_list$specific_leisure$get_index_of(
-          as.character(spec_leisure_location)
-        )
-        spec_leisure_I_size <- individual:::bitset_count_and(I, spec_leisure)
+    for (j in seq_along(actual_leisure_ids)) {
+      lid <- actual_leisure_ids[j]
+      visitors <- which(leisure_today == lid)
+      num_visitors <- length(visitors)
+      if (num_visitors > 0) {
+        # Count infected among visitors
+        spec_leisure_I_size <- sum(leisure_today[I_vec] == lid)
         if (parameters_list$far_uvc_leisure) {
-          if (parameters_list$uvc_leisure[i] == 1 &
+          if (parameters_list$uvc_leisure[j] == 1 &
                 t > parameters_list$far_uvc_leisure_timestep) {
-            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
+            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[j] *
               (1 - parameters_list$far_uvc_leisure_efficacy) *
               (parameters_list$beta_leisure * spec_leisure_I_size /
-                 spec_leisure$size())
+                 num_visitors)
           } else {
-            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
+            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[j] *
               parameters_list$beta_leisure * spec_leisure_I_size /
-              spec_leisure$size()
+              num_visitors
           }
         } else {
-          spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
+          spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[j] *
             parameters_list$beta_leisure * spec_leisure_I_size /
-            spec_leisure$size()
+            num_visitors
         }
-        leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
+        leisure_FOI[visitors] <- spec_leisure_FOI
       }
     }
 
     #=== Community FOI ===#
     community_FOI <- parameters_list$beta_community *
-      variables_list$disease_state$get_size_of("I") /
-      parameters_list$human_population
+      length(I_vec) / N
 
     #=== Total FOI ===#
     total_FOI <- household_FOI + workplace_FOI + school_FOI +

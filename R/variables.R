@@ -33,12 +33,10 @@ create_variables <- function(parameters_list) {
     )
 
     # Household variable
-    household_variable <- individual::CategoricalVariable$new(
-      categories = sprintf(
-        "%d",
-        1:max(household_age_list$individual_households)
-      ),
-      initial_values = sprintf("%d", household_age_list$individual_households)
+    household_integers <- as.integer(household_age_list$individual_households)
+    num_households <- max(household_integers)
+    household_variable <- individual::IntegerVariable$new(
+      initial_values = household_integers
     )
 
     # If user wants to specify age-class proportions and associated households manually
@@ -60,9 +58,10 @@ create_variables <- function(parameters_list) {
       parameters_list = parameters_list,
       age_class_variable = age_class_variable
     )
-    household_variable <- individual::CategoricalVariable$new(
-      categories = sprintf("%d", 1:max(initial_households)),
-      initial_values = sprintf("%d", initial_households)
+    household_integers <- as.integer(initial_households)
+    num_households <- max(household_integers)
+    household_variable <- individual::IntegerVariable$new(
+      initial_values = household_integers
     )
   }
 
@@ -78,15 +77,15 @@ create_variables <- function(parameters_list) {
       age_class_variable = age_class_variable
     )
   }
-  num_schools <- max(as.numeric(initial_school_settings))
+  school_integers <- as.integer(initial_school_settings)
+  num_schools <- max(school_integers)
   if (num_schools <= 2) {
     message(
       "There are less than or equal to 2 schools. Consider the population size may be too small!"
     )
   }
-  school_variable <- individual::CategoricalVariable$new(
-    categories = as.character(0:num_schools),
-    initial_values = initial_school_settings
+  school_variable <- individual::IntegerVariable$new(
+    initial_values = school_integers
   )
 
   # Workplace setting variable
@@ -95,15 +94,15 @@ create_variables <- function(parameters_list) {
     age_class_variable = age_class_variable,
     school_variable = school_variable
   )
-  num_workplaces <- max(as.numeric(initial_workplace_settings))
+  workplace_integers <- as.integer(initial_workplace_settings)
+  num_workplaces <- max(workplace_integers)
   if (num_workplaces <= 2) {
     message(
       "There are less than or equal to 2 workplaces. Consider the population size may be too small!"
     )
   }
-  workplace_variable <- individual::CategoricalVariable$new(
-    categories = as.character(0:num_workplaces),
-    initial_values = initial_workplace_settings
+  workplace_variable <- individual::IntegerVariable$new(
+    initial_values = workplace_integers
   )
 
   # Generating the number and sizes of each leisure setting
@@ -155,14 +154,6 @@ create_variables <- function(parameters_list) {
   # length(parameters_list$leisure_setting_sizes) because the indices in actual_assigned_leisure_settings
   # are missing the values from leisure_setting_not_assigned_to_anyone.
 
-  ## Creating initial CategoricalVariable tracking leisure location an individiual goes to on a given day, which we will dynamically update
-  specific_day_leisure_variable <- individual::CategoricalVariable$new(
-    categories = as.character(assigned_leisure_locations[order(
-      assigned_leisure_locations
-    )]),
-    initial_values = rep(as.character(0), parameters_list$human_population)
-  )
-
   # Return the list of model variables
   variables_list <- list(
     disease_state = disease_state_variable,
@@ -170,35 +161,37 @@ create_variables <- function(parameters_list) {
     workplace = workplace_variable,
     school = school_variable,
     household = household_variable,
-    leisure = leisure_variable,
-    specific_leisure = specific_day_leisure_variable
+    leisure = leisure_variable
   )
+
+  # Store setting counts in parameters (num_households, num_schools, num_workplaces
+  # are already computed above during variable creation)
+  parameters_list$num_households <- num_households
+  parameters_list$num_workplaces <- num_workplaces
+  parameters_list$num_schools <- num_schools
 
   # Store setting sizes in a list:
   setting_sizes <- list(
-    workplace = get_setting_size(variables_list, setting = "workplace"),
-    school = get_setting_size(variables_list, setting = "school"),
+    workplace = tabulate(workplace_integers, nbins = num_workplaces),
+    school = tabulate(school_integers, nbins = num_schools),
     leisure = leisure_setting_sizes,
-    household = get_setting_size(variables_list, setting = "household")
+    household = tabulate(household_integers, nbins = num_households)
   )
 
-  # Append setting sizes to variables_list:
+  # Append setting sizes to parameters_list:
   parameters_list$setting_sizes <- setting_sizes
 
   # Creating vector of setting-specific riskinesses for each setting type
-  num_households <- max(as.numeric(variables_list$household$get_categories()))
   parameters_list$household_specific_riskiness <- generate_setting_specific_riskinesses(
     parameters_list = parameters_list,
     setting = "household",
     number_of_locations = num_households
   )
-  num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
   parameters_list$workplace_specific_riskiness <- generate_setting_specific_riskinesses(
     parameters_list = parameters_list,
     setting = "workplace",
     number_of_locations = num_workplaces
   )
-  num_schools <- max(as.numeric(variables_list$school$get_categories()))
   parameters_list$school_specific_riskiness <- generate_setting_specific_riskinesses(
     parameters_list = parameters_list,
     setting = "school",
@@ -598,7 +591,7 @@ generate_initial_workplaces <- function(
 
   # Calculating number of unassigned adults and assigning them to workplaces
   set.seed(parameters_list$seed)
-  index_not_school <- school_variable$get_index_of(values = c("0"))$to_vector()
+  index_not_school <- school_variable$get_index_of(set = 0L)$to_vector()
   index_adults <- age_class_variable$get_index_of("adult")$to_vector()
   index_unassigned_adults <- intersect(index_not_school, index_adults)
   if (parameters_list$workplace_distribution_country == "USA") {

@@ -96,37 +96,22 @@ create_SE_process <- function(
   N <- parameters_list$human_population
 
   ##### HOUSEHOLDS #####
-  # Build integer vector mapping each individual to their household ID
-  num_households <- max(as.numeric(variables_list$household$get_categories()))
-  household_of <- integer(N)
-  household_sizes <- integer(num_households)
-  for (i in seq(num_households)) {
-    members <- variables_list$household$get_index_of(as.character(i))$to_vector()
-    household_of[members] <- i
-    household_sizes[i] <- length(members)
-  }
+  # Get integer vector mapping each individual to their household ID
+  num_households <- parameters_list$num_households
+  household_of <- variables_list$household$get_values()
+  household_sizes <- tabulate(household_of, nbins = num_households)
 
   ##### WORKPLACES #####
-  # Build integer vector mapping each individual to their workplace ID (0 = not in a workplace)
-  num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
-  workplace_of <- integer(N)
-  workplace_sizes <- integer(num_workplaces)
-  for (i in seq(num_workplaces)) {
-    members <- variables_list$workplace$get_index_of(as.character(i))$to_vector()
-    workplace_of[members] <- i
-    workplace_sizes[i] <- length(members)
-  }
+  # Get integer vector mapping each individual to their workplace ID (0 = not in a workplace)
+  num_workplaces <- parameters_list$num_workplaces
+  workplace_of <- variables_list$workplace$get_values()
+  workplace_sizes <- tabulate(workplace_of, nbins = num_workplaces)
 
   ##### SCHOOLS #####
-  # Build integer vector mapping each individual to their school ID (0 = not in a school)
-  num_schools <- max(as.numeric(variables_list$school$get_categories()))
-  school_of <- integer(N)
-  school_sizes <- integer(num_schools)
-  for (i in seq(num_schools)) {
-    members <- variables_list$school$get_index_of(as.character(i))$to_vector()
-    school_of[members] <- i
-    school_sizes[i] <- length(members)
-  }
+  # Get integer vector mapping each individual to their school ID (0 = not in a school)
+  num_schools <- parameters_list$num_schools
+  school_of <- variables_list$school$get_values()
+  school_sizes <- tabulate(school_of, nbins = num_schools)
 
   ##### EFFECTIVE MULTIPLIERS #####
   # Precompute per-group multiplier: riskiness * beta / group_size
