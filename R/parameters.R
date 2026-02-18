@@ -220,6 +220,12 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     setting_specific_ach_household_mean = NULL,
     setting_specific_ach_household_sd = NULL,
 
+    # Volume per person parameters (density values)
+    volume_per_person_workplace = 1
+    volume_per_person_school = 1
+    volume_per_person_leisure = 1
+    volume_per_person_household = 1
+
   # W-R parameters
     wells_riley_emission_rate = 27,  # FFU/hour
     wells_riley_decay_rate = 0.64, # k_D, natural decay rate (1/hr)
@@ -227,12 +233,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     wells_riley_respiratory_rate_factor = 0.45, # RR_tv
     wells_riley_time_in_room = 4,# t, hours spent in room
     wells_riley_reference_ach = NULL,
-
-    # Setting-Specific Room Volume? right now inputting volume directly to calculate Css
-    room_volume_workplace = 150,
-    room_volume_school = 150,
-    room_volume_leisure = 150,
-    room_volume_household = 150,
 
     # Far UVC Efficacy Parameters (function of ACH)
     far_uvc_efficacy_function = "?", #unsure what the shape looks like

@@ -26,7 +26,14 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
   r <- parameters_list$wells_riley_infection_prob_per_ffu
   RRtv <- parameters_list$wells_riley_respiratory_rate_factor
   t <- parameters_list$wells_riley_time_in_room
-  room_vol <- parameters_list[[paste0("room_volume_", setting)]]  #currently calculated by pop size of specific location * setting-specific density, adjust ach formula to be calulated like this)
+
+  #getting number of people in each location
+  location_sizes <- parameters_list$setting_size[[setting]]
+  volume_per_person <- parameter_list[[paste0("volume_per_person_",setting)]]
+  room_volumes <- location_sizes*volume_per_person
+
+    #old
+    #room_vol <- parameters_list[[paste0("room_volume_", setting)]]  #currently calculated by pop size of specific location * setting-specific density, adjust ach formula to be calculated like this)
 
   # alpha values
   alpha_values <- ach_values + kD
@@ -43,7 +50,8 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
     ach_ref <- median(ach_values)
   }
   alpha_ref <- ach_ref + kD
-  Css_ref <- (I * pi) / (alpha_ref * room_vol)
+  room_vol_ref <- median(room_volumes)
+  Css_ref <- (I * pi) / (alpha_ref * room_vol_ref)
   p_inf_ref <- 1 - exp(-r * Css_ref * RRtv * t)
 
   # relative riskiness
