@@ -199,35 +199,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     setting_specific_riskiness_household_min = NULL,
     setting_specific_riskiness_household_max = NULL,
 
-
-    # Setting-Specific Riskiness Parameters: Workplace
-    setting_specific_riskiness_workplace = FALSE,
-    setting_specific_riskiness_workplace_meanlog = NULL,
-    setting_specific_riskiness_workplace_sdlog = NULL,
-    setting_specific_riskiness_workplace_min = NULL,
-    setting_specific_riskiness_workplace_max = NULL,
-
-    # Setting-Specific Riskiness Parameters: School
-    setting_specific_riskiness_school = FALSE,
-    setting_specific_riskiness_school_meanlog = NULL,
-    setting_specific_riskiness_school_sdlog = NULL,
-    setting_specific_riskiness_school_min = NULL,
-    setting_specific_riskiness_school_max = NULL,
-
-    # Setting-Specific Riskiness Parameters: Leisure
-    setting_specific_riskiness_leisure = FALSE,
-    setting_specific_riskiness_leisure_meanlog = NULL,
-    setting_specific_riskiness_leisure_sdlog = NULL,
-    setting_specific_riskiness_leisure_min = NULL,
-    setting_specific_riskiness_leisure_max = NULL,
-
-    # Setting-Specific Riskiness Parameters: Household
-    setting_specific_riskiness_household = FALSE,
-    setting_specific_riskiness_household_meanlog = NULL,
-    setting_specific_riskiness_household_sdlog = NULL,
-    setting_specific_riskiness_household_min = NULL,
-    setting_specific_riskiness_household_max = NULL,
-
     # Setting-Specific ACH Parameters: Workplace
     setting_specific_ach_workplace = FALSE,
     setting_specific_ach_workplace_mean = NULL,
@@ -249,11 +220,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     setting_specific_ach_household_mean = NULL,
     setting_specific_ach_household_sd = NULL,
 
-    # Setting-Specific ACH Parameters: Workplace
-    setting_specific_ach_workplace = FALSE,
-    setting_specific_ach_workplace_mean = NULL,
-    setting_specific_ach_workplace_sd = NULL,
-
+  # W-R parameters
     wells_riley_emission_rate = 27,  # FFU/hour
     wells_riley_decay_rate = 0.64, # k_D, natural decay rate (1/hr)
     wells_riley_infection_prob_per_ffu = 1.37e-2, # r, infection probability per FFU

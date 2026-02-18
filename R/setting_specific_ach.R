@@ -7,12 +7,9 @@ generate_setting_specific_ach <- function(parameters_list, setting, number_of_lo
   mu <- parameters_list[[paste0("setting_specific_ach_", setting, "_mean")]]
   sigma <- parameters_list[[paste0("setting_specific_ach_", setting, "_sd")]]
 
-  #Draw values from distribution, draw double(?) than what you need because we are cutting off negatives (replace this with trunc norm) 
-  raw_draws <- rnorm(n = number_of_locations * 2, mean = mu, sd = sigma)
+  #Draw values from truncated normal distribution
+  raw_draws <- rtruncnorm( n = number_of_locations, a = 0, b - Inf, mean =mu, sd = sigma)
 
-  #Remove negative values
-  #(idk if this is the right call, not really shaped like a normal dist after this but lognormal ACH doesn't work well for riskiness dist)
-  ach_values <- raw_draws[raw_draws > 0]
 
   #return num of locaions
   return(ach_values[1:number_of_locations])
@@ -23,7 +20,7 @@ generate_setting_specific_ach <- function(parameters_list, setting, number_of_lo
 convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
 
   #W-R parameters from parameters_list in parameters.R
-  I <- 1  #should this be hard defined?
+  I <- 1
   pi <- parameters_list$wells_riley_emission_rate
   kD <- parameters_list$wells_riley_decay_rate
   r <- parameters_list$wells_riley_infection_prob_per_ffu
