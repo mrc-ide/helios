@@ -221,10 +221,10 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     setting_specific_ach_household_sd = NULL,
 
     # Volume per person parameters (density values)
-    volume_per_person_workplace = 1
-    volume_per_person_school = 1
-    volume_per_person_leisure = 1
-    volume_per_person_household = 1
+    volume_per_person_workplace = 1,
+    volume_per_person_school = 1,
+    volume_per_person_leisure = 1,
+    volume_per_person_household = 1,
 
   # W-R parameters
     wells_riley_emission_rate = 27,  # FFU/hour
@@ -235,7 +235,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     wells_riley_reference_ach = NULL,
 
     # Far UVC Efficacy Parameters (function of ACH)
-    far_uvc_efficacy_function = "?", #unsure what the shape looks like
+    far_uvc_efficacy_function = NULL,
     far_uvc_efficacy_max_workplace = NULL,
     far_uvc_efficacy_max_school = NULL,
     far_uvc_efficacy_max_leisure = NULL,
@@ -282,7 +282,28 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_household_timestep = NULL,
 
     #ach to efficacy parameters_workplace
-    far_uvc_workplace_ach_efficacy_relationship = "constant",
+    far_uvc_workplace_ach_efficacy_relationship = NULL, #constant or sigmoid
+    far_uvc_workplace_efficacy = NULL, #constant
+    far_uvc_workplace_max_efficacy = NULL,  # sigmoid
+    far_uvc_workplace_sigmoid_k = NULL,
+    far_uvc_workplace_sigmoid_x0 = NULL,
+
+    #ach to efficacy parameters_school
+    far_uvc_school_ach_efficacy_relationship = NULL, #constant or sigmoid
+    far_uvc_school_efficacy = NULL, #constant
+    far_uvc_school_max_efficacy = NULL,  # sigmoid
+    far_uvc_school_sigmoid_k = NULL,
+    far_uvc_school_sigmoid_x0 = NULL,
+
+    #ach to efficacy parameters_leisure
+    far_uvc_workplace_ach_efficacy_relationship = NULL, #constant or sigmoid
+    far_uvc_workplace_efficacy = NULL, #constant
+    far_uvc_workplace_max_efficacy = NULL,  # sigmoid
+    far_uvc_workplace_sigmoid_k = NULL,
+    far_uvc_workplace_sigmoid_x0 = NULL,
+
+    #ach to efficacy parameters_house
+    far_uvc_workplace_ach_efficacy_relationship = NULL, #constant or sigmoid
     far_uvc_workplace_efficacy = NULL, #constant
     far_uvc_workplace_max_efficacy = NULL,  # sigmoid
     far_uvc_workplace_sigmoid_k = NULL,

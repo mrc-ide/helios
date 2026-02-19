@@ -8,7 +8,7 @@ generate_setting_specific_ach <- function(parameters_list, setting, number_of_lo
   sigma <- parameters_list[[paste0("setting_specific_ach_", setting, "_sd")]]
 
   #Draw values from truncated normal distribution
-  raw_draws <- rtruncnorm( n = number_of_locations, a = 0, b - Inf, mean =mu, sd = sigma)
+  ach_values <- rtruncnorm( n = number_of_locations, a = 0, b = Inf, mean =mu, sd = sigma)
 
 
   #return num of locaions
@@ -28,8 +28,8 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
   t <- parameters_list$wells_riley_time_in_room
 
   #getting number of people in each location
-  location_sizes <- parameters_list$setting_size[[setting]]
-  volume_per_person <- parameter_list[[paste0("volume_per_person_",setting)]]
+  location_sizes <- parameters_list$setting_sizes[[setting]]
+  volume_per_person <- parameters_list[[paste0("volume_per_person_",setting)]]
   room_volumes <- location_sizes*volume_per_person
 
     #old
@@ -39,7 +39,7 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
   alpha_values <- ach_values + kD
 
   # steady-state concentration
-  Css_values <- (I * pi) / (alpha_values * room_vol)
+  Css_values <- (I * pi) / (alpha_values * room_volumes)
 
   # p(infection)
   p_inf_values <- 1 - exp(-r * Css_values * RRtv * t)
@@ -63,7 +63,7 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
 #Getting AQI efficacy from ACH
 calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   #determine which ach -> efficacy relationship is being used (need to make sure these are all defined for each setting)
-  relationship_type <- parameters_list[[paste0("far_uvc", setting, "_ach_efficacy_relationship")]]
+  relationship_type <- parameters_list[[paste0("far_uvc_", setting, "_ach_efficacy_relationship")]]
 
   #use constant as default
   if (is.null(relationship_type)) {
@@ -73,25 +73,19 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   #functions for constant
   if (relationship_type == "constant") {
     efficacy <- parameters_list[[paste0("far_uvc_", setting, "_efficacy")]]
+    #same efficacy for each location in a setting
+    efficacy_values <- rep(efficacy, length(ach_values))
+    #efficacy = max_eff/(1+ exp(-k(x - x0))),
+    #need to define all of these in the parameter list
+  } else if (relationship_type == "sigmoid") {
+    max_eff <- parameters_list[[paste0("far_uvc_", setting, "_max_efficacy")]]
+    k <- parameters_list[[paste0("far_uvc_", setting, "_sigmoid_k")]]
+    x0 <- parameters_list[[paste0("far_uvc_", setting, "_sigmoid_x0")]]
+    efficacy_values <- max_eff / (1 + exp(-k * (ach_values - x0)))
   }
 
-  #same efficacy for each location in a setting
-  efficacy_values <- rep(efficacy, length(ach_values))
+  return(efficacy_values)
 
-
-} else if (relationship_type =="sigmoid") {
-
-  #efficacy = max_eff/(1+ exp(-k(x - x0))),
-  #need to define all of these in the parameter list
-  max_eff <- parameters_list[[paste0("far_uvc_", setting, "_max_efficacy")]]
-  k <- parameters_list[[paste0("far_uvc_", setting, "_sigmoid_k")]]
-  x0 <- parameters_list[[paste0("far_uvc_", setting, "_sigmoid_x0")]]
-}
-
-  efficacy_values <- max_eff / (1 + exp(-k * (ach_values - x0)))
-}
-
-return(efficacy_values)
 
 #Set ACH distribution for a setting type
 #need to add validation
