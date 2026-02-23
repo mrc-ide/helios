@@ -296,18 +296,18 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_school_sigmoid_x0 = NULL,
 
     #ach to efficacy parameters_leisure
-    far_uvc_workplace_ach_efficacy_relationship = NULL, #constant or sigmoid
-    far_uvc_workplace_efficacy = NULL, #constant
-    far_uvc_workplace_max_efficacy = NULL,  # sigmoid
-    far_uvc_workplace_sigmoid_k = NULL,
-    far_uvc_workplace_sigmoid_x0 = NULL,
+    far_uvc_leisure_ach_efficacy_relationship = NULL, #constant or sigmoid
+    far_uvc_leisure_efficacy = NULL, #constant
+    far_uvc_leisure_max_efficacy = NULL,  # sigmoid
+    far_uvc_leisure_sigmoid_k = NULL,
+    far_uvc_leisure_sigmoid_x0 = NULL,
 
     #ach to efficacy parameters_house
-    far_uvc_workplace_ach_efficacy_relationship = NULL, #constant or sigmoid
-    far_uvc_workplace_efficacy = NULL, #constant
-    far_uvc_workplace_max_efficacy = NULL,  # sigmoid
-    far_uvc_workplace_sigmoid_k = NULL,
-    far_uvc_workplace_sigmoid_x0 = NULL,
+    far_uvc_household_ach_efficacy_relationship = NULL, #constant or sigmoid
+    far_uvc_household_efficacy = NULL, #constant
+    far_uvc_household_max_efficacy = NULL,  # sigmoid
+    far_uvc_household_sigmoid_k = NULL,
+    far_uvc_household_sigmoid_x0 = NULL,
 
     # Room Size Per Individual Parameters:
     size_per_individual_workplace = 1,

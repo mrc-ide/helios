@@ -32,8 +32,6 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
   volume_per_person <- parameters_list[[paste0("volume_per_person_",setting)]]
   room_volumes <- location_sizes*volume_per_person
 
-    #old
-    #room_vol <- parameters_list[[paste0("room_volume_", setting)]]  #currently calculated by pop size of specific location * setting-specific density, adjust ach formula to be calculated like this)
 
   # alpha values
   alpha_values <- ach_values + kD
@@ -85,7 +83,7 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   }
 
   return(efficacy_values)
-
+}
 
 #Set ACH distribution for a setting type
 #need to add validation
