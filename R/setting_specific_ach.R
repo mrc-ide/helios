@@ -85,6 +85,33 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   return(efficacy_values)
 }
 
+
+set_uvc_ach <- function (parameters_list,
+                         setting,
+                         coverage,
+                         coverage_target,
+                         coverage_type,
+                         timestep,
+                         relationship_type,
+                         max_efficacy,
+                         sigmoid_k,
+                         sigmoid_x0) {
+
+  parameters_list[[paste0("far_uvc_", setting)]] <- TRUE
+  parameters_list[[paste0("far_uvc_", setting, "_coverage")]] <- coverage
+  parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]] <- coverage_target
+  parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]] <- coverage_type
+  parameters_list[[paste0("far_uvc_", setting, "_timestep")]] <- timestep
+
+  parameters_list[[paste0("far_uvc_", setting, "_ach_efficacy_relationship")]] <- relationship_type
+  parameters_list[[paste0("far_uvc_", setting, "_max_efficacy")]] <- max_efficacy
+  parameters_list[[paste0("far_uvc_", setting, "_sigmoid_k")]] <- sigmoid_k
+  parameters_list[[paste0("far_uvc_", setting, "_sigmoid_x0")]] <- sigmoid_x0
+
+  return(parameters_list)
+
+
+}
 #Set ACH distribution for a setting type
 #need to add validation
 set_setting_specific_ach <- function(parameters_list, setting, mean, sd) {
