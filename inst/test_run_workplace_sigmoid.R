@@ -1,8 +1,6 @@
 #Test Run with workplace sigmoid efficacy
 
 library(helios)
-devtools::load_all()
-
 parameters_list <- get_parameters(
   overrides = list(
     human_population = 1000,
