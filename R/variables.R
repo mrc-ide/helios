@@ -272,16 +272,6 @@ create_variables <- function(parameters_list) {
 
   ## getting specific efficacies for each location based on the ACH, rather than single efficacy
   setting_types <- c("workplace", "school", "leisure", "household") #need to double check this
-  for (setting in setting_types) {
-    if (parameters_list[[paste0("far_uvc_", setting)]]) {
-      parameters_list[[paste0(setting, "_specific_efficacy")]] <- calculate_efficacy_from_ach(
-        ach_values = parameters_list[[paste0(setting, "_specific_ach")]],
-        parameters_list = parameters_list,
-        setting = setting
-      )
-    }
-  }
-
   #if any setting has uvc installed, get sizes of settings
   if (any(parameters_list$far_uvc_joint,
           parameters_list$far_uvc_workplace,
