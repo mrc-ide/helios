@@ -13,10 +13,11 @@ parameters_list <- get_parameters(
   archetype = "sars_cov_2"
 )
 
-parameters_list <- set_setting_specific_ach(parameters_list, setting = "workplace", mean = 4.8, sd = 2.0)
-parameters_list <- set_setting_specific_ach(parameters_list, setting = "school",    mean = 3.5, sd = 1.5)
-parameters_list <- set_setting_specific_ach(parameters_list, setting = "leisure",   mean = 5.0, sd = 2.0)
-parameters_list <- set_setting_specific_ach(parameters_list, setting = "household", mean = 2.0, sd = 1.0)
+parameters_list <- parameters_list %>%
+  set_setting_specific_ach("workplace", mean = 4.8, sd = 2.0) %>%
+  set_setting_specific_ach("school",    mean = 3.5, sd = 1.5) %>%
+  set_setting_specific_ach("leisure",   mean = 5.0, sd = 2.0) %>%
+  set_setting_specific_ach("household", mean = 2.0, sd = 1.0)
 
 parameters_list <- set_uvc_ach(
   parameters_list,

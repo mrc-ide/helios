@@ -220,11 +220,11 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     setting_specific_ach_household_mean = NULL,
     setting_specific_ach_household_sd = NULL,
 
-    # Volume per person parameters (density values)
-    volume_per_person_workplace = 1,
-    volume_per_person_school = 1,
-    volume_per_person_leisure = 1,
-    volume_per_person_household = 1,
+    # Volume per person parameters (density values, m^3, room heights are assumptions)
+    volume_per_person_workplace = 27, #10m^2 *2.7m
+    volume_per_person_school = 10, # 3.33m^2 *3m
+    volume_per_person_leisure = 8, # 2m^2*4M
+    volume_per_person_household = 50, # 20m^2 * 2.5m
 
   # W-R parameters
     wells_riley_emission_rate = 27,  # FFU/hour
