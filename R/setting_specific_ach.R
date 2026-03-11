@@ -70,7 +70,7 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
 
   #functions for constant
   if (relationship_type == "constant") {
-    efficacy <- parameters_list[[paste0("far_uvc_", setting, "_efficacy")]]
+    efficacy <- parameters_list[[paste0("far_uvc_", setting, "_max_efficacy")]]
     #same efficacy for each location in a setting
     efficacy_values <- rep(efficacy, length(ach_values))
     #efficacy = max_eff/(1+ exp(-k(x - x0))),
