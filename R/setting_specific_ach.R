@@ -18,8 +18,7 @@ generate_setting_specific_ach <- function(parameters_list, setting, number_of_lo
 #Convert ACH values to riskiness using W-R
 
 convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
-
-  #W-R parameters from parameters_list in parameters.R
+  # W-R parameters from parameters_list in parameters.R
   I <- 1
   pi <- parameters_list$wells_riley_emission_rate
   kD <- parameters_list$wells_riley_decay_rate
@@ -27,29 +26,24 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
   RRtv <- parameters_list$wells_riley_respiratory_rate_factor
   t <- parameters_list$wells_riley_time_in_room
 
-  #getting number of people in each location
-  location_sizes <- parameters_list$setting_sizes[[setting]]
-  volume_per_person <- parameters_list[[paste0("volume_per_person_",setting)]]
-  room_volumes <- location_sizes*volume_per_person
-
+  volume_per_person <- parameters_list[[paste0("volume_per_person_", setting)]]
 
   # alpha values
   alpha_values <- ach_values + kD
 
-  # steady-state concentration
-  Css_values <- (I * pi) / (alpha_values * room_volumes)
+  # steady-state concentration (per-person volume, density-based)
+  Css_values <- (I * pi) / (alpha_values * volume_per_person)
 
   # p(infection)
   p_inf_values <- 1 - exp(-r * Css_values * RRtv * t)
 
-  #  reference p_inf for normalization
+  # reference p_inf for normalization
   ach_ref <- parameters_list$wells_riley_reference_ach
   if (is.null(ach_ref)) {
     ach_ref <- median(ach_values)
   }
   alpha_ref <- ach_ref + kD
-  room_vol_ref <- median(room_volumes)
-  Css_ref <- (I * pi) / (alpha_ref * room_vol_ref)
+  Css_ref <- (I * pi) / (alpha_ref * volume_per_person)
   p_inf_ref <- 1 - exp(-r * Css_ref * RRtv * t)
 
   # relative riskiness
