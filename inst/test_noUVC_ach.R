@@ -1,13 +1,14 @@
 library(dplyr)
 library(ggplot2)
+library(tidyr)
 
 devtools::load_all()
 
 base_params <- get_parameters(
   overrides = list(
-    human_population = 5000 * 2,
-    number_initial_S = 4995 * 2,
-    number_initial_E = 5 * 2,
+    human_population = 10000,
+    number_initial_S = 9990,
+    number_initial_E = 10,
     number_initial_I = 0,
     number_initial_R = 0,
     simulation_time  = 150,
@@ -16,26 +17,22 @@ base_params <- get_parameters(
   archetype = "sars_cov_2"
 )
 
-output_2a <- base_params %>%
+params_2a <- base_params %>%
   set_setting_specific_ach("workplace", mean = 4.8, sd = 1.5) %>%
   set_setting_specific_ach("school",    mean = 4.0, sd = 1.2) %>%
   set_setting_specific_ach("leisure",   mean = 3.0, sd = 1.0) %>%
-  set_setting_specific_ach("household", mean = 0.5, sd = 0.2) %>%
-  run_simulation()
+  set_setting_specific_ach("household", mean = 0.5, sd = 0.2)
 
- output_df_2a <- output_2a
+variables_output <- create_variables(params_2a)
+params_with_riskiness <- variables_output$parameters_list
+
+output_2a <- run_simulation(params_2a)
+output_df_2a <- output_2a
 
 
-
-cat("Peak infections:", max(output_df_2a$I_count),
-    "at timestep", which.max(output_df_2a$I_count), "\n")
-cat("Attack rate:",
-    round(max(output_df_2a$R_count) / base_params$human_population * 100, 1), "%\n")
-cat("Final susceptible:", tail(output_df_2a$S_count, 1), "\n\n")
-
-output_df_2a %>%
+p1 <- output_df_2a %>%
   select(timestep, S_count, E_count, I_count, R_count) %>%
-  tidyr::pivot_longer(
+  pivot_longer(
     cols      = ends_with("_count"),
     names_to  = "compartment",
     values_to = "count"
@@ -65,3 +62,57 @@ output_df_2a %>%
   ) +
   theme_minimal() +
   theme(legend.position = "bottom")
+
+print(p1)
+
+riskiness_data <- data.frame(
+  setting = c(
+    rep("Workplace", length(params_with_riskiness$workplace_specific_riskiness)),
+    rep("School", length(params_with_riskiness$school_specific_riskiness)),
+    rep("Leisure", length(params_with_riskiness$leisure_specific_riskiness)),
+    rep("Household", length(params_with_riskiness$household_specific_riskiness))
+  ),
+  riskiness = c(
+    params_with_riskiness$workplace_specific_riskiness,
+    params_with_riskiness$school_specific_riskiness,
+    params_with_riskiness$leisure_specific_riskiness,
+    params_with_riskiness$household_specific_riskiness
+  )
+)
+
+p2 <- riskiness_data %>%
+  ggplot(aes(x = riskiness, fill = setting)) +
+  geom_histogram(bins = 30, alpha = 0.7, position = "identity") +
+  facet_wrap(~setting, scales = "free_y", ncol = 2) +
+  scale_fill_manual(
+    values = c(
+      "Workplace" = "steelblue",
+      "School"    = "orange",
+      "Leisure"   = "purple",
+      "Household" = "darkgreen"
+    )
+  ) +
+  labs(
+    title = "Riskiness Distributions by Setting (from ACH)",
+    x     = "Relative Riskiness",
+    y     = "Count",
+    fill  = "Setting"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+print(p2)
+
+# Summary statistics for riskiness
+cat("\n=== RISKINESS SUMMARY ===\n")
+riskiness_summary <- riskiness_data %>%
+  group_by(setting) %>%
+  summarise(
+    mean_riskiness = mean(riskiness),
+    median_riskiness = median(riskiness),
+    sd_riskiness = sd(riskiness),
+    min_riskiness = min(riskiness),
+    max_riskiness = max(riskiness)
+  )
+
+print(riskiness_summary)
