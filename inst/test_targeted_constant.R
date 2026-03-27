@@ -22,19 +22,19 @@ output_2b <- base_params %>%
   set_setting_specific_ach("leisure",   mean = 3.0, sd = 1.0) %>%
   set_setting_specific_ach("household", mean = 0.5, sd = 0.2) %>%
   set_uvc_ach("workplace", coverage = 0.5, coverage_target = "square_footage",
-              coverage_type = "random", timestep = 0,
+              coverage_type = "targeted_riskiness", timestep = 0,
               relationship_type = "constant", max_efficacy = 0.5,
               sigmoid_k = NULL, sigmoid_x0 = NULL) %>%
   set_uvc_ach("school",    coverage = 0.5, coverage_target = "square_footage",
-              coverage_type = "random", timestep = 0,
+              coverage_type = "targeted_riskiness", timestep = 0,
               relationship_type = "constant", max_efficacy = 0.5,
               sigmoid_k = NULL, sigmoid_x0 = NULL) %>%
   set_uvc_ach("leisure",   coverage = 0.5, coverage_target = "square_footage",
-              coverage_type = "random", timestep = 0,
+              coverage_type = "targeted_riskiness", timestep = 0,
               relationship_type = "constant", max_efficacy = 0.5,
               sigmoid_k = NULL, sigmoid_x0 = NULL) %>%
   set_uvc_ach("household", coverage = 0.5, coverage_target = "square_footage",
-              coverage_type = "random", timestep = 0,
+              coverage_type = "targeted_riskiness", timestep = 0,
               relationship_type = "constant", max_efficacy = 0.5,
               sigmoid_k = NULL, sigmoid_x0 = NULL) %>%
   run_simulation()
@@ -67,7 +67,7 @@ output_df_2b %>%
     )
   ) +
   labs(
-    title = "Epidemic | ACH Pipeline | Random UVC | (constant 50% efficacy, 50% coverage)",
+    title = "Epidemic | ACH Pipeline | targeted UVC | (constant 50% efficacy, 50% coverage)",
     x     = "Timestep",
     y     = "Number of individuals",
     color = "Compartment"

@@ -116,3 +116,10 @@ riskiness_summary <- riskiness_data %>%
   )
 
 print(riskiness_summary)
+
+variables_output_2a <- create_variables(params_2a)
+cat("\n=== ACH Summary ===\n")
+cat("Household ACH: mean=", mean(variables_output_2a$parameters_list$household_specific_ach),
+    "sd=", sd(variables_output_2a$parameters_list$household_specific_ach), "\n")
+cat("Workplace ACH: mean=", mean(variables_output_2a$parameters_list$workplace_specific_ach),
+    "sd=", sd(variables_output_2a$parameters_list$workplace_specific_ach), "\n")

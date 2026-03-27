@@ -16,33 +16,40 @@ base_params <- get_parameters(
   archetype = "sars_cov_2"
 )
 
-output_2b <- base_params %>%
+output_2c <- base_params %>%
   set_setting_specific_ach("workplace", mean = 4.8, sd = 1.5) %>%
   set_setting_specific_ach("school",    mean = 4.0, sd = 1.2) %>%
   set_setting_specific_ach("leisure",   mean = 3.0, sd = 1.0) %>%
   set_setting_specific_ach("household", mean = 0.5, sd = 0.2) %>%
   set_uvc_ach("workplace", coverage = 0.5, coverage_target = "square_footage",
-              coverage_type = "random", timestep = 0,
-              relationship_type = "constant", max_efficacy = 0.5,
-              sigmoid_k = NULL, sigmoid_x0 = NULL) %>%
+              coverage_type = "targeted_riskiness", timestep = 0,
+              relationship_type = "sigmoid", max_efficacy = 0.9,
+              sigmoid_k = 1, sigmoid_x0 = 4.8) %>%
   set_uvc_ach("school",    coverage = 0.5, coverage_target = "square_footage",
-              coverage_type = "random", timestep = 0,
-              relationship_type = "constant", max_efficacy = 0.5,
-              sigmoid_k = NULL, sigmoid_x0 = NULL) %>%
+              coverage_type = "targeted_riskiness", timestep = 0,
+              relationship_type = "sigmoid", max_efficacy = 0.9,
+              sigmoid_k = 1, sigmoid_x0 = 4) %>%
   set_uvc_ach("leisure",   coverage = 0.5, coverage_target = "square_footage",
-              coverage_type = "random", timestep = 0,
-              relationship_type = "constant", max_efficacy = 0.5,
-              sigmoid_k = NULL, sigmoid_x0 = NULL) %>%
+              coverage_type = "targeted_riskiness", timestep = 0,
+              relationship_type = "sigmoid", max_efficacy = 0.9,
+              sigmoid_k = 1, sigmoid_x0 = 3.0) %>%
   set_uvc_ach("household", coverage = 0.5, coverage_target = "square_footage",
-              coverage_type = "random", timestep = 0,
-              relationship_type = "constant", max_efficacy = 0.5,
-              sigmoid_k = NULL, sigmoid_x0 = NULL) %>%
+              coverage_type = "targeted_riskiness", timestep = 0,
+              relationship_type = "sigmoid", max_efficacy = 0.9,
+              sigmoid_k = 1, sigmoid_x0 = 0.5) %>%
   run_simulation()
 
-output_df_2b <- output_2b
+output_df_2c <- output_2c
 
 
-output_df_2b %>%
+cat("\n=== KEY METRICS - Run 2C (ACH + UVC sigmoid efficacy) ===\n")
+cat("Peak infections:", max(output_df_2c$I_count),
+    "at timestep", which.max(output_df_2c$I_count), "\n")
+cat("Attack rate:",
+    round(max(output_df_2c$R_count) / base_params$human_population * 100, 1), "%\n")
+cat("Final susceptible:", tail(output_df_2c$S_count, 1), "\n\n")
+
+output_df_2c %>%
   select(timestep, S_count, E_count, I_count, R_count) %>%
   tidyr::pivot_longer(
     cols      = ends_with("_count"),
@@ -67,7 +74,7 @@ output_df_2b %>%
     )
   ) +
   labs(
-    title = "Epidemic | ACH Pipeline | Random UVC | (constant 50% efficacy, 50% coverage)",
+    title = "Epidemic | ACH | targeted UVC | sigmoid efficacy, 50% coverage)",
     x     = "Timestep",
     y     = "Number of individuals",
     color = "Compartment"

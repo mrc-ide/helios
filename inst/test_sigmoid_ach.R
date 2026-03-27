@@ -74,7 +74,7 @@ output_df_2c %>%
     )
   ) +
   labs(
-    title = "Epidemic | ACH | UVC sigmoid efficacy, 50% coverage)",
+    title = "Epidemic | ACH | Random UVC | sigmoid efficacy, 50% coverage)",
     x     = "Timestep",
     y     = "Number of individuals",
     color = "Compartment"
