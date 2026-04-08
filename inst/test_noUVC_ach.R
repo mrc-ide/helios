@@ -1,6 +1,7 @@
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+library(truncnorm)
 
 devtools::load_all()
 
@@ -84,6 +85,10 @@ p2 <- riskiness_data %>%
   ggplot(aes(x = riskiness, fill = setting)) +
   geom_histogram(bins = 30, alpha = 0.7, position = "identity") +
   facet_wrap(~setting, scales = "free_y", ncol = 2) +
+  scale_x_continuous(
+    breaks = seq(0.5,3, by = 0.5),
+    limits = c(0.5,3)
+  ) +
   scale_fill_manual(
     values = c(
       "Workplace" = "steelblue",
