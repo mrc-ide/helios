@@ -212,8 +212,8 @@ get_parameters <- function(overrides = list(), archetype = "none") {
 
     # Setting-Specific ACH Parameters: Leisure
     setting_specific_ach_leisure = FALSE,
-    setting_specific_ach_leisure_meanlog = NULL,
-    setting_specific_ach_leisure_sdlog = NULL,
+    setting_specific_ach_leisure_mean = NULL,
+    setting_specific_ach_leisure_sd = NULL,
 
     # Setting-Specific ACH Parameters: Household
     setting_specific_ach_household = FALSE,
