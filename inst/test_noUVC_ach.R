@@ -7,9 +7,9 @@ devtools::load_all()
 
 base_params <- get_parameters(
   overrides = list(
-    human_population = 10000,
-    number_initial_S = 9990,
-    number_initial_E = 10,
+    human_population = 10000 *25,
+    number_initial_S = 9990*25,
+    number_initial_E = 10*25,
     number_initial_I = 0,
     number_initial_R = 0,
     simulation_time  = 150,
@@ -83,7 +83,7 @@ riskiness_data <- data.frame(
 
 p2 <- riskiness_data %>%
   ggplot(aes(x = riskiness, fill = setting)) +
-  geom_histogram(bins = 30, alpha = 0.7, position = "identity") +
+  geom_histogram(bins = 40, alpha = 0.7, position = "identity") +
   facet_wrap(~setting, scales = "free_y", ncol = 2) +
   scale_x_continuous(
     breaks = seq(0.5,3, by = 0.5),
