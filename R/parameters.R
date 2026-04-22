@@ -281,7 +281,9 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_household_efficacy = NULL,
     far_uvc_household_timestep = NULL,
 
-    #ach to efficacy parameters_workplace
+
+
+  #ach to efficacy parameters_workplace
     far_uvc_workplace_ach_efficacy_relationship = NULL, #constant or sigmoid
     far_uvc_workplace_efficacy = NULL, #constant
     far_uvc_workplace_max_efficacy = NULL,  # sigmoid
@@ -308,6 +310,23 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     far_uvc_household_max_efficacy = NULL,  # sigmoid
     far_uvc_household_sigmoid_k = NULL,
     far_uvc_household_sigmoid_x0 = NULL,
+
+  # Intervention parameters (Wells-Riley ACH-based efficacy):
+    intervention_workplace_active = FALSE,
+    intervention_workplace_delta_ach = 0,
+    intervention_workplace_delta_uv = 0,
+
+    intervention_school_active = FALSE,
+    intervention_school_delta_ach = 0,
+    intervention_school_delta_uv = 0,
+
+    intervention_leisure_active = FALSE,
+    intervention_leisure_delta_ach = 0,
+    intervention_leisure_delta_uv = 0,
+
+    intervention_household_active = FALSE,
+    intervention_household_delta_ach = 0,
+    intervention_household_delta_uv = 0,
 
     # Room Size Per Individual Parameters:
     size_per_individual_workplace = 1,

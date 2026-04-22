@@ -199,7 +199,6 @@ create_variables <- function(parameters_list) {
     setting = "household"
   )
 
-
   num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
   parameters_list$workplace_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
@@ -225,6 +224,7 @@ create_variables <- function(parameters_list) {
     parameters_list = parameters_list,
     setting = "school"
   )
+
   num_leisure <- length(parameters_list$setting_sizes$leisure)
   parameters_list$leisure_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
@@ -237,7 +237,7 @@ create_variables <- function(parameters_list) {
     parameters_list = parameters_list,
     setting = "leisure"
   )
-  # If any setting has UVC installed, retrieve the sizes of all of the settings:
+  # If any setting has UVC installed, generate far UVC switches and handle joint intervention:
   if (
     any(
       parameters_list$far_uvc_joint,
@@ -247,81 +247,49 @@ create_variables <- function(parameters_list) {
       parameters_list$far_uvc_household
     )
   ) {
-    # Generate and append the far UVC switches for settings in which it has been switched on:
-    parameters_list <- generate_far_uvc_switches(
-      parameters_list,
-      variables_list
-    )
-
-    # If joint has been specified, updating setting-type specific far UVC parameters used during model running
-    setting_types <- c("workplace", "school", "leisure") # , "household")
-    if (parameters_list$far_uvc_joint) {
-      parameters_list[paste0("far_uvc_", setting_types)] <- TRUE
-      parameters_list[paste0(
-        "far_uvc_",
-        setting_types,
-        "_efficacy"
-      )] <- parameters_list$far_uvc_joint_efficacy
-      parameters_list[paste0(
-        "far_uvc_",
-        setting_types,
-        "_timestep"
-      )] <- parameters_list$far_uvc_joint_timestep
-    }
-  }
-
-  ## getting specific efficacies for each location based on the ACH, rather than single efficacy
-  setting_types <- c("workplace", "school", "leisure", "household") #need to double check this
-  #if any setting has uvc installed, get sizes of settings
-  if (any(parameters_list$far_uvc_joint,
-          parameters_list$far_uvc_workplace,
-          parameters_list$far_uvc_school,
-          parameters_list$far_uvc_leisure,
-          parameters_list$far_uvc_household)) {
-    #generate far uvc switches for settings where its turned on
     parameters_list <- generate_far_uvc_switches(parameters_list, variables_list)
 
-    #if joint, updates setting specific uvc params
-    setting_types <- c("workplace", "school", "leisure") # , "household")
+    setting_types <- c("workplace", "school", "leisure")
     if (parameters_list$far_uvc_joint) {
       parameters_list[paste0("far_uvc_", setting_types)] <- TRUE
       parameters_list[paste0("far_uvc_", setting_types, "_efficacy")] <- parameters_list$far_uvc_joint_efficacy
       parameters_list[paste0("far_uvc_", setting_types, "_timestep")] <- parameters_list$far_uvc_joint_timestep
     }
-
-    #calculate location specific ACH-based efficacy
-    if (parameters_list$far_uvc_workplace) {
-      parameters_list$workplace_specific_efficacy <- calculate_efficacy_from_ach(
-        ach_values = parameters_list$workplace_specific_ach,
-        parameters_list = parameters_list,
-        setting = "workplace"
-      )
-    }
-
-    if (parameters_list$far_uvc_school) {
-      parameters_list$school_specific_efficacy <- calculate_efficacy_from_ach(
-        ach_values = parameters_list$school_specific_ach,
-        parameters_list = parameters_list,
-        setting = "school"
-      )
-    }
-
-    if (parameters_list$far_uvc_leisure) {
-      parameters_list$leisure_specific_efficacy <- calculate_efficacy_from_ach(
-        ach_values = parameters_list$leisure_specific_ach,
-        parameters_list = parameters_list,
-        setting = "leisure"
-      )
-    }
-
-    if (parameters_list$far_uvc_household) {
-      parameters_list$household_specific_efficacy <- calculate_efficacy_from_ach(
-        ach_values = parameters_list$household_specific_ach,
-        parameters_list = parameters_list,
-        setting = "household"
-      )
-    }
   }
+
+  # Calculate location-specific efficacy from ACH using Wells-Riley for any active intervention:
+  if (isTRUE(parameters_list$intervention_workplace_active)) {
+    parameters_list$workplace_specific_efficacy <- calculate_efficacy_from_ach(
+      ach_values = parameters_list$workplace_specific_ach,
+      parameters_list = parameters_list,
+      setting = "workplace"
+    )
+  }
+
+  if (isTRUE(parameters_list$intervention_school_active)) {
+    parameters_list$school_specific_efficacy <- calculate_efficacy_from_ach(
+      ach_values = parameters_list$school_specific_ach,
+      parameters_list = parameters_list,
+      setting = "school"
+    )
+  }
+
+  if (isTRUE(parameters_list$intervention_leisure_active)) {
+    parameters_list$leisure_specific_efficacy <- calculate_efficacy_from_ach(
+      ach_values = parameters_list$leisure_specific_ach,
+      parameters_list = parameters_list,
+      setting = "leisure"
+    )
+  }
+
+  if (isTRUE(parameters_list$intervention_household_active)) {
+    parameters_list$household_specific_efficacy <- calculate_efficacy_from_ach(
+      ach_values = parameters_list$household_specific_ach,
+      parameters_list = parameters_list,
+      setting = "household"
+    )
+  }
+
   # Return the list of model variables:
   return(list(
     variables_list = variables_list,
@@ -435,7 +403,7 @@ generate_initial_age_classes <- function(parameters_list) {
       parameters_list$initial_proportion_adult,
       parameters_list$initial_proportion_elderly
     ) !=
-      1
+    1
   ) {
     stop("initial age class proportions do not sum to 1")
   }
@@ -541,8 +509,8 @@ generate_initial_schools <- function(parameters_list, age_class_variable) {
 #' @family variables
 #' @export
 generate_initial_schools_bootstrap <- function(
-  parameters_list,
-  age_class_variable
+    parameters_list,
+    age_class_variable
 ) {
   # Check that the requisite parameters are present:
   if (!("human_population" %in% names(parameters_list))) {
@@ -637,9 +605,9 @@ generate_initial_schools_bootstrap <- function(
 #' @family variables
 #' @export
 generate_initial_workplaces <- function(
-  parameters_list,
-  age_class_variable,
-  school_variable
+    parameters_list,
+    age_class_variable,
+    school_variable
 ) {
   # Checking that the parameter list contains the requisite parameters
   if (!("human_population" %in% names(parameters_list))) {
@@ -817,7 +785,7 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
   ## Checking population size N is the same as implied by age_class_variable
   if (
     parameters_list$human_population !=
-      age_class_variable$get_size_of(age_class_variable$get_categories())
+    age_class_variable$get_size_of(age_class_variable$get_categories())
   ) {
     stop("Human population and age_class_vector are different lengths")
   }
@@ -863,7 +831,7 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
     ## Looping over this whilst current household isn't full
     while (
       length(temp_household) < household_size &&
-        sum(assigned) < parameters_list$human_population
+      sum(assigned) < parameters_list$human_population
     ) {
       # Randomly select an unassigned individual
       candidates <- which(!assigned)

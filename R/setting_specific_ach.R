@@ -89,7 +89,7 @@ set_intervention_ach <- function(parameters_list,
                                  timestep,
                                  delta_ach = 0,
                                  delta_uv = 0) {
-
+  parameters_list[[paste0("intervention_", setting, "_active")]] <- TRUE
   parameters_list[[paste0("intervention_", setting, "_coverage")]] <- coverage
   parameters_list[[paste0("intervention_", setting, "_coverage_target")]] <- coverage_target
   parameters_list[[paste0("intervention_", setting, "_coverage_type")]] <- coverage_type
