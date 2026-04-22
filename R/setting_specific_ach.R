@@ -52,6 +52,8 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
   return(riskiness)
 }
 
+
+
 #Getting AQI efficacy from ACH
 calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   #determine which ach -> efficacy relationship is being used (need to make sure these are all defined for each setting)
@@ -79,33 +81,51 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   return(efficacy_values)
 }
 
+set_intervention_ach <- function(parameters_list,
+                                 setting,
+                                 coverage,
+                                 coverage_target,
+                                 coverage_type,
+                                 timestep,
+                                 delta_ach = 0,
+                                 delta_uv = 0) {
 
-set_uvc_ach <- function (parameters_list,
-                         setting,
-                         coverage,
-                         coverage_target,
-                         coverage_type,
-                         timestep,
-                         relationship_type,
-                         max_efficacy,
-                         sigmoid_k,
-                         sigmoid_x0) {
-
-  parameters_list[[paste0("far_uvc_", setting)]] <- TRUE
-  parameters_list[[paste0("far_uvc_", setting, "_coverage")]] <- coverage
-  parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]] <- coverage_target
-  parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]] <- coverage_type
-  parameters_list[[paste0("far_uvc_", setting, "_timestep")]] <- timestep
-
-  parameters_list[[paste0("far_uvc_", setting, "_ach_efficacy_relationship")]] <- relationship_type
-  parameters_list[[paste0("far_uvc_", setting, "_max_efficacy")]] <- max_efficacy
-  parameters_list[[paste0("far_uvc_", setting, "_sigmoid_k")]] <- sigmoid_k
-  parameters_list[[paste0("far_uvc_", setting, "_sigmoid_x0")]] <- sigmoid_x0
+  parameters_list[[paste0("intervention_", setting, "_coverage")]] <- coverage
+  parameters_list[[paste0("intervention_", setting, "_coverage_target")]] <- coverage_target
+  parameters_list[[paste0("intervention_", setting, "_coverage_type")]] <- coverage_type
+  parameters_list[[paste0("intervention_", setting, "_timestep")]] <- timestep
+  parameters_list[[paste0("intervention_", setting, "_delta_ach")]] <- delta_ach
+  parameters_list[[paste0("intervention_", setting, "_delta_uv")]] <- delta_uv
 
   return(parameters_list)
-
-
 }
+# set_uvc_ach <- function (parameters_list,
+#                          setting,
+#                          coverage,
+#                          coverage_target,
+#                          coverage_type,
+#                          timestep,
+#                          relationship_type,
+#                          max_efficacy,
+#                          sigmoid_k,
+#                          sigmoid_x0) {
+#
+#   parameters_list[[paste0("far_uvc_", setting)]] <- TRUE
+#   parameters_list[[paste0("far_uvc_", setting, "_coverage")]] <- coverage
+#   parameters_list[[paste0("far_uvc_", setting, "_coverage_target")]] <- coverage_target
+#   parameters_list[[paste0("far_uvc_", setting, "_coverage_type")]] <- coverage_type
+#   parameters_list[[paste0("far_uvc_", setting, "_timestep")]] <- timestep
+#
+#   parameters_list[[paste0("far_uvc_", setting, "_ach_efficacy_relationship")]] <- relationship_type
+#   parameters_list[[paste0("far_uvc_", setting, "_max_efficacy")]] <- max_efficacy
+#   parameters_list[[paste0("far_uvc_", setting, "_sigmoid_k")]] <- sigmoid_k
+#   parameters_list[[paste0("far_uvc_", setting, "_sigmoid_x0")]] <- sigmoid_x0
+#
+#   return(parameters_list)
+#
+#
+# }
+
 #Set ACH distribution for a setting type
 #need to add validation
 set_setting_specific_ach <- function(parameters_list, setting, mean, sd) {
@@ -115,3 +135,57 @@ set_setting_specific_ach <- function(parameters_list, setting, mean, sd) {
 
   return(parameters_list)
 }
+
+calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
+  I      <- 1
+  pi     <- parameters_list$wells_riley_emission_rate
+  kD     <- parameters_list$wells_riley_decay_rate
+  r      <- parameters_list$wells_riley_infection_prob_per_ffu
+  RRtv   <- parameters_list$wells_riley_respiratory_rate_factor
+  t      <- parameters_list$wells_riley_time_in_room
+  V      <- parameters_list[[paste0("volume_per_person_", setting)]]
+
+  delta_ach       <- parameters_list[[paste0("intervention_", setting, "_delta_ach")]]
+  delta_lambda_uv <- parameters_list[[paste0("intervention_", setting, "_delta_lambda_uv")]]
+  if (is.null(delta_ach))       delta_ach <- 0
+  if (is.null(delta_lambda_uv)) delta_lambda_uv <- 0
+
+  alpha_pre  <- ach_values + kD
+  alpha_post <- (ach_values + delta_ach) + (kD + delta_lambda_uv)
+
+  p_pre  <- 1 - exp(-r * (I * pi_q / (alpha_pre  * V)) * RRtv * t)
+  p_post <- 1 - exp(-r * (I * pi_q / (alpha_post * V)) * RRtv * t)
+
+  efficacy_values <- 1 - p_post / p_pre
+
+  return(efficacy_values)
+}
+# calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
+#   #determine which ach -> efficacy relationship is being used (need to make sure these are all defined for each setting)
+#   relationship_type <- parameters_list[[paste0("far_uvc_", setting, "_ach_efficacy_relationship")]]
+#
+#   #use constant as default
+#   if (is.null(relationship_type)) {
+#     relationship_type <- "constant"
+#   }
+#
+#   #functions for constant
+#   if (relationship_type == "constant") {
+#     efficacy <- parameters_list[[paste0("far_uvc_", setting, "_max_efficacy")]]
+#     #same efficacy for each location in a setting
+#     efficacy_values <- rep(efficacy, length(ach_values))
+#     #efficacy = max_eff/(1+ exp(-k(x - x0))),
+#     #need to define all of these in the parameter list
+#   } else if (relationship_type == "sigmoid") {
+#     max_eff <- parameters_list[[paste0("far_uvc_", setting, "_max_efficacy")]]
+#     k <- parameters_list[[paste0("far_uvc_", setting, "_sigmoid_k")]]
+#     x0 <- parameters_list[[paste0("far_uvc_", setting, "_sigmoid_x0")]]
+#     efficacy_values <- max_eff / (1 + exp(-k * (ach_values - x0)))
+#   }
+#
+#   return(efficacy_values)
+# }
+
+
+
+
