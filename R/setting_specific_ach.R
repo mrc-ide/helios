@@ -153,8 +153,8 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   alpha_pre  <- ach_values + kD
   alpha_post <- (ach_values + delta_ach) + (kD + delta_uv)
 
-  p_pre  <- 1 - exp(-r * (I * pi_q / (alpha_pre  * V)) * RRtv * t)
-  p_post <- 1 - exp(-r * (I * pi_q / (alpha_post * V)) * RRtv * t)
+  p_pre  <- 1 - exp(-r * (I * pi / (alpha_pre  * V)) * RRtv * t)
+  p_post <- 1 - exp(-r * (I * pi / (alpha_post * V)) * RRtv * t)
 
   efficacy_values <- 1 - p_post / p_pre
 

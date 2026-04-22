@@ -237,7 +237,8 @@ create_variables <- function(parameters_list) {
     parameters_list = parameters_list,
     setting = "leisure"
   )
-  # If any setting has UVC installed, generate far UVC switches and handle joint intervention:
+
+  # If any setting has UVC installed, retrieve the sizes of all of the settings:
   if (
     any(
       parameters_list$far_uvc_joint,
@@ -257,7 +258,7 @@ create_variables <- function(parameters_list) {
     }
   }
 
-  # Calculate location-specific efficacy from ACH using Wells-Riley for any active intervention:
+  # Calculate location-specific efficacy from ACH using W-R
   if (isTRUE(parameters_list$intervention_workplace_active)) {
     parameters_list$workplace_specific_efficacy <- calculate_efficacy_from_ach(
       ach_values = parameters_list$workplace_specific_ach,
