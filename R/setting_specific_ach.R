@@ -146,12 +146,12 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   V      <- parameters_list[[paste0("volume_per_person_", setting)]]
 
   delta_ach       <- parameters_list[[paste0("intervention_", setting, "_delta_ach")]]
-  delta_lambda_uv <- parameters_list[[paste0("intervention_", setting, "_delta_lambda_uv")]]
+  delta_uv <- parameters_list[[paste0("intervention_", setting, "_delta_uv")]]
   if (is.null(delta_ach))       delta_ach <- 0
-  if (is.null(delta_lambda_uv)) delta_lambda_uv <- 0
+  if (is.null(delta_uv)) delta_uv <- 0
 
   alpha_pre  <- ach_values + kD
-  alpha_post <- (ach_values + delta_ach) + (kD + delta_lambda_uv)
+  alpha_post <- (ach_values + delta_ach) + (kD + delta_uv)
 
   p_pre  <- 1 - exp(-r * (I * pi_q / (alpha_pre  * V)) * RRtv * t)
   p_post <- 1 - exp(-r * (I * pi_q / (alpha_post * V)) * RRtv * t)
