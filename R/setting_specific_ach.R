@@ -186,6 +186,47 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
 #   return(efficacy_values)
 # }
 
+#### Helper Functions
+#Converting UVC to delta_uv ACH equivalent
+#inputs f: frac of room irradiated, E_acg: avg fluence rate, k = UV inactivation constant
+uv_to_delta <- function(f, E_avg, k) {
+  f*E_avg_k*3.6
+}
 
+#Input: ACH, Output: Efficacy
+ach_to_efficacy <- function(baseline_ach,
+                            delta_ach = 0,
+                            delta_uv = 0,
+                            kD = 0.61,
+                            r = 0.0126,
+                            pi = 397,
+                            I = 1,
+                            RRtv = 1,
+                            t = 1,
+                            V = 50) {
+  A <- r * I * pi * RRtv * t/V
+  alpha_pre <- baseline_ach + kD
+  alpha_post <- baseline_ach + delta_ach + kD + delta_uv
+  p_pre <- 1 - exp(-A/alpha_pre)
+  p_post <- 1 - exp(-A/alpha_post)
+  return(1- p_post/p_pre)
+}
+
+#efficacy to delta ACH
+efficacy_to_delta <- function(target_efficacy,
+                              baseline_ach,
+                              kD = 0.61,
+                              r = 0.0126,
+                              pi = 397,
+                              I = 1,
+                              RRtv = 1,
+                              t = 1,
+                              V = 50) {
+  A          <- r * I * pi_q * RRtv * t / V
+  alpha_pre  <- baseline_ach + kD
+  p_pre      <- 1 - exp(-A / alpha_pre)
+  alpha_post <- -A / log(1 - p_pre * (1 - desired_efficacy))
+  return(alpha_post - alpha_pre)
+}
 
 
