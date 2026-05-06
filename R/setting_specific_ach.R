@@ -257,10 +257,10 @@ efficacy_to_delta <- function(target_efficacy,
 #   #determine which ach -> efficacy relationship is being used (need to make sure these are all defined for each setting)
 #  # relationship_type <- parameters_list[[paste0("far_uvc_", setting, "_ach_efficacy_relationship")]]
 #
-#   #use constant as default
-#   if (is.null(relationship_type)) {
-#     relationship_type <- "constant"
-#   }
+# #   #use constant as default
+# # if (is.null(relationship_type)) {
+# #     relationship_type <- "constant"
+# #   }
 #
 #   #functions for constant
 #   if (relationship_type == "constant") {
