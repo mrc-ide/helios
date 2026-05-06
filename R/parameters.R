@@ -283,50 +283,46 @@ get_parameters <- function(overrides = list(), archetype = "none") {
 
 
 
-  #ach to efficacy parameters_workplace
-    far_uvc_workplace_ach_efficacy_relationship = NULL, #constant or sigmoid
-    far_uvc_workplace_efficacy = NULL, #constant
-    far_uvc_workplace_max_efficacy = NULL,  # sigmoid
-    far_uvc_workplace_sigmoid_k = NULL,
-    far_uvc_workplace_sigmoid_x0 = NULL,
-
-    #ach to efficacy parameters_school
-    far_uvc_school_ach_efficacy_relationship = NULL, #constant or sigmoid
-    far_uvc_school_efficacy = NULL, #constant
-    far_uvc_school_max_efficacy = NULL,  # sigmoid
-    far_uvc_school_sigmoid_k = NULL,
-    far_uvc_school_sigmoid_x0 = NULL,
-
-    #ach to efficacy parameters_leisure
-    far_uvc_leisure_ach_efficacy_relationship = NULL, #constant or sigmoid
-    far_uvc_leisure_efficacy = NULL, #constant
-    far_uvc_leisure_max_efficacy = NULL,  # sigmoid
-    far_uvc_leisure_sigmoid_k = NULL,
-    far_uvc_leisure_sigmoid_x0 = NULL,
-
-    #ach to efficacy parameters_house
-    far_uvc_household_ach_efficacy_relationship = NULL, #constant or sigmoid
-    far_uvc_household_efficacy = NULL, #constant
-    far_uvc_household_max_efficacy = NULL,  # sigmoid
-    far_uvc_household_sigmoid_k = NULL,
-    far_uvc_household_sigmoid_x0 = NULL,
+  # #ach to efficacy parameters_workplace
+  #   far_uvc_workplace_ach_efficacy_relationship = NULL, #constant or sigmoid
+  #   far_uvc_workplace_efficacy = NULL, #constant
+  #   far_uvc_workplace_max_efficacy = NULL,  # sigmoid
+  #   far_uvc_workplace_sigmoid_k = NULL,
+  #   far_uvc_workplace_sigmoid_x0 = NULL,
+  #
+  #   #ach to efficacy parameters_school
+  #   far_uvc_school_ach_efficacy_relationship = NULL, #constant or sigmoid
+  #   far_uvc_school_efficacy = NULL, #constant
+  #   far_uvc_school_max_efficacy = NULL,  # sigmoid
+  #   far_uvc_school_sigmoid_k = NULL,
+  #   far_uvc_school_sigmoid_x0 = NULL,
+  #
+  #   #ach to efficacy parameters_leisure
+  #   far_uvc_leisure_ach_efficacy_relationship = NULL, #constant or sigmoid
+  #   far_uvc_leisure_efficacy = NULL, #constant
+  #   far_uvc_leisure_max_efficacy = NULL,  # sigmoid
+  #   far_uvc_leisure_sigmoid_k = NULL,
+  #   far_uvc_leisure_sigmoid_x0 = NULL,
+  #
+  #   #ach to efficacy parameters_house
+  #   far_uvc_household_ach_efficacy_relationship = NULL, #constant or sigmoid
+  #   far_uvc_household_efficacy = NULL, #constant
+  #   far_uvc_household_max_efficacy = NULL,  # sigmoid
+  #   far_uvc_household_sigmoid_k = NULL,
+  #   far_uvc_household_sigmoid_x0 = NULL,
 
   # Intervention parameters (Wells-Riley ACH-based efficacy):
     intervention_workplace_active = FALSE,
-    intervention_workplace_delta_ach = 0,
-    intervention_workplace_delta_uv = 0,
+    intervention_workplace_list = NULL,
 
     intervention_school_active = FALSE,
-    intervention_school_delta_ach = 0,
-    intervention_school_delta_uv = 0,
+    intervention_school_list = NULL,
 
     intervention_leisure_active = FALSE,
-    intervention_leisure_delta_ach = 0,
-    intervention_leisure_delta_uv = 0,
+    intervention_leisure_list = NULL,
 
     intervention_household_active = FALSE,
-    intervention_household_delta_ach = 0,
-    intervention_household_delta_uv = 0,
+    intervention_household_list = NULL,
 
     # Room Size Per Individual Parameters:
     size_per_individual_workplace = 1,
