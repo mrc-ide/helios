@@ -115,6 +115,9 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
 
   interventions <- parameters_list[[paste0("intervention_", setting, "_list")]]
 
+  if (is.null(interventions) || length(interventions) ==0 ) {
+    return(rep(0,n))
+  }
   for (intervention in interventions) {
 
     # call baseline_ach_function to get delta for each location
