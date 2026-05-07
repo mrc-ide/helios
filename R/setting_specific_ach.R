@@ -194,8 +194,7 @@ uv_to_delta <- function(f, E_avg, k) {
 
 #Input: ACH, Output: Efficacy
 ach_to_efficacy <- function(baseline_ach,
-                            delta_ach = 0,
-                            delta_uv = 0,
+                            delta = 0,
                             kD = 0.61,
                             r = 0.0126,
                             pi = 397,
