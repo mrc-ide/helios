@@ -180,8 +180,8 @@ create_SE_process <- function(
           household_bitset_list[[i]]
         )
 
-        #  Calculate the FOI for the i-th household - with and without farUVC installed
-        if (parameters_list$far_uvc_household) {
+        #  Calculate the FOI for the i-th household - with and without AQI installed
+        if (parameters_list$intervention_household_active) {
           if (
             parameters_list$uvc_household[i] == 1 &
               t > parameters_list$far_uvc_household_timestep
@@ -233,7 +233,7 @@ create_SE_process <- function(
       )
 
       # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
-      if (parameters_list$far_uvc_workplace) {
+      if (parameters_list$intervention_workplace_active) {
         if (
           parameters_list$uvc_workplace[i] == 1 &
             t > parameters_list$far_uvc_workplace_timestep
@@ -282,7 +282,7 @@ create_SE_process <- function(
       )
 
       # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
-      if (parameters_list$far_uvc_school) {
+      if (parameters_list$intervention_school_active) {
         if (
           parameters_list$uvc_school[i] == 1 &
             t > parameters_list$far_uvc_school_timestep
