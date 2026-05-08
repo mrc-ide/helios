@@ -258,8 +258,16 @@ create_variables <- function(parameters_list) {
     }
   }
 
-  # Calculate location-specific efficacy from ACH using W-R
+  # Calculate location-specific efficacy from ACH using W-R.
+  # For each setting with an active intervention, first draw the per-location
+  # coverage vector, then compute efficacy (which uses the coverage vector to
+  # zero out delta for uncovered locations).
   if (isTRUE(parameters_list$intervention_workplace_active)) {
+    parameters_list$intervention_workplace_covered <- generate_intervention_coverage_vector(
+      parameters_list,
+      setting       = "workplace",
+      num_locations = length(parameters_list$workplace_specific_ach)
+    )
     parameters_list$workplace_specific_efficacy <- calculate_efficacy_from_ach(
       ach_values = parameters_list$workplace_specific_ach,
       parameters_list = parameters_list,
@@ -268,6 +276,11 @@ create_variables <- function(parameters_list) {
   }
 
   if (isTRUE(parameters_list$intervention_school_active)) {
+    parameters_list$intervention_school_covered <- generate_intervention_coverage_vector(
+      parameters_list,
+      setting       = "school",
+      num_locations = length(parameters_list$school_specific_ach)
+    )
     parameters_list$school_specific_efficacy <- calculate_efficacy_from_ach(
       ach_values = parameters_list$school_specific_ach,
       parameters_list = parameters_list,
@@ -276,6 +289,11 @@ create_variables <- function(parameters_list) {
   }
 
   if (isTRUE(parameters_list$intervention_leisure_active)) {
+    parameters_list$intervention_leisure_covered <- generate_intervention_coverage_vector(
+      parameters_list,
+      setting       = "leisure",
+      num_locations = length(parameters_list$leisure_specific_ach)
+    )
     parameters_list$leisure_specific_efficacy <- calculate_efficacy_from_ach(
       ach_values = parameters_list$leisure_specific_ach,
       parameters_list = parameters_list,
@@ -284,6 +302,11 @@ create_variables <- function(parameters_list) {
   }
 
   if (isTRUE(parameters_list$intervention_household_active)) {
+    parameters_list$intervention_household_covered <- generate_intervention_coverage_vector(
+      parameters_list,
+      setting       = "household",
+      num_locations = length(parameters_list$household_specific_ach)
+    )
     parameters_list$household_specific_efficacy <- calculate_efficacy_from_ach(
       ach_values = parameters_list$household_specific_ach,
       parameters_list = parameters_list,

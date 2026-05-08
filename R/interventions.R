@@ -334,3 +334,202 @@ generate_setting_far_uvc_switches <- function(
 
   return(parameters_list)
 }
+
+
+# =============================================================================
+# Wells-Riley ACH-based intervention pipeline
+# =============================================================================
+# Constructor for an intervention object. The intervention's effect on per-
+# location alpha (ACH + decay) is described by `baseline_ach_function`, which
+# can either depend on the location's baseline ACH or be a fixed delta.
+make_intervention <- function(name,
+                              affected_by_baseline_ach = FALSE,
+                              baseline_ach_function    = NULL,
+                              baseline_ach_params      = list(),
+                              variation                = FALSE,
+                              variation_function       = NULL,
+                              variation_params         = list(),
+                              coverage                 = 1.0) {
+  list(
+    name                     = name,
+    affected_by_baseline_ach = affected_by_baseline_ach,
+    baseline_ach_function    = baseline_ach_function,
+    baseline_ach_params      = baseline_ach_params,
+    variation                = variation,
+    variation_function       = variation_function,
+    variation_params         = variation_params,
+    coverage                 = coverage
+  )
+}
+
+# Store an intervention for a setting in parameters_list. Single-intervention
+# only for now; multi-intervention design is deferred until clumped vs.
+# independent coverage is settled.
+set_intervention_ach <- function(parameters_list,
+                                 setting,
+                                 coverage,
+                                 coverage_target,
+                                 coverage_type,
+                                 timestep,
+                                 ...) {
+  interventions <- list(...)
+
+  if (length(interventions) == 0) {
+    stop("set_intervention_ach requires at least one intervention")
+  }
+  if (length(interventions) > 1) {
+    stop("multi-intervention support is not yet implemented; please pass a single intervention")
+  }
+  if (!is.numeric(coverage) || length(coverage) != 1 || coverage < 0 || coverage > 1) {
+    stop("coverage must be a single numeric value between 0 and 1")
+  }
+
+  parameters_list[[paste0("intervention_", setting, "_active")]]          <- TRUE
+  parameters_list[[paste0("intervention_", setting, "_list")]]            <- interventions
+  parameters_list[[paste0("intervention_", setting, "_coverage")]]        <- coverage
+  parameters_list[[paste0("intervention_", setting, "_coverage_target")]] <- coverage_target
+  parameters_list[[paste0("intervention_", setting, "_coverage_type")]]   <- coverage_type
+  parameters_list[[paste0("intervention_", setting, "_timestep")]]        <- timestep
+
+  return(parameters_list)
+}
+
+# Draw a per-location 0/1 coverage vector for a single intervention.
+# Returns a length-num_locations integer vector where 1 = covered.
+generate_intervention_coverage_vector <- function(parameters_list, setting, num_locations) {
+  coverage      <- parameters_list[[paste0("intervention_", setting, "_coverage")]]
+  coverage_type <- parameters_list[[paste0("intervention_", setting, "_coverage_type")]]
+
+  n_covered <- round(coverage * num_locations)
+
+  if (is.null(coverage_type) || coverage_type == "random") {
+    covered_idx <- sample.int(num_locations, n_covered)
+  } else if (coverage_type == "targeted_riskiness") {
+    riskiness <- parameters_list[[paste0(setting, "_specific_riskiness")]]
+    if (is.null(riskiness)) {
+      stop(paste0("coverage_type = 'targeted_riskiness' requires ",
+                  setting, "_specific_riskiness to be populated"))
+    }
+    covered_idx <- order(riskiness, decreasing = TRUE)[seq_len(n_covered)]
+  } else {
+    stop(paste0("Unknown coverage_type: ", coverage_type))
+  }
+
+  coverage_vector <- rep(0L, num_locations)
+  coverage_vector[covered_idx] <- 1L
+  return(coverage_vector)
+}
+
+# Compute per-location intervention efficacy from baseline ACH using W-R.
+# Efficacy at location i = 1 - p_post[i] / p_pre[i], where the post-intervention
+# alpha is augmented by the sum of intervention deltas (zeroed for uncovered
+# locations via the coverage vector).
+calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
+  I    <- 1
+  pi   <- parameters_list$wells_riley_emission_rate
+  kD   <- parameters_list$wells_riley_decay_rate
+  r    <- parameters_list$wells_riley_infection_prob_per_ffu
+  RRtv <- parameters_list$wells_riley_respiratory_rate_factor
+  t    <- parameters_list$wells_riley_time_in_room
+  V    <- parameters_list[[paste0("volume_per_person_", setting)]]
+
+  n           <- length(ach_values)
+  total_delta <- rep(0, n)
+
+  interventions <- parameters_list[[paste0("intervention_", setting, "_list")]]
+
+  if (is.null(interventions) || length(interventions) ==0 ) {
+    return(rep(0,n))
+  }
+
+  # Coverage vector: 1 if location is covered, 0 if not. NULL = full coverage
+  # (used by unit tests that bypass set_intervention_ach).
+  coverage_vector <- parameters_list[[paste0("intervention_", setting, "_covered")]]
+
+  for (intervention in interventions) {
+
+    # call baseline_ach_function to get delta for each location
+    if (intervention$affected_by_baseline_ach) {
+      # pass baseline ACH as first argument, then params
+      delta_i <- mapply(
+        function(ach) do.call(intervention$baseline_ach_function,
+                              c(list(ach), intervention$baseline_ach_params)),
+        ach_values
+      )
+    } else {
+      # function only uses its own params — same delta replicated across locations
+      delta_i <- rep(
+        do.call(intervention$baseline_ach_function, intervention$baseline_ach_params),
+        n
+      )
+    }
+
+    # add location-to-location variation if requested
+    if (intervention$variation && !is.null(intervention$variation_function)) {
+      noise   <- do.call(intervention$variation_function,
+                         c(list(n), intervention$variation_params))
+      delta_i <- pmax(0, delta_i + noise)
+    }
+
+    # zero out delta for uncovered locations
+    if (!is.null(coverage_vector)) {
+      delta_i <- delta_i * coverage_vector
+    }
+
+    total_delta <- total_delta + delta_i
+  }
+
+  alpha_pre  <- ach_values + kD
+  alpha_post <- ach_values + kD + total_delta
+
+  p_pre  <- 1 - exp(-r * (I * pi / (alpha_pre  * V)) * RRtv * t)
+  p_post <- 1 - exp(-r * (I * pi / (alpha_post * V)) * RRtv * t)
+
+  return(1 - p_post / p_pre)
+}
+
+
+# =============================================================================
+# Helper functions for ACH / efficacy / UV-C conversions
+# =============================================================================
+# Convert UVC (f: fraction of room irradiated, E_avg: avg fluence rate,
+# k: UV inactivation constant) to a delta in ACH-equivalent units (hr^-1).
+uv_to_delta <- function(f, E_avg, k) {
+  f * E_avg * k * 3.6
+}
+
+# ACH -> efficacy (Wells-Riley). delta is the total added ACH-equivalent
+# (ventilation increase + UV-C inactivation expressed as eACH).
+ach_to_efficacy <- function(baseline_ach,
+                            delta = 0,
+                            kD = 0.61,
+                            r = 0.0126,
+                            pi = 397,
+                            I = 1,
+                            RRtv = 1,
+                            t = 1,
+                            V = 50) {
+  A <- r * I * pi * RRtv * t / V
+  alpha_pre <- baseline_ach + kD
+  alpha_post <- baseline_ach + kD + delta
+  p_pre <- 1 - exp(-A / alpha_pre)
+  p_post <- 1 - exp(-A / alpha_post)
+  return(1 - p_post / p_pre)
+}
+
+# efficacy -> delta ACH (inverse of ach_to_efficacy)
+efficacy_to_delta <- function(target_efficacy,
+                              baseline_ach,
+                              kD = 0.61,
+                              r = 0.0126,
+                              pi = 397,
+                              I = 1,
+                              RRtv = 1,
+                              t = 1,
+                              V = 50) {
+  A          <- r * I * pi * RRtv * t / V
+  alpha_pre  <- baseline_ach + kD
+  p_pre      <- 1 - exp(-A / alpha_pre)
+  alpha_post <- -A / log(1 - p_pre * (1 - target_efficacy))
+  return(alpha_post - alpha_pre)
+}

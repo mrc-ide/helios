@@ -1,3 +1,4 @@
+#Tests to check new modular intervention implementation, single intervetion
 library(dplyr)
 library(ggplot2)
 library(tidyr)
@@ -16,7 +17,7 @@ wr_params <- list(
   volume_per_person_workplace        = 27       # V, m^3 per person
 )
 
-# A range of ACH values covering low-to-high ventilation
+# range of ACH values
 ach_values <- c(1, 2, 4, 6, 8, 10)
 
 # Helper: factory that produces a zero-argument function returning a fixed delta.
@@ -175,11 +176,8 @@ cat("  PASS\n\n")
 
 cat("=== Tests 21-29 COMPLETE ===\n\n\n")
 
-cat("======================================================\n")
-cat("  INTEGRATION TESTS: single intervention (37-42)\n")
-cat("======================================================\n\n")
+#Integration Tests
 
-# ── Shared baseline parameters ────────────────────────────────────────────────
 base_params <- get_parameters(
   overrides = list(
     human_population = 10000,
@@ -215,6 +213,7 @@ uv222_intv <- make_intervention(
 params_intv <- params_baseline %>%
   set_intervention_ach(
     setting         = "workplace",
+    coverage        = 1.0,
     coverage_target = "individuals",
     coverage_type   = "random",
     timestep        = 0,
@@ -226,12 +225,12 @@ stopifnot("intervention list is stored" = is.list(params_intv$intervention_workp
 stopifnot("one intervention in list"    = length(params_intv$intervention_workplace_list) == 1)
 stopifnot("intervention name correct"   =
             params_intv$intervention_workplace_list[[1]]$name == "uv222_workplace")
+stopifnot("coverage stored"             = params_intv$intervention_workplace_coverage == 1.0)
 cat("  PASS\n\n")
 
 
 # ── Test 38: calculate_efficacy_from_ach on real ACH distribution ────────────
-# After create_variables() draws per-location ACH values, passing them to
-# calculate_efficacy_from_ach should return a vector of the same length.
+# After create_variables() draws per-location ACH values, passing them to calculate_efficacy_from_ach should return a vector of the same length.
 
 cat("Test 38: calculate_efficacy_from_ach returns correct-length vector\n")
 

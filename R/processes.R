@@ -183,8 +183,7 @@ create_SE_process <- function(
         #  Calculate the FOI for the i-th household - with and without AQI installed
         if (parameters_list$intervention_household_active) {
           if (
-            parameters_list$uvc_household[i] == 1 &
-              t > parameters_list$far_uvc_household_timestep
+            t > parameters_list$intervention_household_timestep
           ) {
             spec_household_FOI <- parameters_list$household_specific_riskiness[
               i
@@ -235,8 +234,7 @@ create_SE_process <- function(
       # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
       if (parameters_list$intervention_workplace_active) {
         if (
-          parameters_list$uvc_workplace[i] == 1 &
-            t > parameters_list$far_uvc_workplace_timestep
+          t > parameters_list$intervention_workplace_timestep
         ) {
           spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[
             i
@@ -284,8 +282,7 @@ create_SE_process <- function(
       # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
       if (parameters_list$intervention_school_active) {
         if (
-          parameters_list$uvc_school[i] == 1 &
-            t > parameters_list$far_uvc_school_timestep
+          t > parameters_list$intervention_school_timestep
         ) {
           spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
             (1 - parameters_list$school_specific_efficacy[i]) *
@@ -368,10 +365,9 @@ create_SE_process <- function(
         ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure locations
         ## (this is in contrast to leisure_indices, which uses the original indices from their generation,
         ##  and which span 1 to max(leisure_indices) with some gaps)
-        if (parameters_list$far_uvc_leisure) {
+        if (parameters_list$intervention_leisure_active) {
           if (
-            parameters_list$uvc_leisure[i] == 1 &
-              t > parameters_list$far_uvc_leisure_timestep
+            t > parameters_list$intervention_leisure_timestep
           ) {
             spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
               (1 - parameters_list$leisure_specific_efficacy[i]) *
