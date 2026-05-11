@@ -238,79 +238,79 @@ create_variables <- function(parameters_list) {
     setting = "leisure"
   )
 
-  # If any setting has UVC installed, retrieve the sizes of all of the settings:
+  # # Old far-UVC switches block, kept as comments for reference. The new
+  # # intervention pipeline uses the dispatcher generate_intervention_switches()
+  # # below which handles both joint and per-setting coverage and stores results
+  # # under intervention_<setting>_covered (instead of uvc_<setting>).
+  # if (
+  #   any(
+  #     parameters_list$far_uvc_joint,
+  #     parameters_list$far_uvc_workplace,
+  #     parameters_list$far_uvc_school,
+  #     parameters_list$far_uvc_leisure,
+  #     parameters_list$far_uvc_household
+  #   )
+  # ) {
+  #   parameters_list <- generate_far_uvc_switches(parameters_list, variables_list)
+  #
+  #   setting_types <- c("workplace", "school", "leisure")
+  #   if (parameters_list$far_uvc_joint) {
+  #     parameters_list[paste0("far_uvc_", setting_types)] <- TRUE
+  #     parameters_list[paste0("far_uvc_", setting_types, "_efficacy")] <- parameters_list$far_uvc_joint_efficacy
+  #     parameters_list[paste0("far_uvc_", setting_types, "_timestep")] <- parameters_list$far_uvc_joint_timestep
+  #   }
+  # }
+
+  # If any intervention is active (per-setting or joint), dispatch to the
+  # intervention switches generator. For joint mode, this also propagates the
+  # joint intervention list, timestep, and active flags to each per-setting
+  # slot, so the per-setting efficacy blocks below run uniformly.
   if (
     any(
-      parameters_list$far_uvc_joint,
-      parameters_list$far_uvc_workplace,
-      parameters_list$far_uvc_school,
-      parameters_list$far_uvc_leisure,
-      parameters_list$far_uvc_household
+      isTRUE(parameters_list$intervention_joint_active),
+      isTRUE(parameters_list$intervention_workplace_active),
+      isTRUE(parameters_list$intervention_school_active),
+      isTRUE(parameters_list$intervention_leisure_active),
+      isTRUE(parameters_list$intervention_household_active)
     )
   ) {
-    parameters_list <- generate_far_uvc_switches(parameters_list, variables_list)
-
-    setting_types <- c("workplace", "school", "leisure")
-    if (parameters_list$far_uvc_joint) {
-      parameters_list[paste0("far_uvc_", setting_types)] <- TRUE
-      parameters_list[paste0("far_uvc_", setting_types, "_efficacy")] <- parameters_list$far_uvc_joint_efficacy
-      parameters_list[paste0("far_uvc_", setting_types, "_timestep")] <- parameters_list$far_uvc_joint_timestep
-    }
+    parameters_list <- generate_intervention_switches(parameters_list, variables_list)
   }
 
-  # Calculate location-specific efficacy from ACH using W-R.
-  # For each setting with an active intervention, first draw the per-location
-  # coverage vector, then compute efficacy (which uses the coverage vector to
-  # zero out delta for uncovered locations).
+  # Calculate location-specific efficacy from ACH using W-R for each setting
+  # with an active intervention. The coverage vector
+  # (intervention_<setting>_covered) was already populated by the dispatcher
+  # above and is consumed inside calculate_efficacy_from_ach to zero out delta
+  # for uncovered locations.
   if (isTRUE(parameters_list$intervention_workplace_active)) {
-    parameters_list$intervention_workplace_covered <- generate_intervention_coverage_vector(
-      parameters_list,
-      setting       = "workplace",
-      num_locations = length(parameters_list$workplace_specific_ach)
-    )
     parameters_list$workplace_specific_efficacy <- calculate_efficacy_from_ach(
-      ach_values = parameters_list$workplace_specific_ach,
+      ach_values      = parameters_list$workplace_specific_ach,
       parameters_list = parameters_list,
-      setting = "workplace"
+      setting         = "workplace"
     )
   }
 
   if (isTRUE(parameters_list$intervention_school_active)) {
-    parameters_list$intervention_school_covered <- generate_intervention_coverage_vector(
-      parameters_list,
-      setting       = "school",
-      num_locations = length(parameters_list$school_specific_ach)
-    )
     parameters_list$school_specific_efficacy <- calculate_efficacy_from_ach(
-      ach_values = parameters_list$school_specific_ach,
+      ach_values      = parameters_list$school_specific_ach,
       parameters_list = parameters_list,
-      setting = "school"
+      setting         = "school"
     )
   }
 
   if (isTRUE(parameters_list$intervention_leisure_active)) {
-    parameters_list$intervention_leisure_covered <- generate_intervention_coverage_vector(
-      parameters_list,
-      setting       = "leisure",
-      num_locations = length(parameters_list$leisure_specific_ach)
-    )
     parameters_list$leisure_specific_efficacy <- calculate_efficacy_from_ach(
-      ach_values = parameters_list$leisure_specific_ach,
+      ach_values      = parameters_list$leisure_specific_ach,
       parameters_list = parameters_list,
-      setting = "leisure"
+      setting         = "leisure"
     )
   }
 
   if (isTRUE(parameters_list$intervention_household_active)) {
-    parameters_list$intervention_household_covered <- generate_intervention_coverage_vector(
-      parameters_list,
-      setting       = "household",
-      num_locations = length(parameters_list$household_specific_ach)
-    )
     parameters_list$household_specific_efficacy <- calculate_efficacy_from_ach(
-      ach_values = parameters_list$household_specific_ach,
+      ach_values      = parameters_list$household_specific_ach,
       parameters_list = parameters_list,
-      setting = "household"
+      setting         = "household"
     )
   }
 

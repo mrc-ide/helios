@@ -312,6 +312,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   #   far_uvc_household_sigmoid_x0 = NULL,
 
   # Intervention parameters (Wells-Riley ACH-based efficacy):
+    intervention_joint_active              = FALSE,
+    intervention_joint_list                = NULL,
+    intervention_joint_coverage            = NULL,
+    intervention_joint_coverage_target     = NULL,
+    intervention_joint_coverage_type       = NULL,
+    intervention_joint_timestep            = NULL,
+
     intervention_workplace_active          = FALSE,
     intervention_workplace_list            = NULL,
     intervention_workplace_coverage        = NULL,
