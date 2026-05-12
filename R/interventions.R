@@ -598,7 +598,7 @@ make_intervention <- function(name,
                               variation                = FALSE,
                               variation_function       = NULL,
                               variation_params         = list(),
-                              coverage                 = 1.0) {
+                              coverage                 = NULL) {
   list(
     name                     = name,
     affected_by_baseline_ach = affected_by_baseline_ach,
@@ -616,7 +616,6 @@ make_intervention <- function(name,
 # independent coverage is settled.
 set_intervention_ach <- function(parameters_list,
                                  setting,
-                                 coverage,
                                  coverage_target,
                                  coverage_type,
                                  timestep,
@@ -638,9 +637,6 @@ set_intervention_ach <- function(parameters_list,
   }
   if (length(interventions) > 1) {
     stop("multi-intervention support is not yet implemented; please pass a single intervention")
-  }
-  if (!is.numeric(coverage) || length(coverage) != 1 || coverage < 0 || coverage > 1) {
-    stop("coverage must be a single numeric value between 0 and 1")
   }
   if (length(coverage_target) > 1) {
     stop(
@@ -671,6 +667,10 @@ set_intervention_ach <- function(parameters_list,
   parameters_list[[paste0("intervention_", setting, "_coverage_target")]] <- coverage_target
   parameters_list[[paste0("intervention_", setting, "_coverage_type")]]   <- coverage_type
   parameters_list[[paste0("intervention_", setting, "_timestep")]]        <- timestep
+
+  if (setting == "joint") {
+    parameters_list[["intervention_joint_coverage"]] <- interventions[[1]]$coverage
+  }
 
   return(parameters_list)
 }
