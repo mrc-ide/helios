@@ -231,7 +231,7 @@ create_SE_process <- function(
         workplace_bitset_list[[i]]
       )
 
-      # Calculate the workplace-specific FOI of the i-th workplace - with and without farUVC installed
+      # Calculate the workplace-specific FOI of the i-th workplace - with and without AQI installed
       if (parameters_list$intervention_workplace_active) {
         if (
           t > parameters_list$intervention_workplace_timestep
@@ -279,7 +279,7 @@ create_SE_process <- function(
         school_bitset_list[[i]]
       )
 
-      # Calculate the school-specific FOI for the i-th school - with and without farUVC installed
+      # Calculate the school-specific FOI for the i-th school - with and without AQI installed
       if (parameters_list$intervention_school_active) {
         if (
           t > parameters_list$intervention_school_timestep
@@ -361,7 +361,7 @@ create_SE_process <- function(
         # Count the number of infectious individuals in the relevant leisure setting
         spec_leisure_I_size <- individual:::bitset_count_and(I, spec_leisure)
 
-        # Calculate the leisure-specific FOI for the i-th leisure location - with and without farUVC installed
+        # Calculate the leisure-specific FOI for the i-th leisure location - with and without AQI installed
         ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure locations
         ## (this is in contrast to leisure_indices, which uses the original indices from their generation,
         ##  and which span 1 to max(leisure_indices) with some gaps)

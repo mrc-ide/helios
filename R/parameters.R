@@ -396,63 +396,64 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     stop("dt must evenly divide into 1 e.g. 0.1, 0.2, 0.25, 0.5")
   }
 
-  ## put warning or check in here about if coverage_type = "targeted_riskiness" but riskiness
-  ## isn't turned on.
-  if (parameters$far_uvc_joint) {
-    if (
-      parameters$far_uvc_joint_coverage_target == "targeted_riskiness" &
-        !any(
-          parameters$setting_specific_riskiness_workplace |
-            parameters$setting_specific_riskiness_school |
-            parameters$setting_specific_riskiness_leisure |
-            parameters$setting_specific_riskiness_household
-        )
-    ) {
-      warning(
-        "coverage_target is set to targeted_riskiness but at least one of the setting_specific_riskinesses is not turned on"
-      )
-    }
-  }
-  if (parameters$far_uvc_household) {
-    if (
-      parameters$far_uvc_household_coverage_target == "targeted_riskiness" &
-        !parameters$setting_specific_riskiness_household
-    ) {
-      warning(
-        "far_uvc_household_coverage_target is set to targeted_riskiness but setting_specific_riskiness_household is not turned on"
-      )
-    }
-  }
-  if (parameters$far_uvc_workplace) {
-    if (
-      parameters$far_uvc_workplace_coverage_target == "targeted_riskiness" &
-        !parameters$setting_specific_riskiness_workplace
-    ) {
-      warning(
-        "far_uvc_workplace_coverage_target is set to targeted_riskiness but setting_specific_riskiness_workplace is not turned on"
-      )
-    }
-  }
-  if (parameters$far_uvc_school) {
-    if (
-      parameters$far_uvc_school_coverage_target == "targeted_riskiness" &
-        !parameters$setting_specific_riskiness_school
-    ) {
-      warning(
-        "far_uvc_school_coverage_target is set to targeted_riskiness but setting_specific_riskiness_school is not turned on"
-      )
-    }
-  }
-  if (parameters$far_uvc_leisure) {
-    if (
-      parameters$far_uvc_leisure_coverage_target == "targeted_riskiness" &
-        !parameters$setting_specific_riskiness_leisure
-    ) {
-      warning(
-        "far_uvc_leisure_coverage_target is set to targeted_riskiness but setting_specific_riskiness_leisure is not turned on"
-      )
-    }
-  }
+  # # Old targeted_riskiness validation against the removed far_uvc_* config
+  # # slots. Disabled because those defaults are no longer in parameters_list;
+  # # equivalent checks for the new intervention_* API still TODO.
+  # if (parameters$far_uvc_joint) {
+  #   if (
+  #     parameters$far_uvc_joint_coverage_target == "targeted_riskiness" &
+  #       !any(
+  #         parameters$setting_specific_riskiness_workplace |
+  #           parameters$setting_specific_riskiness_school |
+  #           parameters$setting_specific_riskiness_leisure |
+  #           parameters$setting_specific_riskiness_household
+  #       )
+  #   ) {
+  #     warning(
+  #       "coverage_target is set to targeted_riskiness but at least one of the setting_specific_riskinesses is not turned on"
+  #     )
+  #   }
+  # }
+  # if (parameters$far_uvc_household) {
+  #   if (
+  #     parameters$far_uvc_household_coverage_target == "targeted_riskiness" &
+  #       !parameters$setting_specific_riskiness_household
+  #   ) {
+  #     warning(
+  #       "far_uvc_household_coverage_target is set to targeted_riskiness but setting_specific_riskiness_household is not turned on"
+  #     )
+  #   }
+  # }
+  # if (parameters$far_uvc_workplace) {
+  #   if (
+  #     parameters$far_uvc_workplace_coverage_target == "targeted_riskiness" &
+  #       !parameters$setting_specific_riskiness_workplace
+  #   ) {
+  #     warning(
+  #       "far_uvc_workplace_coverage_target is set to targeted_riskiness but setting_specific_riskiness_workplace is not turned on"
+  #     )
+  #   }
+  # }
+  # if (parameters$far_uvc_school) {
+  #   if (
+  #     parameters$far_uvc_school_coverage_target == "targeted_riskiness" &
+  #       !parameters$setting_specific_riskiness_school
+  #   ) {
+  #     warning(
+  #       "far_uvc_school_coverage_target is set to targeted_riskiness but setting_specific_riskiness_school is not turned on"
+  #     )
+  #   }
+  # }
+  # if (parameters$far_uvc_leisure) {
+  #   if (
+  #     parameters$far_uvc_leisure_coverage_target == "targeted_riskiness" &
+  #       !parameters$setting_specific_riskiness_leisure
+  #   ) {
+  #     warning(
+  #       "far_uvc_leisure_coverage_target is set to targeted_riskiness but setting_specific_riskiness_leisure is not turned on"
+  #     )
+  #   }
+  # }
 
   # Check duration_immune is set if endemic_or_epidemic == "endemic"
   if (!(parameters$endemic_or_epidemic %in% c("endemic", "epidemic"))) {

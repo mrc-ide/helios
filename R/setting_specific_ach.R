@@ -1,17 +1,23 @@
 #Generating ACH values for locations in a setting
 
 generate_setting_specific_ach <- function(parameters_list, setting, number_of_locations) {
-  #TODO: establish a baseline value for ACH if not specified by user
+  # If setting-specific ACH is switched off for this setting, return uniform
+  # values. convert_ach_to_riskiness normalizes by the median (when
+  # wells_riley_reference_ach is NULL), so uniform ACH yields uniform
+  # riskiness == 1, matching the "no setting-specific riskiness" behavior on
+  # main.
+  if (!isTRUE(parameters_list[[paste0("setting_specific_ach_", setting)]])) {
+    return(rep(1, number_of_locations))
+  }
 
-  #retrieve mean and sd values from parameters.R
+  #retrieve mean and sd values from parameters.R or user input
   mu <- parameters_list[[paste0("setting_specific_ach_", setting, "_mean")]]
   sigma <- parameters_list[[paste0("setting_specific_ach_", setting, "_sd")]]
 
   #Draw values from truncated normal distribution
-  ach_values <- rtruncnorm( n = number_of_locations, a = 0, b = Inf, mean =mu, sd = sigma)
+  ach_values <- truncnorm::rtruncnorm(n = number_of_locations, a = 0, b = Inf, mean = mu, sd = sigma)
 
-  #return number of locations
-  return(ach_values[1:number_of_locations])
+  return(ach_values)
 }
 
 #Convert ACH values to riskiness using W-R
@@ -183,48 +189,6 @@ set_setting_specific_ach <- function(parameters_list, setting, mean, sd) {
 
 
 
-
-#### Helper Functions
-#Converting UVC to delta_uv ACH equivalent
-#inputs f: frac of room irradiated, E_acg: avg fluence rate, k = UV inactivation constant
-# uv_to_delta <- function(f, E_avg, k) {
-#   f*E_avg *k *3.6
-# }
-#
-# #Input: ACH, Output: Efficacy
-# ach_to_efficacy <- function(baseline_ach,
-#                             delta = 0,
-#                             kD = 0.61,
-#                             r = 0.0126,
-#                             pi = 397,
-#                             I = 1,
-#                             RRtv = 1,
-#                             t = 1,
-#                             V = 50) {
-#   A <- r * I * pi * RRtv * t/V
-#   alpha_pre <- baseline_ach + kD
-#   alpha_post <- baseline_ach + kD + delta
-#   p_pre <- 1 - exp(-A/alpha_pre)
-#   p_post <- 1 - exp(-A/alpha_post)
-#   return(1- p_post/p_pre)
-# }
-#
-# #efficacy to delta ACH
-# efficacy_to_delta <- function(target_efficacy,
-#                               baseline_ach,
-#                               kD = 0.61,
-#                               r = 0.0126,
-#                               pi = 397,
-#                               I = 1,
-#                               RRtv = 1,
-#                               t = 1,
-#                               V = 50) {
-#   A          <- r * I * pi * RRtv * t / V
-#   alpha_pre  <- baseline_ach + kD
-#   p_pre      <- 1 - exp(-A / alpha_pre)
-#   alpha_post <- -A / log(1 - p_pre * (1 - target_efficacy))
-#   return(alpha_post - alpha_pre)
-# }
 
 # set_uvc_ach <- function (parameters_list,
 #                          setting,

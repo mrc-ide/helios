@@ -1,95 +1,97 @@
-#' Update model parameters with far UVC settings
-#'
-#' @description
-#' The `set_uvc()` function is a user-facing function that is used to parameterise far UVC deployment
-#' for an individual setting type (e.g. workplace). The function takes as arguments a `helios`
-#' parameter list, the `setting` type for which far UVC deployment is being parameterised, the `coverage`
-#' of far UVC within each location of a setting type (e.g. coverage of individual workplaces within
-#' the workplace setting class), the `coverage_type` (currently supporting random and targeted at the
-#' most populated settings), the `efficacy` of far UVC in the setting type, and the `timestep` on
-#' which far UVC is deployed. The function appends these additional setting-specific parameters to
-#' the parameter list and returns an updated version of it.
-#'
-#' @param parameters_list A list of parameters as generated using `get_parameters()`
-#' @param setting A character string describing the setting type in which far UVC is being deployed
-#' @param coverage A numeric value describing the coverage of far UVC within the setting class for which which far UVC is deployed
-#' @param coverage_target A character describing the target of the coverage ("buildings" or "individuals")
-#' @param coverage_type A character describing the type of coverage ("random" or "targeted")
-#' @param efficacy A numeric value describing the efficacy of the far UVC deployed
-#' @param timestep A numeric value describing the timestep in which far UVC is deployed
-#'
-#' @family intervention
-#' @export
-set_uvc <- function(
-  parameters_list,
-  setting,
-  coverage,
-  coverage_target,
-  coverage_type,
-  efficacy,
-  timestep
-) {
-  if (length(setting) > 1) {
-    stop(
-      "Error: Number of settings input greater than 1, parameterise for one setting at a time"
-    )
-  }
-
-  if (!(setting %in% c("workplace", "school", "leisure", "household", "joint"))) {
-    stop(
-      "Error: Input setting invalid -far UVC only deployable in workplace, school, leisure, household, or joint settings"
-    )
-  }
-
-  if (coverage < 0 | coverage > 1) {
-    stop("Error: coverage must take a value between 0 and 1")
-  }
-
-  if (length(coverage_target) > 1) {
-    stop(
-      "Error: Number of coverage targets input greater than 1, parameterise for one coverage target at a time"
-    )
-  }
-
-  if (coverage_target != "individuals" & coverage_target != "square_footage") {
-    stop(
-      "Error: Input setting invalid - far UVC coverage only applicable to individuals or square_footage"
-    )
-  }
-
-  if (length(coverage_type) > 1) {
-    stop(
-      "Error: Number of coverage types input greater than 1, parameterise for one coverage type at a time"
-    )
-  }
-
-  if (coverage_type != "random" & coverage_type != "targeted_riskiness") {
-    stop(
-      "Error: Input setting invalid - far UVC only deployable in random or targeted_riskiness coverage types"
-    )
-  }
-
-  if (efficacy < 0 | efficacy > 1) {
-    stop("Error: efficacy must take a value between 0 and 1")
-  }
-
-  parameters_list[[paste0("far_uvc_", setting)]] <- TRUE
-  parameters_list[[paste0("far_uvc_", setting, "_coverage")]] <- coverage
-  parameters_list[[paste0(
-    "far_uvc_",
-    setting,
-    "_coverage_target"
-  )]] <- coverage_target
-  parameters_list[[paste0(
-    "far_uvc_",
-    setting,
-    "_coverage_type"
-  )]] <- coverage_type
-  parameters_list[[paste0("far_uvc_", setting, "_efficacy")]] <- efficacy
-  parameters_list[[paste0("far_uvc_", setting, "_timestep")]] <- timestep
-
-  return(parameters_list)
-}
+# # Old far-UVC setter. Superseded by set_intervention_ach() + make_intervention()
+# # in the ACH/efficacy pipeline. Kept commented for reference.
+# #' Update model parameters with far UVC settings
+# #'
+# #' @description
+# #' The `set_uvc()` function is a user-facing function that is used to parameterise far UVC deployment
+# #' for an individual setting type (e.g. workplace). The function takes as arguments a `helios`
+# #' parameter list, the `setting` type for which far UVC deployment is being parameterised, the `coverage`
+# #' of far UVC within each location of a setting type (e.g. coverage of individual workplaces within
+# #' the workplace setting class), the `coverage_type` (currently supporting random and targeted at the
+# #' most populated settings), the `efficacy` of far UVC in the setting type, and the `timestep` on
+# #' which far UVC is deployed. The function appends these additional setting-specific parameters to
+# #' the parameter list and returns an updated version of it.
+# #'
+# #' @param parameters_list A list of parameters as generated using `get_parameters()`
+# #' @param setting A character string describing the setting type in which far UVC is being deployed
+# #' @param coverage A numeric value describing the coverage of far UVC within the setting class for which which far UVC is deployed
+# #' @param coverage_target A character describing the target of the coverage ("buildings" or "individuals")
+# #' @param coverage_type A character describing the type of coverage ("random" or "targeted")
+# #' @param efficacy A numeric value describing the efficacy of the far UVC deployed
+# #' @param timestep A numeric value describing the timestep in which far UVC is deployed
+# #'
+# #' @family intervention
+# #' @export
+# set_uvc <- function(
+#   parameters_list,
+#   setting,
+#   coverage,
+#   coverage_target,
+#   coverage_type,
+#   efficacy,
+#   timestep
+# ) {
+#   if (length(setting) > 1) {
+#     stop(
+#       "Error: Number of settings input greater than 1, parameterise for one setting at a time"
+#     )
+#   }
+#
+#   if (!(setting %in% c("workplace", "school", "leisure", "household", "joint"))) {
+#     stop(
+#       "Error: Input setting invalid -far UVC only deployable in workplace, school, leisure, household, or joint settings"
+#     )
+#   }
+#
+#   if (coverage < 0 | coverage > 1) {
+#     stop("Error: coverage must take a value between 0 and 1")
+#   }
+#
+#   if (length(coverage_target) > 1) {
+#     stop(
+#       "Error: Number of coverage targets input greater than 1, parameterise for one coverage target at a time"
+#     )
+#   }
+#
+#   if (coverage_target != "individuals" & coverage_target != "square_footage") {
+#     stop(
+#       "Error: Input setting invalid - far UVC coverage only applicable to individuals or square_footage"
+#     )
+#   }
+#
+#   if (length(coverage_type) > 1) {
+#     stop(
+#       "Error: Number of coverage types input greater than 1, parameterise for one coverage type at a time"
+#     )
+#   }
+#
+#   if (coverage_type != "random" & coverage_type != "targeted_riskiness") {
+#     stop(
+#       "Error: Input setting invalid - far UVC only deployable in random or targeted_riskiness coverage types"
+#     )
+#   }
+#
+#   if (efficacy < 0 | efficacy > 1) {
+#     stop("Error: efficacy must take a value between 0 and 1")
+#   }
+#
+#   parameters_list[[paste0("far_uvc_", setting)]] <- TRUE
+#   parameters_list[[paste0("far_uvc_", setting, "_coverage")]] <- coverage
+#   parameters_list[[paste0(
+#     "far_uvc_",
+#     setting,
+#     "_coverage_target"
+#   )]] <- coverage_target
+#   parameters_list[[paste0(
+#     "far_uvc_",
+#     setting,
+#     "_coverage_type"
+#   )]] <- coverage_type
+#   parameters_list[[paste0("far_uvc_", setting, "_efficacy")]] <- efficacy
+#   parameters_list[[paste0("far_uvc_", setting, "_timestep")]] <- timestep
+#
+#   return(parameters_list)
+# }
 
 # #' Update model parameters with far UVC switches
 # #'
@@ -597,8 +599,7 @@ make_intervention <- function(name,
                               baseline_ach_params      = list(),
                               variation                = FALSE,
                               variation_function       = NULL,
-                              variation_params         = list(),
-                              coverage                 = 1.0) {
+                              variation_params         = list()) {
   list(
     name                     = name,
     affected_by_baseline_ach = affected_by_baseline_ach,
@@ -606,8 +607,7 @@ make_intervention <- function(name,
     baseline_ach_params      = baseline_ach_params,
     variation                = variation,
     variation_function       = variation_function,
-    variation_params         = variation_params,
-    coverage                 = coverage
+    variation_params         = variation_params
   )
 }
 
@@ -721,46 +721,42 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
 
   interventions <- parameters_list[[paste0("intervention_", setting, "_list")]]
 
-  if (is.null(interventions) || length(interventions) ==0 ) {
-    return(rep(0,n))
+  if (is.null(interventions) || length(interventions) == 0) {
+    return(rep(0, n))
   }
+
+  # Single-intervention only. Multi-intervention support lives on a separate
+  # branch (clumped vs. independent coverage still to be settled).
+  intervention <- interventions[[1]]
 
   # Coverage vector: 1 if location is covered, 0 if not. NULL = full coverage
   # (used by unit tests that bypass set_intervention_ach).
   coverage_vector <- parameters_list[[paste0("intervention_", setting, "_covered")]]
 
-  for (intervention in interventions) {
-
-    # call baseline_ach_function to get delta for each location
-    if (intervention$affected_by_baseline_ach) {
-      # pass baseline ACH as first argument, then params
-      delta_i <- mapply(
-        function(ach) do.call(intervention$baseline_ach_function,
-                              c(list(ach), intervention$baseline_ach_params)),
-        ach_values
-      )
-    } else {
-      # function only uses its own params — same delta replicated across locations
-      delta_i <- rep(
-        do.call(intervention$baseline_ach_function, intervention$baseline_ach_params),
-        n
-      )
-    }
-
-    # add location-to-location variation if requested
-    if (intervention$variation && !is.null(intervention$variation_function)) {
-      noise   <- do.call(intervention$variation_function,
-                         c(list(n), intervention$variation_params))
-      delta_i <- pmax(0, delta_i + noise)
-    }
-
-    # zero out delta for uncovered locations
-    if (!is.null(coverage_vector)) {
-      delta_i <- delta_i * coverage_vector
-    }
-
-    total_delta <- total_delta + delta_i
+  if (intervention$affected_by_baseline_ach) {
+    delta_i <- mapply(
+      function(ach) do.call(intervention$baseline_ach_function,
+                            c(list(ach), intervention$baseline_ach_params)),
+      ach_values
+    )
+  } else {
+    delta_i <- rep(
+      do.call(intervention$baseline_ach_function, intervention$baseline_ach_params),
+      n
+    )
   }
+
+  if (intervention$variation && !is.null(intervention$variation_function)) {
+    noise   <- do.call(intervention$variation_function,
+                       c(list(n), intervention$variation_params))
+    delta_i <- pmax(0, delta_i + noise)
+  }
+
+  if (!is.null(coverage_vector)) {
+    delta_i <- delta_i * coverage_vector
+  }
+
+  total_delta <- delta_i
 
   alpha_pre  <- ach_values + kD
   alpha_post <- ach_values + kD + total_delta
@@ -783,33 +779,38 @@ uv_to_delta <- function(f, E_avg, k) {
 
 # ACH -> efficacy (Wells-Riley). delta is the total added ACH-equivalent
 # (ventilation increase + UV-C inactivation expressed as eACH).
+# Defaults match the live pipeline in calculate_efficacy_from_ach (kD, r, pi,
+# RRtv, t). V is setting-specific (workplace=27, school=10, leisure=8,
+# household=50) so the caller must supply it explicitly.
 ach_to_efficacy <- function(baseline_ach,
                             delta = 0,
-                            kD = 0.61,
-                            r = 0.0126,
-                            pi = 397,
-                            I = 1,
-                            RRtv = 1,
-                            t = 1,
-                            V = 50) {
+                            V,
+                            kD   = 0.64,
+                            r    = 1.37e-2,
+                            pi   = 27,
+                            I    = 1,
+                            RRtv = 0.45,
+                            t    = 4) {
   A <- r * I * pi * RRtv * t / V
-  alpha_pre <- baseline_ach + kD
+  alpha_pre  <- baseline_ach + kD
   alpha_post <- baseline_ach + kD + delta
-  p_pre <- 1 - exp(-A / alpha_pre)
+  p_pre  <- 1 - exp(-A / alpha_pre)
   p_post <- 1 - exp(-A / alpha_post)
   return(1 - p_post / p_pre)
 }
 
-# efficacy -> delta ACH (inverse of ach_to_efficacy)
+# efficacy -> delta ACH (inverse of ach_to_efficacy). Same default conventions
+# as ach_to_efficacy: V is required, other W-R parameters match the live
+# pipeline.
 efficacy_to_delta <- function(target_efficacy,
                               baseline_ach,
-                              kD = 0.61,
-                              r = 0.0126,
-                              pi = 397,
-                              I = 1,
-                              RRtv = 1,
-                              t = 1,
-                              V = 50) {
+                              V,
+                              kD   = 0.64,
+                              r    = 1.37e-2,
+                              pi   = 27,
+                              I    = 1,
+                              RRtv = 0.45,
+                              t    = 4) {
   A          <- r * I * pi * RRtv * t / V
   alpha_pre  <- baseline_ach + kD
   p_pre      <- 1 - exp(-A / alpha_pre)
