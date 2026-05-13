@@ -106,19 +106,19 @@
 #' * `setting_specific_riskiness_household_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.4472
 #' * `setting_specific_riskiness_household_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
 #'
-#' Setting-Specific ACH Parameters: #default values need to be adjusted
+#' Setting-Specific ACH Parameters:
 #' * `setting_specific_ach_workplace`: boolean switch set to TRUE if setting-specific ACH parameterised in the workplace setting using `set_setting_specific_ach()`; default = FALSE
-#' * `setting_specific_ach_workplace_mean`: The mean of the normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =
-#' * `setting_specific_ach_workplace_sd`: The standard deviation of the normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =
+#' * `setting_specific_ach_workplace_mean`: The mean of the  truncated normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =4.8
+#' * `setting_specific_ach_workplace_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =1.5
 #' * `setting_specific_ach_school`: boolean switch set to TRUE if setting-specific ACH parameterised in the school setting using `set_setting_specific_ach()`; default = FALSE
-#' * `setting_specific_ach_school_mean`: The mean of the normal distribution from which the setting-specific ACH of individual schools is drawn; default = 0
-#' * `setting_specific_ach_school_sd`: The standard deviation of the normal distribution from which the setting-specific ACH of individual schools is drawn; default = 0.37
+#' * `setting_specific_ach_school_mean`: The mean of the truncated normal distribution from which the setting-specific ACH of individual schools is drawn; default = 4.0
+#' * `setting_specific_ach_school_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual schools is drawn; default = 1.2
 #' * `setting_specific_ach_leisure`: boolean switch set to TRUE if setting-specific ACH parameterised in the leisure setting using `set_setting_specific_ach()`; default = FALSE
-#' * `setting_specific_ach_leisure_mean`: The mean of the normal distribution from which the setting-specific ACH of individual leisure locations is drawn; default = 0
-#' * `setting_specific_ach_leisure_sd`: The standard deviation of the normal distribution from which the setting-specific ACH of individual leisure settings is drawn; default = 0.37
+#' * `setting_specific_ach_leisure_mean`: The mean of the truncated normal distribution from which the setting-specific ACH of individual leisure locations is drawn; default = 3.0
+#' * `setting_specific_ach_leisure_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual leisure settings is drawn; default = 1.0
 #' * `setting_specific_ach_household`: boolean switch set to TRUE if setting-specific ACH parameterised in the household setting using `set_setting_specific_ach()`; default = FALSE
-#' * `setting_specific_ach_household_mean`: The mean of the normal distribution from which the setting-specific ACH of individual households is drawn; default = 0
-#' * `setting_specific_ach_household_sd`: The standard deviation of the normal distribution from which the setting-specific ACH of individual households is drawn;
+#' * `setting_specific_ach_household_mean`: The mean of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.5
+#' * `setting_specific_ach_household_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.2
 #' Setting-Specific Room Size Per Individual Parameters:
 #' * `size_per_individual_workplace`: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
 #' * `size_per_individual_school`: The volume or surface area for each individual in the school setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
@@ -234,53 +234,53 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     wells_riley_time_in_room = 4,# t, hours spent in room
     wells_riley_reference_ach = NULL,
 
-    # Far UVC Efficacy Parameters (function of ACH)
-    far_uvc_efficacy_function = NULL,
-    far_uvc_efficacy_max_workplace = NULL,
-    far_uvc_efficacy_max_school = NULL,
-    far_uvc_efficacy_max_leisure = NULL,
-    far_uvc_efficacy_max_household = NULL,
+    # # Far UVC Efficacy Parameters (function of ACH)
+    # far_uvc_efficacy_function = NULL,
+    # far_uvc_efficacy_max_workplace = NULL,
+    # far_uvc_efficacy_max_school = NULL,
+    # far_uvc_efficacy_max_leisure = NULL,
+    # far_uvc_efficacy_max_household = NULL,
 
-    # Far UVC Parameters: Joint
-    far_uvc_joint = FALSE,
-    far_uvc_joint_coverage = NULL,
-    far_uvc_joint_coverage_target = NULL,
-    far_uvc_joint_coverage_type = NULL,
-    far_uvc_joint_efficacy = NULL,
-    far_uvc_joint_timestep = NULL,
-
-    # Far UVC Parameters: Workplace
-    far_uvc_workplace = FALSE,
-    far_uvc_workplace_coverage = NULL,
-    far_uvc_workplace_coverage_target = NULL,
-    far_uvc_workplace_coverage_type = NULL,
-    far_uvc_workplace_efficacy = NULL,
-    far_uvc_workplace_timestep = NULL,
-
-    # Far UVC Parameters: School
-    far_uvc_school = FALSE,
-    far_uvc_school_coverage = NULL,
-    far_uvc_school_coverage_target = NULL,
-    far_uvc_school_coverage_type = NULL,
-    far_uvc_school_efficacy = NULL,
-    far_uvc_school_timestep = NULL,
-
-    # Far UVC Parameters: Leisure:
-    far_uvc_leisure = FALSE,
-    far_uvc_leisure_coverage = NULL,
-    far_uvc_leisure_coverage_target = NULL,
-    far_uvc_leisure_coverage_type = NULL,
-    far_uvc_leisure_efficacy = NULL,
-    far_uvc_leisure_timestep = NULL,
-
-    # Far UVC Parameters: Household:
-    far_uvc_household = FALSE,
-    far_uvc_household_coverage = NULL,
-    far_uvc_household_coverage_target = NULL,
-    far_uvc_household_coverage_type = NULL,
-    far_uvc_household_efficacy = NULL,
-    far_uvc_household_timestep = NULL,
-
+    # # Far UVC Parameters: Joint
+    # far_uvc_joint = FALSE,
+    # far_uvc_joint_coverage = NULL,
+    # far_uvc_joint_coverage_target = NULL,
+    # far_uvc_joint_coverage_type = NULL,
+    # far_uvc_joint_efficacy = NULL,
+    # far_uvc_joint_timestep = NULL,
+    #
+    # # Far UVC Parameters: Workplace
+    # far_uvc_workplace = FALSE,
+    # far_uvc_workplace_coverage = NULL,
+    # far_uvc_workplace_coverage_target = NULL,
+    # far_uvc_workplace_coverage_type = NULL,
+    # far_uvc_workplace_efficacy = NULL,
+    # far_uvc_workplace_timestep = NULL,
+    #
+    # # Far UVC Parameters: School
+    # far_uvc_school = FALSE,
+    # far_uvc_school_coverage = NULL,
+    # far_uvc_school_coverage_target = NULL,
+    # far_uvc_school_coverage_type = NULL,
+    # far_uvc_school_efficacy = NULL,
+    # far_uvc_school_timestep = NULL,
+    #
+    # # Far UVC Parameters: Leisure:
+    # far_uvc_leisure = FALSE,
+    # far_uvc_leisure_coverage = NULL,
+    # far_uvc_leisure_coverage_target = NULL,
+    # far_uvc_leisure_coverage_type = NULL,
+    # far_uvc_leisure_efficacy = NULL,
+    # far_uvc_leisure_timestep = NULL,
+    #
+    # # Far UVC Parameters: Household:
+    # far_uvc_household = FALSE,
+    # far_uvc_household_coverage = NULL,
+    # far_uvc_household_coverage_target = NULL,
+    # far_uvc_household_coverage_type = NULL,
+    # far_uvc_household_efficacy = NULL,
+    # far_uvc_household_timestep = NULL,
+    #
 
 
   # #ach to efficacy parameters_workplace
