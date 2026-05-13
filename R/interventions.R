@@ -542,9 +542,9 @@ generate_setting_intervention_switches <- function(
 
   total <- sum(setting_size)
   intervention_switches <- rep(0, length(setting_size))
-  total_with_intervention <- floor(
-    parameters_list[[paste0("intervention_", setting, "_coverage")]] * total
-  )
+  interventions <- parameters_list[[paste0("intervention_", setting, "_list")]]
+  total_with_intervention <- floor(interventions[[1]]$coverage * total)
+
 
   if (parameters_list[[paste0("intervention_", setting, "_coverage_type")]] == "random") {
     sum <- 0
@@ -663,7 +663,6 @@ set_intervention_ach <- function(parameters_list,
   # intervention_<setting>_*. Same paste0 pattern works for both.
   parameters_list[[paste0("intervention_", setting, "_active")]]          <- TRUE
   parameters_list[[paste0("intervention_", setting, "_list")]]            <- interventions
-  parameters_list[[paste0("intervention_", setting, "_coverage")]]        <- coverage
   parameters_list[[paste0("intervention_", setting, "_coverage_target")]] <- coverage_target
   parameters_list[[paste0("intervention_", setting, "_coverage_type")]]   <- coverage_type
   parameters_list[[paste0("intervention_", setting, "_timestep")]]        <- timestep

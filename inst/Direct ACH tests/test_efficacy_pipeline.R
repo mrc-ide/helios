@@ -205,15 +205,15 @@ params_baseline <- base_params %>%
 cat("Test 37: set_intervention_ach -> active flag and list stored correctly\n")
 
 uv222_intv <- make_intervention(
-  name                   = "uv222_workplace",
+  name                     = "uv222_workplace",
   affected_by_baseline_ach = FALSE,
-  baseline_ach_function  = make_const_fn(uv_to_delta(f = 1, E_avg = 1, k = 4.22))
+  baseline_ach_function    = make_const_fn(uv_to_delta(f = 1, E_avg = 1, k = 4.22)),
+  coverage                 = 1.0
 )
 
 params_intv <- params_baseline %>%
   set_intervention_ach(
     setting         = "workplace",
-    coverage        = 1.0,
     coverage_target = "individuals",
     coverage_type   = "random",
     timestep        = 0,
@@ -225,7 +225,8 @@ stopifnot("intervention list is stored" = is.list(params_intv$intervention_workp
 stopifnot("one intervention in list"    = length(params_intv$intervention_workplace_list) == 1)
 stopifnot("intervention name correct"   =
             params_intv$intervention_workplace_list[[1]]$name == "uv222_workplace")
-stopifnot("coverage stored"             = params_intv$intervention_workplace_coverage == 1.0)
+stopifnot("coverage stored on intervention" =
+            params_intv$intervention_workplace_list[[1]]$coverage == 1.0)
 cat("  PASS\n\n")
 
 
