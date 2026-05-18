@@ -23,7 +23,7 @@
 # #' @family intervention
 # #' @export
 # set_uvc <- function(
-#   parameters_list,
+    #   parameters_list,
 #   setting,
 #   coverage,
 #   coverage_target,
@@ -165,7 +165,7 @@ generate_intervention_switches <- function(parameters_list, variables_list) {
   setting_types <- c("workplace", "school", "leisure", "household")
   if (
     isTRUE(parameters_list$intervention_joint_active) &
-      any(unlist(parameters_list[paste0("intervention_", setting_types, "_active")]))
+    any(unlist(parameters_list[paste0("intervention_", setting_types, "_active")]))
   ) {
     stop(
       "If intervention_joint_active is set to TRUE, setting-type specific intervention switches must be set to FALSE"
@@ -428,7 +428,7 @@ generate_joint_intervention_switches <- function(parameters_list, variables_list
 # #' @family intervention
 # #' @export
 # generate_setting_far_uvc_switches <- function(
-#   parameters_list,
+    #   parameters_list,
 #   variables_list,
 #   setting
 # ) {
@@ -518,9 +518,9 @@ generate_joint_intervention_switches <- function(parameters_list, variables_list
 #' @family intervention
 #' @export
 generate_setting_intervention_switches <- function(
-  parameters_list,
-  variables_list,
-  setting
+    parameters_list,
+    variables_list,
+    setting
 ) {
   if (parameters_list[[paste0("intervention_", setting, "_coverage_target")]] == "individuals") {
     if (setting == "leisure") {
@@ -544,9 +544,9 @@ generate_setting_intervention_switches <- function(
 
   total <- sum(setting_size)
   intervention_switches <- rep(0, length(setting_size))
-  total_with_intervention <- floor(
-    parameters_list[[paste0("intervention_", setting, "_coverage")]] * total
-  )
+  interventions <- parameters_list[[paste0("intervention_", setting, "_list")]]
+  total_with_intervention <- floor(interventions[[1]]$coverage * total)
+
 
   if (parameters_list[[paste0("intervention_", setting, "_coverage_type")]] == "random") {
     sum <- 0
@@ -599,7 +599,8 @@ make_intervention <- function(name,
                               baseline_ach_params      = list(),
                               variation                = FALSE,
                               variation_function       = NULL,
-                              variation_params         = list()) {
+                              variation_params         = list(),
+                              coverage                 = NULL) {
   list(
     name                     = name,
     affected_by_baseline_ach = affected_by_baseline_ach,
@@ -607,7 +608,8 @@ make_intervention <- function(name,
     baseline_ach_params      = baseline_ach_params,
     variation                = variation,
     variation_function       = variation_function,
-    variation_params         = variation_params
+    variation_params         = variation_params,
+    coverage                 = coverage
   )
 }
 
@@ -616,7 +618,6 @@ make_intervention <- function(name,
 # independent coverage is settled.
 set_intervention_ach <- function(parameters_list,
                                  setting,
-                                 coverage,
                                  coverage_target,
                                  coverage_type,
                                  timestep,
@@ -638,9 +639,6 @@ set_intervention_ach <- function(parameters_list,
   }
   if (length(interventions) > 1) {
     stop("multi-intervention support is not yet implemented; please pass a single intervention")
-  }
-  if (!is.numeric(coverage) || length(coverage) != 1 || coverage < 0 || coverage > 1) {
-    stop("coverage must be a single numeric value between 0 and 1")
   }
   if (length(coverage_target) > 1) {
     stop(
@@ -667,10 +665,13 @@ set_intervention_ach <- function(parameters_list,
   # intervention_<setting>_*. Same paste0 pattern works for both.
   parameters_list[[paste0("intervention_", setting, "_active")]]          <- TRUE
   parameters_list[[paste0("intervention_", setting, "_list")]]            <- interventions
-  parameters_list[[paste0("intervention_", setting, "_coverage")]]        <- coverage
   parameters_list[[paste0("intervention_", setting, "_coverage_target")]] <- coverage_target
   parameters_list[[paste0("intervention_", setting, "_coverage_type")]]   <- coverage_type
   parameters_list[[paste0("intervention_", setting, "_timestep")]]        <- timestep
+
+  if (setting == "joint") {
+    parameters_list[["intervention_joint_coverage"]] <- interventions[[1]]$coverage
+  }
 
   return(parameters_list)
 }
@@ -733,30 +734,38 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   # (used by unit tests that bypass set_intervention_ach).
   coverage_vector <- parameters_list[[paste0("intervention_", setting, "_covered")]]
 
-  if (intervention$affected_by_baseline_ach) {
-    delta_i <- mapply(
-      function(ach) do.call(intervention$baseline_ach_function,
-                            c(list(ach), intervention$baseline_ach_params)),
-      ach_values
-    )
-  } else {
-    delta_i <- rep(
-      do.call(intervention$baseline_ach_function, intervention$baseline_ach_params),
-      n
-    )
-  }
+  for (intervention in interventions) {
 
-  if (intervention$variation && !is.null(intervention$variation_function)) {
-    noise   <- do.call(intervention$variation_function,
-                       c(list(n), intervention$variation_params))
-    delta_i <- pmax(0, delta_i + noise)
-  }
+    # call baseline_ach_function to get delta for each location
+    if (intervention$affected_by_baseline_ach) {
+      # pass baseline ACH as first argument, then params
+      delta_i <- mapply(
+        function(ach) do.call(intervention$baseline_ach_function,
+                              c(list(ach), intervention$baseline_ach_params)),
+        ach_values
+      )
+    } else {
+      # function only uses its own params — same delta replicated across locations
+      delta_i <- rep(
+        do.call(intervention$baseline_ach_function, intervention$baseline_ach_params),
+        n
+      )
+    }
 
-  if (!is.null(coverage_vector)) {
-    delta_i <- delta_i * coverage_vector
-  }
+    # add location-to-location variation if requested
+    if (intervention$variation && !is.null(intervention$variation_function)) {
+      noise   <- do.call(intervention$variation_function,
+                         c(list(n), intervention$variation_params))
+      delta_i <- pmax(0, delta_i + noise)
+    }
 
-  total_delta <- delta_i
+    # zero out delta for uncovered locations
+    if (!is.null(coverage_vector)) {
+      delta_i <- delta_i * coverage_vector
+    }
+
+    total_delta <- total_delta + delta_i
+  }
 
   alpha_pre  <- ach_values + kD
   alpha_post <- ach_values + kD + total_delta
