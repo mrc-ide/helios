@@ -48,41 +48,6 @@
 #' Rendering Parameters
 #' * `render_diagnostics`: FALSE
 #'
-#' Far UVC Intervention Parameters:
-#' * `far_uvc_joint`: boolean switch set to TRUE if far UVC intervention parameterised jointly using `set_uvc()`; default = FALSE
-#' * `far_uvc_joint_coverage`: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_joint_coverage_target`: The target that coverage proportion applies to. Can either be "individuals" or "square footage".
-#' * `far_uvc_joint_coverage_type`: Type of coverage. Can either be "random" or "targeted_riskiness".
-#' * `far_uvc_joint_efficacy`: : Efficacy of far UVC in the joint setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_joint_timestep`: The timestep on which far UVC is jointly implemented (must be a numeric value greater than or equal to 0)
-#'
-#' * `far_uvc_workplace`: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using `set_uvc()`; default = FALSE
-#' * `far_uvc_workplace_coverage`: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_workplace_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-#' * `far_uvc_workplace_coverage_type`: Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted_riskiness" for targeting interventions at most risky workplaces
-#' * `far_uvc_workplace_efficacy`: : Efficacy of far UVC in the workplace setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_workplace_timestep`: The timestep on which far UVC is implemented in the workplace setting (must be a numeric value greater than or equal to 0)
-#'
-#' * `far_uvc_school`: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using `set_uvc()`; default = FALSE
-#' * `far_uvc_school_coverage`: Proportion of schools covered with far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_school_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-#' * `far_uvc_school_coverage_type`: Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted_riskiness" for targeting interventions at most risky schools
-#' * `far_uvc_school_efficacy`: : Efficacy of far UVC in the school setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_school_timestep`: The timestep on which far UVC is implemented in the school setting (must be a numeric value greater than or equal to 0)
-#'
-#' * `far_uvc_leisure`: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using `set_uvc()`; default = FALSE
-#' * `far_uvc_leisure_coverage`: Proportion of leisure settings covered with far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_leisure_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-#' * `far_uvc_leisure_coverage_type`: Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted_riskiness" for targeting interventions at most risky leisure settings
-#' * `far_uvc_leisure_efficacy`: : Efficacy of far UVC in the leisure setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_leisure_timestep`: The timestep on which far UVC is implemented in the leisure setting (must be a numeric value greater than or equal to 0)
-#'
-#' * `far_uvc_household`: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using `set_uvc()`; default = FALSE
-#' * `far_uvc_household_coverage`: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_household_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-#' * `far_uvc_household_coverage_type`: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted_riskiness" for targeting interventions at most risky households
-#' * `far_uvc_household_efficacy`: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_household_timestep`: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
 #'
 #' Setting-Specific Riskiness Parameters:
 #' * `setting_specific_riskiness_workplace`: boolean switch set to TRUE if setting-specific riskiness parameterised in the workplace setting using `set_setting_specific_riskiness()`; default = FALSE
@@ -234,82 +199,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     wells_riley_time_in_room = 4,# t, hours spent in room
     wells_riley_reference_ach = NULL,
 
-    # # Far UVC Efficacy Parameters (function of ACH)
-    # far_uvc_efficacy_function = NULL,
-    # far_uvc_efficacy_max_workplace = NULL,
-    # far_uvc_efficacy_max_school = NULL,
-    # far_uvc_efficacy_max_leisure = NULL,
-    # far_uvc_efficacy_max_household = NULL,
-
-    # # Far UVC Parameters: Joint
-    # far_uvc_joint = FALSE,
-    # far_uvc_joint_coverage = NULL,
-    # far_uvc_joint_coverage_target = NULL,
-    # far_uvc_joint_coverage_type = NULL,
-    # far_uvc_joint_efficacy = NULL,
-    # far_uvc_joint_timestep = NULL,
-    #
-    # # Far UVC Parameters: Workplace
-    # far_uvc_workplace = FALSE,
-    # far_uvc_workplace_coverage = NULL,
-    # far_uvc_workplace_coverage_target = NULL,
-    # far_uvc_workplace_coverage_type = NULL,
-    # far_uvc_workplace_efficacy = NULL,
-    # far_uvc_workplace_timestep = NULL,
-    #
-    # # Far UVC Parameters: School
-    # far_uvc_school = FALSE,
-    # far_uvc_school_coverage = NULL,
-    # far_uvc_school_coverage_target = NULL,
-    # far_uvc_school_coverage_type = NULL,
-    # far_uvc_school_efficacy = NULL,
-    # far_uvc_school_timestep = NULL,
-    #
-    # # Far UVC Parameters: Leisure:
-    # far_uvc_leisure = FALSE,
-    # far_uvc_leisure_coverage = NULL,
-    # far_uvc_leisure_coverage_target = NULL,
-    # far_uvc_leisure_coverage_type = NULL,
-    # far_uvc_leisure_efficacy = NULL,
-    # far_uvc_leisure_timestep = NULL,
-    #
-    # # Far UVC Parameters: Household:
-    # far_uvc_household = FALSE,
-    # far_uvc_household_coverage = NULL,
-    # far_uvc_household_coverage_target = NULL,
-    # far_uvc_household_coverage_type = NULL,
-    # far_uvc_household_efficacy = NULL,
-    # far_uvc_household_timestep = NULL,
-    #
-
-
-  # #ach to efficacy parameters_workplace
-  #   far_uvc_workplace_ach_efficacy_relationship = NULL, #constant or sigmoid
-  #   far_uvc_workplace_efficacy = NULL, #constant
-  #   far_uvc_workplace_max_efficacy = NULL,  # sigmoid
-  #   far_uvc_workplace_sigmoid_k = NULL,
-  #   far_uvc_workplace_sigmoid_x0 = NULL,
-  #
-  #   #ach to efficacy parameters_school
-  #   far_uvc_school_ach_efficacy_relationship = NULL, #constant or sigmoid
-  #   far_uvc_school_efficacy = NULL, #constant
-  #   far_uvc_school_max_efficacy = NULL,  # sigmoid
-  #   far_uvc_school_sigmoid_k = NULL,
-  #   far_uvc_school_sigmoid_x0 = NULL,
-  #
-  #   #ach to efficacy parameters_leisure
-  #   far_uvc_leisure_ach_efficacy_relationship = NULL, #constant or sigmoid
-  #   far_uvc_leisure_efficacy = NULL, #constant
-  #   far_uvc_leisure_max_efficacy = NULL,  # sigmoid
-  #   far_uvc_leisure_sigmoid_k = NULL,
-  #   far_uvc_leisure_sigmoid_x0 = NULL,
-  #
-  #   #ach to efficacy parameters_house
-  #   far_uvc_household_ach_efficacy_relationship = NULL, #constant or sigmoid
-  #   far_uvc_household_efficacy = NULL, #constant
-  #   far_uvc_household_max_efficacy = NULL,  # sigmoid
-  #   far_uvc_household_sigmoid_k = NULL,
-  #   far_uvc_household_sigmoid_x0 = NULL,
 
   # Intervention parameters (Wells-Riley ACH-based efficacy):
     intervention_joint_active              = FALSE,
@@ -396,64 +285,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     stop("dt must evenly divide into 1 e.g. 0.1, 0.2, 0.25, 0.5")
   }
 
-  # # Old targeted_riskiness validation against the removed far_uvc_* config
-  # # slots. Disabled because those defaults are no longer in parameters_list;
-  # # equivalent checks for the new intervention_* API still TODO.
-  # if (parameters$far_uvc_joint) {
-  #   if (
-  #     parameters$far_uvc_joint_coverage_target == "targeted_riskiness" &
-  #       !any(
-  #         parameters$setting_specific_riskiness_workplace |
-  #           parameters$setting_specific_riskiness_school |
-  #           parameters$setting_specific_riskiness_leisure |
-  #           parameters$setting_specific_riskiness_household
-  #       )
-  #   ) {
-  #     warning(
-  #       "coverage_target is set to targeted_riskiness but at least one of the setting_specific_riskinesses is not turned on"
-  #     )
-  #   }
-  # }
-  # if (parameters$far_uvc_household) {
-  #   if (
-  #     parameters$far_uvc_household_coverage_target == "targeted_riskiness" &
-  #       !parameters$setting_specific_riskiness_household
-  #   ) {
-  #     warning(
-  #       "far_uvc_household_coverage_target is set to targeted_riskiness but setting_specific_riskiness_household is not turned on"
-  #     )
-  #   }
-  # }
-  # if (parameters$far_uvc_workplace) {
-  #   if (
-  #     parameters$far_uvc_workplace_coverage_target == "targeted_riskiness" &
-  #       !parameters$setting_specific_riskiness_workplace
-  #   ) {
-  #     warning(
-  #       "far_uvc_workplace_coverage_target is set to targeted_riskiness but setting_specific_riskiness_workplace is not turned on"
-  #     )
-  #   }
-  # }
-  # if (parameters$far_uvc_school) {
-  #   if (
-  #     parameters$far_uvc_school_coverage_target == "targeted_riskiness" &
-  #       !parameters$setting_specific_riskiness_school
-  #   ) {
-  #     warning(
-  #       "far_uvc_school_coverage_target is set to targeted_riskiness but setting_specific_riskiness_school is not turned on"
-  #     )
-  #   }
-  # }
-  # if (parameters$far_uvc_leisure) {
-  #   if (
-  #     parameters$far_uvc_leisure_coverage_target == "targeted_riskiness" &
-  #       !parameters$setting_specific_riskiness_leisure
-  #   ) {
-  #     warning(
-  #       "far_uvc_leisure_coverage_target is set to targeted_riskiness but setting_specific_riskiness_leisure is not turned on"
-  #     )
-  #   }
-  # }
+
 
   # Check duration_immune is set if endemic_or_epidemic == "endemic"
   if (!(parameters$endemic_or_epidemic %in% c("endemic", "epidemic"))) {

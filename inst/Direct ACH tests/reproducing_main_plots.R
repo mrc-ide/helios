@@ -1,6 +1,4 @@
-# Coverage × efficacy scan on the branch
-# SARS-CoV-2 only, 50k pop, joint intervention, 5 seeds
-# Run from /Users/geethaj/helios (ach_efficacy_update branch)
+
 
 library(dplyr)
 library(ggplot2)
