@@ -226,8 +226,8 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     volume_per_person_leisure = 8, # 2m^2*4M
     volume_per_person_household = 50, # 20m^2 * 2.5m
 
-  # W-R parameters
-    wells_riley_emission_rate = 27,  # FFU/hour
+    # W-R parameters
+    wells_riley_emission_rate = 27, # FFU/hour
     wells_riley_decay_rate = 0.64, # k_D, natural decay rate (1/hr)
     wells_riley_infection_prob_per_ffu = 1.37e-2, # r, infection probability per FFU
     wells_riley_respiratory_rate_factor = 0.45, # RR_tv
