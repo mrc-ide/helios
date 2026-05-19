@@ -166,6 +166,7 @@ p_peak <- ggplot(summary_df, aes(x = coverage * 100, color = coverage_label,
   facet_grid(. ~ efficacy_label) +
   scale_color_manual(values = c(Random = "#5DADE2", Targeted = "#1B4F72")) +
   scale_fill_manual(values  = c(Random = "#5DADE2", Targeted = "#1B4F72")) +
+  scale_y_continuous(limits = c(0, NA), breaks = seq(0,25, by = 5)) +
   labs(
     x = "Joint Intervention Coverage (%)",
     y = "Mean Peak Epidemic Size\n(% of population)",
