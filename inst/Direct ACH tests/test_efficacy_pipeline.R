@@ -34,20 +34,20 @@ stopifnot("efficacy should be 0 when no interventions" = all(abs(eff_21) < 1e-10
 cat("  PASS\n\n")
 
 
-# ── Test 22: affected_by_baseline_ach = FALSE -> uniform delta ────────────────
+# ── Test 22: delta_depends_on_baseline_ach = FALSE -> uniform delta ────────────────
 # All locations receive the same delta regardless of their ACH value.
 # Because delta is the same but baseline ACH differs, efficacy still varies
 # across locations — specifically, higher baseline ACH yields LOWER efficacy
 # (diminishing returns). We verify the monotone-decreasing pattern.
 
-cat("Test 22: affected_by_baseline_ach = FALSE -> uniform delta, efficacy\n",
+cat("Test 22: delta_depends_on_baseline_ach = FALSE -> uniform delta, efficacy\n",
     "         decreases as baseline ACH increases\n")
 
 intv_22 <- make_intervention(
   name                   = "constant_ach",
-  affected_by_baseline_ach = FALSE,
-  baseline_ach_function  = make_const_fn(5),
-  baseline_ach_params    = list()
+  delta_depends_on_baseline_ach = FALSE,
+  delta_function  = make_const_fn(5),
+  delta_params    = list()
 )
 params_22 <- c(wr_params, list(intervention_workplace_list = list(intv_22)))
 eff_22    <- calculate_efficacy_from_ach(ach_values, params_22, "workplace")
@@ -57,16 +57,16 @@ stopifnot("efficacy strictly decreases as baseline ACH increases" = all(diff(eff
 cat("  PASS\n\n")
 
 
-# ── Test 23: affected_by_baseline_ach = TRUE -> delta varies by location ──────
+# ── Test 23: delta_depends_on_baseline_ach = TRUE -> delta varies by location ──────
 # Delta is a function of the location's baseline ACH. Output should still be
 # a vector of length n with all values in [0, 1).
 
-cat("Test 23: affected_by_baseline_ach = TRUE -> delta varies, output length OK\n")
+cat("Test 23: delta_depends_on_baseline_ach = TRUE -> delta varies, output length OK\n")
 
 intv_23 <- make_intervention(
   name                   = "ach_dependent",
-  affected_by_baseline_ach = TRUE,
-  baseline_ach_function  = function(ach) ach * 0.5  # delta = half of baseline ACH
+  delta_depends_on_baseline_ach = TRUE,
+  delta_function  = function(ach) ach * 0.5  # delta = half of baseline ACH
 )
 params_23 <- c(wr_params, list(intervention_workplace_list = list(intv_23)))
 eff_23    <- calculate_efficacy_from_ach(ach_values, params_23, "workplace")
@@ -84,9 +84,9 @@ cat("  PASS\n\n")
 
 cat("Test 24: Two additive interventions -> same result as single delta = sum\n")
 
-intv_a        <- make_intervention("A", baseline_ach_function = make_const_fn(3))
-intv_b        <- make_intervention("B", baseline_ach_function = make_const_fn(4))
-intv_combined <- make_intervention("AB", baseline_ach_function = make_const_fn(7))
+intv_a        <- make_intervention("A", delta_function = make_const_fn(3))
+intv_b        <- make_intervention("B", delta_function = make_const_fn(4))
+intv_combined <- make_intervention("AB", delta_function = make_const_fn(7))
 
 params_both <- c(wr_params, list(intervention_workplace_list = list(intv_a, intv_b)))
 params_comb <- c(wr_params, list(intervention_workplace_list = list(intv_combined)))
@@ -105,7 +105,7 @@ cat("  PASS\n\n")
 cat("Test 25: All efficacy values in [0, 1)\n")
 
 uv222_delta <- uv_to_delta(f = 1, E_avg = 1, k = 4.22)   # ~15.2 eACH
-intv_25 <- make_intervention("uv222", baseline_ach_function = make_const_fn(uv222_delta))
+intv_25 <- make_intervention("uv222", delta_function = make_const_fn(uv222_delta))
 params_25 <- c(wr_params, list(intervention_workplace_list = list(intv_25)))
 eff_25    <- calculate_efficacy_from_ach(ach_values, params_25, "workplace")
 
@@ -119,7 +119,7 @@ cat("  PASS\n\n")
 
 cat("Test 26: delta = 0 -> efficacy = 0\n")
 
-intv_26 <- make_intervention("zero", baseline_ach_function = make_const_fn(0))
+intv_26 <- make_intervention("zero", delta_function = make_const_fn(0))
 params_26 <- c(wr_params, list(intervention_workplace_list = list(intv_26)))
 eff_26    <- calculate_efficacy_from_ach(ach_values, params_26, "workplace")
 
@@ -133,7 +133,7 @@ cat("  PASS\n\n")
 
 cat("Test 27: Very large delta -> efficacy close to 1 but strictly < 1\n")
 
-intv_27 <- make_intervention("huge", baseline_ach_function = make_const_fn(1e6))
+intv_27 <- make_intervention("huge", delta_function = make_const_fn(1e6))
 params_27 <- c(wr_params, list(intervention_workplace_list = list(intv_27)))
 eff_27    <- calculate_efficacy_from_ach(ach_values, params_27, "workplace")
 
@@ -149,7 +149,7 @@ cat("  PASS\n\n")
 cat("Test 28: Higher baseline ACH -> lower efficacy for same intervention\n")
 
 ach_range <- c(0.5, 1, 3, 6, 10, 20)
-intv_28   <- make_intervention("fixed", baseline_ach_function = make_const_fn(5))
+intv_28   <- make_intervention("fixed", delta_function = make_const_fn(5))
 params_28 <- c(wr_params, list(intervention_workplace_list = list(intv_28)))
 eff_28    <- calculate_efficacy_from_ach(ach_range, params_28, "workplace")
 
@@ -165,7 +165,7 @@ cat("Test 29: Larger delta -> higher efficacy at same baseline ACH\n")
 deltas <- c(1, 3, 5, 10, 20)
 eff_29 <- sapply(deltas, function(d) {
   p <- c(wr_params, list(intervention_workplace_list = list(
-    make_intervention("x", baseline_ach_function = make_const_fn(d))
+    make_intervention("x", delta_function = make_const_fn(d))
   )))
   calculate_efficacy_from_ach(4, p, "workplace")  # fixed ACH = 4
 })
@@ -206,8 +206,8 @@ cat("Test 37: set_intervention_ach -> active flag and list stored correctly\n")
 
 uv222_intv <- make_intervention(
   name                   = "uv222_workplace",
-  affected_by_baseline_ach = FALSE,
-  baseline_ach_function  = make_const_fn(uv_to_delta(f = 1, E_avg = 1, k = 4.22))
+  delta_depends_on_baseline_ach = FALSE,
+  delta_function  = make_const_fn(uv_to_delta(f = 1, E_avg = 1, k = 4.22))
 )
 
 params_intv <- params_baseline %>%

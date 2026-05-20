@@ -47,12 +47,12 @@ run_one <- function(seed, coverage, efficacy_target, coverage_type) {
     d <- calibrated_deltas[[as.character(efficacy_target)]]
     intv <- make_intervention(
       name                     = paste0("uvc_eff", efficacy_target),
-      affected_by_baseline_ach = FALSE,
-      baseline_ach_function    = local({
+      delta_depends_on_baseline_ach = FALSE,
+      delta_function    = local({
         delta_val <- d
         function() delta_val
       }),
-      baseline_ach_params      = list(),
+      delta_params      = list(),
       coverage = coverage
     )
     params <- set_intervention_ach(

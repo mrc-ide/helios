@@ -14,10 +14,10 @@
 #       set_setting_specific_ach("household", mean = 0.5, sd = 0.2)
 #
 # (3) (Optional) Define an intervention. Three orthogonal knobs:
-#     - constant delta:            affected_by_baseline_ach = FALSE,
-#                                  baseline_ach_function = function() <delta>
-#     - delta varies with ACH:     affected_by_baseline_ach = TRUE,
-#                                  baseline_ach_function = function(ach, ...) <expr>
+#     - constant delta:            delta_depends_on_baseline_ach = FALSE,
+#                                  delta_function = function() <delta>
+#     - delta varies with ACH:     delta_depends_on_baseline_ach = TRUE,
+#                                  delta_function = function(ach, ...) <expr>
 #     - unit-to-unit noise:        variation = TRUE,
 #                                  variation_function = rnorm,
 #                                  variation_params = list(mean=0, sd=...)
@@ -25,9 +25,9 @@
 #     intervention object:
 #     intv <- make_intervention(
 #       name                     = "...",
-#       affected_by_baseline_ach = FALSE,
-#       baseline_ach_function    = function() 4,
-#       baseline_ach_params      = list(),
+#       delta_depends_on_baseline_ach = FALSE,
+#       delta_function    = function() 4,
+#       delta_params      = list(),
 #       coverage                 = 0.5
 #     )
 #
@@ -159,9 +159,9 @@ cat(sprintf("Calibrated delta for %.0f%% target efficacy: %.2f eACH\n",
 
 intv_3 <- make_intervention(
   name                     = "constant_uvc",
-  affected_by_baseline_ach = FALSE,
-  baseline_ach_function    = local({d <- delta_3; function() d}),
-  baseline_ach_params      = list(),
+  delta_depends_on_baseline_ach = FALSE,
+  delta_function    = local({d <- delta_3; function() d}),
+  delta_params      = list(),
   coverage                 = 0.5
 )
 params_3 <- make_base_params() %>% add_setting_specific_ach() %>%
@@ -191,15 +191,15 @@ for (s in c("workplace", "school", "leisure")) {
 # Section 4 — Baseline-ACH-dependent intervention (delta scales with ACH)
 # =============================================================================
 # Models "improve ventilation by X% of baseline": delta = boost * ach.
-# Tests the affected_by_baseline_ach = TRUE code path. Locations with higher
+# Tests the delta_depends_on_baseline_ach = TRUE code path. Locations with higher
 # baseline ACH get a bigger absolute delta added.
 
 cat("\n========== 4: baseline-ACH-dependent intervention ==========\n")
 intv_4 <- make_intervention(
   name                     = "ventilation_upgrade",
-  affected_by_baseline_ach = TRUE,
-  baseline_ach_function    = function(ach, boost) ach * boost,
-  baseline_ach_params      = list(boost = 0.5),
+  delta_depends_on_baseline_ach = TRUE,
+  delta_function    = function(ach, boost) ach * boost,
+  delta_params      = list(boost = 0.5),
   coverage                 = 0.5
 )
 params_4 <- make_base_params() %>% add_setting_specific_ach() %>%
@@ -224,9 +224,9 @@ plot_seir(out_4, "4: delta = 0.5 * baseline ACH, joint, 50% cov")
 cat("\n========== 5: intervention with variation ==========\n")
 intv_5 <- make_intervention(
   name                     = "hepa_with_variation",
-  affected_by_baseline_ach = FALSE,
-  baseline_ach_function    = function() 3,
-  baseline_ach_params      = list(),
+  delta_depends_on_baseline_ach = FALSE,
+  delta_function    = function() 3,
+  delta_params      = list(),
   variation                = TRUE,
   variation_function       = rnorm,
   variation_params         = list(mean = 0, sd = 0.5),
@@ -254,15 +254,15 @@ plot_seir(out_5, "5: HEPA delta=3, noise sd=0.5, joint, 50% cov")
 cat("\n========== 6: per-setting interventions ==========\n")
 intv_wp <- make_intervention(
   name = "uvc_workplace",
-  affected_by_baseline_ach = FALSE,
-  baseline_ach_function = function() 4,
-  baseline_ach_params = list(), coverage = 0.6
+  delta_depends_on_baseline_ach = FALSE,
+  delta_function = function() 4,
+  delta_params = list(), coverage = 0.6
 )
 intv_sc <- make_intervention(
   name = "uvc_school",
-  affected_by_baseline_ach = FALSE,
-  baseline_ach_function = function() 2,
-  baseline_ach_params = list(), coverage = 0.8
+  delta_depends_on_baseline_ach = FALSE,
+  delta_function = function() 2,
+  delta_params = list(), coverage = 0.8
 )
 params_6 <- make_base_params() %>% add_setting_specific_ach() %>%
   set_intervention_ach(
@@ -288,9 +288,9 @@ cat("\n========== 7: random vs targeted ==========\n")
 make_intv <- function() {
   make_intervention(
     name = "comparison",
-    affected_by_baseline_ach = FALSE,
-    baseline_ach_function = local({d <- delta_3; function() d}),
-    baseline_ach_params = list(),
+    delta_depends_on_baseline_ach = FALSE,
+    delta_function = local({d <- delta_3; function() d}),
+    delta_params = list(),
     coverage = 0.5
   )
 }

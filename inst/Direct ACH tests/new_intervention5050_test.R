@@ -42,13 +42,13 @@ delta_calibrated <- efficacy_to_delta(
 )
 cat("Calibrated intervention delta (eACH):", round(delta_calibrated, 2), "\n")
 
-# Constant-delta intervention. baseline_ach_function takes no args and returns
-# the same delta everywhere; affected_by_baseline_ach = FALSE.
+# Constant-delta intervention. delta_function takes no args and returns
+# the same delta everywhere; delta_depends_on_baseline_ach = FALSE.
 joint_intv <- make_intervention(
   name                     = "joint_uvc",
-  affected_by_baseline_ach = FALSE,
-  baseline_ach_function    = function() delta_calibrated,
-  baseline_ach_params      = list()
+  delta_depends_on_baseline_ach = FALSE,
+  delta_function    = function() delta_calibrated,
+  delta_params      = list()
 )
 
 # ---- Configure intervention -------------------------------------------------

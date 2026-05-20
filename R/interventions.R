@@ -591,21 +591,21 @@ generate_setting_intervention_switches <- function(
 # Wells-Riley ACH-based intervention pipeline
 # =============================================================================
 # Constructor for an intervention object. The intervention's effect on per-
-# location alpha (ACH + decay) is described by `baseline_ach_function`, which
+# location alpha (ACH + decay) is described by `delta_function`, which
 # can either depend on the location's baseline ACH or be a fixed delta.
 make_intervention <- function(name,
-                              affected_by_baseline_ach = FALSE,
-                              baseline_ach_function    = NULL,
-                              baseline_ach_params      = list(),
+                              delta_depends_on_baseline_ach = FALSE,
+                              delta_function    = NULL,
+                              delta_params      = list(),
                               variation                = FALSE,
                               variation_function       = NULL,
                               variation_params         = list(),
                               coverage                 = NULL) {
   list(
     name                     = name,
-    affected_by_baseline_ach = affected_by_baseline_ach,
-    baseline_ach_function    = baseline_ach_function,
-    baseline_ach_params      = baseline_ach_params,
+    delta_depends_on_baseline_ach = delta_depends_on_baseline_ach,
+    delta_function    = delta_function,
+    delta_params      = delta_params,
     variation                = variation,
     variation_function       = variation_function,
     variation_params         = variation_params,
@@ -736,18 +736,18 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
 
   for (intervention in interventions) {
 
-    # call baseline_ach_function to get delta for each location
-    if (intervention$affected_by_baseline_ach) {
+    # call delta_function to get delta for each location
+    if (intervention$delta_depends_on_baseline_ach) {
       # pass baseline ACH as first argument, then params
       delta_i <- mapply(
-        function(ach) do.call(intervention$baseline_ach_function,
-                              c(list(ach), intervention$baseline_ach_params)),
+        function(ach) do.call(intervention$delta_function,
+                              c(list(ach), intervention$delta_params)),
         ach_values
       )
     } else {
       # function only uses its own params — same delta replicated across locations
       delta_i <- rep(
-        do.call(intervention$baseline_ach_function, intervention$baseline_ach_params),
+        do.call(intervention$delta_function, intervention$delta_params),
         n
       )
     }
