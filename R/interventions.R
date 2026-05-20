@@ -589,8 +589,8 @@ set_intervention_ach <- function(parameters_list,
                                  coverage_target,
                                  coverage_type,
                                  timestep,
-                                 coverage_correlation = NULL,
-                                 ...) {
+                                 ...,
+                                 coverage_correlation = NULL) {
   interventions <- list(...)
 
   if (length(setting) > 1) {
