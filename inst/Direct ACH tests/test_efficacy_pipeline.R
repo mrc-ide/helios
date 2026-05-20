@@ -353,4 +353,120 @@ cat("  Plot printed — check that intervention curve is below baseline.\n\n")
 
 
 cat("=== Tests 37-42 COMPLETE ===\n\n")
+
+
+# ── Test 43: Multi-intervention — matrix shape and marginals (rho = 0) ────────
+# Two interventions with different coverages, drawn independently. Verify the
+# coverage matrix has the right shape and per-column marginals match p_k.
+
+cat("Test 43: Two interventions, rho = 0 -> independent draws, marginals match\n")
+
+uv222_multi <- make_intervention(
+  "uv222",
+  affected_by_baseline_ach = FALSE,
+  baseline_ach_function    = make_const_fn(15),
+  coverage                 = 0.5
+)
+hepa_multi <- make_intervention(
+  "hepa",
+  affected_by_baseline_ach = FALSE,
+  baseline_ach_function    = make_const_fn(8),
+  coverage                 = 0.3
+)
+
+params_multi_indep <- params_baseline %>%
+  set_intervention_ach(
+    setting              = "workplace",
+    coverage_target      = "individuals",
+    coverage_type        = "random",
+    timestep             = 0,
+    uv222_multi, hepa_multi,
+    coverage_correlation = 0
+  )
+
+vars_indep <- create_variables(params_multi_indep)
+M_indep    <- vars_indep$parameters_list$intervention_workplace_coverage_matrix
+
+cat("  Matrix shape:", paste(dim(M_indep), collapse = " x "), "\n")
+cat("  colMeans (expect ~0.5, ~0.3):", paste(round(colMeans(M_indep), 3), collapse = ", "), "\n")
+cat("  Both-covered fraction (expect ~0.15):", round(mean(M_indep[, 1] & M_indep[, 2]), 3), "\n")
+
+stopifnot("matrix has 2 columns" = ncol(M_indep) == 2)
+stopifnot("column 1 marginal near 0.5" = abs(mean(M_indep[, 1]) - 0.5) < 0.1)
+stopifnot("column 2 marginal near 0.3" = abs(mean(M_indep[, 2]) - 0.3) < 0.1)
+stopifnot("rho=0 overlap near p1*p2 = 0.15" =
+            abs(mean(M_indep[, 1] & M_indep[, 2]) - 0.15) < 0.07)
+cat("  PASS\n\n")
+
+
+# ── Test 44: Multi-intervention — perfect correlation (rho = 1) -> nested ─────
+# At rho=1, the smaller-p intervention's covered set should be (nearly) a
+# subset of the larger-p one's. Overlap fraction ~= min(p1, p2) = 0.3.
+
+cat("Test 44: Two interventions, rho = 1 -> nested coverage\n")
+
+params_multi_nested <- params_baseline %>%
+  set_intervention_ach(
+    setting              = "workplace",
+    coverage_target      = "individuals",
+    coverage_type        = "random",
+    timestep             = 0,
+    uv222_multi, hepa_multi,
+    coverage_correlation = 1
+  )
+
+vars_nested <- create_variables(params_multi_nested)
+M_nested    <- vars_nested$parameters_list$intervention_workplace_coverage_matrix
+
+overlap <- mean(M_nested[, 1] & M_nested[, 2])
+cat("  colMeans (expect ~0.5, ~0.3):", paste(round(colMeans(M_nested), 3), collapse = ", "), "\n")
+cat("  Both-covered fraction (expect ~0.3, the smaller p):", round(overlap, 3), "\n")
+
+stopifnot("column 1 marginal near 0.5" = abs(mean(M_nested[, 1]) - 0.5) < 0.1)
+stopifnot("column 2 marginal near 0.3" = abs(mean(M_nested[, 2]) - 0.3) < 0.1)
+stopifnot("rho=1 overlap near min(p1, p2)" = abs(overlap - 0.3) < 0.07)
+cat("  PASS\n\n")
+
+
+# ── Test 45: Multi-intervention validation errors ─────────────────────────────
+# - Missing coverage_correlation with 2+ random interventions -> error
+# - Joint setting + 2 interventions -> error
+
+cat("Test 45: validation errors\n")
+
+err_no_rho <- tryCatch({
+  params_baseline %>%
+    set_intervention_ach(
+      setting         = "workplace",
+      coverage_target = "individuals",
+      coverage_type   = "random",
+      timestep        = 0,
+      uv222_multi, hepa_multi
+    )
+  NULL
+}, error = function(e) conditionMessage(e))
+
+stopifnot("missing coverage_correlation errors" =
+            !is.null(err_no_rho) && grepl("coverage_correlation", err_no_rho))
+
+err_joint_multi <- tryCatch({
+  params_baseline %>%
+    set_intervention_ach(
+      setting              = "joint",
+      coverage_target      = "individuals",
+      coverage_type        = "random",
+      timestep             = 0,
+      uv222_multi, hepa_multi,
+      coverage_correlation = 0
+    )
+  NULL
+}, error = function(e) conditionMessage(e))
+
+stopifnot("joint + multi errors" =
+            !is.null(err_joint_multi) && grepl("joint", err_joint_multi))
+
+cat("  PASS\n\n")
+
+
+cat("=== Tests 43-45 COMPLETE ===\n\n")
 cat("All tests passed.\n")
