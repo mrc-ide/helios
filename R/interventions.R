@@ -387,15 +387,12 @@ generate_joint_intervention_switches <- function(parameters_list, variables_list
     names(setting_size_list),
     lengths(setting_size_list)
   )
-  parameters_list[["intervention_workplace_covered"]] <- intervention_switches[
-    setting_name_index == "workplace"
-  ]
-  parameters_list[["intervention_school_covered"]] <- intervention_switches[
-    setting_name_index == "school"
-  ]
-  parameters_list[["intervention_leisure_covered"]] <- intervention_switches[
-    setting_name_index == "leisure"
-  ]
+  parameters_list[["intervention_workplace_coverage_matrix"]] <-
+    matrix(intervention_switches[setting_name_index == "workplace"], ncol = 1)
+  parameters_list[["intervention_school_coverage_matrix"]] <-
+    matrix(intervention_switches[setting_name_index == "school"], ncol = 1)
+  parameters_list[["intervention_leisure_coverage_matrix"]] <-
+    matrix(intervention_switches[setting_name_index == "leisure"], ncol = 1)
 
   # Propagate joint intervention list and timestep to each per-setting slot,
   # and switch each setting's _active flag on so the per-setting efficacy
@@ -540,46 +537,19 @@ generate_setting_intervention_switches <- function(
     stop("coverage_target must be either individuals or square_footage")
   }
 
-  total <- sum(setting_size)
-  intervention_switches <- rep(0, length(setting_size))
   interventions <- parameters_list[[paste0("intervention_", setting, "_list")]]
-  total_with_intervention <- floor(interventions[[1]]$coverage * total)
+  p_vec         <- vapply(interventions, function(x) x$coverage, numeric(1))
+  rho           <- parameters_list[[paste0("intervention_", setting, "_coverage_correlation")]]
+  coverage_type <- parameters_list[[paste0("intervention_", setting, "_coverage_type")]]
 
-
-  if (parameters_list[[paste0("intervention_", setting, "_coverage_type")]] == "random") {
-    sum <- 0
-    indices <- c()
-    location_indices <- 1:length(setting_size)
-
-    while (sum < total_with_intervention) {
-      i <- sample(location_indices, 1)
-      sum <- sum + setting_size[i]
-      indices <- c(indices, i)
-      location_indices <- setdiff(location_indices, i)
-      if (length(location_indices) == 0 & sum < total_with_intervention) {
-        stop("Insufficient individuals to meet intervention coverage")
-      }
-    }
-    intervention_switches[indices] <- 1
-    parameters_list[[paste0("intervention_", setting, "_covered")]] <- intervention_switches
-  } else if (
-    parameters_list[[paste0("intervention_", setting, "_coverage_type")]] == "targeted_riskiness"
-  ) {
-    riskiness <- parameters_list[[paste0(setting, "_specific_riskiness")]]
-    riskiness_sorted <- sort(
-      x = riskiness,
-      decreasing = TRUE,
-      index.return = TRUE
+  parameters_list[[paste0("intervention_", setting, "_coverage_matrix")]] <-
+    draw_coverage_matrix(
+      p_vec         = p_vec,
+      rho           = rho,
+      coverage_type = coverage_type,
+      setting_size  = setting_size,
+      riskiness     = parameters_list[[paste0(setting, "_specific_riskiness")]]
     )
-    final_index <- min(which(
-      cumsum(setting_size[riskiness_sorted$ix]) >= total_with_intervention
-    ))
-    indices <- riskiness_sorted$ix[1:final_index]
-    intervention_switches[indices] <- 1
-    parameters_list[[paste0("intervention_", setting, "_covered")]] <- intervention_switches
-  } else {
-    stop("coverage_type must be either random or targeted_riskiness")
-  }
 
   return(parameters_list)
 }
@@ -611,14 +581,15 @@ make_intervention <- function(name,
   )
 }
 
-# Store an intervention for a setting in parameters_list. Single-intervention
-# only for now; multi-intervention design is deferred until clumped vs.
-# independent coverage is settled.
+# Store intervention(s) for a setting in parameters_list. Supports multiple
+# interventions per setting (per-setting modes only); joint mode remains
+# single-intervention in v1.
 set_intervention_ach <- function(parameters_list,
                                  setting,
                                  coverage_target,
                                  coverage_type,
                                  timestep,
+                                 coverage_correlation = NULL,
                                  ...) {
   interventions <- list(...)
 
@@ -635,8 +606,10 @@ set_intervention_ach <- function(parameters_list,
   if (length(interventions) == 0) {
     stop("set_intervention_ach requires at least one intervention")
   }
-  if (length(interventions) > 1) {
-    stop("multi-intervention support is not yet implemented; please pass a single intervention")
+  if (setting == "joint" && length(interventions) > 1) {
+    stop(
+      "multi-intervention support for joint mode is not yet implemented; please pass a single intervention"
+    )
   }
   if (length(coverage_target) > 1) {
     stop(
@@ -659,19 +632,127 @@ set_intervention_ach <- function(parameters_list,
     )
   }
 
+  # coverage_correlation validation: required for K>=2 random, ignored otherwise
+  if (length(interventions) >= 2) {
+    if (coverage_type == "targeted_riskiness" && !is.null(coverage_correlation)) {
+      stop(
+        "coverage_correlation is not used with coverage_type = 'targeted_riskiness' (deployment is deterministic / inherently nested)"
+      )
+    }
+    if (coverage_type == "random") {
+      if (is.null(coverage_correlation) ||
+          !is.numeric(coverage_correlation) || length(coverage_correlation) != 1 ||
+          coverage_correlation < -1 || coverage_correlation > 1) {
+        stop(
+          "coverage_correlation must be a single numeric value in [-1, 1] when 2+ interventions are deployed with coverage_type = 'random'"
+        )
+      }
+    }
+  }
+
   # Joint mode is keyed under intervention_joint_*; per-setting modes under
   # intervention_<setting>_*. Same paste0 pattern works for both.
-  parameters_list[[paste0("intervention_", setting, "_active")]]          <- TRUE
-  parameters_list[[paste0("intervention_", setting, "_list")]]            <- interventions
-  parameters_list[[paste0("intervention_", setting, "_coverage_target")]] <- coverage_target
-  parameters_list[[paste0("intervention_", setting, "_coverage_type")]]   <- coverage_type
-  parameters_list[[paste0("intervention_", setting, "_timestep")]]        <- timestep
+  parameters_list[[paste0("intervention_", setting, "_active")]]               <- TRUE
+  parameters_list[[paste0("intervention_", setting, "_list")]]                 <- interventions
+  parameters_list[[paste0("intervention_", setting, "_coverage_target")]]      <- coverage_target
+  parameters_list[[paste0("intervention_", setting, "_coverage_type")]]        <- coverage_type
+  parameters_list[[paste0("intervention_", setting, "_timestep")]]             <- timestep
+  parameters_list[[paste0("intervention_", setting, "_coverage_correlation")]] <- coverage_correlation
 
   if (setting == "joint") {
     parameters_list[["intervention_joint_coverage"]] <- interventions[[1]]$coverage
   }
 
   return(parameters_list)
+}
+
+
+# Produce an N x K binary coverage matrix where column k indicates which
+# locations are covered by intervention k.
+#
+#   p_vec:         length-K vector of per-intervention marginal coverages in [0,1]
+#   rho:           exchangeable correlation between columns (used only when
+#                  coverage_type == "random" and K >= 2)
+#   coverage_type: "random" or "targeted_riskiness"
+#   setting_size:  length-N vector of per-location sizes (individuals or sq ft)
+#   riskiness:     length-N vector (required for "targeted_riskiness")
+#
+# Random K=1: keeps the existing size-weighted budget picker (same behavior
+# as before multi-intervention).
+# Random K>=2: Gaussian copula on per-location Bernoulli marginals (NOT
+# size-weighted — this is a deliberate v1 simplification).
+# Targeted K>=1: deterministic top-by-riskiness picker per intervention.
+# Resulting columns are nested when riskiness vector is shared.
+draw_coverage_matrix <- function(p_vec, rho, coverage_type,
+                                 setting_size, riskiness = NULL) {
+  N <- length(setting_size)
+  K <- length(p_vec)
+
+  if (coverage_type == "targeted_riskiness") {
+    if (is.null(riskiness)) {
+      stop("draw_coverage_matrix: riskiness vector required for targeted_riskiness")
+    }
+    total <- sum(setting_size)
+    riskiness_sorted <- sort(riskiness, decreasing = TRUE, index.return = TRUE)
+    cumsize_sorted   <- cumsum(setting_size[riskiness_sorted$ix])
+    cols <- vapply(p_vec, function(p) {
+      budget <- floor(p * total)
+      final_index <- min(which(cumsize_sorted >= budget))
+      col <- rep(0, N)
+      col[riskiness_sorted$ix[1:final_index]] <- 1
+      col
+    }, numeric(N))
+    return(matrix(cols, nrow = N, ncol = K))
+  }
+
+  # coverage_type == "random"
+  if (K == 1) {
+    # Size-weighted budget picker (legacy single-intervention behavior).
+    budget <- floor(p_vec[1] * sum(setting_size))
+    col <- rep(0, N)
+    sum_so_far <- 0
+    indices <- c()
+    location_indices <- seq_len(N)
+    while (sum_so_far < budget) {
+      i <- sample(location_indices, 1)
+      sum_so_far <- sum_so_far + setting_size[i]
+      indices <- c(indices, i)
+      location_indices <- setdiff(location_indices, i)
+      if (length(location_indices) == 0 && sum_so_far < budget) {
+        stop("Insufficient size to meet intervention coverage")
+      }
+    }
+    col[indices] <- 1
+    return(matrix(col, ncol = 1))
+  }
+
+  # K >= 2 random: Gaussian copula on per-location Bernoulli marginals.
+  # Build N x K matrix of N(0,1) with exchangeable correlation rho across cols.
+  # For rho >= 0: Z[, k] = sqrt(rho) * u + sqrt(1 - rho) * eps[, k]
+  # gives Cov(Z[, j], Z[, k]) = rho for j != k.
+  # For rho < 0 with K = 2: flip the shared-component sign.
+  if (rho >= 0) {
+    u   <- rnorm(N)
+    eps <- matrix(rnorm(N * K), nrow = N)
+    Z   <- sqrt(rho) * u + sqrt(1 - rho) * eps
+  } else {
+    if (K > 2) {
+      stop(
+        "Negative coverage_correlation is only supported for K = 2 interventions in v1"
+      )
+    }
+    u   <- rnorm(N)
+    eps <- rnorm(N)
+    Z   <- cbind(
+      u,
+      rho * u + sqrt(1 - rho^2) * eps
+    )
+  }
+
+  thresholds <- qnorm(p_vec)
+  M <- sweep(Z, 2, thresholds, FUN = "<")
+  storage.mode(M) <- "integer"
+  M
 }
 
 # # Replaced by generate_setting_intervention_switches (which uses the
@@ -724,11 +805,13 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
     return(rep(0,n))
   }
 
-  # Coverage vector: 1 if location is covered, 0 if not. NULL = full coverage
-  # (used by unit tests that bypass set_intervention_ach).
-  coverage_vector <- parameters_list[[paste0("intervention_", setting, "_covered")]]
+  # Coverage matrix: N x K binary matrix where column k indicates which
+  # locations are covered by intervention k. NULL = full coverage (used by
+  # unit tests that bypass set_intervention_ach).
+  coverage_matrix <- parameters_list[[paste0("intervention_", setting, "_coverage_matrix")]]
 
-  for (intervention in interventions) {
+  for (k in seq_along(interventions)) {
+    intervention <- interventions[[k]]
 
     # call baseline_ach_function to get delta for each location
     if (intervention$affected_by_baseline_ach) {
@@ -753,9 +836,9 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
       delta_i <- pmax(0, delta_i + noise)
     }
 
-    # zero out delta for uncovered locations
-    if (!is.null(coverage_vector)) {
-      delta_i <- delta_i * coverage_vector
+    # zero out delta for uncovered locations (column k of coverage matrix)
+    if (!is.null(coverage_matrix)) {
+      delta_i <- delta_i * coverage_matrix[, k]
     }
 
     total_delta <- total_delta + delta_i
