@@ -84,6 +84,30 @@
 #' * `setting_specific_ach_household`: boolean switch set to TRUE if setting-specific ACH parameterised in the household setting using `set_setting_specific_ach()`; default = FALSE
 #' * `setting_specific_ach_household_mean`: The mean of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.5
 #' * `setting_specific_ach_household_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.2
+#'
+#' Volume Per Person Parameters (used in the Wells-Riley calculation; units: m^3 per person):
+#' * `volume_per_person_workplace`: average air volume per person in a workplace; default = 27 (assumes ~10 m^2 floor area at 2.7 m height)
+#' * `volume_per_person_school`: average air volume per person in a school; default = 10 (assumes ~3.33 m^2 floor area at 3 m height)
+#' * `volume_per_person_leisure`: average air volume per person in a leisure setting; default = 8 (assumes ~2 m^2 floor area at 4 m height)
+#' * `volume_per_person_household`: average air volume per person in a household; default = 50 (assumes ~20 m^2 floor area at 2.5 m height)
+#'
+#' Wells-Riley Parameters (used by `convert_ach_to_riskiness()` to derive per-location riskiness from ACH, and by `calculate_efficacy_from_ach()` to derive per-location intervention efficacy from ACH and the intervention delta):
+#' * `wells_riley_emission_rate`: rate at which an infectious individual emits airborne infectious units; units = FFU/hour; default = 27
+#' * `wells_riley_decay_rate`: natural decay rate of airborne pathogens (denoted k_D); units = 1/hour; default = 0.64
+#' * `wells_riley_infection_prob_per_ffu`: probability of infection per inhaled FFU (denoted r); default = 1.37e-2
+#' * `wells_riley_respiratory_rate_factor`: respiratory rate multiplied by tidal volume (denoted RR_tv); units = m^3/hour; default = 0.45
+#' * `wells_riley_time_in_room`: exposure window used inside the Wells-Riley calculation (denoted t); units = hours; default = 4
+#' * `wells_riley_reference_ach`: reference ACH value used to normalise riskiness so the riskiness distribution is centred near 1. If NULL, the median ACH of the drawn distribution for the setting is used. Default = NULL
+#'
+#' Intervention Parameters (populated internally by `set_intervention_ach()` and by `generate_intervention_switches()`; users do not normally set these directly. One block per scope <s> in {joint, workplace, school, leisure, household}):
+#' * `intervention_<s>_active`: boolean flag set to TRUE when an intervention has been installed in scope <s>. Default = FALSE
+#' * `intervention_<s>_list`: list of intervention objects (each as returned by `make_intervention()`) deployed in scope <s>. Currently single-intervention only — list always has length 1 when active. Default = NULL
+#' * `intervention_<s>_coverage`: fraction of total setting size to cover (numeric in [0,1]); inherited from the intervention object's `coverage` field. Default = NULL
+#' * `intervention_<s>_coverage_target`: what the coverage fraction applies to. Either "individuals" or "square_footage". Default = NULL
+#' * `intervention_<s>_coverage_type`: how locations are selected for coverage. Either "random" (uniform sampling) or "targeted_riskiness" (locations ranked in decreasing order of riskiness). Default = NULL
+#' * `intervention_<s>_timestep`: first simulation timestep at which the intervention's efficacy is applied in the FOI calculation. Default = NULL
+#' * `intervention_<setting>_covered` (per-setting scopes only — workplace/school/leisure/household): 0/1 vector of length equal to the number of locations in the setting, populated by the dispatcher to mark which locations received the intervention. Default = NULL
+#'
 #' Setting-Specific Room Size Per Individual Parameters:
 #' * `size_per_individual_workplace`: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
 #' * `size_per_individual_school`: The volume or surface area for each individual in the school setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
