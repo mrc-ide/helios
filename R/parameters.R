@@ -48,29 +48,6 @@
 #' Rendering Parameters
 #' * `render_diagnostics`: FALSE
 #'
-#'
-#' Setting-Specific Riskiness Parameters:
-#' * `setting_specific_riskiness_workplace`: boolean switch set to TRUE if setting-specific riskiness parameterised in the workplace setting using `set_setting_specific_riskiness()`; default = FALSE
-#' * `setting_specific_riskiness_workplace_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0
-#' * `setting_specific_riskiness_workplace_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0.37
-#' * `setting_specific_riskiness_workplace_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0.4472
-#' * `setting_specific_riskiness_workplace_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 2.236
-#' * `setting_specific_riskiness_school`: boolean switch set to TRUE if setting-specific riskiness parameterised in the school setting using `set_setting_specific_riskiness()`; default = FALSE
-#' * `setting_specific_riskiness_school_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0
-#' * `setting_specific_riskiness_school_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0.37
-#' * `setting_specific_riskiness_school_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0.4472
-#' * `setting_specific_riskiness_school_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 2.236
-#' * `setting_specific_riskiness_leisure`: boolean switch set to TRUE if setting-specific riskiness parameterised in the leisure setting using `set_setting_specific_riskiness()`; default = FALSE
-#' * `setting_specific_riskiness_leisure_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure locations is drawn; default = 0
-#' * `setting_specific_riskiness_leisure_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 0.37
-#' * `setting_specific_riskiness_leisure_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 0.4472
-#' * `setting_specific_riskiness_leisure_max`:The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 2.236
-#' * `setting_specific_riskiness_household`: boolean switch set to TRUE if setting-specific riskiness parameterised in the household setting using `set_setting_specific_riskiness()`; default = FALSE
-#' * `setting_specific_riskiness_household_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0
-#' * `setting_specific_riskiness_household_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.37
-#' * `setting_specific_riskiness_household_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.4472
-#' * `setting_specific_riskiness_household_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
-#'
 #' Setting-Specific ACH Parameters:
 #' * `setting_specific_ach_workplace`: boolean switch set to TRUE if setting-specific ACH parameterised in the workplace setting using `set_setting_specific_ach()`; default = FALSE
 #' * `setting_specific_ach_workplace_mean`: The mean of the  truncated normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =4.8
@@ -102,7 +79,7 @@
 #' Intervention Parameters (populated internally by `set_intervention_ach()` and by `generate_intervention_switches()`; users do not normally set these directly. One block per scope <s> in {joint, workplace, school, leisure, household}):
 #' * `intervention_<s>_active`: boolean flag set to TRUE when an intervention has been installed in scope <s>. Default = FALSE
 #' * `intervention_<s>_list`: list of intervention objects (each as returned by `make_intervention()`) deployed in scope <s>. Currently single-intervention only — list always has length 1 when active. Default = NULL
-#' * `intervention_<s>_coverage`: fraction of total setting size to cover (numeric in [0,1]); inherited from the intervention object's `coverage` field. Default = NULL
+#' * `intervention_<s>_coverage`: fraction of total setting size to cover (numeric in `[0, 1]`); inherited from the intervention object's `coverage` field. Default = NULL
 #' * `intervention_<s>_coverage_target`: what the coverage fraction applies to. Either "individuals" or "square_footage". Default = NULL
 #' * `intervention_<s>_coverage_type`: how locations are selected for coverage. Either "random" (uniform sampling) or "targeted_riskiness" (locations ranked in decreasing order of riskiness). Default = NULL
 #' * `intervention_<s>_timestep`: first simulation timestep at which the intervention's efficacy is applied in the FOI calculation. Default = NULL
@@ -159,34 +136,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     endemic_or_epidemic = "epidemic",
     duration_immune = NULL,
     prob_inf_external = NULL,
-
-    # Setting-Specific Riskiness Parameters: Workplace
-    setting_specific_riskiness_workplace = FALSE,
-    setting_specific_riskiness_workplace_meanlog = NULL,
-    setting_specific_riskiness_workplace_sdlog = NULL,
-    setting_specific_riskiness_workplace_min = NULL,
-    setting_specific_riskiness_workplace_max = NULL,
-
-    # Setting-Specific Riskiness Parameters: School
-    setting_specific_riskiness_school = FALSE,
-    setting_specific_riskiness_school_meanlog = NULL,
-    setting_specific_riskiness_school_sdlog = NULL,
-    setting_specific_riskiness_school_min = NULL,
-    setting_specific_riskiness_school_max = NULL,
-
-    # Setting-Specific Riskiness Parameters: Leisure
-    setting_specific_riskiness_leisure = FALSE,
-    setting_specific_riskiness_leisure_meanlog = NULL,
-    setting_specific_riskiness_leisure_sdlog = NULL,
-    setting_specific_riskiness_leisure_min = NULL,
-    setting_specific_riskiness_leisure_max = NULL,
-
-    # Setting-Specific Riskiness Parameters: Household
-    setting_specific_riskiness_household = FALSE,
-    setting_specific_riskiness_household_meanlog = NULL,
-    setting_specific_riskiness_household_sdlog = NULL,
-    setting_specific_riskiness_household_min = NULL,
-    setting_specific_riskiness_household_max = NULL,
 
     # Setting-Specific ACH Parameters: Workplace
     setting_specific_ach_workplace = FALSE,
@@ -264,7 +213,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     intervention_household_timestep        = NULL,
     intervention_household_covered         = NULL,
 
-    # Room Size Per Individual Parameters:
+    # Room Size Per Individual Parameters: (currently used for coverage allocation)
     size_per_individual_workplace = 1,
     size_per_individual_school = 1,
     size_per_individual_leisure = 1,

@@ -54,65 +54,50 @@ Rendering Parameters
 \item \code{render_diagnostics}: FALSE
 }
 
-Far UVC Intervention Parameters:
+Setting-Specific ACH Parameters:
 \itemize{
-\item \code{far_uvc_joint}: boolean switch set to TRUE if far UVC intervention parameterised jointly using \code{set_uvc()}; default = FALSE
-\item \code{far_uvc_joint_coverage}: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
-\item \code{far_uvc_joint_coverage_target}: The target that coverage proportion applies to. Can either be "individuals" or "square footage".
-\item \code{far_uvc_joint_coverage_type}: Type of coverage. Can either be "random" or "targeted_riskiness".
-\item \code{far_uvc_joint_efficacy}: : Efficacy of far UVC in the joint setting (must be a numeric value between 0 and 1)
-\item \code{far_uvc_joint_timestep}: The timestep on which far UVC is jointly implemented (must be a numeric value greater than or equal to 0)
-\item \code{far_uvc_workplace}: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using \code{set_uvc()}; default = FALSE
-\item \code{far_uvc_workplace_coverage}: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
-\item \code{far_uvc_workplace_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-\item \code{far_uvc_workplace_coverage_type}: Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted_riskiness" for targeting interventions at most risky workplaces
-\item \code{far_uvc_workplace_efficacy}: : Efficacy of far UVC in the workplace setting (must be a numeric value between 0 and 1)
-\item \code{far_uvc_workplace_timestep}: The timestep on which far UVC is implemented in the workplace setting (must be a numeric value greater than or equal to 0)
-\item \code{far_uvc_school}: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using \code{set_uvc()}; default = FALSE
-\item \code{far_uvc_school_coverage}: Proportion of schools covered with far UVC (must be a numeric value between 0 and 1)
-\item \code{far_uvc_school_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-\item \code{far_uvc_school_coverage_type}: Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted_riskiness" for targeting interventions at most risky schools
-\item \code{far_uvc_school_efficacy}: : Efficacy of far UVC in the school setting (must be a numeric value between 0 and 1)
-\item \code{far_uvc_school_timestep}: The timestep on which far UVC is implemented in the school setting (must be a numeric value greater than or equal to 0)
-\item \code{far_uvc_leisure}: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using \code{set_uvc()}; default = FALSE
-\item \code{far_uvc_leisure_coverage}: Proportion of leisure settings covered with far UVC (must be a numeric value between 0 and 1)
-\item \code{far_uvc_leisure_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-\item \code{far_uvc_leisure_coverage_type}: Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted_riskiness" for targeting interventions at most risky leisure settings
-\item \code{far_uvc_leisure_efficacy}: : Efficacy of far UVC in the leisure setting (must be a numeric value between 0 and 1)
-\item \code{far_uvc_leisure_timestep}: The timestep on which far UVC is implemented in the leisure setting (must be a numeric value greater than or equal to 0)
-\item \code{far_uvc_household}: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using \code{set_uvc()}; default = FALSE
-\item \code{far_uvc_household_coverage}: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
-\item \code{far_uvc_household_coverage_target}: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-\item \code{far_uvc_household_coverage_type}: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted_riskiness" for targeting interventions at most risky households
-\item \code{far_uvc_household_efficacy}: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
-\item \code{far_uvc_household_timestep}: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
+\item \code{setting_specific_ach_workplace}: boolean switch set to TRUE if setting-specific ACH parameterised in the workplace setting using \code{set_setting_specific_ach()}; default = FALSE
+\item \code{setting_specific_ach_workplace_mean}: The mean of the  truncated normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =4.8
+\item \code{setting_specific_ach_workplace_sd}: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =1.5
+\item \code{setting_specific_ach_school}: boolean switch set to TRUE if setting-specific ACH parameterised in the school setting using \code{set_setting_specific_ach()}; default = FALSE
+\item \code{setting_specific_ach_school_mean}: The mean of the truncated normal distribution from which the setting-specific ACH of individual schools is drawn; default = 4.0
+\item \code{setting_specific_ach_school_sd}: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual schools is drawn; default = 1.2
+\item \code{setting_specific_ach_leisure}: boolean switch set to TRUE if setting-specific ACH parameterised in the leisure setting using \code{set_setting_specific_ach()}; default = FALSE
+\item \code{setting_specific_ach_leisure_mean}: The mean of the truncated normal distribution from which the setting-specific ACH of individual leisure locations is drawn; default = 3.0
+\item \code{setting_specific_ach_leisure_sd}: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual leisure settings is drawn; default = 1.0
+\item \code{setting_specific_ach_household}: boolean switch set to TRUE if setting-specific ACH parameterised in the household setting using \code{set_setting_specific_ach()}; default = FALSE
+\item \code{setting_specific_ach_household_mean}: The mean of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.5
+\item \code{setting_specific_ach_household_sd}: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.2
 }
 
-Setting-Specific Riskiness Parameters:
+Volume Per Person Parameters (used in the Wells-Riley calculation; units: m^3 per person):
 \itemize{
-\item \code{setting_specific_riskiness_workplace}: boolean switch set to TRUE if setting-specific riskiness parameterised in the workplace setting using \code{set_setting_specific_riskiness()}; default = FALSE
-\item \code{setting_specific_riskiness_workplace_meanlog}: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0
-\item \code{setting_specific_riskiness_workplace_sdlog}: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0.37
-\item \code{setting_specific_riskiness_workplace_min}: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0.4472
-\item \code{setting_specific_riskiness_workplace_max}: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 2.236
-\item \code{setting_specific_riskiness_school}: boolean switch set to TRUE if setting-specific riskiness parameterised in the school setting using \code{set_setting_specific_riskiness()}; default = FALSE
-\item \code{setting_specific_riskiness_school_meanlog}: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0
-\item \code{setting_specific_riskiness_school_sdlog}: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0.37
-\item \code{setting_specific_riskiness_school_min}: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0.4472
-\item \code{setting_specific_riskiness_school_max}: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 2.236
-\item \code{setting_specific_riskiness_leisure}: boolean switch set to TRUE if setting-specific riskiness parameterised in the leisure setting using \code{set_setting_specific_riskiness()}; default = FALSE
-\item \code{setting_specific_riskiness_leisure_meanlog}: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure locations is drawn; default = 0
-\item \code{setting_specific_riskiness_leisure_sdlog}: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 0.37
-\item \code{setting_specific_riskiness_leisure_min}: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 0.4472
-\item \code{setting_specific_riskiness_leisure_max}:The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 2.236
-\item \code{setting_specific_riskiness_household}: boolean switch set to TRUE if setting-specific riskiness parameterised in the household setting using \code{set_setting_specific_riskiness()}; default = FALSE
-\item \code{setting_specific_riskiness_household_meanlog}: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0
-\item \code{setting_specific_riskiness_household_sdlog}: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.37
-\item \code{setting_specific_riskiness_household_min}: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.4472
-\item \code{setting_specific_riskiness_household_max}: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
+\item \code{volume_per_person_workplace}: average air volume per person in a workplace; default = 27 (assumes ~10 m^2 floor area at 2.7 m height)
+\item \code{volume_per_person_school}: average air volume per person in a school; default = 10 (assumes ~3.33 m^2 floor area at 3 m height)
+\item \code{volume_per_person_leisure}: average air volume per person in a leisure setting; default = 8 (assumes ~2 m^2 floor area at 4 m height)
+\item \code{volume_per_person_household}: average air volume per person in a household; default = 50 (assumes ~20 m^2 floor area at 2.5 m height)
 }
 
-Setting-Specific ACH Parameters
+Wells-Riley Parameters (used by \code{convert_ach_to_riskiness()} to derive per-location riskiness from ACH, and by \code{calculate_efficacy_from_ach()} to derive per-location intervention efficacy from ACH and the intervention delta):
+\itemize{
+\item \code{wells_riley_emission_rate}: rate at which an infectious individual emits airborne infectious units; units = FFU/hour; default = 27
+\item \code{wells_riley_decay_rate}: natural decay rate of airborne pathogens (denoted k_D); units = 1/hour; default = 0.64
+\item \code{wells_riley_infection_prob_per_ffu}: probability of infection per inhaled FFU (denoted r); default = 1.37e-2
+\item \code{wells_riley_respiratory_rate_factor}: respiratory rate multiplied by tidal volume (denoted RR_tv); units = m^3/hour; default = 0.45
+\item \code{wells_riley_time_in_room}: exposure window used inside the Wells-Riley calculation (denoted t); units = hours; default = 4
+\item \code{wells_riley_reference_ach}: reference ACH value used to normalise riskiness so the riskiness distribution is centred near 1. If NULL, the median ACH of the drawn distribution for the setting is used. Default = NULL
+}
+
+Intervention Parameters (populated internally by \code{set_intervention_ach()} and by \code{generate_intervention_switches()}; users do not normally set these directly. One block per scope \if{html}{\out{<s>}} in {joint, workplace, school, leisure, household}):
+\itemize{
+\item \verb{intervention_<s>_active}: boolean flag set to TRUE when an intervention has been installed in scope \if{html}{\out{<s>}}. Default = FALSE
+\item \verb{intervention_<s>_list}: list of intervention objects (each as returned by \code{make_intervention()}) deployed in scope \if{html}{\out{<s>}}. Currently single-intervention only — list always has length 1 when active. Default = NULL
+\item \verb{intervention_<s>_coverage}: fraction of total setting size to cover (numeric in \verb{[0, 1]}); inherited from the intervention object's \code{coverage} field. Default = NULL
+\item \verb{intervention_<s>_coverage_target}: what the coverage fraction applies to. Either "individuals" or "square_footage". Default = NULL
+\item \verb{intervention_<s>_coverage_type}: how locations are selected for coverage. Either "random" (uniform sampling) or "targeted_riskiness" (locations ranked in decreasing order of riskiness). Default = NULL
+\item \verb{intervention_<s>_timestep}: first simulation timestep at which the intervention's efficacy is applied in the FOI calculation. Default = NULL
+\item \verb{intervention_<setting>_covered} (per-setting scopes only — workplace/school/leisure/household): 0/1 vector of length equal to the number of locations in the setting, populated by the dispatcher to mark which locations received the intervention. Default = NULL
+}
 
 Setting-Specific Room Size Per Individual Parameters:
 \itemize{
