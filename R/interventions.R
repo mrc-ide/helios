@@ -328,7 +328,7 @@ make_intervention <- function(name,
 #' `"targeted_riskiness"` (locations ranked in decreasing order of riskiness).
 #' @param timestep Numeric. First simulation timestep at which the
 #' intervention's efficacy is applied in the FOI calculation.
-#' @param ... One intervention object as returned by [make_intervention()].
+#' @param intervention One intervention object as returned by [make_intervention()].
 #'
 #' @return The input `parameters_list` with the `intervention_<setting>_*`
 #' slots populated. For `setting = "joint"`, the `intervention_joint_coverage`
@@ -342,8 +342,10 @@ set_intervention_ach <- function(parameters_list,
                                  coverage_target,
                                  coverage_type,
                                  timestep,
-                                 ...) {
-  interventions <- list(...)
+                                 intervention) {
+  # Single intervention only. Stored as a length-1 list so downstream code
+  # (e.g. calculate_efficacy_from_ach) can index it as interventions[[1]].
+  interventions <- list(intervention)
 
   if (length(setting) > 1) {
     stop(
@@ -354,12 +356,6 @@ set_intervention_ach <- function(parameters_list,
     stop(
       "Error: Input setting invalid - intervention only deployable in workplace, school, leisure, household, or joint settings"
     )
-  }
-  if (length(interventions) == 0) {
-    stop("set_intervention_ach requires at least one intervention")
-  }
-  if (length(interventions) > 1) {
-    stop("multi-intervention support is not yet implemented; please pass a single intervention")
   }
   if (length(coverage_target) > 1) {
     stop(

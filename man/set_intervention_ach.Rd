@@ -10,7 +10,7 @@ set_intervention_ach(
   coverage_target,
   coverage_type,
   timestep,
-  ...
+  intervention
 )
 }
 \arguments{
@@ -31,7 +31,7 @@ either \code{"random"} (uniform sampling until the coverage budget is met) or
 \item{timestep}{Numeric. First simulation timestep at which the
 intervention's efficacy is applied in the FOI calculation.}
 
-\item{...}{One intervention object as returned by \code{\link[=make_intervention]{make_intervention()}}.}
+\item{intervention}{One intervention object as returned by \code{\link[=make_intervention]{make_intervention()}}.}
 }
 \value{
 The input \code{parameters_list} with the \verb{intervention_<setting>_*}
