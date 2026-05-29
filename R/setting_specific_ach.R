@@ -2,10 +2,11 @@
 
 generate_setting_specific_ach <- function(parameters_list, setting, number_of_locations) {
   # If setting-specific ACH is switched off for this setting, return uniform
-  # values. convert_ach_to_riskiness normalizes by the median (when
-  # wells_riley_reference_ach is NULL), so uniform ACH yields uniform
-  # riskiness == 1, matching the "no setting-specific riskiness" behavior on
-  # main.
+  # values. convert_ach_to_riskiness normalizes by the median, so uniform ACH
+  # yields uniform riskiness == 1, matching the "no setting-specific riskiness"
+  # behavior on main.
+  # The caveat/downside is that this impacts the efficacy if the default
+  # rooms have a low ACH.
   if (!isTRUE(parameters_list[[paste0("setting_specific_ach_", setting)]])) {
     return(rep(1, number_of_locations))
   }
@@ -41,11 +42,9 @@ convert_ach_to_riskiness <- function(ach_values, parameters_list, setting) {
   # p(infection)
   p_inf_values <- 1 - exp(-r * Css_values * RRtv * t)
 
-  # reference p_inf for normalization
-  ach_ref <- parameters_list$wells_riley_reference_ach
-  if (is.null(ach_ref)) {
-    ach_ref <- median(ach_values)
-  }
+  # reference p_inf for normalization: anchor riskiness at the setting's
+  # median ACH, so the typical location has riskiness ~ 1.
+  ach_ref <- median(ach_values)
   alpha_ref <- ach_ref + kD
   Css_ref <- (I * pi) / (alpha_ref * volume_per_person)
   p_inf_ref <- 1 - exp(-r * Css_ref * RRtv * t)

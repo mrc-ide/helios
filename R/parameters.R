@@ -74,7 +74,6 @@
 #' * `wells_riley_infection_prob_per_ffu`: probability of infection per inhaled FFU (denoted r); default = 1.37e-2
 #' * `wells_riley_respiratory_rate_factor`: respiratory rate multiplied by tidal volume (denoted RR_tv); units = m^3/hour; default = 0.45
 #' * `wells_riley_time_in_room`: exposure window used inside the Wells-Riley calculation (denoted t); units = hours; default = 4
-#' * `wells_riley_reference_ach`: reference ACH value used to normalise riskiness so the riskiness distribution is centred near 1. If NULL, the median ACH of the drawn distribution for the setting is used. Default = NULL
 #'
 #' Intervention Parameters (populated internally by `set_intervention_ach()` and by `generate_intervention_switches()`; users do not normally set these directly. One block per scope <s> in {joint, workplace, school, leisure, household}):
 #' * `intervention_<s>_active`: boolean flag set to TRUE when an intervention has been installed in scope <s>. Default = FALSE
@@ -170,7 +169,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     wells_riley_infection_prob_per_ffu = 1.37e-2, # r, infection probability per FFU
     wells_riley_respiratory_rate_factor = 0.45, # RR_tv
     wells_riley_time_in_room = 4,# t, hours spent in room
-    wells_riley_reference_ach = NULL,
 
 
   # Intervention parameters (Wells-Riley ACH-based efficacy):

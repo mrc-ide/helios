@@ -905,7 +905,8 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
 #' Alternative to [generate_initial_households()]. Rather than using a parametric
 #' distribution, this function uses sampling with replacement from a reference
 #' dataset. This is known as bootstrapping. The dataset used is
-#' [`baseline_household_demographics`]. Unlike [generate_initial_households()],
+#' [`baseline_household_demographics_uk`] or
+#' [`baseline_household_demographics_usa`]. Unlike [generate_initial_households()],
 #' this function generates both the household and age class assignments together.
 #'
 #' @inheritParams create_variables

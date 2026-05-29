@@ -85,7 +85,6 @@ Wells-Riley Parameters (used by \code{convert_ach_to_riskiness()} to derive per-
 \item \code{wells_riley_infection_prob_per_ffu}: probability of infection per inhaled FFU (denoted r); default = 1.37e-2
 \item \code{wells_riley_respiratory_rate_factor}: respiratory rate multiplied by tidal volume (denoted RR_tv); units = m^3/hour; default = 0.45
 \item \code{wells_riley_time_in_room}: exposure window used inside the Wells-Riley calculation (denoted t); units = hours; default = 4
-\item \code{wells_riley_reference_ach}: reference ACH value used to normalise riskiness so the riskiness distribution is centred near 1. If NULL, the median ACH of the drawn distribution for the setting is used. Default = NULL
 }
 
 Intervention Parameters (populated internally by \code{set_intervention_ach()} and by \code{generate_intervention_switches()}; users do not normally set these directly. One block per scope \if{html}{\out{<s>}} in {joint, workplace, school, leisure, household}):
