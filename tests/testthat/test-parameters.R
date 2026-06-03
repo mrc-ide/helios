@@ -1,3 +1,63 @@
+test_that("get_parameters() accepts a valid length-365 seasonality_multiplier when seasonality_on is TRUE", {
+  expect_no_error(
+    get_parameters(
+      overrides = list(
+        seasonality_on = TRUE,
+        seasonality_multiplier = rep(1, 365)
+      )
+    )
+  )
+})
+
+test_that("get_parameters() errors when seasonality_on is TRUE but seasonality_multiplier is NULL", {
+  expect_error(
+    get_parameters(
+      overrides = list(
+        seasonality_on = TRUE
+      )
+    ),
+    regexp = "seasonality_multiplier must be a numeric vector of length 365"
+  )
+})
+
+test_that("get_parameters() errors when seasonality_multiplier is not length 365", {
+  expect_error(
+    get_parameters(
+      overrides = list(
+        seasonality_on = TRUE,
+        seasonality_multiplier = rep(1, 100)
+      )
+    ),
+    regexp = "seasonality_multiplier must be a numeric vector of length 365"
+  )
+})
+
+test_that("get_parameters() errors when seasonality_multiplier contains NAs", {
+  m <- rep(1, 365)
+  m[10] <- NA
+  expect_error(
+    get_parameters(
+      overrides = list(
+        seasonality_on = TRUE,
+        seasonality_multiplier = m
+      )
+    ),
+    regexp = "seasonality_multiplier must be a numeric vector of length 365"
+  )
+})
+
+test_that("get_parameters() ignores seasonality_multiplier when seasonality_on is FALSE", {
+  # An invalid multiplier should not error while seasonality is switched off:
+  expect_no_error(
+    get_parameters(
+      overrides = list(
+        seasonality_on = FALSE,
+        seasonality_multiplier = rep(1, 10)
+      )
+    )
+  )
+})
+
 test_that("get_parameters() errors when a setting-specific beta has length greater than 1", {
   expect_error(
     object = parameters <- get_parameters(

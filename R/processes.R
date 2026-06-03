@@ -171,6 +171,25 @@ create_SE_process <- function(
     ## Bitset for all infectious individuals
     I <- variables_list$disease_state$get_index_of("I_mild")
 
+    #=== Seasonal scaling of betas ===#
+    #=================================#
+    # When seasonality is on, scale every setting-specific beta by the seasonal
+    # multiplier for the current day of the year. The timestep t is converted to
+    # a day via ceiling(t * dt) (1/dt timesteps per day) and recycled annually
+    # over the length-365 multiplier. When seasonality is off, the multiplier is
+    # 1 and the effective betas are identical to the constant baseline betas.
+    if (parameters_list$seasonality_on) {
+      day_of_year <- timestep_to_day_of_year(t, parameters_list$dt)
+      seasonal_mult <- parameters_list$seasonality_multiplier[day_of_year]
+    } else {
+      seasonal_mult <- 1
+    }
+    beta_household_t <- parameters_list$beta_household * seasonal_mult
+    beta_workplace_t <- parameters_list$beta_workplace * seasonal_mult
+    beta_school_t <- parameters_list$beta_school * seasonal_mult
+    beta_leisure_t <- parameters_list$beta_leisure * seasonal_mult
+    beta_community_t <- parameters_list$beta_community * seasonal_mult
+
     #=== Household FOI ===#
     #=====================#
     # Open vector to store household FOIs experienced by each individual
@@ -199,14 +218,14 @@ create_SE_process <- function(
               i
             ] *
               (1 - parameters_list$far_uvc_household_efficacy) *
-              (parameters_list$beta_household *
+              (beta_household_t *
                 spec_household_I_size /
                 household_size_list[[i]])
           } else {
             spec_household_FOI <- parameters_list$household_specific_riskiness[
               i
             ] *
-              parameters_list$beta_household *
+              beta_household_t *
               spec_household_I_size /
               household_size_list[[i]]
           }
@@ -214,7 +233,7 @@ create_SE_process <- function(
           spec_household_FOI <- parameters_list$household_specific_riskiness[
             i
           ] *
-            parameters_list$beta_household *
+            beta_household_t *
             spec_household_I_size /
             household_size_list[[i]]
         }
@@ -251,20 +270,20 @@ create_SE_process <- function(
             i
           ] *
             (1 - parameters_list$far_uvc_workplace_efficacy) *
-            (parameters_list$beta_workplace *
+            (beta_workplace_t *
               spec_workplace_I_size /
               workplace_size_list[[i]])
         } else {
           spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[
             i
           ] *
-            parameters_list$beta_workplace *
+            beta_workplace_t *
             spec_workplace_I_size /
             workplace_size_list[[i]]
         }
       } else {
         spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[i] *
-          parameters_list$beta_workplace *
+          beta_workplace_t *
           spec_workplace_I_size /
           workplace_size_list[[i]]
       }
@@ -298,18 +317,18 @@ create_SE_process <- function(
         ) {
           spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
             (1 - parameters_list$far_uvc_school_efficacy) *
-            (parameters_list$beta_school *
+            (beta_school_t *
               spec_school_I_size /
               school_size_list[[i]])
         } else {
           spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-            parameters_list$beta_school *
+            beta_school_t *
             spec_school_I_size /
             school_size_list[[i]]
         }
       } else {
         spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-          parameters_list$beta_school *
+          beta_school_t *
           spec_school_I_size /
           school_size_list[[i]]
       }
@@ -384,18 +403,18 @@ create_SE_process <- function(
           ) {
             spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
               (1 - parameters_list$far_uvc_leisure_efficacy) *
-              (parameters_list$beta_leisure *
+              (beta_leisure_t *
                 spec_leisure_I_size /
                 spec_leisure$size()) ## this calculation needs more in it
           } else {
             spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-              parameters_list$beta_leisure *
+              beta_leisure_t *
               spec_leisure_I_size /
               spec_leisure$size() ## this calculation needs more in it
           }
         } else {
           spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-            parameters_list$beta_leisure *
+            beta_leisure_t *
             spec_leisure_I_size /
             spec_leisure$size() ## this calculation needs more in it
         }
@@ -409,7 +428,7 @@ create_SE_process <- function(
     #=====================#
     ### Calculate Community FOI (real-valued for all individuals)
     #### NOTE: Double check whether the "/N" is correct here - not sure currently
-    community_FOI <- parameters_list$beta_community *
+    community_FOI <- beta_community_t *
       variables_list$disease_state$get_size_of("I_mild")/
       parameters_list$human_population
 
