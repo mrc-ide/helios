@@ -249,7 +249,11 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     prob_death_hosp_child = 0.01,
     prob_death_hosp_adult = 0.08,
     prob_death_hosp_elderly = 0.3,
-    duration_hospitalized = 10
+    duration_hospitalized = 10,
+
+    #Seasonality
+    seasonality_on = FALSE,
+    seasonality_multiplier = NULL #365 length vector of relative multipliers
 
   )
 
