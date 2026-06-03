@@ -70,6 +70,14 @@ Setting-Specific ACH Parameters:
 \item \code{setting_specific_ach_household_sd}: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.2
 }
 
+Default (Uniform) ACH Parameters (used when \verb{setting_specific_ach_<setting>} is FALSE; if both are unset, \code{generate_setting_specific_ach()} errors):
+\itemize{
+\item \code{default_ach_workplace}: uniform ACH assigned to every workplace location when \code{setting_specific_ach_workplace} is FALSE. Set via \code{\link[=set_default_ach]{set_default_ach()}}. Default = NULL (must be set explicitly).
+\item \code{default_ach_school}: uniform ACH assigned to every school location when \code{setting_specific_ach_school} is FALSE. Default = NULL.
+\item \code{default_ach_leisure}: uniform ACH assigned to every leisure location when \code{setting_specific_ach_leisure} is FALSE. Default = NULL.
+\item \code{default_ach_household}: uniform ACH assigned to every household location when \code{setting_specific_ach_household} is FALSE. Default = NULL.
+}
+
 Volume Per Person Parameters (used in the Wells-Riley calculation; units: m^3 per person):
 \itemize{
 \item \code{volume_per_person_workplace}: average air volume per person in a workplace; default = 27 (assumes ~10 m^2 floor area at 2.7 m height)

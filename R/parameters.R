@@ -62,6 +62,12 @@
 #' * `setting_specific_ach_household_mean`: The mean of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.5
 #' * `setting_specific_ach_household_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.2
 #'
+#' Default (Uniform) ACH Parameters (used when `setting_specific_ach_<setting>` is FALSE; if both are unset, `generate_setting_specific_ach()` errors):
+#' * `default_ach_workplace`: uniform ACH assigned to every workplace location when `setting_specific_ach_workplace` is FALSE. Set via [set_default_ach()]. Default = NULL (must be set explicitly).
+#' * `default_ach_school`: uniform ACH assigned to every school location when `setting_specific_ach_school` is FALSE. Default = NULL.
+#' * `default_ach_leisure`: uniform ACH assigned to every leisure location when `setting_specific_ach_leisure` is FALSE. Default = NULL.
+#' * `default_ach_household`: uniform ACH assigned to every household location when `setting_specific_ach_household` is FALSE. Default = NULL.
+#'
 #' Volume Per Person Parameters (used in the Wells-Riley calculation; units: m^3 per person):
 #' * `volume_per_person_workplace`: average air volume per person in a workplace; default = 27 (assumes ~10 m^2 floor area at 2.7 m height)
 #' * `volume_per_person_school`: average air volume per person in a school; default = 10 (assumes ~3.33 m^2 floor area at 3 m height)
@@ -156,6 +162,14 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     setting_specific_ach_household = FALSE,
     setting_specific_ach_household_mean = NULL,
     setting_specific_ach_household_sd = NULL,
+
+    # Default (uniform) ACH per setting, used when setting_specific_ach_<setting>
+    # is FALSE. NULL means "not configured" — generate_setting_specific_ach()
+    # will error if both the switch is FALSE and the default is NULL.
+    default_ach_workplace = NULL,
+    default_ach_school    = NULL,
+    default_ach_leisure   = NULL,
+    default_ach_household = NULL,
 
     # Volume per person parameters (density values, m^3, room heights are assumptions)
     volume_per_person_workplace = 27, #10m^2 *2.7m
