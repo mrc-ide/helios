@@ -37,6 +37,8 @@ For every setting used in a simulation, the user must call either
 }
 \seealso{
 Other setting-specific ACH: 
+\code{\link{convert_ach_to_riskiness}()},
+\code{\link{generate_setting_specific_ach}()},
 \code{\link{set_setting_specific_ach}()}
 }
 \concept{setting-specific ACH}
