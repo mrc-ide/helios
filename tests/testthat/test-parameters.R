@@ -124,10 +124,10 @@ test_that("get_parameters() assigns correct parameters for measles archetype", {
 
 test_that("run_simulation() works when a parameter archetype specified", {
   # Generate the parameter list for the fly archetype:
-  parameters_list <- get_parameters(
+  parameters_list <- with_default_ach(get_parameters(
     overrides = list(simulation_time = 3),
     archetype = "flu"
-  )
+  ))
 
   # Run the simulation:
   simulation_example <- run_simulation(parameters_list = parameters_list)
