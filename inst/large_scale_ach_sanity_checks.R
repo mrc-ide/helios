@@ -243,3 +243,76 @@ summary_table <- aggregate(
 print(summary_table)
 
 cat("\nDone. Results saved to /tmp/ach_sanity_check_results.{rds,csv}\n")
+
+# ---------------------------------------------------------------------------
+# Visualization
+# ---------------------------------------------------------------------------
+# One panel per scenario family. Each plots attack_rate per replicate
+# (jittered points) plus the mean +/- 1 SD across replicates, ordered by the
+# swept parameter -- so a monotonic line is exactly what "intuitively makes
+# sense" should look like for families A/B/C, and family D/E are direct
+# two-group comparisons instead of a sweep.
+
+library(ggplot2)
+
+# Pull the swept numeric value back out of the scenario label (e.g.
+# "B_coverage_0.5" -> 0.5) so points plot in the right order on the x-axis.
+all_results$x_value <- as.numeric(sub("^[A-E]_[a-z]+_", "", all_results$scenario))
+
+plot_sweep <- function(data, family_prefix, x_lab, title) {
+  d <- data[grepl(paste0("^", family_prefix, "_"), data$scenario), ]
+  summary_d <- aggregate(attack_rate ~ x_value, data = d, FUN = mean)
+  ggplot(d, aes(x = x_value, y = attack_rate)) +
+    geom_jitter(width = 0.02 * diff(range(d$x_value, na.rm = TRUE)), alpha = 0.4) +
+    geom_line(data = summary_d, linewidth = 1, color = "steelblue") +
+    geom_point(data = summary_d, size = 3, color = "steelblue") +
+    labs(x = x_lab, y = "Attack rate (fraction ever infected)", title = title) +
+    theme_minimal()
+}
+
+p_A <- plot_sweep(all_results, "A", "Baseline ACH (uniform, all settings)",
+                   "A: higher baseline ACH should lower attack rate")
+p_B <- plot_sweep(all_results, "B", "Workplace intervention coverage",
+                   "B: higher coverage should lower attack rate")
+p_C <- plot_sweep(all_results, "C", "Workplace intervention delta (eACH)",
+                   "C: bigger delta should lower attack rate (diminishing returns)")
+
+print(p_A)
+print(p_B)
+print(p_C)
+
+# D: targeted_riskiness vs random coverage, same coverage level -- targeted
+# should match or beat random (lower or equal attack rate).
+p_D <- ggplot(
+  subset(all_results, scenario %in% c("D_random", "D_targeted")),
+  aes(x = scenario, y = attack_rate)
+) +
+  geom_boxplot(outlier.shape = NA, width = 0.5) +
+  geom_jitter(width = 0.1, alpha = 0.5) +
+  labs(x = NULL, y = "Attack rate", title = "D: targeted_riskiness should match or beat random") +
+  theme_minimal()
+print(p_D)
+
+# E: joint intervention vs no intervention, broken out by setting-specific
+# mean FOI. Workplace/school/leisure FOI should drop under the joint
+# intervention; household FOI should be ~unchanged (household is excluded
+# from joint deployment by design).
+foi_long <- reshape(
+  subset(all_results, scenario %in% c("E_none", "E_joint"),
+         select = c(scenario, rep, mean_FOI_household, mean_FOI_workplace,
+                    mean_FOI_school, mean_FOI_leisure)),
+  varying = c("mean_FOI_household", "mean_FOI_workplace", "mean_FOI_school", "mean_FOI_leisure"),
+  v.names = "mean_FOI",
+  timevar = "setting",
+  times = c("household", "workplace", "school", "leisure"),
+  direction = "long"
+)
+
+p_E <- ggplot(foi_long, aes(x = setting, y = mean_FOI, fill = scenario)) +
+  geom_boxplot(outlier.shape = NA, position = position_dodge(0.7), width = 0.6) +
+  labs(
+    x = NULL, y = "Mean FOI over simulation",
+    title = "E: joint intervention should lower workplace/school/leisure FOI, leave household ~flat"
+  ) +
+  theme_minimal()
+print(p_E)
