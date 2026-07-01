@@ -5,16 +5,20 @@
 # tests. Takes ~10-15 minutes wall time using a PSOCK cluster.
 #
 # Uses parallel::makeCluster()/parLapply() (PSOCK, separate processes)
-# rather than mclapply() (fork-based): forking a multithreaded process is a
-# known crash/error source on macOS, especially from inside RStudio's GUI
-# process, and mclapply() silently swallows per-worker errors as
-# try-error objects (which then blow up rbind() with an opaque "numbers of
-# columns ... do not match" error). PSOCK workers are genuinely separate R
-# sessions, so they're robust cross-platform/cross-IDE, and a worker error
-# surfaces immediately as a real error instead of being swallowed.
+# rather than mclapply(): forking a multithreaded process is a known
+# crash/error source on macOS (especially from RStudio's GUI process), and
+# mclapply() silently swallows per-worker errors as try-error objects. PSOCK
+# workers are separate R sessions, so a worker error surfaces immediately.
+#
+# Uses the "flu" archetype (R0 ~ 1.5) rather than the raw/uncalibrated
+# defaults, which otherwise produce unrealistically high attack rates.
 #
 # Checks covered:
-#   A. Higher baseline ACH -> lower attack rate (monotonic, no intervention)
+#   A. Higher baseline ACH -> lower attack rate (monotonic, no intervention).
+#      Uses set_setting_specific_ach() (heterogeneous truncated-normal),
+#      not set_default_ach(): with a *uniform* ACH, riskiness is normalised
+#      to the setting's own median and always collapses to 1, so the
+#      absolute ACH level would have no effect at all.
 #   B. Higher intervention coverage -> lower attack rate (monotonic)
 #   C. Bigger intervention delta (eACH) -> lower attack rate (monotonic,
 #      diminishing returns expected at high delta)
@@ -24,6 +28,46 @@
 #      those settings' FOI but leaves household FOI essentially untouched
 #      (household is excluded from joint deployment by design)
 
+# ---------------------------------------------------------------------------
+# Bootstrap (for a machine that has never run helios before)
+# ---------------------------------------------------------------------------
+# Installs devtools/remotes (needed to load_all() and to install "individual"
+# from GitHub), the package's own declared Imports, and ggplot2 for the
+# plotting section at the bottom. Safe to re-run -- only installs what's
+# missing.
+
+# Without an explicit repos option, install.packages() pops up an
+# interactive CRAN-mirror chooser (chooseCRANmirror()) on the first call --
+# and any other package-install prompt (e.g. devtools::load_all() asking
+# "install missing dependency?") has the same problem -- in a
+# non-interactive Rscript session these menus have no terminal to read
+# from, and end up misreading the rest of this file as menu selections.
+# Setting a mirror and disabling rlang's interactive prompts avoids both.
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+options(rlang_interactive = FALSE)
+
+cran_pkgs <- c(
+  "devtools", "remotes", "withr", "dplyr", "EnvStats", "dqrng", "truncnorm", "ggplot2"
+)
+missing_cran <- setdiff(cran_pkgs, rownames(installed.packages()))
+if (length(missing_cran) > 0) install.packages(missing_cran)
+
+# "individual" must come from the branch helios currently depends on (see
+# Remotes: in DESCRIPTION), not CRAN.
+#
+# On Windows with a recent Rtools/GCC (e.g. Rtools45 / GCC 14), the source
+# build can fail with errors like "'reference' in ... allocator_type does
+# not name a type": GCC defaults to -std=gnu++20, and individual's C++
+# headers use pre-C++20 std::allocator members (reference/const_reference)
+# that C++20 removed. Forcing CXX_STD = CXX17 for this build works around
+# it without touching individual's source.
+if (!requireNamespace("individual", quietly = TRUE)) {
+  withr::with_makevars(
+    c(CXX_STD = "CXX17"),
+    remotes::install_github("mrc-ide/individual@feat/logi_size")
+  )
+}
+
 # Run this from the package root (or open the helios .Rproj first) so that
 # devtools::load_all(pkg_path) below can find the package.
 pkg_path <- normalizePath(".")
@@ -32,73 +76,61 @@ devtools::load_all(pkg_path)
 # Overridable via env vars for smoke-testing at small scale before committing
 # to the full 50k/8-rep run, e.g.:
 #   ACH_SANITY_N_REPS=2 ACH_SANITY_POP=500 ACH_SANITY_SIM_TIME=10 Rscript inst/large_scale_ach_sanity_checks.R
-N_REPS     <- as.integer(Sys.getenv("ACH_SANITY_N_REPS", "8"))
-POP        <- as.integer(Sys.getenv("ACH_SANITY_POP", "50000"))
-SIM_TIME   <- as.integer(Sys.getenv("ACH_SANITY_SIM_TIME", "150"))
-N_WORKERS  <- max(1, min(10, parallel::detectCores() - 1))
+N_REPS    <- as.integer(Sys.getenv("ACH_SANITY_N_REPS", "8"))
+POP       <- as.integer(Sys.getenv("ACH_SANITY_POP", "50000"))
+SIM_TIME  <- as.integer(Sys.getenv("ACH_SANITY_SIM_TIME", "150"))
+ARCHETYPE <- "flu"
+N_WORKERS <- max(1, min(10, parallel::detectCores() - 1))
 
 cl <- parallel::makeCluster(N_WORKERS)
 parallel::clusterCall(cl, function(p) { devtools::load_all(p); NULL }, pkg_path)
 
-with_default_ach <- function(parameters_list, ach = 4) {
+# ---------------------------------------------------------------------------
+# Scenario building blocks
+# ---------------------------------------------------------------------------
+
+base_params <- function(seed, extra_overrides = list()) {
+  get_parameters(
+    archetype = ARCHETYPE,
+    overrides = c(
+      list(
+        human_population = POP,
+        simulation_time  = SIM_TIME,
+        number_initial_S = POP - 5,
+        number_initial_E = 5,
+        seed             = seed
+      ),
+      extra_overrides
+    )
+  )
+}
+
+# Calibrated per-setting baseline ACH -- the fixed baseline for the
+# intervention checks (B/C/D/E), where what matters is the delta the
+# intervention adds, not the absolute ACH level. Heterogeneous
+# (truncated-normal) per setting, with mean/sd roughly reflecting typical
+# ventilation rates: workplaces best-ventilated, households worst.
+with_realistic_baseline_ach <- function(parameters_list) {
+  parameters_list <- set_setting_specific_ach(parameters_list, "workplace", mean = 4.8, sd = 1.5)
+  parameters_list <- set_setting_specific_ach(parameters_list, "school",    mean = 4.0, sd = 1.2)
+  parameters_list <- set_setting_specific_ach(parameters_list, "leisure",   mean = 3.0, sd = 1.0)
+  parameters_list <- set_setting_specific_ach(parameters_list, "household", mean = 0.5, sd = 0.2)
+  parameters_list
+}
+
+# Heterogeneous baseline ACH (truncated-normal, fixed sd) for every setting
+# -- used by family A, which sweeps mean_ach and needs real cross-location
+# spread for the riskiness normalisation to reflect the swept value.
+with_setting_specific_ach <- function(parameters_list, mean_ach, sd_ach = 2) {
   for (setting in c("household", "workplace", "school", "leisure")) {
-    parameters_list <- set_default_ach(parameters_list, setting, ach)
+    parameters_list <- set_setting_specific_ach(parameters_list, setting, mean = mean_ach, sd = sd_ach)
   }
   parameters_list
 }
 
-# ---------------------------------------------------------------------------
-# Scenario builders
-# ---------------------------------------------------------------------------
-
-base_overrides <- function(seed) {
-  list(
-    human_population  = POP,
-    simulation_time   = SIM_TIME,
-    number_initial_S  = POP - 5,
-    number_initial_E  = 5,
-    seed              = seed
-  )
-}
-
-# A: no intervention, sweep uniform baseline ACH
-build_ach_scenario <- function(ach, seed) {
-  with_default_ach(get_parameters(overrides = base_overrides(seed)), ach = ach)
-}
-
-# B/C: workplace intervention, sweep coverage and/or delta
-build_intervention_scenario <- function(
-  coverage, delta, coverage_type = "random", seed, ach = 4
-) {
-  parameters_list <- with_default_ach(
-    get_parameters(overrides = base_overrides(seed)), ach = ach
-  )
-  if (coverage == 0) {
-    return(parameters_list) # no intervention installed at all
-  }
-  intervention <- make_intervention(
-    name = "constant_delta",
-    delta_function = function(d) d,
-    delta_params = list(d = delta),
-    coverage = coverage
-  )
-  set_intervention_ach(
-    parameters_list = parameters_list,
-    setting = "workplace",
-    coverage_target = "individuals",
-    coverage_type = coverage_type,
-    timestep = 1,
-    intervention = intervention
-  )
-}
-
-# E: joint intervention (workplace+school+leisure), diagnostics on so we can
-# inspect per-setting FOI
-build_joint_scenario <- function(coverage, delta, seed, ach = 4) {
-  parameters_list <- with_default_ach(
-    get_parameters(overrides = c(base_overrides(seed), list(render_diagnostics = TRUE))),
-    ach = ach
-  )
+# Installs a constant-delta intervention on `setting` (or no-ops at coverage
+# 0). Used by B/C/D (setting = "workplace") and E (setting = "joint").
+add_intervention <- function(parameters_list, setting, coverage, delta, coverage_type = "random") {
   if (coverage == 0) {
     return(parameters_list)
   }
@@ -110,12 +142,29 @@ build_joint_scenario <- function(coverage, delta, seed, ach = 4) {
   )
   set_intervention_ach(
     parameters_list = parameters_list,
-    setting = "joint",
+    setting = setting,
     coverage_target = "individuals",
-    coverage_type = "random",
+    coverage_type = coverage_type,
     timestep = 1,
     intervention = intervention
   )
+}
+
+# A: no intervention, sweep heterogeneous baseline ACH
+build_A <- function(mean_ach, seed) {
+  with_setting_specific_ach(base_params(seed), mean_ach = mean_ach)
+}
+
+# B/C/D: workplace intervention, sweep coverage and/or delta
+build_BCD <- function(coverage, delta, seed, coverage_type = "random") {
+  add_intervention(with_realistic_baseline_ach(base_params(seed)), "workplace", coverage, delta, coverage_type)
+}
+
+# E: joint intervention (workplace+school+leisure), diagnostics on so we can
+# inspect per-setting FOI
+build_E <- function(coverage, delta, seed) {
+  parameters_list <- with_realistic_baseline_ach(base_params(seed, list(render_diagnostics = TRUE)))
+  add_intervention(parameters_list, "joint", coverage, delta)
 }
 
 # ---------------------------------------------------------------------------
@@ -136,31 +185,35 @@ summarise_run <- function(out, population, dt) {
   )
 }
 
-run_scenario <- function(label, build_fn, ..., n_reps = N_REPS, cluster = cl) {
+# seed_group defaults to label for backwards compatibility, but callers that
+# are part of a sweep (varying one parameter across several run_scenario()
+# calls) MUST pass a shared seed_group across the whole sweep. Seeding off
+# label (which encodes the swept value) gives every point in the sweep an
+# independent random draw, so differences between points are confounded with
+# run-to-run noise instead of isolating the effect of the swept parameter --
+# this produced a spurious non-monotonic attack-rate curve in T-SETTING.
+# Pairing (same seed_group/rep -> same seed) cancels that noise out.
+run_scenario <- function(label, build_fn, ..., seed_group = label, n_reps = N_REPS, cluster = cl) {
   t0 <- Sys.time()
   cat(sprintf("  -> %s (%d reps, %d workers)... ", label, n_reps, length(cluster)))
-  results <- parallel::parLapply(cluster, seq_len(n_reps), function(i, label, build_fn, dots) {
-    seed <- 10000 * (abs(sum(utf8ToInt(label))) %% 97 + 1) + i
+  results <- parallel::parLapply(cluster, seq_len(n_reps), function(i, label, seed_group, build_fn, dots) {
+    seed <- 10000 * (abs(sum(utf8ToInt(seed_group))) %% 97 + 1) + i
     parameters_list <- do.call(build_fn, c(dots, list(seed = seed)))
     out <- run_simulation(parameters_list)
     s <- summarise_run(out, parameters_list$human_population, parameters_list$dt)
     data.frame(scenario = label, rep = i, seed = seed, s)
-  }, label = label, build_fn = build_fn, dots = list(...))
+  }, label = label, seed_group = seed_group, build_fn = build_fn, dots = list(...))
   cat(sprintf("done (%.0fs)\n", as.numeric(Sys.time() - t0, units = "secs")))
   do.call(rbind, results)
 }
 
-# Each PSOCK worker is a separate R process that only has the package
-# loaded (via clusterCall() above) -- it does NOT have access to this
-# script's global objects unless explicitly exported. build_fn closures
-# (with_default_ach, base_overrides, POP, SIM_TIME in their lexical scope)
-# resolve those free variables against the *worker's* global env when
-# unserialized there, so all of this must be exported before run_scenario()
-# is called below.
+# PSOCK workers are separate R processes with only the package loaded (via
+# clusterCall() above); they need every helper/constant used inside
+# build_fn closures exported explicitly.
 parallel::clusterExport(cl, varlist = c(
-  "with_default_ach", "base_overrides",
-  "build_ach_scenario", "build_intervention_scenario", "build_joint_scenario",
-  "summarise_run", "POP", "SIM_TIME"
+  "base_params", "with_realistic_baseline_ach", "with_setting_specific_ach", "add_intervention",
+  "build_A", "build_BCD", "build_E", "summarise_run",
+  "POP", "SIM_TIME", "ARCHETYPE"
 ))
 
 # ---------------------------------------------------------------------------
@@ -168,9 +221,8 @@ parallel::clusterExport(cl, varlist = c(
 # ---------------------------------------------------------------------------
 
 cat("Running scenario family A: baseline ACH sweep...\n")
-ach_levels <- c(1, 4, 10, 20)
-results_A <- do.call(rbind, lapply(ach_levels, function(ach) {
-  run_scenario(paste0("A_ach_", ach), build_ach_scenario, ach = ach)
+results_A <- do.call(rbind, lapply(c(1, 4, 10, 20), function(mean_ach) {
+  run_scenario(paste0("A_ach_", mean_ach), build_A, mean_ach = mean_ach, seed_group = "A")
 }))
 
 # ---------------------------------------------------------------------------
@@ -178,51 +230,46 @@ results_A <- do.call(rbind, lapply(ach_levels, function(ach) {
 # ---------------------------------------------------------------------------
 
 cat("Running scenario family B: coverage sweep...\n")
-coverage_levels <- c(0, 0.25, 0.5, 0.75, 1.0)
-results_B <- do.call(rbind, lapply(coverage_levels, function(cov) {
-  run_scenario(
-    paste0("B_coverage_", cov), build_intervention_scenario,
-    coverage = cov, delta = 5, coverage_type = "random"
-  )
+results_B <- do.call(rbind, lapply(c(0, 0.25, 0.5, 0.75, 1.0), function(cov) {
+  run_scenario(paste0("B_coverage_", cov), build_BCD, coverage = cov, delta = 5, seed_group = "B")
 }))
 
 # ---------------------------------------------------------------------------
 # C. Delta sweep (fixed coverage = 1, random coverage, workplace)
 # ---------------------------------------------------------------------------
+# Not reusing B's coverage=1/delta=5 point here: it was drawn under
+# seed_group "B", which would break the within-C pairing across delta. Rerun
+# delta=5 explicitly under seed_group "C" instead -- a few extra sims is
+# cheap relative to a sweep that's actually internally paired.
 
 cat("Running scenario family C: delta sweep...\n")
-delta_levels <- c(0, 2, 10, 20) # delta = 5 @ coverage = 1 reused from family B
-results_C <- do.call(rbind, lapply(delta_levels, function(d) {
-  run_scenario(
-    paste0("C_delta_", d), build_intervention_scenario,
-    coverage = 1, delta = d, coverage_type = "random"
-  )
+results_C <- do.call(rbind, lapply(c(0, 2, 5, 10, 20), function(d) {
+  run_scenario(paste0("C_delta_", d), build_BCD, coverage = 1, delta = d, seed_group = "C")
 }))
-results_C_delta5 <- subset(results_B, scenario == "B_coverage_1")
-results_C_delta5$scenario <- "C_delta_5"
-results_C <- rbind(results_C, results_C_delta5)
 
 # ---------------------------------------------------------------------------
 # D. targeted_riskiness vs random coverage (same coverage = 0.5, delta = 5)
 # ---------------------------------------------------------------------------
+# Same reasoning as C: rerun the random-coverage arm under seed_group "D"
+# rather than reusing B's row, so D_targeted and D_random are paired.
 
 cat("Running scenario family D: targeted vs random coverage...\n")
-results_D_targeted <- run_scenario(
-  "D_targeted", build_intervention_scenario,
-  coverage = 0.5, delta = 5, coverage_type = "targeted_riskiness"
+results_D <- rbind(
+  run_scenario("D_targeted", build_BCD, coverage = 0.5, delta = 5,
+               coverage_type = "targeted_riskiness", seed_group = "D"),
+  run_scenario("D_random", build_BCD, coverage = 0.5, delta = 5,
+               coverage_type = "random", seed_group = "D")
 )
-results_D_random <- subset(results_B, scenario == "B_coverage_0.5")
-results_D_random$scenario <- "D_random"
-results_D <- rbind(results_D_targeted, results_D_random)
 
 # ---------------------------------------------------------------------------
 # E. Joint intervention vs no intervention (household exclusion check)
 # ---------------------------------------------------------------------------
 
 cat("Running scenario family E: joint intervention / household exclusion...\n")
-results_E_none  <- run_scenario("E_none",  build_joint_scenario, coverage = 0,   delta = 5)
-results_E_joint <- run_scenario("E_joint", build_joint_scenario, coverage = 0.5, delta = 5)
-results_E <- rbind(results_E_none, results_E_joint)
+results_E <- rbind(
+  run_scenario("E_none",  build_E, coverage = 0,   delta = 5, seed_group = "E"),
+  run_scenario("E_joint", build_E, coverage = 0.5, delta = 5, seed_group = "E")
+)
 
 parallel::stopCluster(cl)
 
@@ -232,8 +279,12 @@ parallel::stopCluster(cl)
 
 all_results <- rbind(results_A, results_B, results_C, results_D, results_E)
 out_suffix <- Sys.getenv("ACH_SANITY_OUT_SUFFIX", "")
-saveRDS(all_results, paste0("/tmp/ach_sanity_check_results", out_suffix, ".rds"))
-write.csv(all_results, paste0("/tmp/ach_sanity_check_results", out_suffix, ".csv"), row.names = FALSE)
+# tempdir() resolves to a real, writable directory on every OS -- "/tmp"
+# doesn't exist on Windows R sessions and silently fails saveRDS/write.csv.
+out_dir <- Sys.getenv("ACH_SANITY_OUT_DIR", tempdir())
+out_base <- file.path(out_dir, paste0("ach_sanity_check_results", out_suffix))
+saveRDS(all_results, paste0(out_base, ".rds"))
+write.csv(all_results, paste0(out_base, ".csv"), row.names = FALSE)
 
 summary_table <- aggregate(
   cbind(attack_rate, peak_I) ~ scenario,
@@ -242,7 +293,7 @@ summary_table <- aggregate(
 )
 print(summary_table)
 
-cat("\nDone. Results saved to /tmp/ach_sanity_check_results.{rds,csv}\n")
+cat("\nDone. Results saved to", paste0(out_base, ".{rds,csv}"), "\n")
 
 # ---------------------------------------------------------------------------
 # Visualization
@@ -270,7 +321,7 @@ plot_sweep <- function(data, family_prefix, x_lab, title) {
     theme_minimal()
 }
 
-p_A <- plot_sweep(all_results, "A", "Baseline ACH (uniform, all settings)",
+p_A <- plot_sweep(all_results, "A", "Baseline ACH (mean of truncated-normal, all settings)",
                    "A: higher baseline ACH should lower attack rate")
 p_B <- plot_sweep(all_results, "B", "Workplace intervention coverage",
                    "B: higher coverage should lower attack rate")
