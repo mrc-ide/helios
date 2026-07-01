@@ -33,6 +33,6 @@ dataframe containing the beta values and their proportions of the total betas.
 \seealso{
 Other miscellaneous: 
 \code{\link{get_setting_size}()},
-\code{\link{timestep_to_day_of_year}()}
+\code{\link{timestep_to_day}()}
 }
 \concept{miscellaneous}

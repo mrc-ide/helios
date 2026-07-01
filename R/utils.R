@@ -45,23 +45,21 @@ get_setting_size <- function(variables_list, setting) {
   return(location_sizes)
 }
 
-#' timestep_to_day_of_year
+#' timestep_to_day
 #'
 #' @description
-#' Converts a simulation timestep into a day-of-year index in 1:365, used to look
-#' up the seasonal multiplier for time-varying betas. There are `1 / dt` timesteps
-#' per day, so the timestep is first mapped to a day via `ceiling(t * dt)` and then
-#' recycled annually with a modulo over 365. All timesteps within the same day map
-#' to the same day-of-year, and day 366 of a multi-year run wraps back to day 1.
+#' Converts a simulation timestep into a simulation-day index. There are `1 / dt`
+#' timesteps per day, so the day is `ceiling(t * dt)`. All timesteps within the
+#' same day map to the same index. The index keeps counting past day 365 for
+#' simulations longer than one year.
 #'
 #' @param t The simulation timestep (a positive integer, as passed to a process function).
 #' @param dt The timestep length as a fraction of a day (e.g. 0.5 for two timesteps per day).
-#' @return An integer in 1:365 giving the day of the year for timestep `t`.
+#' @return An integer giving the simulation day for timestep `t`.
 #' @family miscellaneous
 #' @export
-timestep_to_day_of_year <- function(t, dt) {
-  day <- ceiling(t * dt)
-  ((day - 1) %% 365) + 1
+timestep_to_day <- function(t, dt) {
+  ceiling(t * dt)
 }
 
 #' generate_betas

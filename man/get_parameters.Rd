@@ -40,7 +40,7 @@ These parameters are:
 \item \code{beta_leisure}: TBD
 \item \code{beta_community}: TBD
 \item \code{seasonality_on}: Logical flag (default \code{FALSE}). When \code{FALSE}, the setting-specific betas are used as constant scalars. When \code{TRUE}, each beta is scaled on each day by the corresponding entry of \code{seasonality_multiplier}.
-\item \code{seasonality_multiplier}: A numeric vector of length 365 giving the relative seasonal multiplier for each day of the year (recycled annually). On a given day \code{d}, the effective beta for each setting is \code{beta_setting * seasonality_multiplier[d]}. Typically centred on 1.0 so the annual mean beta is unchanged; values not centred on 1.0 also rescale the mean beta, not just its seasonal variation. Only used when \code{seasonality_on} is \code{TRUE}.
+\item \code{seasonality_multiplier}: A numeric vector of length equal to \code{simulation_time}, giving the relative seasonal multiplier for each simulated day. On day \code{d}, the effective beta for each setting is \code{beta_setting * seasonality_multiplier[d]}. Typically centred on 1.0 so the mean beta is unchanged. Only used when \code{seasonality_on} is \code{TRUE}.
 \item \code{dt}: TBD
 \item \code{simulation_time}: TBD
 \item \code{household_distribution_country}: TBD

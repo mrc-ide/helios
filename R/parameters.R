@@ -37,7 +37,7 @@
 #' * `beta_leisure`: TBD
 #' * `beta_community`: TBD
 #' * `seasonality_on`: Logical flag (default `FALSE`). When `FALSE`, the setting-specific betas are used as constant scalars. When `TRUE`, each beta is scaled on each day by the corresponding entry of `seasonality_multiplier`.
-#' * `seasonality_multiplier`: A numeric vector of length 365 giving the relative seasonal multiplier for each day of the year (recycled annually). On a given day `d`, the effective beta for each setting is `beta_setting * seasonality_multiplier[d]`. Typically centred on 1.0 so the annual mean beta is unchanged; values not centred on 1.0 also rescale the mean beta, not just its seasonal variation. Only used when `seasonality_on` is `TRUE`.
+#' * `seasonality_multiplier`: A numeric vector of length equal to `simulation_time`, giving the relative seasonal multiplier for each simulated day. On day `d`, the effective beta for each setting is `beta_setting * seasonality_multiplier[d]`. Typically centred on 1.0 so the mean beta is unchanged. Only used when `seasonality_on` is `TRUE`.
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
 #' * `household_distribution_country`: TBD
@@ -162,7 +162,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     beta_community = 0.2, # check this as default
     #Seasonality
     seasonality_on = FALSE,
-    seasonality_multiplier = NULL, #365 length vector of relative multipliers
+    seasonality_multiplier = NULL, # numeric vector, length = simulation_time
     dt = 0.5, # check this as default
     simulation_time = 150,
     render_diagnostics = FALSE,
@@ -466,11 +466,11 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     if (
       is.null(seasonality_multiplier) ||
         !is.numeric(seasonality_multiplier) ||
-        length(seasonality_multiplier) != 365 ||
+        length(seasonality_multiplier) != parameters$simulation_time ||
         any(is.na(seasonality_multiplier))
     ) {
       stop(
-        "ERROR: seasonality_multiplier must be a numeric vector of length 365 with no NAs when seasonality_on is TRUE"
+        "ERROR: seasonality_multiplier must be a numeric vector of length equal to simulation_time, with no NAs, when seasonality_on is TRUE"
       )
     }
   }

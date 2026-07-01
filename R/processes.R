@@ -174,13 +174,13 @@ create_SE_process <- function(
     #=== Seasonal scaling of betas ===#
     #=================================#
     # When seasonality is on, scale every setting-specific beta by the seasonal
-    # multiplier for the current day of the year. The timestep t is converted to
-    # a day via ceiling(t * dt) (1/dt timesteps per day) and recycled annually
-    # over the length-365 multiplier. When seasonality is off, the multiplier is
-    # 1 and the effective betas are identical to the constant baseline betas.
+    # multiplier for the current simulation day. The timestep t is converted to
+    # a day via ceiling(t * dt) (1/dt timesteps per day); the index runs from 1
+    # to simulation_time with no recycling. When seasonality is off, the
+    # multiplier is 1 and betas are identical to the constant baseline values.
     if (parameters_list$seasonality_on) {
-      day_of_year <- timestep_to_day_of_year(t, parameters_list$dt)
-      seasonal_mult <- parameters_list$seasonality_multiplier[day_of_year]
+      day <- timestep_to_day(t, parameters_list$dt)
+      seasonal_mult <- parameters_list$seasonality_multiplier[day]
     } else {
       seasonal_mult <- 1
     }

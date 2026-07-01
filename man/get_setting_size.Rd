@@ -25,6 +25,6 @@ leisure setting.
 \seealso{
 Other miscellaneous: 
 \code{\link{generate_betas}()},
-\code{\link{timestep_to_day_of_year}()}
+\code{\link{timestep_to_day}()}
 }
 \concept{miscellaneous}

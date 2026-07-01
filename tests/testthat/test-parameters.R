@@ -1,9 +1,10 @@
-test_that("get_parameters() accepts a valid length-365 seasonality_multiplier when seasonality_on is TRUE", {
+test_that("get_parameters() accepts a seasonality_multiplier matching simulation_time when seasonality_on is TRUE", {
   expect_no_error(
     get_parameters(
       overrides = list(
+        simulation_time = 30,
         seasonality_on = TRUE,
-        seasonality_multiplier = rep(1, 365)
+        seasonality_multiplier = rep(1, 30)
       )
     )
   )
@@ -13,36 +14,39 @@ test_that("get_parameters() errors when seasonality_on is TRUE but seasonality_m
   expect_error(
     get_parameters(
       overrides = list(
+        simulation_time = 30,
         seasonality_on = TRUE
       )
     ),
-    regexp = "seasonality_multiplier must be a numeric vector of length 365"
+    regexp = "seasonality_multiplier must be a numeric vector of length equal to simulation_time"
   )
 })
 
-test_that("get_parameters() errors when seasonality_multiplier is not length 365", {
+test_that("get_parameters() errors when seasonality_multiplier length does not match simulation_time", {
   expect_error(
     get_parameters(
       overrides = list(
+        simulation_time = 30,
         seasonality_on = TRUE,
         seasonality_multiplier = rep(1, 100)
       )
     ),
-    regexp = "seasonality_multiplier must be a numeric vector of length 365"
+    regexp = "seasonality_multiplier must be a numeric vector of length equal to simulation_time"
   )
 })
 
 test_that("get_parameters() errors when seasonality_multiplier contains NAs", {
-  m <- rep(1, 365)
+  m <- rep(1, 30)
   m[10] <- NA
   expect_error(
     get_parameters(
       overrides = list(
+        simulation_time = 30,
         seasonality_on = TRUE,
         seasonality_multiplier = m
       )
     ),
-    regexp = "seasonality_multiplier must be a numeric vector of length 365"
+    regexp = "seasonality_multiplier must be a numeric vector of length equal to simulation_time"
   )
 })
 
