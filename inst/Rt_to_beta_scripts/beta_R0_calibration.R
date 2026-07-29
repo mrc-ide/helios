@@ -1,18 +1,10 @@
-# beta_R0_calibration.R
-#
-# PURPOSE
-# -------
 # Script 1 of the beta/R0 calibration pipeline: runs Helios across a grid of
 # beta_community values (no interventions, seasonality off) and measures the
 # resulting final attack rate at each one. This produces a beta <-> R0 lookup
 # table used downstream by Script 2 (map_beta_finalsize.R), which maps a
 # target R0 or Rt(t) series to the corresponding beta_community value(s) via
 # interpolation (R0 > 1) or linear extrapolation (R0 <= 1) against this
-# table -- no new Helios simulations are run in Script 2.
-#
-# This is a deliberate, one-time preprocessing step per pathogen/transmission
-# configuration -- not a function called inside a simulation loop.
-#
+# table
 # R0 is back-solved from the final attack rate at every swept beta value,
 # including subcritical (R0 < 1) values, via the closed-form final-size
 # relation (get_R0_from_attack_rate).
@@ -73,7 +65,7 @@ run_beta_sweep <- function(
   out_file = NULL
 ) {
 
-  #=== Validate transmission_fraction ===#
+  #Validate transmission fraction
   required_settings <- c("household", "workplace", "leisure", "community")
   if (!setequal(names(transmission_fraction), required_settings)) {
     stop(sprintf(
@@ -85,7 +77,7 @@ run_beta_sweep <- function(
     stop("transmission_fraction must sum to 1")
   }
 
-  #=== Resolve arguments against pathogen_params_list defaults ===#
+  #Defaults
   # If the user did not supply a value (it is NULL), fall back to a default
   if (is.null(population)) {
     population <- pathogen_params_list$human_population
@@ -101,7 +93,7 @@ run_beta_sweep <- function(
   }
 
   #=== Derive setting-specific beta ratios ===#
-  # beta_school is always forced equal to beta_workplace (see R/processes.R)
+  # beta_school is always forced equal to beta_workplace
   household_ratio <- transmission_fraction["household"] / transmission_fraction["community"]
   workplace_ratio <- transmission_fraction["workplace"] / transmission_fraction["community"]
   leisure_ratio   <- transmission_fraction["leisure"]   / transmission_fraction["community"]
@@ -176,8 +168,6 @@ run_beta_sweep <- function(
 
   message(sprintf("Sweep complete (%d beta values x %d reps)", n_beta, n_reps))
 
-  # No filtering on R0 >= 1 here: all swept betas are retained, including
-  # subcritical ones
 
   #=== Assemble and save result ===#
   result <- list(
@@ -279,4 +269,46 @@ get_R0_from_attack_rate <- function(attack_rate) {
   }
 
   R0
+}
+
+#' Plot sanity-check figures for a beta sweep result
+#'
+#' Produces a two-panel base R plot: beta vs. back-solved R0 (with a
+#' reference line at R0 = 1), and beta vs. attack rate with error bars
+#' across replicates. Useful for a visual check that a sweep behaved
+#' sensibly (monotonic R0, reasonable attack-rate spread) before using it
+#' in [get_beta_from_R0_finalsize()].
+#'
+#' @param sweep_result The list returned by [run_beta_sweep()]
+#'
+#' @return Invisibly returns `NULL`. Called for its plotting side effect.
+generate_beta_sweep_plot <- function(sweep_result) {
+
+  sweep_table <- sweep_result$sweep_table
+
+  original_par <- par(mfrow = c(1, 2))
+
+  plot(
+    sweep_table$beta, sweep_table$R0_fs_mean,
+    type = "b", pch = 19, col = "steelblue",
+    xlab = "beta_community", ylab = "R0 (back-solved)",
+    main = "beta -> R0 mapping"
+  )
+  abline(h = 1, lty = 2, col = "grey60")
+
+  plot(
+    sweep_table$beta, sweep_table$AR_mean,
+    type = "b", pch = 19, col = "coral", ylim = c(0, 1),
+    xlab = "beta_community", ylab = "Attack rate (mean over replicates)",
+    main = "beta -> Attack rate"
+  )
+  arrows(
+    sweep_table$beta, sweep_table$AR_mean - sweep_table$AR_sd,
+    sweep_table$beta, sweep_table$AR_mean + sweep_table$AR_sd,
+    length = 0.03, angle = 90, code = 3, col = "coral"
+  )
+
+  par(original_par)
+
+  invisible(NULL)
 }

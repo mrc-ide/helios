@@ -1,12 +1,9 @@
 # map_beta_finalsize.R
 #
-# PURPOSE
-# -------
 # Script 2 of the beta/R0 calibration pipeline: maps a target R0 value, or
 # an Rt(t) time series, to the corresponding beta_community value(s), using
 # only the final-size (attack-rate-derived) table produced by Script 1
-# (beta_R0_calibration.R). No new Helios simulations are run here -- this
-# is pure lookup/interpolation against an existing sweep.
+# (beta_R0_calibration.R).
 #
 # For target values strictly greater than 1, this interpolates between
 # swept beta values using the final-size table directly.
@@ -72,7 +69,7 @@ get_beta_from_R0_finalsize <- function(
     stop("fewer valid final-size rows than n_linear_bottom -- widen the sweep or lower n_linear_bottom")
   }
 
-  #=== Build the two lookup mechanisms ===#
+  #Lookup
   # Interpolation for target > 1, spanning the whole final-size table
   interpolate_beta <- approxfun(
     x = valid_rows$R0_fs_mean,
@@ -86,12 +83,10 @@ get_beta_from_R0_finalsize <- function(
   bottom_rows <- valid_rows[seq_len(n_linear_bottom), ]
   extrapolation_fit <- lm(beta ~ R0_fs_mean, data = bottom_rows)
 
-  #=== Look up beta for each target value ===#
+  #Look up beta for each target value
   # Each element of target is looked up independently against this static
   # beta-R0 relationship. For an Rt(t) series, this treats every timepoint
-  # as an isolated instantaneous lookup -- it does not model time-varying
-  # susceptible depletion interacting with a changing Rt. This is a
-  # documented simplification, not an assumption made silently
+  # as an isolated instantaneous lookup.
   beta_out   <- vector(mode = "numeric", length = length(target))
   source_out <- vector(mode = "character", length = length(target))
 
