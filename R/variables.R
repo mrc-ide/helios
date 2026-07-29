@@ -238,29 +238,6 @@ create_variables <- function(parameters_list) {
     setting = "leisure"
   )
 
-  # # Old far-UVC switches block, kept as comments for reference. The new
-  # # intervention pipeline uses the dispatcher generate_intervention_switches()
-  # # below which handles both joint and per-setting coverage and stores results
-  # # under intervention_<setting>_covered (instead of uvc_<setting>).
-  # if (
-  #   any(
-  #     parameters_list$far_uvc_joint,
-  #     parameters_list$far_uvc_workplace,
-  #     parameters_list$far_uvc_school,
-  #     parameters_list$far_uvc_leisure,
-  #     parameters_list$far_uvc_household
-  #   )
-  # ) {
-  #   parameters_list <- generate_far_uvc_switches(parameters_list, variables_list)
-  #
-  #   setting_types <- c("workplace", "school", "leisure")
-  #   if (parameters_list$far_uvc_joint) {
-  #     parameters_list[paste0("far_uvc_", setting_types)] <- TRUE
-  #     parameters_list[paste0("far_uvc_", setting_types, "_efficacy")] <- parameters_list$far_uvc_joint_efficacy
-  #     parameters_list[paste0("far_uvc_", setting_types, "_timestep")] <- parameters_list$far_uvc_joint_timestep
-  #   }
-  # }
-
   # If any intervention is active (per-setting or joint), dispatch to the
   # intervention switches generator. For joint mode, this also propagates the
   # joint intervention list, timestep, and active flags to each per-setting
