@@ -31,13 +31,12 @@
 #' * `duration_exposed`: TBD
 #' * `duration_infectious`: TBD
 #' * `prob_inf_external`: The probability a susceptible individual is infected from an external source
-#' * `beta_household`: TBD
-#' * `beta_workplace`: TBD
-#' * `beta_school`: TBD
-#' * `beta_leisure`: TBD
-#' * `beta_community`: TBD
-#' * `seasonality_on`: Logical flag (default `FALSE`). When `FALSE`, the setting-specific betas are used as constant scalars. When `TRUE`, each beta is scaled on each day by the corresponding entry of `seasonality_multiplier`.
-#' * `seasonality_multiplier`: A numeric vector of length equal to `simulation_time`, giving the relative seasonal multiplier for each simulated day. On day `d`, the effective beta for each setting is `beta_setting * seasonality_multiplier[d]`. Typically centred on 1.0 so the mean beta is unchanged. Only used when `seasonality_on` is `TRUE`.
+#' * `beta_household`: A single constant value when `seasonality_on` is `FALSE`, or a numeric vector of length equal to `simulation_time` (one value per simulated day) when `seasonality_on` is `TRUE`.
+#' * `beta_workplace`: Same length rule as `beta_household`.
+#' * `beta_school`: Same length rule as `beta_household`.
+#' * `beta_leisure`: Same length rule as `beta_household`.
+#' * `beta_community`: Same length rule as `beta_household`.
+#' * `seasonality_on`: Logical flag (default `FALSE`). When `FALSE`, each setting-specific beta must be a single constant value. When `TRUE`, each setting-specific beta must instead be a numeric vector of length `simulation_time`, giving that setting's beta for each simulated day directly.
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
 #' * `household_distribution_country`: TBD
@@ -162,7 +161,6 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     beta_community = 0.2, # check this as default
     #Seasonality
     seasonality_on = FALSE,
-    seasonality_multiplier = NULL, # numeric vector, length = simulation_time
     dt = 0.5, # check this as default
     simulation_time = 150,
     render_diagnostics = FALSE,
@@ -256,6 +254,64 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     prob_death_hosp_elderly = 0.3,
     duration_hospitalized = 10
   )
+
+  # Overwrite parameters if archetype specified. This runs before the
+  # overrides loop below so that explicit overrides always take final
+  # precedence over archetype defaults, rather than being silently
+  # clobbered by them.
+  # Flu (R0 ~ 1.5)
+  if (archetype == "flu") {
+    parameters$duration_exposed = 1
+    parameters$duration_infectious = 2
+    parameters$beta_household = 0.207
+    parameters$beta_workplace = 0.207
+    parameters$beta_school = 0.207
+    parameters$beta_leisure = 0.207
+    parameters$beta_community = 0.069
+    prob_hosp_child = 0.001
+    prob_hosp_adult = 0.03
+    prob_hosp_elderly = 0.18
+    prob_death_hosp_child = 0.01
+    prob_death_hosp_adult = 0.08
+    prob_death_hosp_elderly = 0.3
+    duration_hospitalized = 5
+  }
+
+  # SARS-CoV-2 (R0 ~ 2.5)
+  if (archetype == "sars_cov_2") {
+    parameters$duration_exposed = 2
+    parameters$duration_infectious = 4
+    parameters$beta_household = 0.24
+    parameters$beta_workplace = 0.24
+    parameters$beta_school = 0.24
+    parameters$beta_leisure = 0.24
+    parameters$beta_community = 0.08
+    prob_hosp_child = 0.001
+    prob_hosp_adult = 0.03
+    prob_hosp_elderly = 0.18
+    prob_death_hosp_child = 0.01
+    prob_death_hosp_adult = 0.08
+    prob_death_hosp_elderly = 0.3
+    duration_hospitalized = 10
+  }
+
+  # Measles (R0 ~ 9)
+  if (archetype == "measles") {
+    parameters$duration_exposed = 8
+    parameters$duration_infectious = 5
+    parameters$beta_household = 1.26
+    parameters$beta_workplace = 1.26
+    parameters$beta_school = 1.26
+    parameters$beta_leisure = 1.26
+    parameters$beta_community = 0.42
+    prob_hosp_child = 0.001
+    prob_hosp_adult = 0.03
+    prob_hosp_elderly = 0.18
+    prob_death_hosp_child = 0.01
+    prob_death_hosp_adult = 0.08
+    prob_death_hosp_elderly = 0.3
+    duration_hospitalized = 7
+  }
 
   # Ensure overridden parameters are passed as a list
   if (!is.list(overrides)) {
@@ -389,88 +445,36 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     stop("school_distribution_country must be set to either UK, USA or custom")
   }
 
-  # Overwrite parameters if archetype specified:
-  # Flu (R0 ~ 1.5)
-  if (archetype == "flu") {
-    parameters$duration_exposed = 1
-    parameters$duration_infectious = 2
-    parameters$beta_household = 0.207
-    parameters$beta_workplace = 0.207
-    parameters$beta_school = 0.207
-    parameters$beta_leisure = 0.207
-    parameters$beta_community = 0.069
-    prob_hosp_child = 0.001
-    prob_hosp_adult = 0.03
-    prob_hosp_elderly = 0.18
-    prob_death_hosp_child = 0.01
-    prob_death_hosp_adult = 0.08
-    prob_death_hosp_elderly = 0.3
-    duration_hospitalized = 5
-  }
-
-  # SARS-CoV-2 (R0 ~ 2.5)
-  if (archetype == "sars_cov_2") {
-    parameters$duration_exposed = 2
-    parameters$duration_infectious = 4
-    parameters$beta_household = 0.24
-    parameters$beta_workplace = 0.24
-    parameters$beta_school = 0.24
-    parameters$beta_leisure = 0.24
-    parameters$beta_community = 0.08
-    prob_hosp_child = 0.001
-    prob_hosp_adult = 0.03
-    prob_hosp_elderly = 0.18
-    prob_death_hosp_child = 0.01
-    prob_death_hosp_adult = 0.08
-    prob_death_hosp_elderly = 0.3
-    duration_hospitalized = 10
-  }
-
-  # Measles (R0 ~ 9)
-  if (archetype == "measles") {
-    parameters$duration_exposed = 8
-    parameters$duration_infectious = 5
-    parameters$beta_household = 1.26
-    parameters$beta_workplace = 1.26
-    parameters$beta_school = 1.26
-    parameters$beta_leisure = 1.26
-    parameters$beta_community = 0.42
-    prob_hosp_child = 0.001
-    prob_hosp_adult = 0.03
-    prob_hosp_elderly = 0.18
-    prob_death_hosp_child = 0.01
-    prob_death_hosp_adult = 0.08
-    prob_death_hosp_elderly = 0.3
-    duration_hospitalized = 7
-  }
-
-  # Check that all setting-specific betas are of length 1:
-  if (
-    any(
-      length(parameters$beta_household) != 1,
-      length(parameters$beta_school) != 1,
-      length(parameters$beta_workplace) != 1,
-      length(parameters$beta_leisure) != 1,
-      length(parameters$beta_community) != 1
-    )
-  ) {
-    stop(
-      "ERROR: A setting-specific beta has length not equal to 1. All setting-specific betas must be of length 1"
-    )
-  }
-
-  # If seasonality is switched on, the seasonality_multiplier must be a numeric
-  # vector of length 365 (one value per day of the year, recycled annually):
+  # Check that all setting-specific betas are of the correct length and type:
+  # a single constant value when seasonality is off, or a numeric vector of
+  # length simulation_time (one value per simulated day, with no NAs) when
+  # seasonality is on
   if (isTRUE(parameters$seasonality_on)) {
-    seasonality_multiplier <- parameters$seasonality_multiplier
     if (
-      is.null(seasonality_multiplier) ||
-        !is.numeric(seasonality_multiplier) ||
-        length(seasonality_multiplier) != parameters$simulation_time ||
-        any(is.na(seasonality_multiplier))
+      any(
+        !is.numeric(parameters$beta_household) | length(parameters$beta_household) != parameters$simulation_time | anyNA(parameters$beta_household),
+        !is.numeric(parameters$beta_school) | length(parameters$beta_school) != parameters$simulation_time | anyNA(parameters$beta_school),
+        !is.numeric(parameters$beta_workplace) | length(parameters$beta_workplace) != parameters$simulation_time | anyNA(parameters$beta_workplace),
+        !is.numeric(parameters$beta_leisure) | length(parameters$beta_leisure) != parameters$simulation_time | anyNA(parameters$beta_leisure),
+        !is.numeric(parameters$beta_community) | length(parameters$beta_community) != parameters$simulation_time | anyNA(parameters$beta_community)
+      )
     ) {
       stop(
-        "ERROR: seasonality_multiplier must be a numeric vector of length equal to simulation_time, with no NAs, when seasonality_on is TRUE"
+        "ERROR: when seasonality_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time, with no NAs"
+      )
+    }
+  } else {
+    if (
+      any(
+        length(parameters$beta_household) != 1,
+        length(parameters$beta_school) != 1,
+        length(parameters$beta_workplace) != 1,
+        length(parameters$beta_leisure) != 1,
+        length(parameters$beta_community) != 1
+      )
+    ) {
+      stop(
+        "ERROR: A setting-specific beta has length not equal to 1. All setting-specific betas must be of length 1"
       )
     }
   }

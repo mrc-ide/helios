@@ -173,22 +173,25 @@ create_SE_process <- function(
 
     #=== Seasonal scaling of betas ===#
     #=================================#
-    # When seasonality is on, scale every setting-specific beta by the seasonal
-    # multiplier for the current simulation day. The timestep t is converted to
-    # a day via ceiling(t * dt) (1/dt timesteps per day); the index runs from 1
-    # to simulation_time with no recycling. When seasonality is off, the
-    # multiplier is 1 and betas are identical to the constant baseline values.
+    # When seasonality is on, each setting-specific beta is a vector with one
+    # value per simulated day; the timestep t is converted to a day via
+    # timestep_to_day() (1/dt timesteps per day) and that day's value is used.
+    # When seasonality is off, each setting-specific beta is a single constant
+    # value used for every timestep.
     if (parameters_list$seasonality_on) {
       day <- timestep_to_day(t, parameters_list$dt)
-      seasonal_mult <- parameters_list$seasonality_multiplier[day]
+      beta_household_t <- parameters_list$beta_household[day]
+      beta_workplace_t <- parameters_list$beta_workplace[day]
+      beta_school_t <- parameters_list$beta_school[day]
+      beta_leisure_t <- parameters_list$beta_leisure[day]
+      beta_community_t <- parameters_list$beta_community[day]
     } else {
-      seasonal_mult <- 1
+      beta_household_t <- parameters_list$beta_household
+      beta_workplace_t <- parameters_list$beta_workplace
+      beta_school_t <- parameters_list$beta_school
+      beta_leisure_t <- parameters_list$beta_leisure
+      beta_community_t <- parameters_list$beta_community
     }
-    beta_household_t <- parameters_list$beta_household * seasonal_mult
-    beta_workplace_t <- parameters_list$beta_workplace * seasonal_mult
-    beta_school_t <- parameters_list$beta_school * seasonal_mult
-    beta_leisure_t <- parameters_list$beta_leisure * seasonal_mult
-    beta_community_t <- parameters_list$beta_community * seasonal_mult
 
     #=== Household FOI ===#
     #=====================#

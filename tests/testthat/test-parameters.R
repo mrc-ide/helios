@@ -1,16 +1,20 @@
-test_that("get_parameters() accepts a seasonality_multiplier matching simulation_time when seasonality_on is TRUE", {
+test_that("get_parameters() accepts setting-specific betas as vectors matching simulation_time when seasonality_on is TRUE", {
   expect_no_error(
     get_parameters(
       overrides = list(
         simulation_time = 30,
         seasonality_on = TRUE,
-        seasonality_multiplier = rep(1, 30)
+        beta_household = rep(0.5, 30),
+        beta_school = rep(0.5, 30),
+        beta_workplace = rep(0.5, 30),
+        beta_leisure = rep(0.5, 30),
+        beta_community = rep(0.2, 30)
       )
     )
   )
 })
 
-test_that("get_parameters() errors when seasonality_on is TRUE but seasonality_multiplier is NULL", {
+test_that("get_parameters() errors when seasonality_on is TRUE but a setting-specific beta is still a constant", {
   expect_error(
     get_parameters(
       overrides = list(
@@ -18,47 +22,57 @@ test_that("get_parameters() errors when seasonality_on is TRUE but seasonality_m
         seasonality_on = TRUE
       )
     ),
-    regexp = "seasonality_multiplier must be a numeric vector of length equal to simulation_time"
+    regexp = "when seasonality_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
   )
 })
 
-test_that("get_parameters() errors when seasonality_multiplier length does not match simulation_time", {
+test_that("get_parameters() errors when a setting-specific beta length does not match simulation_time under seasonality", {
   expect_error(
     get_parameters(
       overrides = list(
         simulation_time = 30,
         seasonality_on = TRUE,
-        seasonality_multiplier = rep(1, 100)
+        beta_household = rep(0.5, 30),
+        beta_school = rep(0.5, 30),
+        beta_workplace = rep(0.5, 30),
+        beta_leisure = rep(0.5, 30),
+        beta_community = rep(0.2, 100)
       )
     ),
-    regexp = "seasonality_multiplier must be a numeric vector of length equal to simulation_time"
+    regexp = "when seasonality_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
   )
 })
 
-test_that("get_parameters() errors when seasonality_multiplier contains NAs", {
-  m <- rep(1, 30)
+test_that("get_parameters() errors when a setting-specific beta contains NAs under seasonality", {
+  m <- rep(0.5, 30)
   m[10] <- NA
   expect_error(
     get_parameters(
       overrides = list(
         simulation_time = 30,
         seasonality_on = TRUE,
-        seasonality_multiplier = m
+        beta_household = m,
+        beta_school = rep(0.5, 30),
+        beta_workplace = rep(0.5, 30),
+        beta_leisure = rep(0.5, 30),
+        beta_community = rep(0.2, 30)
       )
     ),
-    regexp = "seasonality_multiplier must be a numeric vector of length equal to simulation_time"
+    regexp = "when seasonality_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
   )
 })
 
-test_that("get_parameters() ignores seasonality_multiplier when seasonality_on is FALSE", {
-  # An invalid multiplier should not error while seasonality is switched off:
-  expect_no_error(
+test_that("get_parameters() errors when a setting-specific beta is a vector while seasonality_on is FALSE", {
+  # A vector-valued beta is only meaningful under seasonality; it should
+  # error while seasonality is switched off, since a constant is required
+  expect_error(
     get_parameters(
       overrides = list(
         seasonality_on = FALSE,
-        seasonality_multiplier = rep(1, 10)
+        beta_community = rep(0.2, 10)
       )
-    )
+    ),
+    regexp = "ERROR: A setting-specific beta has length not equal to 1"
   )
 })
 
