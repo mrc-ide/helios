@@ -22,7 +22,8 @@
 #' Map a target R0 (or Rt(t) series) to beta_community via final-size data
 #'
 #' Prints a summary of the transmission fractions used in the underlying
-#' sweep, followed by a results table, then returns that same table.
+#' sweep, the results table, and a plot of the mapped beta_community
+#' values across the target sequence, then returns that same table.
 #'
 #' @param target Numeric scalar (a single target R0) or numeric vector (an
 #'   Rt(t) time series). Values > 1 are interpolated against the final-size
@@ -107,13 +108,20 @@ get_beta_from_R0_finalsize <- function(
     source         = source_out
   )
 
-  #=== Print a summary and the results table ===#
+  #=== Print a summary, the results table, and a plot ===#
   cat("Transmission fractions used in the underlying sweep:\n")
   for (setting_name in names(transmission_fraction)) {
     cat(sprintf("  %s: %.1f%%\n", setting_name, transmission_fraction[[setting_name]] * 100))
   }
   cat("\n")
   print(result_table)
+
+  plot(
+    result_table$index, result_table$beta_community,
+    type = "l", col = "steelblue",
+    xlab = "index", ylab = "beta_community",
+    main = "Mapped beta_community across target sequence"
+  )
 
   result_table
 }
