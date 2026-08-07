@@ -9,9 +9,6 @@
 # including subcritical (R0 < 1) values, via the closed-form final-size
 # relation (get_R0_from_attack_rate).
 
-library(helios)
-library(parallel)
-
 #' Run a beta_community sweep and back-solve R0 via the final-size method
 #'
 #' @param transmission_fraction Named numeric vector with names `household`,
@@ -89,7 +86,7 @@ run_beta_sweep <- function(
     sim_time <- pathogen_params_list$simulation_time
   }
   if (is.null(n_cores)) {
-    n_cores <- min(max(1L, detectCores() - 1L), 10L)
+    n_cores <- min(max(1L, parallel::detectCores() - 1L), 10L)
   }
 
   #=== Derive setting-specific beta ratios ===#
@@ -122,7 +119,7 @@ run_beta_sweep <- function(
   # each point along the sweep an independent random draw, which can produce
   # non-monotonic-looking sweep curves near the epidemic threshold that are
   # actually just sampling noise rather than a real model effect
-  raw_attack_rates <- mclapply(
+  raw_attack_rates <- parallel::mclapply(
     seq_len(nrow(jobs)),
     function(i) run_one_sweep_replicate(
       beta                  = beta_grid[jobs$beta_idx[i]],
