@@ -15,25 +15,25 @@
 #'   `workplace`, `leisure`, `community`, summing to 1. Used to derive the
 #'   setting-specific beta ratios relative to beta_community. `beta_school`
 #'   is always set equal to `beta_workplace`.
-#' @param pathogen_params_list A parameters list from [get_parameters()]
+#' @param model_params A parameters list from [get_parameters()]
 #'   (e.g. `get_parameters(archetype = "flu")` or a fully custom
 #'   `get_parameters(overrides = list(duration_exposed = ..., ...))`).
 #'   Supplies natural history (`duration_exposed`, `duration_infectious`,
 #'   hospitalization/death probabilities, etc.) and the defaults for
 #'   `population`, `n_reps`, and `sim_time` below. Initial condition
-#'   proportions are derived from `pathogen_params_list$number_initial_S/E/I/R`
-#'   relative to `pathogen_params_list$human_population`, then rescaled to
+#'   proportions are derived from `model_params$number_initial_S/E/I/R`
+#'   relative to `model_params$human_population`, then rescaled to
 #'   whichever `population` is actually used.
 #' @param beta_community_range Numeric vector `c(min, max)` for the beta
 #'   sweep. Default `c(0.01, 0.25)`.
 #' @param n_beta Number of beta values to sweep, linearly spaced across
 #'   `beta_community_range`. Default 25.
 #' @param population Population size for all runs. If `NULL`, falls back to
-#'   `pathogen_params_list$human_population`.
+#'   `model_params$human_population`.
 #' @param n_reps Number of stochastic replicates per beta value. If `NULL`,
 #'   falls back to 20.
 #' @param sim_time Simulation length in days. If `NULL`, falls back to
-#'   `pathogen_params_list$simulation_time`.
+#'   `model_params$simulation_time`.
 #' @param n_cores Number of cores for parallel execution. If `NULL`, falls
 #'   back to `min(detectCores() - 1, 10)`.
 #' @param seed Random seed. Default 42.
@@ -51,7 +51,7 @@
 #' @export
 run_beta_sweep <- function(
   transmission_fraction,
-  pathogen_params_list,
+  model_params,
   beta_community_range = c(0.01, 0.25),
   n_beta = 25L,
   population = NULL,
@@ -77,13 +77,13 @@ run_beta_sweep <- function(
   #Defaults
   # If the user did not supply a value (it is NULL), fall back to a default
   if (is.null(population)) {
-    population <- pathogen_params_list$human_population
+    population <- model_params$human_population
   }
   if (is.null(n_reps)) {
     n_reps <- 20L
   }
   if (is.null(sim_time)) {
-    sim_time <- pathogen_params_list$simulation_time
+    sim_time <- model_params$simulation_time
   }
   if (is.null(n_cores)) {
     n_cores <- min(max(1L, parallel::detectCores() - 1L), 10L)
@@ -97,9 +97,9 @@ run_beta_sweep <- function(
   school_ratio    <- workplace_ratio
 
   #=== Rescale initial conditions to the resolved population ===#
-  prop_S <- pathogen_params_list$number_initial_S / pathogen_params_list$human_population
-  prop_E <- pathogen_params_list$number_initial_E / pathogen_params_list$human_population
-  prop_I <- pathogen_params_list$number_initial_I / pathogen_params_list$human_population
+  prop_S <- model_params$number_initial_S / model_params$human_population
+  prop_E <- model_params$number_initial_E / model_params$human_population
+  prop_I <- model_params$number_initial_I / model_params$human_population
 
   initial_S <- round(prop_S * population)
   initial_E <- round(prop_E * population)
@@ -123,7 +123,7 @@ run_beta_sweep <- function(
       "beta_grid", "jobs", "seed", "population",
       "initial_S", "initial_E", "initial_I", "initial_R",
       "sim_time", "household_ratio", "workplace_ratio",
-      "school_ratio", "leisure_ratio", "pathogen_params_list"
+      "school_ratio", "leisure_ratio", "model_params"
     ),
     envir = environment()
   )
@@ -151,7 +151,7 @@ run_beta_sweep <- function(
       workplace_ratio       = workplace_ratio,
       school_ratio          = school_ratio,
       leisure_ratio         = leisure_ratio,
-      pathogen_params_list  = pathogen_params_list
+      model_params  = model_params
     )
   )
 
@@ -187,7 +187,7 @@ run_beta_sweep <- function(
     sweep_table = sweep_table,
     args = list(
       transmission_fraction = transmission_fraction,
-      pathogen_params_list  = pathogen_params_list,
+      model_params  = model_params,
       beta_community_range  = beta_community_range,
       n_beta                = n_beta,
       population            = population,
@@ -220,7 +220,7 @@ run_beta_sweep <- function(
 #' @param sim_time Simulation length in days
 #' @param household_ratio,workplace_ratio,school_ratio,leisure_ratio
 #'   Setting-specific beta ratios relative to beta_community
-#' @param pathogen_params_list Base parameters list supplying natural
+#' @param model_params Base parameters list supplying natural
 #'   history and other non-swept parameters
 #'
 #' @return Numeric scalar: final attack rate (fraction of population
@@ -238,17 +238,17 @@ run_one_sweep_replicate <- function(
   workplace_ratio,
   school_ratio,
   leisure_ratio,
-  pathogen_params_list
+  model_params
 ) {
 
-  params_list <- get_parameters(overrides = modifyList(pathogen_params_list, list(
+  params_list <- get_parameters(overrides = modifyList(model_params, list(
     human_population = population,
     number_initial_S = initial_S,
     number_initial_E = initial_E,
     number_initial_I = initial_I,
     number_initial_R = initial_R,
     simulation_time  = sim_time,
-    seasonality_on   = FALSE,
+    time_varying_transmission_on   = FALSE,
     seed             = seed,
     beta_community   = beta,
     beta_household   = household_ratio * beta,

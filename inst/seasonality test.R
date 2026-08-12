@@ -33,7 +33,7 @@ cat("multiplier length:", length(seasonal_curve),
 
 params_on <- get_parameters(overrides = list(
   simulation_time        = 30,
-  seasonality_on         = TRUE,
+  time_varying_transmission_on         = TRUE,
   seasonality_multiplier = seasonal_curve
 ))
 out_on <- run_simulation(params_on)
@@ -48,7 +48,7 @@ print(res_on[nrow(res_on), grep("_count", names(res_on))])
 # ---------------------------------------------------------------------------
 cat("\n=== Validation check (expect an error below) ===\n")
 bad <- tryCatch(
-  get_parameters(overrides = list(seasonality_on = TRUE,
+  get_parameters(overrides = list(time_varying_transmission_on = TRUE,
                                   seasonality_multiplier = rep(1, 100))),
   error = function(e) conditionMessage(e)
 )
@@ -93,7 +93,7 @@ res_off2 <- run_simulation(get_parameters(overrides = list(
 res_on2 <- run_simulation(get_parameters(overrides = list(
   simulation_time        = compare_time,
   seed                   = shared_seed,
-  seasonality_on         = TRUE,
+  time_varying_transmission_on         = TRUE,
   seasonality_multiplier = seasonal_curve
 )))$result
 

@@ -31,12 +31,12 @@
 #' * `duration_exposed`: TBD
 #' * `duration_infectious`: TBD
 #' * `prob_inf_external`: The probability a susceptible individual is infected from an external source
-#' * `beta_household`: A single constant value when `seasonality_on` is `FALSE`, or a numeric vector of length equal to `simulation_time` (one value per simulated day) when `seasonality_on` is `TRUE`.
+#' * `beta_household`: A numeric scalar when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length equal to `simulation_time` (one value per simulated day) when `time_varying_transmission_on` is `TRUE`.
 #' * `beta_workplace`: Same length rule as `beta_household`.
 #' * `beta_school`: Same length rule as `beta_household`.
 #' * `beta_leisure`: Same length rule as `beta_household`.
 #' * `beta_community`: Same length rule as `beta_household`.
-#' * `seasonality_on`: Logical flag (default `FALSE`). When `FALSE`, each setting-specific beta must be a single constant value. When `TRUE`, each setting-specific beta must instead be a numeric vector of length `simulation_time`, giving that setting's beta for each simulated day directly.
+#' * `time_varying_transmission_on`: Logical flag (default `FALSE`). When `FALSE`, each setting-specific beta must be a single constant value. When `TRUE`, each setting-specific beta must instead be a numeric vector of length `simulation_time`, giving that setting's beta for each simulated day directly.
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
 #' * `household_distribution_country`: TBD
@@ -159,8 +159,8 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     beta_school = 0.5, # check this as default
     beta_leisure = 0.5, # check this as default
     beta_community = 0.2, # check this as default
-    #Seasonality
-    seasonality_on = FALSE,
+    #Time-varying transmission
+    time_varying_transmission_on = FALSE,
     dt = 0.5, # check this as default
     simulation_time = 150,
     render_diagnostics = FALSE,
@@ -449,7 +449,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   # a single constant value when seasonality is off, or a numeric vector of
   # length simulation_time (one value per simulated day, with no NAs) when
   # seasonality is on
-  if (isTRUE(parameters$seasonality_on)) {
+  if (isTRUE(parameters$time_varying_transmission_on)) {
     if (
       any(
         !is.numeric(parameters$beta_household) | length(parameters$beta_household) != parameters$simulation_time | anyNA(parameters$beta_household),
@@ -460,7 +460,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
       )
     ) {
       stop(
-        "ERROR: when seasonality_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time, with no NAs"
+        "ERROR: when time_varying_transmission_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time, with no NAs"
       )
     }
   } else {

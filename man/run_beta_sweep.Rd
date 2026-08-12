@@ -6,7 +6,7 @@
 \usage{
 run_beta_sweep(
   transmission_fraction,
-  pathogen_params_list,
+  model_params,
   beta_community_range = c(0.01, 0.25),
   n_beta = 25L,
   population = NULL,
@@ -23,14 +23,14 @@ run_beta_sweep(
 setting-specific beta ratios relative to beta_community. \code{beta_school}
 is always set equal to \code{beta_workplace}.}
 
-\item{pathogen_params_list}{A parameters list from \code{\link[=get_parameters]{get_parameters()}}
+\item{model_params}{A parameters list from \code{\link[=get_parameters]{get_parameters()}}
 (e.g. \code{get_parameters(archetype = "flu")} or a fully custom
 \code{get_parameters(overrides = list(duration_exposed = ..., ...))}).
 Supplies natural history (\code{duration_exposed}, \code{duration_infectious},
 hospitalization/death probabilities, etc.) and the defaults for
 \code{population}, \code{n_reps}, and \code{sim_time} below. Initial condition
-proportions are derived from \code{pathogen_params_list$number_initial_S/E/I/R}
-relative to \code{pathogen_params_list$human_population}, then rescaled to
+proportions are derived from \code{model_params$number_initial_S/E/I/R}
+relative to \code{model_params$human_population}, then rescaled to
 whichever \code{population} is actually used.}
 
 \item{beta_community_range}{Numeric vector \code{c(min, max)} for the beta
@@ -40,13 +40,13 @@ sweep. Default \code{c(0.01, 0.25)}.}
 \code{beta_community_range}. Default 25.}
 
 \item{population}{Population size for all runs. If \code{NULL}, falls back to
-\code{pathogen_params_list$human_population}.}
+\code{model_params$human_population}.}
 
 \item{n_reps}{Number of stochastic replicates per beta value. If \code{NULL},
 falls back to 20.}
 
 \item{sim_time}{Simulation length in days. If \code{NULL}, falls back to
-\code{pathogen_params_list$simulation_time}.}
+\code{model_params$simulation_time}.}
 
 \item{n_cores}{Number of cores for parallel execution. If \code{NULL}, falls
 back to \code{min(detectCores() - 1, 10)}.}

@@ -178,7 +178,7 @@ create_SE_process <- function(
     # timestep_to_day() (1/dt timesteps per day) and that day's value is used.
     # When seasonality is off, each setting-specific beta is a single constant
     # value used for every timestep.
-    if (parameters_list$seasonality_on) {
+    if (parameters_list$time_varying_transmission_on) {
       day <- timestep_to_day(t, parameters_list$dt)
       beta_household_t <- parameters_list$beta_household[day]
       beta_workplace_t <- parameters_list$beta_workplace[day]

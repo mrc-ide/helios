@@ -1,9 +1,9 @@
-test_that("get_parameters() accepts setting-specific betas as vectors matching simulation_time when seasonality_on is TRUE", {
+test_that("get_parameters() accepts setting-specific betas as vectors matching simulation_time when time_varying_transmission_on is TRUE", {
   expect_no_error(
     get_parameters(
       overrides = list(
         simulation_time = 30,
-        seasonality_on = TRUE,
+        time_varying_transmission_on = TRUE,
         beta_household = rep(0.5, 30),
         beta_school = rep(0.5, 30),
         beta_workplace = rep(0.5, 30),
@@ -14,15 +14,15 @@ test_that("get_parameters() accepts setting-specific betas as vectors matching s
   )
 })
 
-test_that("get_parameters() errors when seasonality_on is TRUE but a setting-specific beta is still a constant", {
+test_that("get_parameters() errors when time_varying_transmission_on is TRUE but a setting-specific beta is still a constant", {
   expect_error(
     get_parameters(
       overrides = list(
         simulation_time = 30,
-        seasonality_on = TRUE
+        time_varying_transmission_on = TRUE
       )
     ),
-    regexp = "when seasonality_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
+    regexp = "when time_varying_transmission_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
   )
 })
 
@@ -31,7 +31,7 @@ test_that("get_parameters() errors when a setting-specific beta length does not 
     get_parameters(
       overrides = list(
         simulation_time = 30,
-        seasonality_on = TRUE,
+        time_varying_transmission_on = TRUE,
         beta_household = rep(0.5, 30),
         beta_school = rep(0.5, 30),
         beta_workplace = rep(0.5, 30),
@@ -39,7 +39,7 @@ test_that("get_parameters() errors when a setting-specific beta length does not 
         beta_community = rep(0.2, 100)
       )
     ),
-    regexp = "when seasonality_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
+    regexp = "when time_varying_transmission_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
   )
 })
 
@@ -50,7 +50,7 @@ test_that("get_parameters() errors when a setting-specific beta contains NAs und
     get_parameters(
       overrides = list(
         simulation_time = 30,
-        seasonality_on = TRUE,
+        time_varying_transmission_on = TRUE,
         beta_household = m,
         beta_school = rep(0.5, 30),
         beta_workplace = rep(0.5, 30),
@@ -58,17 +58,17 @@ test_that("get_parameters() errors when a setting-specific beta contains NAs und
         beta_community = rep(0.2, 30)
       )
     ),
-    regexp = "when seasonality_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
+    regexp = "when time_varying_transmission_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
   )
 })
 
-test_that("get_parameters() errors when a setting-specific beta is a vector while seasonality_on is FALSE", {
+test_that("get_parameters() errors when a setting-specific beta is a vector while time_varying_transmission_on is FALSE", {
   # A vector-valued beta is only meaningful under seasonality; it should
   # error while seasonality is switched off, since a constant is required
   expect_error(
     get_parameters(
       overrides = list(
-        seasonality_on = FALSE,
+        time_varying_transmission_on = FALSE,
         beta_community = rep(0.2, 10)
       )
     ),

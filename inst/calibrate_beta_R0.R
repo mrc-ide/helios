@@ -76,7 +76,7 @@ run_one <- function(job_row) {
     number_initial_I = initial_I,
     number_initial_R = initial_R,
     simulation_time  = sim_time,
-    seasonality_on   = FALSE,
+    time_varying_transmission_on   = FALSE,
     beta_community   = b,
     beta_household   = household_ratio * b,
     beta_workplace   = workplace_ratio * b,
@@ -173,7 +173,7 @@ message(sprintf("\nSaved to %s/: beta_R0_lookup.rds, R0_from_beta.rds, beta_from
 #
 # params <- get_parameters(overrides = list(
 #   simulation_time        = length(Rt),
-#   seasonality_on         = TRUE,
+#   time_varying_transmission_on         = TRUE,
 #   seasonality_multiplier = multiplier,
 #   beta_community         = baseline_beta,
 #   beta_household         = household_ratio * baseline_beta,

@@ -34,12 +34,12 @@ These parameters are:
 \item \code{duration_exposed}: TBD
 \item \code{duration_infectious}: TBD
 \item \code{prob_inf_external}: The probability a susceptible individual is infected from an external source
-\item \code{beta_household}: A single constant value when \code{seasonality_on} is \code{FALSE}, or a numeric vector of length equal to \code{simulation_time} (one value per simulated day) when \code{seasonality_on} is \code{TRUE}.
+\item \code{beta_household}: A numeric scalar when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length equal to \code{simulation_time} (one value per simulated day) when \code{time_varying_transmission_on} is \code{TRUE}.
 \item \code{beta_workplace}: Same length rule as \code{beta_household}.
 \item \code{beta_school}: Same length rule as \code{beta_household}.
 \item \code{beta_leisure}: Same length rule as \code{beta_household}.
 \item \code{beta_community}: Same length rule as \code{beta_household}.
-\item \code{seasonality_on}: Logical flag (default \code{FALSE}). When \code{FALSE}, each setting-specific beta must be a single constant value. When \code{TRUE}, each setting-specific beta must instead be a numeric vector of length \code{simulation_time}, giving that setting's beta for each simulated day directly.
+\item \code{time_varying_transmission_on}: Logical flag (default \code{FALSE}). When \code{FALSE}, each setting-specific beta must be a single constant value. When \code{TRUE}, each setting-specific beta must instead be a numeric vector of length \code{simulation_time}, giving that setting's beta for each simulated day directly.
 \item \code{dt}: TBD
 \item \code{simulation_time}: TBD
 \item \code{household_distribution_country}: TBD

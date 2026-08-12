@@ -17,7 +17,7 @@ run_one_sweep_replicate(
   workplace_ratio,
   school_ratio,
   leisure_ratio,
-  pathogen_params_list
+  model_params
 )
 }
 \arguments{
@@ -34,7 +34,7 @@ run_one_sweep_replicate(
 
 \item{household_ratio, workplace_ratio, school_ratio, leisure_ratio}{Setting-specific beta ratios relative to beta_community}
 
-\item{pathogen_params_list}{Base parameters list supplying natural
+\item{model_params}{Base parameters list supplying natural
 history and other non-swept parameters}
 }
 \value{
