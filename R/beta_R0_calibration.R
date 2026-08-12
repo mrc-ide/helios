@@ -113,13 +113,30 @@ run_beta_sweep <- function(
 
   message(sprintf("Using %d cores", n_cores))
 
+  # Use a PSOCK cluster (parLapply) rather than mclapply: mclapply does not
+  # work on windows.
+  cl <- parallel::makeCluster(n_cores)
+  on.exit(parallel::stopCluster(cl), add = TRUE)
+  parallel::clusterExport(
+    cl,
+    varlist = c(
+      "beta_grid", "jobs", "seed", "population",
+      "initial_S", "initial_E", "initial_I", "initial_R",
+      "sim_time", "household_ratio", "workplace_ratio",
+      "school_ratio", "leisure_ratio", "pathogen_params_list"
+    ),
+    envir = environment()
+  )
+  parallel::clusterEvalQ(cl, library(helios))
+
   # Per-replicate seed depends only on rep, never on the swept beta value, so
   # replicate i uses the same base randomness at every beta (paired
   # comparison). Sweeping beta with seeds tied to beta_idx instead would make
   # each point along the sweep an independent random draw, which can produce
   # non-monotonic-looking sweep curves near the epidemic threshold that are
   # actually just sampling noise rather than a real model effect
-  raw_attack_rates <- parallel::mclapply(
+  raw_attack_rates <- parallel::parLapply(
+    cl,
     seq_len(nrow(jobs)),
     function(i) run_one_sweep_replicate(
       beta                  = beta_grid[jobs$beta_idx[i]],
@@ -135,8 +152,7 @@ run_beta_sweep <- function(
       school_ratio          = school_ratio,
       leisure_ratio         = leisure_ratio,
       pathogen_params_list  = pathogen_params_list
-    ),
-    mc.cores = n_cores
+    )
   )
 
   #=== Back-solve R0 per replicate and aggregate by beta value ===#
