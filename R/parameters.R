@@ -268,13 +268,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     parameters$beta_school = 0.207
     parameters$beta_leisure = 0.207
     parameters$beta_community = 0.069
-    prob_hosp_child = 0.001
-    prob_hosp_adult = 0.03
-    prob_hosp_elderly = 0.18
-    prob_death_hosp_child = 0.01
-    prob_death_hosp_adult = 0.08
-    prob_death_hosp_elderly = 0.3
-    duration_hospitalized = 5
+    parameters$prob_hosp_child = 0.001
+    parameters$prob_hosp_adult = 0.03
+    parameters$prob_hosp_elderly = 0.18
+    parameters$prob_death_hosp_child = 0.01
+    parameters$prob_death_hosp_adult = 0.08
+    parameters$prob_death_hosp_elderly = 0.3
+    parameters$duration_hospitalized = 5
   }
 
   # SARS-CoV-2 (R0 ~ 2.5)
@@ -286,13 +286,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     parameters$beta_school = 0.24
     parameters$beta_leisure = 0.24
     parameters$beta_community = 0.08
-    prob_hosp_child = 0.001
-    prob_hosp_adult = 0.03
-    prob_hosp_elderly = 0.18
-    prob_death_hosp_child = 0.01
-    prob_death_hosp_adult = 0.08
-    prob_death_hosp_elderly = 0.3
-    duration_hospitalized = 10
+    parameters$prob_hosp_child = 0.001
+    parameters$prob_hosp_adult = 0.03
+    parameters$prob_hosp_elderly = 0.18
+    parameters$prob_death_hosp_child = 0.01
+    parameters$prob_death_hosp_adult = 0.08
+    parameters$prob_death_hosp_elderly = 0.3
+    parameters$duration_hospitalized = 10
   }
 
   # Measles (R0 ~ 9)
@@ -304,13 +304,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     parameters$beta_school = 1.26
     parameters$beta_leisure = 1.26
     parameters$beta_community = 0.42
-    prob_hosp_child = 0.001
-    prob_hosp_adult = 0.03
-    prob_hosp_elderly = 0.18
-    prob_death_hosp_child = 0.01
-    prob_death_hosp_adult = 0.08
-    prob_death_hosp_elderly = 0.3
-    duration_hospitalized = 7
+    parameters$prob_hosp_child = 0.001
+    parameters$prob_hosp_adult = 0.03
+    parameters$prob_hosp_elderly = 0.18
+    parameters$prob_death_hosp_child = 0.01
+    parameters$prob_death_hosp_adult = 0.08
+    parameters$prob_death_hosp_elderly = 0.3
+    parameters$duration_hospitalized = 7
   }
 
   # Ensure overridden parameters are passed as a list
