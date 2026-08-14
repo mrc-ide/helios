@@ -5,7 +5,7 @@
 # only the final-size (attack-rate-derived) table produced by Script 1
 # (beta_R0_calibration.R).
 #
-# For target values strictly greater than 1, this interpolates between
+# For target R0 or Rt values strictly greater than 1, this interpolates between
 # swept beta values using the final-size table directly.
 #
 # For target values at or below 1, this fits a linear model to the bottom

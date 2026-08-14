@@ -4,10 +4,9 @@
 # table used downstream by Script 2 (map_beta_finalsize.R), which maps a
 # target R0 or Rt(t) series to the corresponding beta_community value(s) via
 # interpolation (R0 > 1) or linear extrapolation (R0 <= 1) against this
-# table
-# R0 is back-solved from the final attack rate at every swept beta value,
-# including subcritical (R0 < 1) values, via the closed-form final-size
-# relation (get_R0_from_attack_rate).
+# table. For R0 > 1, R0 is backsolved from the final attack rate at every
+# swept beta value using the equation AR = 1 - exp(R0*AR). For
+# R0 <= 1, linear extrapolation is used,
 
 #' Run a beta_community sweep and back-solve R0 via the final-size method
 #'
@@ -258,8 +257,11 @@ run_one_sweep_replicate <- function(
   )))
 
   sim_result  <- run_simulation(parameters_list = params_list)$result
-  attack_rate <- tail(sim_result$R_count, 1) / population
-
+  attack_rate <- (tail(sim_result$R_count, 1) +
+                  tail(sim_result$D_count, 1) +
+                  tail(sim_result$E_count, 1) +
+                  tail(sim_result$I_mild_count, 1) +
+                  tail(sim_result$I_hosp_count, 1))/ population
   attack_rate
 }
 
