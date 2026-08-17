@@ -516,6 +516,12 @@ get_sweep_result_from_source <- function(sweep_db) {
 #' Expand a transmission_fraction split and a beta_community vector into
 #' the five setting-specific beta vectors Helios needs
 #'
+#' Given a time-varying beta_community vector and a fixed transmission fraction
+#' split, this function derives the corresponding time-varying beta values for
+#' all settings. Setting-specific betas are scaled relative to beta_community
+#' using the transmission fraction ratios, producing five vectors ready to pass
+#' into `get_parameters()`.
+#'
 #' @param transmission_fraction Named numeric vector with names `household`,
 #'   `workplace`, `leisure`, `community`, summing to 1.
 #' @param beta_community_vector Numeric vector, the time-varying community beta
