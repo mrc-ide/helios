@@ -2,18 +2,14 @@
 #
 # PURPOSE
 # -------
-# Given a fixed transmission_fraction split (household/workplace/leisure/
-# community ratios, summing to 1) and a time-varying beta_community vector
-# (e.g. the output of get_beta_from_R0_finalsize() applied to an Rt(t)
-# series), expands it into the five setting-specific beta vectors Helios
-# needs when time_varying_transmission_on = TRUE: beta_household, beta_workplace,
-# beta_school, beta_leisure, beta_community, each the same length as the
-# input beta_community vector.
-#
-# This is a plain construction-time helper -- it runs no Helios
-# simulations. Helios's core parameters have no concept of
-# transmission_fraction themselves; the ratio expansion always happens
-# here, before get_parameters() is called.
+# Given a time-varying beta_community vector (e.g. the output of
+# get_beta_from_R0_finalsize() applied to an Rt(t) series) and a fixed
+# transmission_fraction split (household/workplace/leisure/community ratios,
+# summing to 1), this script derives the corresponding time-varying beta values
+# for all settings. Setting-specific betas are scaled relative to beta_community
+# using the transmission fraction ratios, producing five vectors of length equal
+# to beta_community that are ready to pass into get_parameters() alongside
+# time_varying_transmission_on = TRUE.
 
 #' Expand a transmission_fraction split and a beta_community vector into
 #' the five setting-specific beta vectors Helios needs

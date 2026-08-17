@@ -3,7 +3,7 @@
 # PURPOSE
 # -------
 # Builds an empirical beta <-> R0 mapping for Helios by:
-#   1. Running Helios at a grid of flat beta values (seasonality OFF)
+#   1. Running Helios at a grid of flat beta values (time-varying transmission OFF)
 #   2. Measuring the attack rate (AR) at the end of each run
 #   3. Back-solving R0 from AR via the final-size equation: AR = 1 - exp(-R0 * AR)
 #   4. Fitting a piecewise-linear interpolators in both directions (beta->R0, R0->beta)
@@ -19,7 +19,6 @@
 # beta_from_R0.rds    -- approxfun object: R0 -> beta
 # R0_from_beta.rds    -- approxfun object: beta -> R0
 
-library(helios)
 library(parallel)
 
 # ==============================================================================
@@ -87,10 +86,19 @@ run_one <- function(job_row) {
   tail(sim$R_count, 1) / population
 }
 
-raw <- mclapply(
+cl <- makeCluster(n_cores)
+on.exit(stopCluster(cl), add = TRUE)
+clusterExport(cl, varlist = c(
+  "run_one", "beta_grid", "jobs",
+  "population", "initial_S", "initial_E", "initial_I", "initial_R",
+  "sim_time", "household_ratio", "workplace_ratio", "school_ratio", "leisure_ratio"
+))
+clusterEvalQ(cl, library(helios))
+
+raw <- parLapply(
+  cl,
   seq_len(nrow(jobs)),
-  function(i) run_one(jobs[i, ]),
-  mc.cores = n_cores
+  function(i) run_one(jobs[i, ])
 )
 
 results <- do.call(rbind, lapply(seq_along(beta_grid), function(i) {
