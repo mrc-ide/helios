@@ -31,12 +31,30 @@
 #' * `duration_exposed`: TBD
 #' * `duration_infectious`: TBD
 #' * `prob_inf_external`: The probability a susceptible individual is infected from an external source
-#' * `beta_household`: A numeric scalar when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length equal to `simulation_time` (one value per simulated day) when `time_varying_transmission_on` is `TRUE`.
-#' * `beta_workplace`: Same length rule as `beta_household`.
-#' * `beta_school`: Same length rule as `beta_household`.
-#' * `beta_leisure`: Same length rule as `beta_household`.
-#' * `beta_community`: Same length rule as `beta_household`.
-#' * `time_varying_transmission_on`: Logical flag (default `FALSE`). When `FALSE`, each setting-specific beta must be a single constant value. When `TRUE`, each setting-specific beta must instead be a numeric vector of length `simulation_time`, giving that setting's beta for each simulated day directly.
+#' * `beta_household`: The transmission rate for household contacts, used to compute
+#'   the per-timestep force of infection in household settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `beta_workplace`: The transmission rate for workplace contacts, used to compute
+#'   the per-timestep force of infection in workplace settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `beta_school`: The transmission rate for school contacts, used to compute
+#'   the per-timestep force of infection in school settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `beta_leisure`: The transmission rate for leisure contacts, used to compute
+#'   the per-timestep force of infection in leisure settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `beta_community`: The transmission rate for community contacts, used to compute
+#'   the per-timestep force of infection in community settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `time_varying_transmission_on`: Logical flag (default `FALSE`). When `FALSE`,
+#'   each setting-specific beta must be a numeric scalar. When `TRUE`, each
+#'   setting-specific beta must instead be a numeric vector of length
+#'   `simulation_time`, giving that setting's beta for each simulated calendar day.
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
 #' * `household_distribution_country`: TBD
@@ -257,8 +275,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
 
   # Overwrite parameters if archetype specified. This runs before the
   # overrides loop below so that explicit overrides always take final
-  # precedence over archetype defaults, rather than being silently
-  # clobbered by them.
+  # precedence over archetype defaults.
   # Flu (R0 ~ 1.5)
   if (archetype == "flu") {
     parameters$duration_exposed = 1
