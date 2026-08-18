@@ -59,7 +59,20 @@ get_setting_size <- function(variables_list, setting) {
 #' @family miscellaneous
 #' @export
 timestep_to_day <- function(t, dt) {
-  ceiling(t * dt)
+  if (!t == floor(t)) {
+    stop("t must be an integer value")
+  }
+  if (dt <= 0) {
+    stop("dt must be a positive numeric value")
+  }
+
+  day <- ceiling(t * dt)
+
+  if (!day == floor(day)) {
+    stop("calculated day is not a whole number — check that dt is a valid timestep fraction (e.g. 0.5, 1)")
+  }
+
+  day
 }
 
 #' generate_betas

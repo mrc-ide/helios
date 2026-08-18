@@ -42,3 +42,12 @@ test_that("timestep_to_day() does not recycle and keeps counting past day 365", 
   expect_equal(timestep_to_day(730, 1), 730)
   expect_equal(timestep_to_day(731, 0.5), 366)
 })
+
+test_that("timestep_to_day() errors when t is not an integer", {
+  expect_error(timestep_to_day(1.5, 0.5), "t must be an integer value")
+})
+
+test_that("timestep_to_day() errors when dt is zero or negative", {
+  expect_error(timestep_to_day(1, 0),  "dt must be a positive numeric value")
+  expect_error(timestep_to_day(1, -1), "dt must be a positive numeric value")
+})
