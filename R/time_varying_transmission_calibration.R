@@ -66,7 +66,8 @@
 #' @return A list with:
 #'   - `sweep_table`: data.frame with columns `beta_community`, `AR_mean`,
 #'     `AR_sd`, `R0_fs_mean`, `R0_fs_sd` (fs = final-size). One row per swept
-#'     beta value, including subcritical (R0 < 1) values.
+#'     beta value; `R0_fs_mean` and `R0_fs_sd` are `NA` for subcritical beta
+#'     values (those that do not produce a self-sustaining epidemic).
 #'   - `args`: a named list recording every resolved argument used, for
 #'     full reproducibility of the sweep.
 #'   - `call_time`: POSIXct timestamp of when the sweep was run.

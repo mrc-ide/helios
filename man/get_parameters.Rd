@@ -34,12 +34,30 @@ These parameters are:
 \item \code{duration_exposed}: TBD
 \item \code{duration_infectious}: TBD
 \item \code{prob_inf_external}: The probability a susceptible individual is infected from an external source
-\item \code{beta_household}: A numeric scalar when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length equal to \code{simulation_time} (one value per simulated day) when \code{time_varying_transmission_on} is \code{TRUE}.
-\item \code{beta_workplace}: Same length rule as \code{beta_household}.
-\item \code{beta_school}: Same length rule as \code{beta_household}.
-\item \code{beta_leisure}: Same length rule as \code{beta_household}.
-\item \code{beta_community}: Same length rule as \code{beta_household}.
-\item \code{time_varying_transmission_on}: Logical flag (default \code{FALSE}). When \code{FALSE}, each setting-specific beta must be a single constant value. When \code{TRUE}, each setting-specific beta must instead be a numeric vector of length \code{simulation_time}, giving that setting's beta for each simulated day directly.
+\item \code{beta_household}: The transmission rate for household contacts, used to compute
+the per-timestep force of infection in household settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{beta_workplace}: The transmission rate for workplace contacts, used to compute
+the per-timestep force of infection in workplace settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{beta_school}: The transmission rate for school contacts, used to compute
+the per-timestep force of infection in school settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{beta_leisure}: The transmission rate for leisure contacts, used to compute
+the per-timestep force of infection in leisure settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{beta_community}: The transmission rate for community contacts, used to compute
+the per-timestep force of infection in community settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{time_varying_transmission_on}: Logical flag (default \code{FALSE}). When \code{FALSE},
+each setting-specific beta must be a numeric scalar. When \code{TRUE}, each
+setting-specific beta must instead be a numeric vector of length
+\code{simulation_time}, giving that setting's beta for each simulated calendar day.
 \item \code{dt}: TBD
 \item \code{simulation_time}: TBD
 \item \code{household_distribution_country}: TBD
