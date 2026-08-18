@@ -118,10 +118,12 @@ run_beta_sweep <- function(
   initial_I_raw <- model_params$number_initial_I
   if ((initial_E_raw + initial_I_raw) < 50) {
     warning(sprintf(
-      "Total seeding infections (number_initial_E + number_initial_I = %d) is less than 50. ",
-      "With low seeding, stochastic extinction is likely for R0 near 1, which can produce ",
-      "misleading attack rates. Consider increasing number_initial_E or number_initial_I in ",
-      "your model_params.",
+      paste0(
+        "Total seeding infections (number_initial_E + number_initial_I = %d) ",
+        "is less than 50. With low seeding, stochastic extinction is likely for ",
+        "R0 near 1, which can produce misleading attack rates. Consider increasing ",
+        "number_initial_E or number_initial_I in your model_params."
+      ),
       initial_E_raw + initial_I_raw
     ))
   }
