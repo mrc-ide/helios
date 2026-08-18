@@ -177,7 +177,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     beta_school = 0.5, # check this as default
     beta_leisure = 0.5, # check this as default
     beta_community = 0.2, # check this as default
-    #Time-varying transmission
+
     time_varying_transmission_on = FALSE,
     dt = 0.5, # check this as default
     simulation_time = 150,
@@ -463,9 +463,9 @@ get_parameters <- function(overrides = list(), archetype = "none") {
   }
 
   # Check that all setting-specific betas are of the correct length and type:
-  # a single constant value when seasonality is off, or a numeric vector of
+  # a single constant value when time-varying transmission is off, or a numeric vector of
   # length simulation_time (one value per simulated day, with no NAs) when
-  # seasonality is on
+  # time-varying transmission is on
   if (isTRUE(parameters$time_varying_transmission_on)) {
     if (
       any(

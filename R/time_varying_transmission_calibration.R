@@ -8,15 +8,13 @@
 #
 #   Step 1 — run_beta_sweep()
 #     Runs Helios across a grid of beta_community values (no interventions,
-#     time-varying transmission off) and measures the resulting final attack
-#     rate at each one. For R0 > 1, R0 is back-solved from the final attack
-#     rate using the closed-form final-size relation AR = 1 - exp(-R0 * AR),
-#     rearranged as R0 = -log(1 - AR) / AR. For R0 <= 1, the same formula is
-#     applied to the small attack rate produced before stochastic extinction;
-#     these back-solved values are used only for linear extrapolation in Step 2
-#     and should not be interpreted as biologically meaningful threshold
-#     estimates. Output is a sweep_table (one row per beta value, with mean/sd
-#     of both attack rate and back-solved R0) plus a full record of every
+#     time-varying transmission off) and records the final attack rate for
+#     each value. For beta values that produce a self-sustaining epidemic
+#     (R0 > 1), R0 is back-solved from the attack rate using the closed-form
+#     final-size relation: R0 = -log(1 - AR) / AR. For beta values that do
+#     not sustain an epidemic (R0 < 1), R0 is left as NA for those rows.
+#     Output is a sweep_table (one row per beta value, with mean/sd of attack
+#     rate and, where R0 >= 1, back-solved R0) plus a full record of every
 #     argument used, for reproducibility.
 #
 #   Step 2 — get_beta_from_R0_finalsize()
@@ -206,12 +204,14 @@ run_beta_sweep <- function(
       R0_vals[j] <- get_R0_from_attack_rate(ar_vals[j])
     }
 
+    R0_vals_super <- R0_vals[!is.na(R0_vals) & R0_vals >= 1]
+
     sweep_rows[[i]] <- data.frame(
       beta_community = beta_grid[i],
       AR_mean        = mean(ar_vals),
       AR_sd          = sd(ar_vals),
-      R0_fs_mean     = mean(R0_vals, na.rm = TRUE),
-      R0_fs_sd       = sd(R0_vals, na.rm = TRUE)
+      R0_fs_mean     = if (length(R0_vals_super) > 0) mean(R0_vals_super) else NA_real_,
+      R0_fs_sd       = if (length(R0_vals_super) > 0) sd(R0_vals_super)   else NA_real_
     )
   }
 
@@ -439,10 +439,13 @@ get_beta_from_R0_finalsize <- function(
     rule = 2
   )
 
-  # Linear extrapolation for target <= 1: prefer all swept points with
-  # R0 <= linear_threshold (where beta-R0 is closest to linear). If fewer
-  # than min_linear_points fall in that region, fall back to the
-  # min_linear_points swept points with R0 nearest to 1 instead.
+  # For target R0 <= 1, the sweep table has no reliable back-solved R0 values
+  # below the threshold, so we cannot interpolate directly. Instead, we fit a
+  # line through the swept points just above the epidemic threshold
+  # (1 <= R0 <= linear_threshold), where the beta-R0 relationship is
+  # approximately linear, and extrapolate below R0 = 1. If fewer than
+  # min_linear_points swept points fall in that region, we fall back to
+  # the min_linear_points points with R0 closest to 1.
   near_threshold <- valid_rows[valid_rows$R0_fs_mean <= linear_threshold, ]
   if (nrow(near_threshold) >= min_linear_points) {
     fit_rows <- near_threshold
