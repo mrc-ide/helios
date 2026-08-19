@@ -171,12 +171,12 @@ create_SE_process <- function(
     ## Bitset for all infectious individuals
     I <- variables_list$disease_state$get_index_of("I_mild")
 
-    #=== Seasonal scaling of betas ===#
+    #=== time-varying modeification of betas ===#
     #=================================#
-    # When seasonality is on, each setting-specific beta is a vector with one
+    # When time-varying transmission is on, each setting-specific beta is a vector with one
     # value per simulated day; the timestep t is converted to a day via
     # timestep_to_day() (1/dt timesteps per day) and that day's value is used.
-    # When seasonality is off, each setting-specific beta is a single constant
+    # When time-varying transmission is off, each setting-specific beta is a single constant
     # value used for every timestep.
     if (parameters_list$time_varying_transmission_on) {
       day <- timestep_to_day(t, parameters_list$dt)
