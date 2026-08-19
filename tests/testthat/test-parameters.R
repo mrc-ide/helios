@@ -26,7 +26,7 @@ test_that("get_parameters() errors when time_varying_transmission_on is TRUE but
   )
 })
 
-test_that("get_parameters() errors when a setting-specific beta length does not match simulation_time under seasonality", {
+test_that("get_parameters() errors when a setting-specific beta length does not match simulation_time under time-varying transmission", {
   expect_error(
     get_parameters(
       overrides = list(
@@ -43,7 +43,7 @@ test_that("get_parameters() errors when a setting-specific beta length does not 
   )
 })
 
-test_that("get_parameters() errors when a setting-specific beta contains NAs under seasonality", {
+test_that("get_parameters() errors when a setting-specific beta contains NAs under time-varying transmission", {
   m <- rep(0.5, 30)
   m[10] <- NA
   expect_error(
@@ -63,8 +63,9 @@ test_that("get_parameters() errors when a setting-specific beta contains NAs und
 })
 
 test_that("get_parameters() errors when a setting-specific beta is a vector while time_varying_transmission_on is FALSE", {
-  # A vector-valued beta is only meaningful under seasonality; it should
-  # error while seasonality is switched off, since a constant is required
+  # A vector-valued beta is only meaningful under time-varying transmission; it
+  # should error while time-varying transmission is switched off, since a
+  # constant is required
   expect_error(
     get_parameters(
       overrides = list(
