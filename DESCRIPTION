@@ -30,11 +30,12 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Imports: 
+Imports:
     individual,
     dplyr,
     EnvStats,
-    dqrng
+    dqrng,
+    parallel
 Remotes:
     mrc-ide/individual@feat/logi_size
 Roxygen: list(markdown = TRUE)

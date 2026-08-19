@@ -31,11 +31,30 @@
 #' * `duration_exposed`: TBD
 #' * `duration_infectious`: TBD
 #' * `prob_inf_external`: The probability a susceptible individual is infected from an external source
-#' * `beta_household`: TBD
-#' * `beta_workplace`: TBD
-#' * `beta_school`: TBD
-#' * `beta_leisure`: TBD
-#' * `beta_community`: TBD
+#' * `beta_household`: The transmission rate for household contacts, used to compute
+#'   the per-timestep force of infection in household settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `beta_workplace`: The transmission rate for workplace contacts, used to compute
+#'   the per-timestep force of infection in workplace settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `beta_school`: The transmission rate for school contacts, used to compute
+#'   the per-timestep force of infection in school settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `beta_leisure`: The transmission rate for leisure contacts, used to compute
+#'   the per-timestep force of infection in leisure settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `beta_community`: The transmission rate for community contacts, used to compute
+#'   the per-timestep force of infection in community settings. A numeric scalar
+#'   when `time_varying_transmission_on` is `FALSE`, or a numeric vector of length
+#'   `simulation_time` (one value per simulated calendar day) when it is `TRUE`.
+#' * `time_varying_transmission_on`: Logical flag (default `FALSE`). When `FALSE`,
+#'   each setting-specific beta must be a numeric scalar. When `TRUE`, each
+#'   setting-specific beta must instead be a numeric vector of length
+#'   `simulation_time`, giving that setting's beta for each simulated calendar day.
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
 #' * `household_distribution_country`: TBD
@@ -158,6 +177,8 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     beta_school = 0.5, # check this as default
     beta_leisure = 0.5, # check this as default
     beta_community = 0.2, # check this as default
+
+    time_varying_transmission_on = FALSE,
     dt = 0.5, # check this as default
     simulation_time = 150,
     render_diagnostics = FALSE,
@@ -250,8 +271,64 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     prob_death_hosp_adult = 0.08,
     prob_death_hosp_elderly = 0.3,
     duration_hospitalized = 10
-
   )
+
+  # Overwrite parameters if archetype specified. This runs before the
+  # overrides loop below so that explicit overrides always take final
+  # precedence over archetype defaults.
+  # Flu (R0 ~ 1.5)
+  if (archetype == "flu") {
+    parameters$duration_exposed = 1
+    parameters$duration_infectious = 2
+    parameters$beta_household = 0.207
+    parameters$beta_workplace = 0.207
+    parameters$beta_school = 0.207
+    parameters$beta_leisure = 0.207
+    parameters$beta_community = 0.069
+    parameters$prob_hosp_child = 0.001
+    parameters$prob_hosp_adult = 0.03
+    parameters$prob_hosp_elderly = 0.18
+    parameters$prob_death_hosp_child = 0.01
+    parameters$prob_death_hosp_adult = 0.08
+    parameters$prob_death_hosp_elderly = 0.3
+    parameters$duration_hospitalized = 5
+  }
+
+  # SARS-CoV-2 (R0 ~ 2.5)
+  if (archetype == "sars_cov_2") {
+    parameters$duration_exposed = 2
+    parameters$duration_infectious = 4
+    parameters$beta_household = 0.24
+    parameters$beta_workplace = 0.24
+    parameters$beta_school = 0.24
+    parameters$beta_leisure = 0.24
+    parameters$beta_community = 0.08
+    parameters$prob_hosp_child = 0.001
+    parameters$prob_hosp_adult = 0.03
+    parameters$prob_hosp_elderly = 0.18
+    parameters$prob_death_hosp_child = 0.01
+    parameters$prob_death_hosp_adult = 0.08
+    parameters$prob_death_hosp_elderly = 0.3
+    parameters$duration_hospitalized = 10
+  }
+
+  # Measles (R0 ~ 9)
+  if (archetype == "measles") {
+    parameters$duration_exposed = 8
+    parameters$duration_infectious = 5
+    parameters$beta_household = 1.26
+    parameters$beta_workplace = 1.26
+    parameters$beta_school = 1.26
+    parameters$beta_leisure = 1.26
+    parameters$beta_community = 0.42
+    parameters$prob_hosp_child = 0.001
+    parameters$prob_hosp_adult = 0.03
+    parameters$prob_hosp_elderly = 0.18
+    parameters$prob_death_hosp_child = 0.01
+    parameters$prob_death_hosp_adult = 0.08
+    parameters$prob_death_hosp_elderly = 0.3
+    parameters$duration_hospitalized = 7
+  }
 
   # Ensure overridden parameters are passed as a list
   if (!is.list(overrides)) {
@@ -385,74 +462,38 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     stop("school_distribution_country must be set to either UK, USA or custom")
   }
 
-  # Overwrite parameters if archetype specified:
-  # Flu (R0 ~ 1.5)
-  if (archetype == "flu") {
-    parameters$duration_exposed = 1
-    parameters$duration_infectious = 2
-    parameters$beta_household = 0.207
-    parameters$beta_workplace = 0.207
-    parameters$beta_school = 0.207
-    parameters$beta_leisure = 0.207
-    parameters$beta_community = 0.069
-    prob_hosp_child = 0.001
-    prob_hosp_adult = 0.03
-    prob_hosp_elderly = 0.18
-    prob_death_hosp_child = 0.01
-    prob_death_hosp_adult = 0.08
-    prob_death_hosp_elderly = 0.3
-    duration_hospitalized = 5
-  }
-
-  # SARS-CoV-2 (R0 ~ 2.5)
-  if (archetype == "sars_cov_2") {
-    parameters$duration_exposed = 2
-    parameters$duration_infectious = 4
-    parameters$beta_household = 0.24
-    parameters$beta_workplace = 0.24
-    parameters$beta_school = 0.24
-    parameters$beta_leisure = 0.24
-    parameters$beta_community = 0.08
-    prob_hosp_child = 0.001
-    prob_hosp_adult = 0.03
-    prob_hosp_elderly = 0.18
-    prob_death_hosp_child = 0.01
-    prob_death_hosp_adult = 0.08
-    prob_death_hosp_elderly = 0.3
-    duration_hospitalized = 10
-  }
-
-  # Measles (R0 ~ 9)
-  if (archetype == "measles") {
-    parameters$duration_exposed = 8
-    parameters$duration_infectious = 5
-    parameters$beta_household = 1.26
-    parameters$beta_workplace = 1.26
-    parameters$beta_school = 1.26
-    parameters$beta_leisure = 1.26
-    parameters$beta_community = 0.42
-    prob_hosp_child = 0.001
-    prob_hosp_adult = 0.03
-    prob_hosp_elderly = 0.18
-    prob_death_hosp_child = 0.01
-    prob_death_hosp_adult = 0.08
-    prob_death_hosp_elderly = 0.3
-    duration_hospitalized = 7
-  }
-
-  # Check that all setting-specific betas are of length 1:
-  if (
-    any(
-      length(parameters$beta_household) != 1,
-      length(parameters$beta_school) != 1,
-      length(parameters$beta_workplace) != 1,
-      length(parameters$beta_leisure) != 1,
-      length(parameters$beta_community) != 1
-    )
-  ) {
-    stop(
-      "ERROR: A setting-specific beta has length not equal to 1. All setting-specific betas must be of length 1"
-    )
+  # Check that all setting-specific betas are of the correct length and type:
+  # a single constant value when time-varying transmission is off, or a numeric vector of
+  # length simulation_time (one value per simulated day, with no NAs) when
+  # time-varying transmission is on
+  if (isTRUE(parameters$time_varying_transmission_on)) {
+    if (
+      any(
+        !is.numeric(parameters$beta_household) | length(parameters$beta_household) != parameters$simulation_time | anyNA(parameters$beta_household),
+        !is.numeric(parameters$beta_school) | length(parameters$beta_school) != parameters$simulation_time | anyNA(parameters$beta_school),
+        !is.numeric(parameters$beta_workplace) | length(parameters$beta_workplace) != parameters$simulation_time | anyNA(parameters$beta_workplace),
+        !is.numeric(parameters$beta_leisure) | length(parameters$beta_leisure) != parameters$simulation_time | anyNA(parameters$beta_leisure),
+        !is.numeric(parameters$beta_community) | length(parameters$beta_community) != parameters$simulation_time | anyNA(parameters$beta_community)
+      )
+    ) {
+      stop(
+        "ERROR: when time_varying_transmission_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time, with no NAs"
+      )
+    }
+  } else {
+    if (
+      any(
+        length(parameters$beta_household) != 1,
+        length(parameters$beta_school) != 1,
+        length(parameters$beta_workplace) != 1,
+        length(parameters$beta_leisure) != 1,
+        length(parameters$beta_community) != 1
+      )
+    ) {
+      stop(
+        "ERROR: A setting-specific beta has length not equal to 1. All setting-specific betas must be of length 1"
+      )
+    }
   }
 
   # Check that initial numbers in each state sum to the human population size

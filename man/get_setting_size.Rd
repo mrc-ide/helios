@@ -24,6 +24,7 @@ leisure setting.
 }
 \seealso{
 Other miscellaneous: 
-\code{\link{generate_betas}()}
+\code{\link{generate_betas}()},
+\code{\link{timestep_to_day}()}
 }
 \concept{miscellaneous}
