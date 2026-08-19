@@ -171,7 +171,7 @@ create_SE_process <- function(
     ## Bitset for all infectious individuals
     I <- variables_list$disease_state$get_index_of("I_mild")
 
-    #=== time-varying modeification of betas ===#
+    #=== time-varying modification of betas ===#
     #=================================#
     # When time-varying transmission is on, each setting-specific beta is a vector with one
     # value per simulated day; the timestep t is converted to a day via
