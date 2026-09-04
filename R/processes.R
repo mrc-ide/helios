@@ -29,13 +29,22 @@ create_processes <- function(
     EI_process = create_EI_process(
       variables_list = variables_list,
       events_list = events_list,
-      parameters_list = parameters_list
+      parameters_list = parameters_list,
+      renderer= renderer
     ),
 
-    IR_process = create_IR_process(
+    I_mild_R_process = create_I_mild_R_process(
       variables_list = variables_list,
       events_list = events_list,
-      parameters_list = parameters_list
+      parameters_list = parameters_list,
+      renderer= renderer
+    ),
+
+    I_hosp_exit_process = create_I_hosp_exit_process(
+      variables_list = variables_list,
+      events_list = events_list,
+      parameters_list = parameters_list,
+      renderer= renderer
     )
   )
 
@@ -72,7 +81,7 @@ create_processes <- function(
     renderer = individual::categorical_count_renderer_process(
       renderer,
       variables_list$disease_state,
-      c('S', 'E', 'I', 'R')
+      c('S', 'E', 'I_mild', 'I_hosp', 'R', 'D')
     )
   )
 
@@ -160,7 +169,29 @@ create_SE_process <- function(
   ## Process Function
   function(t) {
     ## Bitset for all infectious individuals
-    I <- variables_list$disease_state$get_index_of("I")
+    I <- variables_list$disease_state$get_index_of("I_mild")
+
+    #=== time-varying modification of betas ===#
+    #=================================#
+    # When time-varying transmission is on, each setting-specific beta is a vector with one
+    # value per simulated day; the timestep t is converted to a day via
+    # timestep_to_day() (1/dt timesteps per day) and that day's value is used.
+    # When time-varying transmission is off, each setting-specific beta is a single constant
+    # value used for every timestep.
+    if (parameters_list$time_varying_transmission_on) {
+      day <- timestep_to_day(t, parameters_list$dt)
+      beta_household_t <- parameters_list$beta_household[day]
+      beta_workplace_t <- parameters_list$beta_workplace[day]
+      beta_school_t <- parameters_list$beta_school[day]
+      beta_leisure_t <- parameters_list$beta_leisure[day]
+      beta_community_t <- parameters_list$beta_community[day]
+    } else {
+      beta_household_t <- parameters_list$beta_household
+      beta_workplace_t <- parameters_list$beta_workplace
+      beta_school_t <- parameters_list$beta_school
+      beta_leisure_t <- parameters_list$beta_leisure
+      beta_community_t <- parameters_list$beta_community
+    }
 
     #=== Household FOI ===#
     #=====================#
@@ -189,14 +220,14 @@ create_SE_process <- function(
               i
             ] *
               (1 - parameters_list$household_specific_efficacy[i]) *
-              (parameters_list$beta_household *
+              (beta_household_t *
                 spec_household_I_size /
                 household_size_list[[i]])
           } else {
             spec_household_FOI <- parameters_list$household_specific_riskiness[
               i
             ] *
-              parameters_list$beta_household *
+              beta_household_t *
               spec_household_I_size /
               household_size_list[[i]]
           }
@@ -204,7 +235,7 @@ create_SE_process <- function(
           spec_household_FOI <- parameters_list$household_specific_riskiness[
             i
           ] *
-            parameters_list$beta_household *
+            beta_household_t *
             spec_household_I_size /
             household_size_list[[i]]
         }
@@ -240,20 +271,20 @@ create_SE_process <- function(
             i
           ] *
             (1 - parameters_list$workplace_specific_efficacy[i]) *
-            (parameters_list$beta_workplace *
+            (beta_workplace_t *
               spec_workplace_I_size /
               workplace_size_list[[i]])
         } else {
           spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[
             i
           ] *
-            parameters_list$beta_workplace *
+            beta_workplace_t *
             spec_workplace_I_size /
             workplace_size_list[[i]]
         }
       } else {
         spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[i] *
-          parameters_list$beta_workplace *
+          beta_workplace_t *
           spec_workplace_I_size /
           workplace_size_list[[i]]
       }
@@ -286,18 +317,18 @@ create_SE_process <- function(
         ) {
           spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
             (1 - parameters_list$school_specific_efficacy[i]) *
-            (parameters_list$beta_school *
+            (beta_school_t *
               spec_school_I_size /
               school_size_list[[i]])
         } else {
           spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-            parameters_list$beta_school *
+            beta_school_t *
             spec_school_I_size /
             school_size_list[[i]]
         }
       } else {
         spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-          parameters_list$beta_school *
+          beta_school_t *
           spec_school_I_size /
           school_size_list[[i]]
       }
@@ -371,18 +402,18 @@ create_SE_process <- function(
           ) {
             spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
               (1 - parameters_list$leisure_specific_efficacy[i]) *
-              (parameters_list$beta_leisure *
+              (beta_leisure_t *
                 spec_leisure_I_size /
                 spec_leisure$size()) ## this calculation needs more in it
           } else {
             spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-              parameters_list$beta_leisure *
+              beta_leisure_t *
               spec_leisure_I_size /
               spec_leisure$size() ## this calculation needs more in it
           }
         } else {
           spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-            parameters_list$beta_leisure *
+            beta_leisure_t *
             spec_leisure_I_size /
             spec_leisure$size() ## this calculation needs more in it
         }
@@ -396,8 +427,8 @@ create_SE_process <- function(
     #=====================#
     ### Calculate Community FOI (real-valued for all individuals)
     #### NOTE: Double check whether the "/N" is correct here - not sure currently
-    community_FOI <- parameters_list$beta_community *
-      variables_list$disease_state$get_size_of("I") /
+    community_FOI <- beta_community_t *
+      variables_list$disease_state$get_size_of("I_mild")/
       parameters_list$human_population
 
     #=== Total FOI ===#
@@ -444,67 +475,187 @@ create_SE_process <- function(
 
 #' Create process governing exposed to infectious disease state transition
 #'
+#' Performs an age-dependent binomial split of newly transitioning exposed
+#' individuals between I_mild and I_hosp. Counts `H_new` at entry to I_hosp.
+#'
 #' @inheritParams create_processes
 #'
 #' @family processes
 #' @export
-create_EI_process <- function(variables_list, events_list, parameters_list) {
+create_EI_process <- function(
+  variables_list,
+  events_list,
+  parameters_list,
+  renderer
+) {
   function(t) {
-    # Get the indices of all exposed individuals:
+    # Get exposed individuals not yet scheduled into either EI event
     E <- variables_list$disease_state$get_index_of("E")
+    already_scheduled <- events_list$EI_mild_event$get_scheduled()
+    already_scheduled$or(events_list$EIhosp_event$get_scheduled())
+    E$and(already_scheduled$not(inplace = TRUE))
 
-    # Get the indices of exposed individuals for which transitions to I have been scheduled:
-    EI_already_scheduled <- events_list$EI_event$get_scheduled()
+    if (E$size() == 0) return()
+    E_idx <- E$to_vector()
 
-    # Get the indices of all exposed individuals with progression to I already scheduled:
-    E$and(EI_already_scheduled$not(inplace = TRUE))
+    # Build per-person hospitalization probability based on age class
+    p_hosp <- rep(NA_real_, length(E_idx))
+    child_idx <- variables_list$age_class$get_index_of("child")$to_vector()
+    adult_idx <- variables_list$age_class$get_index_of("adult")$to_vector()
+    elderly_idx <- variables_list$age_class$get_index_of("elderly")$to_vector()
+    p_hosp[E_idx %in% child_idx] <- parameters_list$prob_hosp_child
+    p_hosp[E_idx %in% adult_idx] <- parameters_list$prob_hosp_adult
+    p_hosp[E_idx %in% elderly_idx] <- parameters_list$prob_hosp_elderly
 
-    # Calculate the delay until each exposed individual without a delay transitions to infected:
+    # Guard: every exposed individual must have been matched to one of the
+    # three age classes. NA in p_hosp would propagate to NA in hosp_draw and
+    # silently drop the individual from both the mild and hosp branches.
+    if (anyNA(p_hosp)) {
+      stop(sprintf(
+        "create_EI_process: p_hosp has %d NA entries — some exposed individuals do not match any age class",
+        sum(is.na(p_hosp))
+      ))
+    }
+
+    # Binomial split
+    hosp_draw <- rbinom(length(E_idx), size = 1, prob = p_hosp)
+
+    # Gamma-distributed delay until E -> I transition
     I_times <- round(
       (rgamma(
-        n = E$size(),
+        n = length(E_idx),
         shape = 2,
         rate = 2 / parameters_list$duration_exposed
-      ) +
-        1) /
-        parameters_list$dt
+      ) + 1) / parameters_list$dt
     )
 
-    # Schedule the new transitions from exposed to infected:
-    events_list$EI_event$schedule(target = E, delay = I_times)
+    mild_mask <- hosp_draw == 0
+    hosp_mask <- hosp_draw == 1
+
+    if (any(mild_mask)) {
+      events_list$EI_mild_event$schedule(
+        target = E_idx[mild_mask],
+        delay = I_times[mild_mask]
+      )
+    }
+    if (any(hosp_mask)) {
+      events_list$EIhosp_event$schedule(
+        target = E_idx[hosp_mask],
+        delay = I_times[hosp_mask]
+      )
+    }
+
+    # Count new hospitalizations at the moment severity is decided
+    renderer$render("H_new", sum(hosp_mask), t)
   }
 }
 
-#' Create process governing infectious to recovered disease state transition
+#' Create process governing I_mild -> R disease state transition
+#'
+#' All mild cases recover; no branching.
 #'
 #' @inheritParams create_processes
 #'
 #' @family processes
 #' @export
-create_IR_process <- function(variables_list, events_list, parameters_list) {
+create_I_mild_R_process <- function(
+  variables_list,
+  events_list,
+  parameters_list,
+  renderer
+) {
   function(t) {
-    # Get the indices of currently infectious individuals:
-    I <- variables_list$disease_state$get_index_of("I")
+    I_mild <- variables_list$disease_state$get_index_of("I_mild")
+    already_scheduled <- events_list$I_mild_R_event$get_scheduled()
+    I_mild$and(already_scheduled$not(inplace = TRUE))
 
-    # Get the indices of individuals with I to R transitions already scheduled:
-    IR_already_scheduled <- events_list$IR_event$get_scheduled()
+    if (I_mild$size() == 0) return()
 
-    # Get the indices of infectious individuals without I to R transitions already scheduled:
-    I$and(IR_already_scheduled$not(inplace = TRUE))
-
-    # Calculate recovery times for infectious individuals without transitions scheduled:
     R_times <- round(
       (rgamma(
-        n = I$size(),
+        n = I_mild$size(),
         shape = 2,
         rate = 2 / parameters_list$duration_infectious
-      ) +
-        1) /
-        parameters_list$dt
+      ) + 1) / parameters_list$dt
     )
 
-    # Schedule the recovery events for infectious individuals without transitions scheduled:
-    events_list$IR_event$schedule(target = I, delay = R_times)
+    events_list$I_mild_R_event$schedule(target = I_mild, delay = R_times)
+  }
+}
+
+#' Create process governing I_hosp -> {R, D} disease state transition
+#'
+#' Performs an age-dependent binomial split between recovery and death.
+#' Counts `D_new` at the moment the death decision is made.
+#'
+#' @inheritParams create_processes
+#'
+#' @family processes
+#' @export
+create_I_hosp_exit_process <- function(
+  variables_list,
+  events_list,
+  parameters_list,
+  renderer
+) {
+  function(t) {
+    # Get I_hosp individuals not yet scheduled into either exit event
+    I_hosp <- variables_list$disease_state$get_index_of("I_hosp")
+    already_scheduled <- events_list$I_hosp_R_event$get_scheduled()
+    already_scheduled$or(events_list$I_hosp_D_event$get_scheduled())
+    I_hosp$and(already_scheduled$not(inplace = TRUE))
+
+    if (I_hosp$size() == 0) return()
+    I_hosp_idx <- I_hosp$to_vector()
+
+    # Build per-person death probability based on age class
+    p_death <- rep(NA_real_, length(I_hosp_idx))
+    child_idx <- variables_list$age_class$get_index_of("child")$to_vector()
+    adult_idx <- variables_list$age_class$get_index_of("adult")$to_vector()
+    elderly_idx <- variables_list$age_class$get_index_of("elderly")$to_vector()
+    p_death[I_hosp_idx %in% child_idx] <- parameters_list$prob_death_hosp_child
+    p_death[I_hosp_idx %in% adult_idx] <- parameters_list$prob_death_hosp_adult
+    p_death[I_hosp_idx %in% elderly_idx] <- parameters_list$prob_death_hosp_elderly
+
+    # Guard: every hospitalized individual must have been matched to one of
+    # the three age classes. NA in p_death would propagate to NA in death_draw
+    # and silently drop the individual from both the recover and die branches.
+    if (anyNA(p_death)) {
+      stop(sprintf(
+        "create_I_hosp_exit_process: p_death has %d NA entries — some hospitalized individuals do not match any age class",
+        sum(is.na(p_death))
+      ))
+    }
+
+    # Binomial split
+    death_draw <- rbinom(length(I_hosp_idx), size = 1, prob = p_death)
+
+    # Gamma-distributed delay (reusing duration_infectious)
+    exit_times <- round(
+      (rgamma(
+        n = length(I_hosp_idx),
+        shape = 2,
+        rate = 2 / parameters_list$duration_hospitalized
+      ) + 1) / parameters_list$dt
+    )
+
+    recover_mask <- death_draw == 0
+    death_mask <- death_draw == 1
+
+    if (any(recover_mask)) {
+      events_list$I_hosp_R_event$schedule(
+        target = I_hosp_idx[recover_mask],
+        delay = exit_times[recover_mask]
+      )
+    }
+    if (any(death_mask)) {
+      events_list$I_hosp_D_event$schedule(
+        target = I_hosp_idx[death_mask],
+        delay = exit_times[death_mask]
+      )
+    }
+
+    renderer$render("D_new", sum(death_mask), t)
   }
 }
 

@@ -34,11 +34,30 @@ These parameters are:
 \item \code{duration_exposed}: TBD
 \item \code{duration_infectious}: TBD
 \item \code{prob_inf_external}: The probability a susceptible individual is infected from an external source
-\item \code{beta_household}: TBD
-\item \code{beta_workplace}: TBD
-\item \code{beta_school}: TBD
-\item \code{beta_leisure}: TBD
-\item \code{beta_community}: TBD
+\item \code{beta_household}: The transmission rate for household contacts, used to compute
+the per-timestep force of infection in household settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{beta_workplace}: The transmission rate for workplace contacts, used to compute
+the per-timestep force of infection in workplace settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{beta_school}: The transmission rate for school contacts, used to compute
+the per-timestep force of infection in school settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{beta_leisure}: The transmission rate for leisure contacts, used to compute
+the per-timestep force of infection in leisure settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{beta_community}: The transmission rate for community contacts, used to compute
+the per-timestep force of infection in community settings. A numeric scalar
+when \code{time_varying_transmission_on} is \code{FALSE}, or a numeric vector of length
+\code{simulation_time} (one value per simulated calendar day) when it is \code{TRUE}.
+\item \code{time_varying_transmission_on}: Logical flag (default \code{FALSE}). When \code{FALSE},
+each setting-specific beta must be a numeric scalar. When \code{TRUE}, each
+setting-specific beta must instead be a numeric vector of length
+\code{simulation_time}, giving that setting's beta for each simulated calendar day.
 \item \code{dt}: TBD
 \item \code{simulation_time}: TBD
 \item \code{household_distribution_country}: TBD
@@ -112,6 +131,17 @@ Setting-Specific Room Size Per Individual Parameters:
 \item \code{size_per_individual_school}: The volume or surface area for each individual in the school setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
 \item \code{size_per_individual_leisure}: The volume or surface area for each individual in the leisure setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
 \item \code{size_per_individual_household}: The volume or surface area for each individual in the household setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
+}
+
+Hospitalizations and Deaths
+\itemize{
+\item \code{prob_hosp_child}: Probability that an infected child is hospitalized
+\item \code{prob_hosp_adult}: Probability that an infected adult is hospitalized
+\item \code{prob_hosp_elderly}: Probability that an infected elderly individual is hospitalized
+\item \code{prob_death_hosp_child}: Probability of death for a hospitalized child, conditional on hospitalization
+\item \code{prob_death_hosp_adult}: Probability of death for a hospitalized adult, conditional on hospitalization
+\item \code{prob_death_hosp_elderly}: Probability of death for a hospitalized elderly individual, conditional on hospitalization
+\item \code{duration_hospitalized}: Average duration (in days) of a hospitalization
 }}
 
 \item{archetype}{A text string indicating the pathogen archetype parameter set to load (default = "none", current options are flu, sars_cov_2, and measles)}

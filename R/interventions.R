@@ -619,3 +619,4 @@ efficacy_to_delta <- function(target_efficacy,
   alpha_post <- -A / log(1 - p_pre * (1 - target_efficacy))
   return(alpha_post - alpha_pre)
 }
+

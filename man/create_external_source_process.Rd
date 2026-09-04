@@ -26,7 +26,8 @@ Create process governing exposed to infectious disease state transition
 \seealso{
 Other processes: 
 \code{\link{create_EI_process}()},
-\code{\link{create_IR_process}()},
+\code{\link{create_I_hosp_exit_process}()},
+\code{\link{create_I_mild_R_process}()},
 \code{\link{create_RS_process}()},
 \code{\link{create_SE_process}()},
 \code{\link{create_processes}()}

@@ -6,7 +6,7 @@ test_that("run_simulations() correctly fails to render diagnostic outputs when r
   parameters <- get_parameters(overrides = list(simulation_time = 10))
 
   # Run the simulation:
-  output <- run_simulation(parameters_list = parameters)
+  output <- run_simulation(parameters_list = parameters)$result
 
   # Set up a vector of expected column names:
   expected_columns_names <- c(
@@ -38,7 +38,7 @@ test_that("run_simulations() correctly renders diagnostic outputs when render_di
   )
 
   # Run the simulation:
-  output <- run_simulation(parameters_list = parameters)
+  output <- run_simulation(parameters_list = parameters)$result
 
   # Set up a vector of expected column names:
   expected_columns_names <- c(
@@ -73,7 +73,7 @@ test_that("Disease state counts sum to parameters$human population", {
   )
 
   # Run the simulation:
-  output <- run_simulation(parameters_list = parameters)
+  output <- run_simulation(parameters_list = parameters)$result
 
   # Sum the disease states in each time step:
   for (i in 1:nrow(output)) {
@@ -102,7 +102,7 @@ test_that("Renderer renders the number of externally sourced infections when end
   )
 
   # Run the simulation:
-  simulation_render_test <- run_simulation(parameters_list = parameters_list)
+  simulation_render_test <- run_simulation(parameters_list = parameters_list)$result
 
   # Check that run_simulation() has rendered a data frame with a column for n_external_infections:
   expect_true("n_external_infections" %in% names(simulation_render_test))
@@ -115,7 +115,7 @@ test_that("Renderer does not render the number of externally sourced infections 
   )
 
   # Run the simulation:
-  simulation_render_test <- run_simulation(parameters_list = parameters_list)
+  simulation_render_test <- run_simulation(parameters_list = parameters_list)$result
 
   # Check that run_simulation() has rendered a data frame with a column for n_external_infections:
   expect_false("n_external_infections" %in% names(simulation_render_test))

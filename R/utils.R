@@ -45,6 +45,36 @@ get_setting_size <- function(variables_list, setting) {
   return(location_sizes)
 }
 
+#' timestep_to_day
+#'
+#' @description
+#' Converts a simulation timestep into a simulation-day index. There are `1 / dt`
+#' timesteps per day, so the day is `ceiling(t * dt)`. All timesteps within the
+#' same day map to the same index. The index keeps counting past day 365 for
+#' simulations longer than one year.
+#'
+#' @param t The simulation timestep (a positive integer, as passed to a process function).
+#' @param dt The timestep length as a fraction of a day (e.g. 0.5 for two timesteps per day).
+#' @return An integer giving the simulation day for timestep `t`.
+#' @family miscellaneous
+#' @export
+timestep_to_day <- function(t, dt) {
+  if (!t == floor(t)) {
+    stop("t must be an integer value")
+  }
+  if (dt <= 0) {
+    stop("dt must be a positive numeric value")
+  }
+
+  day <- ceiling(t * dt)
+
+  if (!day == floor(day)) {
+    stop("calculated day is not a whole number — check that dt is a valid timestep fraction (e.g. 0.5, 1)")
+  }
+
+  day
+}
+
 #' generate_betas
 #'
 #' @description

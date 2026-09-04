@@ -6,7 +6,7 @@
 #' @export
 create_variables <- function(parameters_list) {
   # Disease state variable
-  disease_states <- c("S", "E", "I", "R")
+  disease_states <- c("S", "E", "I_mild", "I_hosp", "R", "D")
   initial_disease_states <- generate_initial_disease_states(
     parameters_list = parameters_list
   )
@@ -350,7 +350,7 @@ generate_initial_disease_states <- function(parameters_list) {
     replace = FALSE,
     prob = NULL
   )
-  initial_disease_states[infectious_index] <- "I"
+  initial_disease_states[infectious_index] <- "I_mild"
 
   # Sample indices between 1:human population (minus those initially exposed) to set those initially infectious:
   recovered_index <- sample(

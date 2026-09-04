@@ -1,0 +1,4 @@
+"test_name","peak_infections","timestep_at_peak","attack_rate","final_susceptible","final_recovered"
+"A1",2141,93,90.3,971,9029
+"B1_random",1507,108,83,1700,8300
+"B1_targeted",1452,131,82.3,1772,8228

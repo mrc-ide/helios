@@ -1,3 +1,82 @@
+test_that("get_parameters() accepts setting-specific betas as vectors matching simulation_time when time_varying_transmission_on is TRUE", {
+  expect_no_error(
+    get_parameters(
+      overrides = list(
+        simulation_time = 30,
+        time_varying_transmission_on = TRUE,
+        beta_household = rep(0.5, 30),
+        beta_school = rep(0.5, 30),
+        beta_workplace = rep(0.5, 30),
+        beta_leisure = rep(0.5, 30),
+        beta_community = rep(0.2, 30)
+      )
+    )
+  )
+})
+
+test_that("get_parameters() errors when time_varying_transmission_on is TRUE but a setting-specific beta is still a constant", {
+  expect_error(
+    get_parameters(
+      overrides = list(
+        simulation_time = 30,
+        time_varying_transmission_on = TRUE
+      )
+    ),
+    regexp = "when time_varying_transmission_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
+  )
+})
+
+test_that("get_parameters() errors when a setting-specific beta length does not match simulation_time under time-varying transmission", {
+  expect_error(
+    get_parameters(
+      overrides = list(
+        simulation_time = 30,
+        time_varying_transmission_on = TRUE,
+        beta_household = rep(0.5, 30),
+        beta_school = rep(0.5, 30),
+        beta_workplace = rep(0.5, 30),
+        beta_leisure = rep(0.5, 30),
+        beta_community = rep(0.2, 100)
+      )
+    ),
+    regexp = "when time_varying_transmission_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
+  )
+})
+
+test_that("get_parameters() errors when a setting-specific beta contains NAs under time-varying transmission", {
+  m <- rep(0.5, 30)
+  m[10] <- NA
+  expect_error(
+    get_parameters(
+      overrides = list(
+        simulation_time = 30,
+        time_varying_transmission_on = TRUE,
+        beta_household = m,
+        beta_school = rep(0.5, 30),
+        beta_workplace = rep(0.5, 30),
+        beta_leisure = rep(0.5, 30),
+        beta_community = rep(0.2, 30)
+      )
+    ),
+    regexp = "when time_varying_transmission_on is TRUE, all setting-specific betas must be numeric vectors of length equal to simulation_time"
+  )
+})
+
+test_that("get_parameters() errors when a setting-specific beta is a vector while time_varying_transmission_on is FALSE", {
+  # A vector-valued beta is only meaningful under time-varying transmission; it
+  # should error while time-varying transmission is switched off, since a
+  # constant is required
+  expect_error(
+    get_parameters(
+      overrides = list(
+        time_varying_transmission_on = FALSE,
+        beta_community = rep(0.2, 10)
+      )
+    ),
+    regexp = "ERROR: A setting-specific beta has length not equal to 1"
+  )
+})
+
 test_that("get_parameters() errors when a setting-specific beta has length greater than 1", {
   expect_error(
     object = parameters <- get_parameters(
@@ -130,7 +209,7 @@ test_that("run_simulation() works when a parameter archetype specified", {
   ))
 
   # Run the simulation:
-  simulation_example <- run_simulation(parameters_list = parameters_list)
+  simulation_example <- run_simulation(parameters_list = parameters_list)$result
 
   # Check that the output contains some expected column names and that it is a data.frame:
   expect_true(all(
