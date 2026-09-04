@@ -67,63 +67,47 @@
 #' Rendering Parameters
 #' * `render_diagnostics`: FALSE
 #'
-#' Far UVC Intervention Parameters:
-#' * `far_uvc_joint`: boolean switch set to TRUE if far UVC intervention parameterised jointly using `set_uvc()`; default = FALSE
-#' * `far_uvc_joint_coverage`: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_joint_coverage_target`: The target that coverage proportion applies to. Can either be "individuals" or "square footage".
-#' * `far_uvc_joint_coverage_type`: Type of coverage. Can either be "random" or "targeted_riskiness".
-#' * `far_uvc_joint_efficacy`: : Efficacy of far UVC in the joint setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_joint_timestep`: The timestep on which far UVC is jointly implemented (must be a numeric value greater than or equal to 0)
+#' Setting-Specific ACH Parameters:
+#' * `setting_specific_ach_workplace`: boolean switch set to TRUE if setting-specific ACH parameterised in the workplace setting using `set_setting_specific_ach()`; default = FALSE
+#' * `setting_specific_ach_workplace_mean`: The mean of the  truncated normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =4.8
+#' * `setting_specific_ach_workplace_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual workplaces is drawn; default =1.5
+#' * `setting_specific_ach_school`: boolean switch set to TRUE if setting-specific ACH parameterised in the school setting using `set_setting_specific_ach()`; default = FALSE
+#' * `setting_specific_ach_school_mean`: The mean of the truncated normal distribution from which the setting-specific ACH of individual schools is drawn; default = 4.0
+#' * `setting_specific_ach_school_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual schools is drawn; default = 1.2
+#' * `setting_specific_ach_leisure`: boolean switch set to TRUE if setting-specific ACH parameterised in the leisure setting using `set_setting_specific_ach()`; default = FALSE
+#' * `setting_specific_ach_leisure_mean`: The mean of the truncated normal distribution from which the setting-specific ACH of individual leisure locations is drawn; default = 3.0
+#' * `setting_specific_ach_leisure_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual leisure settings is drawn; default = 1.0
+#' * `setting_specific_ach_household`: boolean switch set to TRUE if setting-specific ACH parameterised in the household setting using `set_setting_specific_ach()`; default = FALSE
+#' * `setting_specific_ach_household_mean`: The mean of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.5
+#' * `setting_specific_ach_household_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.2
 #'
-#' * `far_uvc_workplace`: boolean switch set to TRUE if far UVC intervention parameterised in the workplace setting using `set_uvc()`; default = FALSE
-#' * `far_uvc_workplace_coverage`: Proportion of coverage of far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_workplace_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-#' * `far_uvc_workplace_coverage_type`: Type of coverage. Select "random" for random selecting workplaces for UVC interventions and "targeted_riskiness" for targeting interventions at most risky workplaces
-#' * `far_uvc_workplace_efficacy`: : Efficacy of far UVC in the workplace setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_workplace_timestep`: The timestep on which far UVC is implemented in the workplace setting (must be a numeric value greater than or equal to 0)
+#' Default (Uniform) ACH Parameters (used when `setting_specific_ach_<setting>` is FALSE; if both are unset, `generate_setting_specific_ach()` errors):
+#' * `default_ach_workplace`: uniform ACH assigned to every workplace location when `setting_specific_ach_workplace` is FALSE. Set via [set_default_ach()]. Default = NULL (must be set explicitly).
+#' * `default_ach_school`: uniform ACH assigned to every school location when `setting_specific_ach_school` is FALSE. Default = NULL.
+#' * `default_ach_leisure`: uniform ACH assigned to every leisure location when `setting_specific_ach_leisure` is FALSE. Default = NULL.
+#' * `default_ach_household`: uniform ACH assigned to every household location when `setting_specific_ach_household` is FALSE. Default = NULL.
 #'
-#' * `far_uvc_school`: boolean switch set to TRUE if far UVC intervention parameterised in the school setting using `set_uvc()`; default = FALSE
-#' * `far_uvc_school_coverage`: Proportion of schools covered with far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_school_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-#' * `far_uvc_school_coverage_type`: Type of coverage. Select "random" for random selecting schools for UVC interventions and "targeted_riskiness" for targeting interventions at most risky schools
-#' * `far_uvc_school_efficacy`: : Efficacy of far UVC in the school setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_school_timestep`: The timestep on which far UVC is implemented in the school setting (must be a numeric value greater than or equal to 0)
+#' Volume Per Person Parameters (used in the Wells-Riley calculation; units: m^3 per person):
+#' * `volume_per_person_workplace`: average air volume per person in a workplace; default = 27 (assumes ~10 m^2 floor area at 2.7 m height)
+#' * `volume_per_person_school`: average air volume per person in a school; default = 10 (assumes ~3.33 m^2 floor area at 3 m height)
+#' * `volume_per_person_leisure`: average air volume per person in a leisure setting; default = 8 (assumes ~2 m^2 floor area at 4 m height)
+#' * `volume_per_person_household`: average air volume per person in a household; default = 50 (assumes ~20 m^2 floor area at 2.5 m height)
 #'
-#' * `far_uvc_leisure`: boolean switch set to TRUE if far UVC intervention parameterised in the leisure setting using `set_uvc()`; default = FALSE
-#' * `far_uvc_leisure_coverage`: Proportion of leisure settings covered with far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_leisure_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-#' * `far_uvc_leisure_coverage_type`: Type of coverage. Select "random" for random selecting leisure settings for UVC interventions and "targeted_riskiness" for targeting interventions at most risky leisure settings
-#' * `far_uvc_leisure_efficacy`: : Efficacy of far UVC in the leisure setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_leisure_timestep`: The timestep on which far UVC is implemented in the leisure setting (must be a numeric value greater than or equal to 0)
+#' Wells-Riley Parameters (used by `convert_ach_to_riskiness()` to derive per-location riskiness from ACH, and by `calculate_efficacy_from_ach()` to derive per-location intervention efficacy from ACH and the intervention delta):
+#' * `wells_riley_emission_rate`: rate at which an infectious individual emits airborne infectious units; units = FFU/hour; default = 27
+#' * `wells_riley_decay_rate`: natural decay rate of airborne pathogens (denoted k_D); units = 1/hour; default = 0.64
+#' * `wells_riley_infection_prob_per_ffu`: probability of infection per inhaled FFU (denoted r); default = 1.37e-2
+#' * `wells_riley_respiratory_rate_factor`: respiratory rate multiplied by tidal volume (denoted RR_tv); units = m^3/hour; default = 0.45
+#' * `wells_riley_time_in_room`: exposure window used inside the Wells-Riley calculation (denoted t); units = hours; default = 4
 #'
-#' * `far_uvc_household`: boolean switch set to TRUE if far UVC intervention parameterised in the household setting using `set_uvc()`; default = FALSE
-#' * `far_uvc_household_coverage`: Proportion of households covered with far UVC (must be a numeric value between 0 and 1)
-#' * `far_uvc_household_coverage_target`: The target that coverage proportion applies to. Select either "individuals" or "square footage"
-#' * `far_uvc_household_coverage_type`: Type of coverage. Select "random" for random selecting households for UVC interventions and "targeted_riskiness" for targeting interventions at most risky households
-#' * `far_uvc_household_efficacy`: : Efficacy of far UVC in the household setting (must be a numeric value between 0 and 1)
-#' * `far_uvc_household_timestep`: The timestep on which far UVC is implemented in the household setting (must be a numeric value greater than or equal to 0)
-#'
-#' Setting-Specific Riskiness Parameters:
-#' * `setting_specific_riskiness_workplace`: boolean switch set to TRUE if setting-specific riskiness parameterised in the workplace setting using `set_setting_specific_riskiness()`; default = FALSE
-#' * `setting_specific_riskiness_workplace_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0
-#' * `setting_specific_riskiness_workplace_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0.37
-#' * `setting_specific_riskiness_workplace_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 0.4472
-#' * `setting_specific_riskiness_workplace_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual workplaces is drawn; default = 2.236
-#' * `setting_specific_riskiness_school`: boolean switch set to TRUE if setting-specific riskiness parameterised in the school setting using `set_setting_specific_riskiness()`; default = FALSE
-#' * `setting_specific_riskiness_school_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0
-#' * `setting_specific_riskiness_school_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0.37
-#' * `setting_specific_riskiness_school_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 0.4472
-#' * `setting_specific_riskiness_school_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual schools is drawn; default = 2.236
-#' * `setting_specific_riskiness_leisure`: boolean switch set to TRUE if setting-specific riskiness parameterised in the leisure setting using `set_setting_specific_riskiness()`; default = FALSE
-#' * `setting_specific_riskiness_leisure_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure locations is drawn; default = 0
-#' * `setting_specific_riskiness_leisure_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 0.37
-#' * `setting_specific_riskiness_leisure_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 0.4472
-#' * `setting_specific_riskiness_leisure_max`:The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual leisure settings is drawn; default = 2.236
-#' * `setting_specific_riskiness_household`: boolean switch set to TRUE if setting-specific riskiness parameterised in the household setting using `set_setting_specific_riskiness()`; default = FALSE
-#' * `setting_specific_riskiness_household_meanlog`: The mean of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0
-#' * `setting_specific_riskiness_household_sdlog`: The standard deviation of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.37
-#' * `setting_specific_riskiness_household_min`: The minimum value for truncation on the left tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 0.4472
-#' * `setting_specific_riskiness_household_max`: The maximum value for truncation on the right tail of the truncated log-normal distribution from which the setting-specific riskiness of individual households is drawn; default = 2.236
+#' Intervention Parameters (populated internally by `set_intervention_ach()` and by `generate_intervention_switches()`; users do not normally set these directly. One block per scope <s> in {joint, workplace, school, leisure, household}):
+#' * `intervention_<s>_active`: boolean flag set to TRUE when an intervention has been installed in scope <s>. Default = FALSE
+#' * `intervention_<s>_list`: list of intervention objects (each as returned by `make_intervention()`) deployed in scope <s>. Currently single-intervention only — list always has length 1 when active. Default = NULL
+#' * `intervention_<s>_coverage`: fraction of total setting size to cover (numeric in `[0, 1]`); inherited from the intervention object's `coverage` field. Default = NULL
+#' * `intervention_<s>_coverage_target`: what the coverage fraction applies to. Either "individuals" or "square_footage". Default = NULL
+#' * `intervention_<s>_coverage_type`: how locations are selected for coverage. Either "random" (uniform sampling) or "targeted_riskiness" (locations ranked in decreasing order of riskiness). Default = NULL
+#' * `intervention_<s>_timestep`: first simulation timestep at which the intervention's efficacy is applied in the FOI calculation. Default = NULL
+#' * `intervention_<setting>_covered` (per-setting scopes only — workplace/school/leisure/household): 0/1 vector of length equal to the number of locations in the setting, populated by the dispatcher to mark which locations received the intervention. Default = NULL
 #'
 #' Setting-Specific Room Size Per Individual Parameters:
 #' * `size_per_individual_workplace`: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
@@ -189,75 +173,90 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     duration_immune = NULL,
     prob_inf_external = NULL,
 
-    # Setting-Specific Riskiness Parameters: Workplace
-    setting_specific_riskiness_workplace = FALSE,
-    setting_specific_riskiness_workplace_meanlog = NULL,
-    setting_specific_riskiness_workplace_sdlog = NULL,
-    setting_specific_riskiness_workplace_min = NULL,
-    setting_specific_riskiness_workplace_max = NULL,
+    # Setting-Specific ACH Parameters: Workplace
+    setting_specific_ach_workplace = FALSE,
+    setting_specific_ach_workplace_mean = NULL,
+    setting_specific_ach_workplace_sd = NULL,
 
-    # Setting-Specific Riskiness Parameters: School
-    setting_specific_riskiness_school = FALSE,
-    setting_specific_riskiness_school_meanlog = NULL,
-    setting_specific_riskiness_school_sdlog = NULL,
-    setting_specific_riskiness_school_min = NULL,
-    setting_specific_riskiness_school_max = NULL,
 
-    # Setting-Specific Riskiness Parameters: Leisure
-    setting_specific_riskiness_leisure = FALSE,
-    setting_specific_riskiness_leisure_meanlog = NULL,
-    setting_specific_riskiness_leisure_sdlog = NULL,
-    setting_specific_riskiness_leisure_min = NULL,
-    setting_specific_riskiness_leisure_max = NULL,
+    # Setting-Specific ACH Parameters: School
+    setting_specific_ach_school = FALSE,
+    setting_specific_ach_school_mean = NULL,
+    setting_specific_ach_school_sd = NULL,
 
-    # Setting-Specific Riskiness Parameters: Household
-    setting_specific_riskiness_household = FALSE,
-    setting_specific_riskiness_household_meanlog = NULL,
-    setting_specific_riskiness_household_sdlog = NULL,
-    setting_specific_riskiness_household_min = NULL,
-    setting_specific_riskiness_household_max = NULL,
+    # Setting-Specific ACH Parameters: Leisure
+    setting_specific_ach_leisure = FALSE,
+    setting_specific_ach_leisure_mean = NULL,
+    setting_specific_ach_leisure_sd = NULL,
 
-    # Far UVC Parameters: Joint
-    far_uvc_joint = FALSE,
-    far_uvc_joint_coverage = NULL,
-    far_uvc_joint_coverage_target = NULL,
-    far_uvc_joint_coverage_type = NULL,
-    far_uvc_joint_efficacy = NULL,
-    far_uvc_joint_timestep = NULL,
+    # Setting-Specific ACH Parameters: Household
+    setting_specific_ach_household = FALSE,
+    setting_specific_ach_household_mean = NULL,
+    setting_specific_ach_household_sd = NULL,
 
-    # Far UVC Parameters: Workplace
-    far_uvc_workplace = FALSE,
-    far_uvc_workplace_coverage = NULL,
-    far_uvc_workplace_coverage_target = NULL,
-    far_uvc_workplace_coverage_type = NULL,
-    far_uvc_workplace_efficacy = NULL,
-    far_uvc_workplace_timestep = NULL,
+    # Default (uniform) ACH per setting, used when setting_specific_ach_<setting>
+    # is FALSE. NULL means "not configured" — generate_setting_specific_ach()
+    # will error if both the switch is FALSE and the default is NULL.
+    default_ach_workplace = NULL,
+    default_ach_school    = NULL,
+    default_ach_leisure   = NULL,
+    default_ach_household = NULL,
 
-    # Far UVC Parameters: School
-    far_uvc_school = FALSE,
-    far_uvc_school_coverage = NULL,
-    far_uvc_school_coverage_target = NULL,
-    far_uvc_school_coverage_type = NULL,
-    far_uvc_school_efficacy = NULL,
-    far_uvc_school_timestep = NULL,
+    # Volume per person parameters (density values, m^3, room heights are assumptions)
+    volume_per_person_workplace = 27, #10m^2 *2.7m
+    volume_per_person_school = 10, # 3.33m^2 *3m
+    volume_per_person_leisure = 8, # 2m^2*4M
+    volume_per_person_household = 50, # 20m^2 * 2.5m
 
-    # Far UVC Parameters: Leisure:
-    far_uvc_leisure = FALSE,
-    far_uvc_leisure_coverage = NULL,
-    far_uvc_leisure_coverage_target = NULL,
-    far_uvc_leisure_coverage_type = NULL,
-    far_uvc_leisure_efficacy = NULL,
-    far_uvc_leisure_timestep = NULL,
+    # W-R parameters
+    wells_riley_emission_rate = 27, # FFU/hour
+    wells_riley_decay_rate = 0.64, # k_D, natural decay rate (1/hr)
+    wells_riley_infection_prob_per_ffu = 1.37e-2, # r, infection probability per FFU
+    wells_riley_respiratory_rate_factor = 0.45, # RR_tv
+    wells_riley_time_in_room = 4,# t, hours spent in room
 
-    # Far UVC Parameters: Household:
-    far_uvc_household = FALSE,
-    far_uvc_household_coverage = NULL,
-    far_uvc_household_coverage_target = NULL,
-    far_uvc_household_coverage_type = NULL,
-    far_uvc_household_efficacy = NULL,
-    far_uvc_household_timestep = NULL,
 
-    # Room Size Per Individual Parameters:
+  # Intervention parameters (Wells-Riley ACH-based efficacy):
+    intervention_joint_active              = FALSE,
+    intervention_joint_list                = NULL,
+    intervention_joint_coverage            = NULL,
+    intervention_joint_coverage_target     = NULL,
+    intervention_joint_coverage_type       = NULL,
+    intervention_joint_timestep            = NULL,
+
+    intervention_workplace_active          = FALSE,
+    intervention_workplace_list            = NULL,
+    intervention_workplace_coverage        = NULL,
+    intervention_workplace_coverage_target = NULL,
+    intervention_workplace_coverage_type   = NULL,
+    intervention_workplace_timestep        = NULL,
+    intervention_workplace_covered         = NULL,
+
+    intervention_school_active             = FALSE,
+    intervention_school_list               = NULL,
+    intervention_school_coverage           = NULL,
+    intervention_school_coverage_target    = NULL,
+    intervention_school_coverage_type      = NULL,
+    intervention_school_timestep           = NULL,
+    intervention_school_covered            = NULL,
+
+    intervention_leisure_active            = FALSE,
+    intervention_leisure_list              = NULL,
+    intervention_leisure_coverage          = NULL,
+    intervention_leisure_coverage_target   = NULL,
+    intervention_leisure_coverage_type     = NULL,
+    intervention_leisure_timestep          = NULL,
+    intervention_leisure_covered           = NULL,
+
+    intervention_household_active          = FALSE,
+    intervention_household_list            = NULL,
+    intervention_household_coverage        = NULL,
+    intervention_household_coverage_target = NULL,
+    intervention_household_coverage_type   = NULL,
+    intervention_household_timestep        = NULL,
+    intervention_household_covered         = NULL,
+
+    # Room Size Per Individual Parameters: (currently used for coverage allocation)
     size_per_individual_workplace = 1,
     size_per_individual_school = 1,
     size_per_individual_leisure = 1,
@@ -368,63 +367,7 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     stop("dt must evenly divide into 1 e.g. 0.1, 0.2, 0.25, 0.5")
   }
 
-  ## put warning or check in here about if coverage_type = "targeted_riskiness" but riskiness
-  ## isn't turned on.
-  if (parameters$far_uvc_joint) {
-    if (
-      parameters$far_uvc_joint_coverage_target == "targeted_riskiness" &
-        !any(
-          parameters$setting_specific_riskiness_workplace |
-            parameters$setting_specific_riskiness_school |
-            parameters$setting_specific_riskiness_leisure |
-            parameters$setting_specific_riskiness_household
-        )
-    ) {
-      warning(
-        "coverage_target is set to targeted_riskiness but at least one of the setting_specific_riskinesses is not turned on"
-      )
-    }
-  }
-  if (parameters$far_uvc_household) {
-    if (
-      parameters$far_uvc_household_coverage_target == "targeted_riskiness" &
-        !parameters$setting_specific_riskiness_household
-    ) {
-      warning(
-        "far_uvc_household_coverage_target is set to targeted_riskiness but setting_specific_riskiness_household is not turned on"
-      )
-    }
-  }
-  if (parameters$far_uvc_workplace) {
-    if (
-      parameters$far_uvc_workplace_coverage_target == "targeted_riskiness" &
-        !parameters$setting_specific_riskiness_workplace
-    ) {
-      warning(
-        "far_uvc_workplace_coverage_target is set to targeted_riskiness but setting_specific_riskiness_workplace is not turned on"
-      )
-    }
-  }
-  if (parameters$far_uvc_school) {
-    if (
-      parameters$far_uvc_school_coverage_target == "targeted_riskiness" &
-        !parameters$setting_specific_riskiness_school
-    ) {
-      warning(
-        "far_uvc_school_coverage_target is set to targeted_riskiness but setting_specific_riskiness_school is not turned on"
-      )
-    }
-  }
-  if (parameters$far_uvc_leisure) {
-    if (
-      parameters$far_uvc_leisure_coverage_target == "targeted_riskiness" &
-        !parameters$setting_specific_riskiness_leisure
-    ) {
-      warning(
-        "far_uvc_leisure_coverage_target is set to targeted_riskiness but setting_specific_riskiness_leisure is not turned on"
-      )
-    }
-  }
+
 
   # Check duration_immune is set if endemic_or_epidemic == "endemic"
   if (!(parameters$endemic_or_epidemic %in% c("endemic", "epidemic"))) {
