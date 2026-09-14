@@ -2,7 +2,7 @@
 % Please edit documentation in R/processes.R
 \name{create_I_hosp_exit_process}
 \alias{create_I_hosp_exit_process}
-\title{Create process governing I_hosp -> {R, D} disease state transition}
+\title{Create process governing I_hosp -> R or D disease state transition}
 \usage{
 create_I_hosp_exit_process(
   variables_list,

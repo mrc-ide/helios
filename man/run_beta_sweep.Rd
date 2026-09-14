@@ -71,3 +71,13 @@ full reproducibility of the sweep.
 \description{
 Run a beta_community sweep and back-solve R0 via the final-size method
 }
+\seealso{
+Other calibration: 
+\code{\link{generate_beta_sweep_plot}()},
+\code{\link{generate_time_varying_beta_vectors}()},
+\code{\link{get_R0_from_attack_rate}()},
+\code{\link{get_beta_from_R0_finalsize}()},
+\code{\link{get_sweep_result_from_source}()},
+\code{\link{run_one_sweep_replicate}()}
+}
+\concept{calibration}

@@ -114,7 +114,7 @@ Wells-Riley Parameters (used by \code{convert_ach_to_riskiness()} to derive per-
 \item \code{wells_riley_time_in_room}: exposure window used inside the Wells-Riley calculation (denoted t); units = hours; default = 4
 }
 
-Intervention Parameters (populated internally by \code{set_intervention_ach()} and by \code{generate_intervention_switches()}; users do not normally set these directly. One block per scope \if{html}{\out{<s>}} in {joint, workplace, school, leisure, household}):
+Intervention Parameters (populated internally by \code{set_intervention_ach()} and by \code{generate_intervention_switches()}; users do not normally set these directly. One block per scope, where \verb{<s>} is one of \code{joint}, \code{workplace}, \code{school}, \code{leisure} or \code{household}):
 \itemize{
 \item \verb{intervention_<s>_active}: boolean flag set to TRUE when an intervention has been installed in scope \if{html}{\out{<s>}}. Default = FALSE
 \item \verb{intervention_<s>_list}: list of intervention objects (each as returned by \code{make_intervention()}) deployed in scope \if{html}{\out{<s>}}. Currently single-intervention only — list always has length 1 when active. Default = NULL

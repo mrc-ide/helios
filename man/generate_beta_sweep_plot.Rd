@@ -19,3 +19,13 @@ across replicates. Useful for a visual check that a sweep behaved
 sensibly (monotonic R0, reasonable attack-rate spread) before using it
 in \code{\link[=get_beta_from_R0_finalsize]{get_beta_from_R0_finalsize()}}.
 }
+\seealso{
+Other calibration: 
+\code{\link{generate_time_varying_beta_vectors}()},
+\code{\link{get_R0_from_attack_rate}()},
+\code{\link{get_beta_from_R0_finalsize}()},
+\code{\link{get_sweep_result_from_source}()},
+\code{\link{run_beta_sweep}()},
+\code{\link{run_one_sweep_replicate}()}
+}
+\concept{calibration}

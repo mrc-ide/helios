@@ -19,3 +19,13 @@ Helper for \code{\link[=get_beta_from_R0_finalsize]{get_beta_from_R0_finalsize()
 object returned directly by \code{run_beta_sweep()}, or a file path to an
 \code{.rds} file saved by it, and returns that list either way.
 }
+\seealso{
+Other calibration: 
+\code{\link{generate_beta_sweep_plot}()},
+\code{\link{generate_time_varying_beta_vectors}()},
+\code{\link{get_R0_from_attack_rate}()},
+\code{\link{get_beta_from_R0_finalsize}()},
+\code{\link{run_beta_sweep}()},
+\code{\link{run_one_sweep_replicate}()}
+}
+\concept{calibration}

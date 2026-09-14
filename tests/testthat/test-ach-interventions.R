@@ -568,7 +568,7 @@ test_that("generate_intervention_switches() errors when both joint and a per-set
 })
 
 test_that("generate_joint_intervention_switches() pools workplace, school, and leisure coverage and excludes household", {
-  coverage <- 0.5
+  coverage <- 1
   parameters_list <- with_default_ach(get_parameters())
   intervention <- make_intervention(
     name = "test_intervention",

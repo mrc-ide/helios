@@ -100,7 +100,7 @@
 #' * `wells_riley_respiratory_rate_factor`: respiratory rate multiplied by tidal volume (denoted RR_tv); units = m^3/hour; default = 0.45
 #' * `wells_riley_time_in_room`: exposure window used inside the Wells-Riley calculation (denoted t); units = hours; default = 4
 #'
-#' Intervention Parameters (populated internally by `set_intervention_ach()` and by `generate_intervention_switches()`; users do not normally set these directly. One block per scope <s> in {joint, workplace, school, leisure, household}):
+#' Intervention Parameters (populated internally by `set_intervention_ach()` and by `generate_intervention_switches()`; users do not normally set these directly. One block per scope, where `<s>` is one of `joint`, `workplace`, `school`, `leisure` or `household`):
 #' * `intervention_<s>_active`: boolean flag set to TRUE when an intervention has been installed in scope <s>. Default = FALSE
 #' * `intervention_<s>_list`: list of intervention objects (each as returned by `make_intervention()`) deployed in scope <s>. Currently single-intervention only — list always has length 1 when active. Default = NULL
 #' * `intervention_<s>_coverage`: fraction of total setting size to cover (numeric in `[0, 1]`); inherited from the intervention object's `coverage` field. Default = NULL

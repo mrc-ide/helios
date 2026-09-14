@@ -16,32 +16,11 @@ vignette: >
 bibliography: REFERENCES.bib
 ---
 
-```{r, include = FALSE}
-options(rmarkdown.html_vignette.check_title = FALSE)
+<!-- Generated from mrc-ide/helios@b21815a -->
 
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  echo = FALSE,
-  message = FALSE,
-  warning = FALSE,
-  dpi = 330,
-  out.width = "90%"
-)
 
-```
 
-```{r}
-library(helios)
-library(individual)
-library(ggplot2)
-library(dplyr, warn.conflicts = FALSE)
-library(purrr)
-theme_set(theme_minimal())
-blueprint_colours <- colorRampPalette(c("#00AFFF", "#03113E"))(4)
-exemplar_data <- readRDS("./Blueprint_Report2_July24_files/exemplar_simulations.rds")
-parameter_sweep_data <- readRDS("./Blueprint_Report2_July24_files/parameter_sweep_data.rds")
-```
+
 
 # Overview {.unnumbered}
 
@@ -56,35 +35,7 @@ Two major updates to the model have been made since the initial report. These ar
 
 ## Use of Data from the USA {#usa-data}
 
-```{r}
-human_population <- 250000
 
-parameters_list_usa <- get_parameters(list(human_population = human_population, 
-                                           seed = 1, 
-                                           number_initial_S = human_population - 2500,
-                                           number_initial_E = 1000, 
-                                           number_initial_I = 1000, 
-                                           number_initial_R = 500))
-variables_usa <- create_variables(parameters_list_usa)
-disease_states_usa <- variables_usa$variables_list$disease_state$get_categories()
-age_classes_usa <- variables_usa$variables_list$age_class$get_categories()
-age_class_counts_usa <- purrr::map_vec(age_classes_usa, function(x) variables_usa$variables_list$age_class$get_size_of(values = x))
-
-parameters_list_uk <- get_parameters(list(
-  human_population = human_population,
-  number_initial_S = human_population - 2500, 
-  number_initial_E = 1000, 
-  number_initial_I = 1000, 
-  number_initial_R = 500,
-  seed = 1,
-  household_distribution_country = "UK",
-  school_distribution_country = "UK"
-))
-variables_uk <- create_variables(parameters_list_uk)
-disease_states_uk <- variables_uk$variables_list$disease_state$get_categories()
-age_classes_uk <- variables_uk$variables_list$age_class$get_categories()
-age_class_counts_uk <- purrr::map_vec(age_classes_uk, function(x) variables_uk$variables_list$age_class$get_size_of(values = x))
-```
 
 Previously, we used data both from the United Kingdom (UK) and from the USA. In particular, we used data from the UK to parameterise the age distribution, household and school Setting Types; and data from the USA to parameterise the workplace Setting Type. In this update to the model, we parameterise the age distribution, household and school Setting Types using data only from the USA.
 
@@ -94,83 +45,32 @@ To parameterise the model's household size and age distribution we use data from
 
 **Figure** \@ref(fig:household-size)**A** shows the previous household size distribution used (based on UK data); **Figure** \@ref(fig:household-size)**B** shows the household size distribution now being used (based on the USA data described above). Figure \@ref(fig:age) shows the same but for the age distribution used.
 
-(ref:household-size) A distribution of household sizes for a synthetic population of size `r format(human_population, big.mark = ",", scientific = FALSE)` using data from the UK (A) and from the USA (B).
+(ref:household-size) A distribution of household sizes for a synthetic population of size 250,000 using data from the UK (A) and from the USA (B).
 
-```{r household-size, fig.cap="(ref:household-size)"}
-households_usa <- variables_usa$variables_list$household$get_categories()
-household_sizes_usa <- purrr::map_vec(households_usa, function(x) variables_usa$variables_list$household$get_size_of(values = x))
+<div class="figure">
+<img src="blueprint-july_files/figure-html/household-size-1.png" alt="(ref:household-size)" width="90%" />
+<p class="caption">(\#fig:household-size)(ref:household-size)</p>
+</div>
 
-plot_household_usa <- table(household_sizes_usa)[1:10] |>
-  data.frame() |>
-  ggplot(aes(x = household_sizes_usa, y = 100 * Freq/sum(Freq))) +
-  geom_col() +
-  labs(x = "Number of individuals in the household", y = "% of Households")
+(ref:age) An age group population sizes distribution for a synthetic population of size 250,000 using data from the UK (A) and from the USA (B).
 
-households_uk <- variables_uk$variables_list$household$get_categories()
-household_sizes_uk <- purrr::map_vec(households_uk, function(x) variables_uk$variables_list$household$get_size_of(values = x))
-
-plot_household_uk <- table(household_sizes_uk) |>
-  data.frame() |>
-  ggplot(aes(x = household_sizes_uk, y = 100 * Freq/sum(Freq))) +
-  geom_col() +
-  labs(x = "Number of individuals in the household", y = "% of Households")
-
-cowplot::plot_grid(plot_household_uk, plot_household_usa, nrow = 2, labels = c("A", "B"))
-```
-
-(ref:age) An age group population sizes distribution for a synthetic population of size `r format(human_population, big.mark = ",", scientific = FALSE)` using data from the UK (A) and from the USA (B).
-
-```{r age, fig.cap="(ref:age)"}
-plot_age_usa <- data.frame(age_classes_usa, age_class_counts_usa) |>
-  mutate(age_classes_usa = dplyr::recode_factor(age_classes_usa, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
-  ggplot(aes(x = age_classes_usa, y = 100 * age_class_counts_usa / sum(age_class_counts_usa))) +
-  geom_col() +
-  labs(x = "Age group", y = "% of individuals") +
-  coord_flip()
-
-plot_age_uk <- data.frame(age_classes_uk, age_class_counts_uk) |>
-  mutate(age_classes_uk = dplyr::recode_factor(age_classes_uk, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
-  ggplot(aes(x = age_classes_uk, y = 100 * age_class_counts_uk/sum(age_class_counts_uk))) +
-  geom_col() +
-  labs(x = "Age group", y = "% of individuals") +
-  coord_flip()
-
-cowplot::plot_grid(plot_age_uk, plot_age_usa, nrow = 2, labels = c("A", "B"))
-```
+<div class="figure">
+<img src="blueprint-july_files/figure-html/age-1.png" alt="(ref:age)" width="90%" />
+<p class="caption">(\#fig:age)(ref:age)</p>
+</div>
 
 ### School Setting Type
 
 To parameterise the model's schools sizes, we used US school size data from 2019-2020 from the National Center for Education Statistics, available from @deBrey2023Digest. We included all schools categorised as "prekindergarten", "elementary", "middle", or "secondary and high". As school sizes were provided in ranges (e.g. "500 to 599") we used the midpoint (e.g. 550) for the purposes of constructing the distribution of schools sizes (this is in contrast to the UK data where exact school sizes were available). This data was available only at the national level, which we use here.
 
-**Figure** \@ref(fig:school-size)**A** shows, for a population of `r format(human_population, big.mark = ",", scientific = FALSE)`, the resulting school size distribution used based on previous data which was from the UK; **Figure** \@ref(fig:school-size)**B** shows the household size distribution now being used, which is based on the USA data described above.
+**Figure** \@ref(fig:school-size)**A** shows, for a population of 250,000, the resulting school size distribution used based on previous data which was from the UK; **Figure** \@ref(fig:school-size)**B** shows the household size distribution now being used, which is based on the USA data described above.
 
-(ref:school-size) A distribution of school sizes for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US.
+(ref:school-size) A distribution of school sizes for a synthetic population of size 2.5\times 10^{5} using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US.
 
-```{r school-size, fig.cap="(ref:school-size)"}
-schools_usa <- variables_usa$variables_list$school$get_categories()
-schools_usa <- schools_usa[schools_usa != "0"]
-school_sizes_usa <- purrr::map_vec(schools_usa, function(x) variables_usa$variables_list$school$get_size_of(values = x))
-
-plot_schools_usa <- data.frame(school_sizes_usa) |>
-  ggplot(aes(x = school_sizes_usa)) +
-  geom_histogram() +
-  labs(x = "Number of students per school", y = "Count") +
-  scale_y_continuous(limits = c(0, NA)) +
-  scale_x_continuous(limits = c(0, 3000))
-
-schools_uk <- variables_uk$variables_list$school$get_categories()
-schools_uk <- schools_uk[schools_uk != "0"]
-school_sizes_uk <- purrr::map_vec(schools_uk, function(x) variables_uk$variables_list$school$get_size_of(values = x))
-
-plot_schools_uk <- data.frame(school_sizes_uk) |>
-  ggplot(aes(x = school_sizes_uk)) +
-  geom_histogram() +
-  labs(x = "Number of students per school", y = "Count") +
-  scale_y_continuous(limits = c(0, NA)) +
-  scale_x_continuous(limits = c(0, 3000))
-
-cowplot::plot_grid(plot_schools_uk, plot_schools_usa, nrow = 2, labels = c("A", "B"))
-```
+<div class="figure">
+<img src="blueprint-july_files/figure-html/school-size-1.png" alt="(ref:school-size)" width="90%" />
+<p class="caption">(\#fig:school-size)(ref:school-size)</p>
+</div>
 
 ## Location-Specific Variability in "Riskiness" {#location}
 
@@ -244,46 +144,10 @@ and 1.5 hours in the community, noting that individuals spend time in either Sch
 
 (ref:wells-riley-1) Estimating the variation in riskiness between Locations belonging to the same Setting Type. **A)** For each Setting Type, the probability of infection in the least and most risky settings (i.e. with the lowest and highest ventilation rates) over time. **B)** The ratio of infection risk in the most vs least risky Locations over time for each Setting Type. Vertical dashed lines indicate the time assumed spent in each Setting Type for purposes of modelling. Note ratios are the same for Leisure and Workplace and so only Workplace is plotted.
 
-```{r wells-riley-1, fig.cap="(ref:wells-riley-1)", fig.fullwidth = TRUE, fig.height=5}
-
-overall_df <- readRDS(paste0(here::here(), "/inst/blueprint_july_transient_wells_riley_infection_risk_variation.rds"))
-a <- ggplot(subset(overall_df, infection_prevalence == "1% Prev."),
-       aes(x = as.numeric(time), y = prob_inf, col = factor(ACPH))) +
-  geom_line() +
-  geom_point() +
-  facet_grid(. ~ setting_type, scales = "free_y") +
-  theme_bw() +
-  scale_x_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12)) +
-  labs(x = "Time (Hours)", y = "Prob. Infected\n(Wells Riley)",
-       col = "Air Changes\nPer Hour",
-       title = "Infection Risk for Each Setting Type Across ACPH Range")
-
-overall_df2 <- overall_df |>
-  filter(time != 0) |>
-  group_by(time, infection_prevalence, setting_type) |>
-  summarise(ratio = prob_inf[airchanges_per_hour == min(airchanges_per_hour)]/
-                    prob_inf[airchanges_per_hour == max(airchanges_per_hour)])
-
-y_intercepts <- data.frame(setting_type = c("Household", "Leisure", 
-                                            "School", "Workplace"), 
-                           time_spent = c(12, 2.5, 8, 8))
-
-b <- ggplot(overall_df2, aes(x = as.numeric(time), y = ratio, col = setting_type)) +
-  geom_line() +
-  geom_point() +
-  facet_grid(. ~ infection_prevalence) +
-  geom_vline(data = y_intercepts, aes(xintercept = time_spent, col = setting_type), linetype = "dashed") +
-  lims(y = c(0, 10)) +
-  theme_bw() +
-  scale_x_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12)) +
-  labs(x = "Time (Hours)", y = "Ratio of\nInfection Risk",
-       col = "Air Changes\nPer Hour",
-       title = "Ratio of Infection Risk in Most vs Least Ventilated Locations")
-
-c <- cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
-c
-
-```
+<div class="figure">
+<img src="blueprint-july_files/figure-html/wells-riley-1-1.png" alt="(ref:wells-riley-1)" width="90%" />
+<p class="caption">(\#fig:wells-riley-1)(ref:wells-riley-1)</p>
+</div>
 
 | Parameter       | Value Used                          | Description                                                                                     | Source                                                                                                                                  |
 |-----------------|-------------------------------------|-------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
@@ -323,80 +187,10 @@ For each pathogen archetype, we investigated the effect of far UVC efficacy and 
 
 The results of these analyses are presented in Figure \@ref(fig:placeholder-1). In general, we estimate that far UVC installation would have a larger (proportional) impact on disease burden for an "Influenza-Like" pathogen than a "SARS-CoV-2-Like" pathogen; and that increasing far UVC coverage and/or increasing far UVC efficacy leads to increased impact. Assuming 10% coverage and 60% efficacy, far UVC installation led to a 7% (range 2%-11%) reduction in annual infection incidence for "Influenza-Like" and 3% (range 2%-5%) for "SARS-CoV-2-Like". At 10% coverage and 80% assumed efficacy, these are 10% (range 6%-16%) and 5% (range 2%-8%) respectively.
 
-```{r placeholder-1, fig.cap="(ref:placeholder-1)"}
-
-# Loading in the outputs
-outputs1 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results1.rds"))
-outputs2 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results2.rds"))
-outputs3 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results3.rds"))
-outputs4 <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/raw_outputs_results4.rds"))
-outputs <- c(outputs1, outputs2, outputs3, outputs4)
-simulations_to_run <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/simulations_to_run.rds"))
-parameter_lists <- readRDS(paste0(here::here(), "/inst/blueprint_output_2_July2024/parameter_lists.rds"))
-
-dt <- parameter_lists[[1]]$dt
-population <- parameter_lists[[1]]$human_population
-years_to_simulate <- parameter_lists[[1]]$simulation_time / 365
-timestep_baseline_start <- ((years_to_simulate - 6) * 365) / dt
-timestep_baseline_end <- ((years_to_simulate - 2) * 365) / dt
-timestep_uvc_start <- ((years_to_simulate - 2) * 365 + 1) / dt
-timestep_uvc_end <- (years_to_simulate * 365) / dt
-
-## Removing the burnin whilst the model reaches equilibrium
-outputs_processed <- outputs
-index_start <- which(outputs_processed[[1]]$timestep == timestep_baseline_start)
-index_end <- which(outputs_processed[[1]]$timestep == timestep_uvc_end)
-for (i in 1:length(outputs)) {
-  outputs_processed[[i]] <- outputs_processed[[i]][index_start:index_end, ]
-  outputs_processed[[i]]$archetype <- simulations_to_run[i, "archetype"]
-  outputs_processed[[i]]$coverage <- simulations_to_run[i, "coverage"]
-  outputs_processed[[i]]$efficacy <- simulations_to_run[i, "efficacy"]
-  outputs_processed[[i]]$iteration <- simulations_to_run[i, "iteration"]
-  outputs_processed[[i]]$new_timestep <- outputs_processed[[i]]$timestep - min(outputs_processed[[i]]$timestep)
-}
-
-subset_index <- 4 * 365
-overall <- dplyr::bind_rows(outputs_processed) |>
-  mutate(daily_timestep = floor(new_timestep * dt)) |>
-  group_by(iteration, archetype, efficacy, coverage, daily_timestep) |>
-  summarise(S_count = mean(S_count),
-            E_count = mean(E_count),
-            I_count = mean(I_count),
-            R_count = mean(R_count),
-            E_new = sum(E_new),
-            n_external_infections = sum(n_external_infections))
-end <- length(unique(overall$daily_timestep))
-
-overall5 <- overall |>
-  group_by(iteration, daily_timestep, archetype, efficacy, coverage) |>
-  summarise(S_count = mean(S_count), E_new = mean(E_new)) |>
-  ungroup() |>
-  group_by(iteration, archetype, efficacy, coverage) |>
-  summarise(incidence_pre_uvc = sum(E_new[1:subset_index]) / 4,
-            incidence_after_uvc = sum(E_new[(subset_index + 1):end]) / 2) |>
-  mutate(incidence_reduction = incidence_pre_uvc - incidence_after_uvc,
-         incidence_percentage_reduction = incidence_reduction / incidence_pre_uvc) |>
-  ungroup() |>
-  group_by(archetype, efficacy, coverage) |>
-  summarise(incidence_percentage_reduction_mean = mean(incidence_percentage_reduction),
-            incidence_percentage_reduction_lower = min(incidence_percentage_reduction),
-            incidence_percentage_reduction_upper = max(incidence_percentage_reduction))
-ggplot(overall5, aes(x = factor(100 * efficacy), y = 100 * incidence_percentage_reduction_mean)) +
-  geom_bar(stat = "identity", position = "dodge", fill = "#324A5F", col = "black") +
-  geom_errorbar(aes(ymin = 100 * incidence_percentage_reduction_lower,
-                    ymax = 100 * incidence_percentage_reduction_upper),
-                width = 0.5) +
-  theme_bw() +
-  facet_grid(archetype ~ coverage, 
-             labeller = as_labeller(c(`0` = "0% Coverage",
-                                      `0.1` = "10% Coverage",
-                                      `0.25` = "25% Coverage",
-                                      `0.5` = "50% Coverage",
-                                      `flu` = "Influenza",
-                                      `sars_cov_2` = "SARS-CoV-2"))) +
-  labs(fill = "Time\nPeriod", x = "Far UVC Efficacy (%)",
-       y = "% Reduction in Annual Incidence of Infection")
-```
+<div class="figure">
+<img src="blueprint-july_files/figure-html/placeholder-1-1.png" alt="(ref:placeholder-1)" width="90%" />
+<p class="caption">(\#fig:placeholder-1)(ref:placeholder-1)</p>
+</div>
 
 (ref:placeholder-1) The impact of varying far UVC coverage and efficacy on the annual incidence of a respiratory virus, for "Influenza-Like" and "SARS-CoV-2-Like" pathogen archetypes. The bars represent the mean percentage reduction in infection incidence averaged over the 10 stochastic model simulations run for each parametrisation, with the range of % reduction in incidence across those 10 simulations shown by the error bars.
 
@@ -404,30 +198,10 @@ The results of these analyses are presented in Figure \@ref(fig:placeholder-1). 
 
 We next compared these results to those produced by a simplistic, static multiplicative model of estimated impact calculated by multiplying the coverage and efficacy of the modelled far UVC together and then multiplying this by the proportion of transmission that is "targetable" by far UVC (i.e. the proportion of transmission that occurs outside households). The results of this analyses are plotted below in \@ref(fig:comparison-1). As you can see, this simplified model provides similar estimates to those generated by `helios` for SARS-CoV-2, but significantly underestimates the impact for Influenza.
 
-```{r comparison-1, fig.cap="(ref:comparison-1)"}
-
-targetable_transmission <- 0.6
-df_comparison <- overall5 %>%
-  rowwise() %>%
-  mutate(hypothetical_reduction = targetable_transmission * coverage * efficacy)
-  
-ggplot() + 
-  geom_ribbon(aes(x = 0:26, ymin = seq(0:26) - 1, ymax = rep(60, 27)),
-                alpha = 0.1) +
-  geom_point(data = df_comparison, aes(x = 100 * hypothetical_reduction, 
-                          y = 100 * incidence_percentage_reduction_mean, 
-                          col = archetype), size = 3) +
-  geom_errorbar(data = df_comparison, aes(x = 100 * hypothetical_reduction, 
-                          ymin = 100 * incidence_percentage_reduction_lower,
-                          ymax = 100 * incidence_percentage_reduction_upper, 
-                          col = archetype), linewidth = 1) +
-  geom_abline(slope = 1, linetype = "dashed") +
-  labs(x = "Hypothetical Reduction in Annual Incidence\nBased On Simple, Multiplicative Model",
-       y = "Reduction in Annual Incidence\nPredicted by helios (%)",
-       col = "Pathogen\nArchetype") +
-  theme_bw()
-
-```
+<div class="figure">
+<img src="blueprint-july_files/figure-html/comparison-1-1.png" alt="(ref:comparison-1)" width="90%" />
+<p class="caption">(\#fig:comparison-1)(ref:comparison-1)</p>
+</div>
 
 (ref:comparison-1) Comparing the estimates of impact for `helios` and a simplified multiplicative model. x-axis indicates the reduction estimated by the simple model; y-axis the estimate produced by `helios` . Points are coloured according to pathogen archetype. Dashed line indicates the line of `y = x` (i.e. any points lying on that line have the same impact estimate from `helios` and the simplified model). Grey shaded area indicates range where the simple model predicts lower impact than `helios`.
 
@@ -439,94 +213,9 @@ There is a non-linear influence of $R_{0}$ on prevalence of infection (and hence
 
 (ref:analytical-relationship) The relationship between $R_0$ and the prevalence of infection at endemic equilibrium for each of the two pathogen archetypes considered here, derived mathematically for a simpler model that is similar to `helios`. The vertical dashed lines indicate the value of $R_0$ used for each archetype in the analyses carried out.
 
-```{r analytical-relationship, fig.cap="(ref:analytical-relationship)", , fig.height=5.5}
-## R0 - infection prevalence relationship for Influenza archetype
-R0 <- seq(1, 4, 0.1)
-gamma <- 1 / 2
-sigma <- 1 / 1
-omega <- 1 / 365
-mu <- 1 / 100000
-alpha <- 0
-influenza_infection_prevalence <- c()
-for (i in 1:length(R0)) {
-  beta <- R0[i] * ((sigma + mu) / sigma) * (gamma + mu)
-  S <- 1 / R0[i]
-  I <- (mu * (1 - S)) / ((beta * S) - ((omega * gamma)/(omega + mu)))
-  E <- (gamma + mu + alpha) * I / sigma
-  influenza_infection_prevalence <- c(influenza_infection_prevalence, (E + I) * 100)
-}
-influenza_R0 <- data.frame(archetype = "Influenza-Like", R0 = R0, prevalence = influenza_infection_prevalence)
-
-## R0 - infection prevalence relationship for SC2 archetype
-R0 <- seq(1, 4, 0.1)
-gamma <- 1 / 4
-sigma <- 1 / 2
-omega <- 1 / 365
-mu <- 1 / 100000
-sc2_infection_prevalence <- c()
-for (i in 1:length(R0)) {
-  beta <- R0[i] * ((sigma + mu) / sigma) * (gamma + mu)
-  S <- 1 / R0[i]
-  I <- (mu * (1 - S)) / ((beta * S) - ((omega * gamma)/(omega + mu)))
-  E <- (gamma + mu + alpha) * I / sigma
-  sc2_infection_prevalence <- c(sc2_infection_prevalence, (E + I) * 100)
-}
-sc2_R0 <- data.frame(archetype = "SARS-CoV-2-Like", R0 = R0, prevalence = sc2_infection_prevalence)
-
-overall_R0_df <- rbind(influenza_R0, sc2_R0)
-
-a <- ggplot(overall_R0_df, aes(x = R0, y = prevalence, col = archetype)) +
-  geom_point() +
-  geom_line() +
-  geom_vline(xintercept = c(1.5, 3), linetype = "dashed") +
-  theme_bw() +
-  labs(x = "R0 - Basic Reproduction Number", y = "Prevalence of Infection (%)",
-       col = "Pathogen\nArchetype")
-
-
-## R0 - infection prevalence relationship for limited R0 and varied duration of infectiousness
-R0 <- c(1.5, 2, 3)
-gamma <- 1 / seq(1:15)
-sigma <- 1 / 2
-omega <- 1 / 365
-mu <- 1 / 100000
-durVary_infection_prevalence <- matrix(nrow = length(R0),
-                                       ncol = length(gamma))
-for (i in 1:length(R0)) {
-  for (j in 1:length(gamma)) {
-    beta <- R0[i] * ((sigma + mu) / sigma) * (gamma[j] + mu)
-    S <- 1 / R0[i]
-    I <- (mu * (1 - S)) / ((beta * S) - ((omega * gamma[j])/(omega + mu)))
-    E <- (gamma[j] + mu + alpha) * I / sigma
-    durVary_infection_prevalence[i, j] <- (E + I) * 100
-  }
-}
-colnames(durVary_infection_prevalence) <- 1/gamma
-row.names(durVary_infection_prevalence) <- R0
-
-durVary_infection_prevalence2 <- reshape2::melt(durVary_infection_prevalence)
-colnames(durVary_infection_prevalence2) <- c("R0", "Duration of Infectiousness", "Prevalence of Infection")
-
-# b <- ggplot(durVary_infection_prevalence2, aes(x = `Duration of Infectiousness`, y = `Prevalence of Infection`)) +
-#   geom_point() +
-#   geom_line() +
-#   facet_grid(. ~ R0,
-#              labeller = as_labeller(c(`1.5` = "R0 = 1.5", `2` = "R0 = 2", `3` = "R0 = 3"))) +
-#   theme_bw() +
-#   lims(y = c(0, 4)) +
-#   labs(x = "Duration of Infectiousness (Days)", y = "Prevalence of Infection (%)")
-
-b <- ggplot(durVary_infection_prevalence2, aes(x = `Duration of Infectiousness`, y = `Prevalence of Infection`, col = factor(R0))) +
-  geom_point() +
-  geom_line() +
-  theme_bw() +
-  lims(y = c(0, 4)) +
-  labs(x = "Duration of Infectiousness (Days)", y = "Prevalence of Infection (%)",
-       col = "R0 Value")
-
-cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
-
-
-```
+<div class="figure">
+<img src="blueprint-july_files/figure-html/analytical-relationship-1.png" alt="(ref:analytical-relationship)" width="90%" />
+<p class="caption">(\#fig:analytical-relationship)(ref:analytical-relationship)</p>
+</div>
 
 # Bibliography {.unnumbered}

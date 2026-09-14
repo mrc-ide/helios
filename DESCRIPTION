@@ -25,24 +25,31 @@ License: MIT + file LICENSE
 URL: https://github.com/mrc-ide/helios, https://mrc-ide.github.io/helios/
 Encoding: UTF-8
 LazyData: true
-Suggests: 
+Suggests:
+    bookdown,
+    forcats,
+    ggplot2,
+    gt,
     knitr,
+    purrr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tictoc,
+    tidyr
 Config/testthat/edition: 3
 Imports:
-    individual,
+    individual (>= 0.1.18),
     dplyr,
-    EnvStats,
     dqrng,
+    graphics,
     truncnorm,
-    parallel
+    parallel,
+    stats,
+    utils
 Remotes:
-    mrc-ide/individual@feat/logi_size
+    mrc-ide/individual
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 VignetteBuilder: knitr
-Depends: 
+Depends:
     R (>= 2.10)
-LinkingTo: 
-    individual

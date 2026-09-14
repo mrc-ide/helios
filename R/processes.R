@@ -206,7 +206,7 @@ create_SE_process <- function(
       ## Only calculate FOI is household size is greater than 1
       if (household_size_list[[i]] > 1) {
         # Count the number of infectious individuals in the i-th household
-        spec_household_I_size <- individual:::bitset_count_and(
+        spec_household_I_size <- individual::bitset_count_and(
           I,
           household_bitset_list[[i]]
         )
@@ -257,7 +257,7 @@ create_SE_process <- function(
     # For each workplace:
     for (i in seq(num_workplaces)) {
       # Count the number of infectious individuals in the i-th workplace
-      spec_workplace_I_size <- individual:::bitset_count_and(
+      spec_workplace_I_size <- individual::bitset_count_and(
         I,
         workplace_bitset_list[[i]]
       )
@@ -305,7 +305,7 @@ create_SE_process <- function(
     # For each school:
     for (i in seq(num_schools)) {
       # Count the number of infectious individuals in the i-th school
-      spec_school_I_size <- individual:::bitset_count_and(
+      spec_school_I_size <- individual::bitset_count_and(
         I,
         school_bitset_list[[i]]
       )
@@ -390,7 +390,7 @@ create_SE_process <- function(
         ))
 
         # Count the number of infectious individuals in the relevant leisure setting
-        spec_leisure_I_size <- individual:::bitset_count_and(I, spec_leisure)
+        spec_leisure_I_size <- individual::bitset_count_and(I, spec_leisure)
 
         # Calculate the leisure-specific FOI for the i-th leisure location - with and without AQI installed
         ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure locations
@@ -512,7 +512,7 @@ create_EI_process <- function(
     # silently drop the individual from both the mild and hosp branches.
     if (anyNA(p_hosp)) {
       stop(sprintf(
-        "create_EI_process: p_hosp has %d NA entries — some exposed individuals do not match any age class",
+        "create_EI_process: p_hosp has %d NA entries - some exposed individuals do not match any age class",
         sum(is.na(p_hosp))
       ))
     }
@@ -583,7 +583,7 @@ create_I_mild_R_process <- function(
   }
 }
 
-#' Create process governing I_hosp -> {R, D} disease state transition
+#' Create process governing I_hosp -> R or D disease state transition
 #'
 #' Performs an age-dependent binomial split between recovery and death.
 #' Counts `D_new` at the moment the death decision is made.
@@ -598,6 +598,9 @@ create_I_hosp_exit_process <- function(
   parameters_list,
   renderer
 ) {
+  # Report 0 deaths on timesteps where nobody is hospitalised
+  renderer$set_default("D_new", 0)
+
   function(t) {
     # Get I_hosp individuals not yet scheduled into either exit event
     I_hosp <- variables_list$disease_state$get_index_of("I_hosp")
@@ -622,7 +625,7 @@ create_I_hosp_exit_process <- function(
     # and silently drop the individual from both the recover and die branches.
     if (anyNA(p_death)) {
       stop(sprintf(
-        "create_I_hosp_exit_process: p_death has %d NA entries — some hospitalized individuals do not match any age class",
+        "create_I_hosp_exit_process: p_death has %d NA entries - some hospitalized individuals do not match any age class",
         sum(is.na(p_death))
       ))
     }

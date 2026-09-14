@@ -139,20 +139,20 @@ test_that("get_parameters() assigns correct parameters for flu archetype", {
   # We are expecting the following flu-specific parameters:
   # duration_exposed = 1
   # duration_infectious = 2
-  # beta_household = 0.132
-  # beta_school = 0.132
-  # beta_workplace = 0.132
-  # beta_leisure = 0.132
-  # beta_community = 0.044
+  # beta_household = 0.207
+  # beta_school = 0.207
+  # beta_workplace = 0.207
+  # beta_leisure = 0.207
+  # beta_community = 0.069
 
   # Check that the archetype-specific parameters match the expected values:
   expect_identical(object = parameters_list$duration_exposed, expected = 1)
   expect_identical(object = parameters_list$duration_infectious, expected = 2)
-  expect_identical(object = parameters_list$beta_household, expected = 0.132)
-  expect_identical(object = parameters_list$beta_school, expected = 0.132)
-  expect_identical(object = parameters_list$beta_workplace, expected = 0.132)
-  expect_identical(object = parameters_list$beta_leisure, expected = 0.132)
-  expect_identical(object = parameters_list$beta_community, expected = 0.044)
+  expect_identical(object = parameters_list$beta_household, expected = 0.207)
+  expect_identical(object = parameters_list$beta_school, expected = 0.207)
+  expect_identical(object = parameters_list$beta_workplace, expected = 0.207)
+  expect_identical(object = parameters_list$beta_leisure, expected = 0.207)
+  expect_identical(object = parameters_list$beta_community, expected = 0.069)
 })
 
 test_that("get_parameters() assigns correct parameters for SARS-CoV-2 archetype", {
@@ -213,7 +213,8 @@ test_that("run_simulation() works when a parameter archetype specified", {
 
   # Check that the output contains some expected column names and that it is a data.frame:
   expect_true(all(
-    c("S_count", "E_count", "I_count", "R_count") %in% names(simulation_example)
+    c("S_count", "E_count", "I_mild_count", "I_hosp_count", "R_count") %in%
+      names(simulation_example)
   ))
   expect_true(object = is.data.frame(simulation_example))
 })
