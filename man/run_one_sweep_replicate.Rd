@@ -47,3 +47,13 @@ fully resolved.
 Helper for \code{\link[=run_beta_sweep]{run_beta_sweep()}}. Builds the parameter list for one
 replicate and returns its final attack rate.
 }
+\seealso{
+Other calibration: 
+\code{\link{generate_beta_sweep_plot}()},
+\code{\link{generate_time_varying_beta_vectors}()},
+\code{\link{get_R0_from_attack_rate}()},
+\code{\link{get_beta_from_R0_finalsize}()},
+\code{\link{get_sweep_result_from_source}()},
+\code{\link{run_beta_sweep}()}
+}
+\concept{calibration}

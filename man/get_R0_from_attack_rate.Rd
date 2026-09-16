@@ -18,3 +18,13 @@ Helper for \code{\link[=run_beta_sweep]{run_beta_sweep()}}. Solves \code{AR = 1 
 for R0: rearranging gives \code{R0 = -log(1 - AR) / AR} (R0 appears once after
 taking logs, so no numerical root-finder is needed).
 }
+\seealso{
+Other calibration: 
+\code{\link{generate_beta_sweep_plot}()},
+\code{\link{generate_time_varying_beta_vectors}()},
+\code{\link{get_beta_from_R0_finalsize}()},
+\code{\link{get_sweep_result_from_source}()},
+\code{\link{run_beta_sweep}()},
+\code{\link{run_one_sweep_replicate}()}
+}
+\concept{calibration}

@@ -72,6 +72,7 @@
 #'     full reproducibility of the sweep.
 #'   - `call_time`: POSIXct timestamp of when the sweep was run.
 #'
+#' @family calibration
 #' @export
 run_beta_sweep <- function(
   transmission_fraction,
@@ -267,6 +268,8 @@ run_beta_sweep <- function(
 #'   ultimately infected). Includes R, D, E, I_mild, and I_hosp compartments
 #'   so the estimate is robust when sim_time is short and the epidemic has not
 #'   fully resolved.
+#'
+#' @family calibration
 run_one_sweep_replicate <- function(
   beta,
   seed,
@@ -318,6 +321,8 @@ run_one_sweep_replicate <- function(
 #'   gives 0/0, `attack_rate >= 1` gives log of <= 0, both undefined.
 #'
 #' @return Numeric scalar R0, or `NA` if `attack_rate` is outside (0, 1)
+#'
+#' @family calibration
 get_R0_from_attack_rate <- function(attack_rate) {
 
   if (attack_rate <= 0 | attack_rate >= 1) {
@@ -341,6 +346,7 @@ get_R0_from_attack_rate <- function(attack_rate) {
 #'
 #' @return Invisibly returns `NULL`. Called for its plotting side effect.
 #'
+#' @family calibration
 #' @export
 generate_beta_sweep_plot <- function(sweep_result) {
 
@@ -406,6 +412,7 @@ generate_beta_sweep_plot <- function(sweep_result) {
 #'   - `source`: `"sweep_data"` if `target_R0 > 1` (interpolated directly
 #'     from the sweep), or `"linear_extrapolation"` if `target_R0 <= 1`
 #'
+#' @family calibration
 #' @export
 get_beta_from_R0_finalsize <- function(
   target,
@@ -508,6 +515,8 @@ get_beta_from_R0_finalsize <- function(
 #'
 #' @return The full list returned by `run_beta_sweep()` (containing
 #'   `sweep_table`, `args`, and `call_time`)
+#'
+#' @family calibration
 get_sweep_result_from_source <- function(sweep_db) {
 
   if (is.character(sweep_db)) {
@@ -541,6 +550,7 @@ get_sweep_result_from_source <- function(sweep_db) {
 #'   `get_parameters(overrides = ...)` alongside
 #'   `time_varying_transmission_on = TRUE`.
 #'
+#' @family calibration
 #' @export
 generate_time_varying_beta_vectors <- function(transmission_fraction, beta_community_vector) {
 

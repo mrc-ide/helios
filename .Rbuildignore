@@ -9,3 +9,10 @@
 ^pkgdown$
 ^\.positai$
 ^\.claude$
+^inst/blueprint_output
+^test_results$
+^.*_250k\.(csv|RData)$
+^dev$
+^vignettes/articles$
+^inst/Direct ACH tests$
+^inst/scripts_informal_testing_new_features$

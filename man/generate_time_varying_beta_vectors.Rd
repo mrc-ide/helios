@@ -33,3 +33,13 @@ all settings. Setting-specific betas are scaled relative to beta_community
 using the transmission fraction ratios, producing five vectors ready to pass
 into \code{get_parameters()}.
 }
+\seealso{
+Other calibration: 
+\code{\link{generate_beta_sweep_plot}()},
+\code{\link{get_R0_from_attack_rate}()},
+\code{\link{get_beta_from_R0_finalsize}()},
+\code{\link{get_sweep_result_from_source}()},
+\code{\link{run_beta_sweep}()},
+\code{\link{run_one_sweep_replicate}()}
+}
+\concept{calibration}

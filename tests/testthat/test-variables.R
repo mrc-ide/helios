@@ -6,18 +6,18 @@
 #===== generate_initial_disease_states =====#
 #===========================================#
 
-test_that("generate_initial_disease_states errors if parameter list does not contain number_initially_exposed parameter", {
+test_that("generate_initial_disease_states errors if parameter list does not contain number_initial_E parameter", {
   # Establish the list of model parameters:
   parameters_list <- get_parameters()
 
-  # Remove the number_initially_exposed parameter:
-  parameters_list$number_initially_exposed <- NULL
+  # Remove the number_initial_E parameter:
+  parameters_list$number_initial_E <- NULL
 
-  # Check that generate_initial_disease_states() errors when number_initially_exposed not in the parameters
+  # Check that generate_initial_disease_states() errors when number_initial_E not in the parameters
   # list:
   expect_error(
     object = generate_initial_disease_states(parameters_list = parameters_list),
-    regexp = "parameters list must contain a variable called number_initially_exposed"
+    regexp = "parameters list must contain a variable called number_initial_E"
   )
 })
 
@@ -54,7 +54,7 @@ test_that("generate_initial_disease_states errors if parameter list does not con
 test_that("generate_initial_disease_states returns the expected disease states", {
   # Establish the list of model parameters:
   parameters_list <- get_parameters(
-    overrides = list(number_initially_exposed = 47)
+    overrides = list(number_initial_S = 9953, number_initial_E = 47)
   )
 
   # Generate the initial disease states:
@@ -65,13 +65,13 @@ test_that("generate_initial_disease_states returns the expected disease states",
   # Check that the number of exposed individuals matches expectation:
   expect_equal(
     object = sum(initial_disease_states == "E"),
-    parameters_list$number_initially_exposed
+    parameters_list$number_initial_E
   )
 
   # Check that the number of susceptible indiivduals matches expectation:
   expect_equal(
     sum(initial_disease_states == "S"),
-    parameters_list$human_population - parameters_list$number_initially_exposed
+    parameters_list$number_initial_S
   )
 })
 
@@ -177,7 +177,8 @@ test_that("generate_initial_age_classes contains only the expected age classes",
       initial_proportion_child = 0.5,
       initial_proportion_adult = 0.2,
       initial_proportion_elderly = 0.3,
-      human_population = 1000
+      human_population = 1000,
+      number_initial_S = 995
     )
   )
 

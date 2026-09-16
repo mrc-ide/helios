@@ -13,7 +13,8 @@ generate_initial_households_bootstrap(parameters_list)
 Alternative to \code{\link[=generate_initial_households]{generate_initial_households()}}. Rather than using a parametric
 distribution, this function uses sampling with replacement from a reference
 dataset. This is known as bootstrapping. The dataset used is
-\code{\link{baseline_household_demographics}}. Unlike \code{\link[=generate_initial_households]{generate_initial_households()}},
+\code{\link{baseline_household_demographics_uk}} or
+\code{\link{baseline_household_demographics_usa}}. Unlike \code{\link[=generate_initial_households]{generate_initial_households()}},
 this function generates both the household and age class assignments together.
 }
 \seealso{

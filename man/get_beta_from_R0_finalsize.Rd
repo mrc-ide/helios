@@ -51,3 +51,13 @@ an Rt(t) series, each value is looked up independently against the static
 beta-R0 relationship and does not account for time-varying susceptible
 depletion interacting with a changing Rt.
 }
+\seealso{
+Other calibration: 
+\code{\link{generate_beta_sweep_plot}()},
+\code{\link{generate_time_varying_beta_vectors}()},
+\code{\link{get_R0_from_attack_rate}()},
+\code{\link{get_sweep_result_from_source}()},
+\code{\link{run_beta_sweep}()},
+\code{\link{run_one_sweep_replicate}()}
+}
+\concept{calibration}

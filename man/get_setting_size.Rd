@@ -10,8 +10,6 @@ get_setting_size(variables_list, setting)
 \item{variables_list}{A list of model variables as generated using \code{create_variables()}}
 
 \item{setting}{One of \code{"workplace"}, \code{"school"}, or \code{"household"}}
-
-\item{leisure_sizes}{The sizes of the leisure settings as sampled using \code{sample_negbinom()}}
 }
 \description{
 get_setting_size() retrieves the number of individuals in each individual

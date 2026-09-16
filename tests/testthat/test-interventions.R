@@ -9,7 +9,7 @@ test_that("set_uvc() errors if function given multiple settings in a single call
       parameters_list = parameters,
       setting = c("workplace", "school"),
       coverage = c(0.8),
-      coverage_target = "buildings",
+      coverage_target = "square_footage",
       coverage_type = "random",
       efficacy = c(0.8),
       timestep = c(1)
@@ -28,8 +28,8 @@ test_that("set_uvc() errors if function given multiple coverage types in a singl
       parameters_list = parameters,
       setting = "workplace",
       coverage = c(0.8),
-      coverage_target = "buildings",
-      coverage_type = c("random", "targeted"),
+      coverage_target = "square_footage",
+      coverage_type = c("random", "targeted_riskiness"),
       efficacy = c(0.8),
       timestep = c(1)
     ),
@@ -48,12 +48,12 @@ test_that("set_uvc() errors when setting input not from allowed list of Far UVC 
       parameters_list = parameters,
       setting = "hospital",
       coverage = c(0.8),
-      coverage_target = "buildings",
+      coverage_target = "square_footage",
       coverage_type = "random",
       efficacy = c(0.8),
       timestep = c(1)
     ),
-    regexp = "Error: Input setting invalid - far UVC only deployable in workplace, school, leisure, or household settings"
+    regexp = "Error: Input setting invalid - far UVC only deployable in workplace, school, leisure, household, or joint settings"
   )
 })
 
@@ -68,12 +68,12 @@ test_that("set_uvc() errors when coverage_type input not from allowed list of Fa
       parameters_list = parameters,
       setting = "household",
       coverage = c(0.8),
-      coverage_target = "buildings",
+      coverage_target = "square_footage",
       coverage_type = "weak",
       efficacy = c(0.8),
       timestep = c(1)
     ),
-    regexp = "Error: Input setting invalid - far UVC only deployable in random or targeted coverage types"
+    regexp = "Error: Input setting invalid - far UVC only deployable in random or targeted_riskiness coverage types"
   )
 })
 
@@ -88,8 +88,8 @@ test_that("set_uvc() errors if coverage not between 0 and 1", {
       parameters_list = parameters,
       setting = "workplace",
       coverage = c(-0.8),
-      coverage_target = "buildings",
-      coverage_type = c("targeted"),
+      coverage_target = "square_footage",
+      coverage_type = c("targeted_riskiness"),
       efficacy = c(0.8),
       timestep = c(1)
     ),
@@ -108,8 +108,8 @@ test_that("set_uvc() errors if efficacy not between 0 and 1", {
       parameters_list = parameters,
       setting = "workplace",
       coverage = c(0.8),
-      coverage_target = "buildings",
-      coverage_type = c("targeted"),
+      coverage_target = "square_footage",
+      coverage_type = c("targeted_riskiness"),
       efficacy = c(1.01),
       timestep = c(1)
     ),
@@ -128,7 +128,7 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
     parameters_list = parameters_workplace,
     setting = "workplace",
     coverage = 0.7,
-    coverage_target = "buildings",
+    coverage_target = "square_footage",
     coverage_type = "random",
     efficacy = 0.6,
     timestep = 100
@@ -137,7 +137,7 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
   # Manually create the parameters list you would expect to see after calling set_uvc()
   test_parameters_workplace <- get_parameters()
   test_parameters_workplace$far_uvc_workplace <- TRUE
-  test_parameters_workplace$far_uvc_workplace_coverage_target <- "buildings"
+  test_parameters_workplace$far_uvc_workplace_coverage_target <- "square_footage"
   test_parameters_workplace$far_uvc_workplace_coverage_type <- "random"
   test_parameters_workplace$far_uvc_workplace_coverage <- 0.7
   test_parameters_workplace$far_uvc_workplace_efficacy <- 0.6
@@ -159,8 +159,8 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
     parameters_list = parameters_school,
     setting = "school",
     coverage = 0.7,
-    coverage_target = "buildings",
-    coverage_type = "targeted",
+    coverage_target = "square_footage",
+    coverage_type = "targeted_riskiness",
     efficacy = 0.6,
     timestep = 100
   )
@@ -168,8 +168,8 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
   # Manually create the parameters list you would expect to see after calling set_uvc()
   test_parameters_school <- get_parameters()
   test_parameters_school$far_uvc_school <- TRUE
-  test_parameters_school$far_uvc_school_coverage_target <- "buildings"
-  test_parameters_school$far_uvc_school_coverage_type <- "targeted"
+  test_parameters_school$far_uvc_school_coverage_target <- "square_footage"
+  test_parameters_school$far_uvc_school_coverage_type <- "targeted_riskiness"
   test_parameters_school$far_uvc_school_coverage <- 0.7
   test_parameters_school$far_uvc_school_efficacy <- 0.6
   test_parameters_school$far_uvc_school_timestep <- 100
@@ -190,7 +190,7 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
     parameters_list = parameters_leisure,
     setting = "leisure",
     coverage = 0,
-    coverage_target = "buildings",
+    coverage_target = "square_footage",
     coverage_type = "random",
     efficacy = 0.32,
     timestep = 41
@@ -199,7 +199,7 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
   # Manually create the parameters list you would expect to see after calling set_uvc()
   test_parameters_leisure <- get_parameters()
   test_parameters_leisure$far_uvc_leisure <- TRUE
-  test_parameters_leisure$far_uvc_leisure_coverage_target <- "buildings"
+  test_parameters_leisure$far_uvc_leisure_coverage_target <- "square_footage"
   test_parameters_leisure$far_uvc_leisure_coverage_type <- "random"
   test_parameters_leisure$far_uvc_leisure_coverage <- 0
   test_parameters_leisure$far_uvc_leisure_efficacy <- 0.32
@@ -221,8 +221,8 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
     parameters_list = parameters_household,
     setting = "household",
     coverage = 1,
-    coverage_target = "buildings",
-    coverage_type = "targeted",
+    coverage_target = "square_footage",
+    coverage_type = "targeted_riskiness",
     efficacy = 0.5,
     timestep = 1
   )
@@ -230,8 +230,8 @@ test_that("set_uvc() correctly assigns Far-UVC parameters for all settings and c
   # Manually create the parameters list you would expect to see after calling set_uvc()
   test_parameters_household <- get_parameters()
   test_parameters_household$far_uvc_household <- TRUE
-  test_parameters_household$far_uvc_household_coverage_target <- "buildings"
-  test_parameters_household$far_uvc_household_coverage_type <- "targeted"
+  test_parameters_household$far_uvc_household_coverage_target <- "square_footage"
+  test_parameters_household$far_uvc_household_coverage_type <- "targeted_riskiness"
   test_parameters_household$far_uvc_household_coverage <- 1
   test_parameters_household$far_uvc_household_efficacy <- 0.5
   test_parameters_household$far_uvc_household_timestep <- 1
@@ -255,11 +255,11 @@ test_that("set_uvc() errors coverage_target not from allowed options", {
       setting = "workplace",
       coverage = c(0.8),
       coverage_target = "individual",
-      coverage_type = "targeted",
+      coverage_type = "targeted_riskiness",
       efficacy = c(0.5),
       timestep = c(1)
     ),
-    regexp = "Error: Input setting invalid - far UVC coverage only applicable to individuals or buildings"
+    regexp = "Error: Input setting invalid - far UVC coverage only applicable to individuals or square_footage"
   )
 })
 
@@ -300,10 +300,10 @@ test_that("generate_far_uvc_switches() with coverage_target as individuals and c
   )
 })
 
-test_that("generate_far_uvc_switches() with coverage_target as buildings and coverage_type as random can be used to set UVC switches for households, and the total coverage sums to the expected input", {
+test_that("generate_far_uvc_switches() with coverage_target as square_footage and coverage_type as random can be used to set UVC switches for households, and the total coverage sums to the expected input", {
   test_generate_far_uvc_switches(
     setting = "household",
-    target = "buildings",
+    target = "square_footage",
     type = "random"
   )
 })
@@ -311,8 +311,8 @@ test_that("generate_far_uvc_switches() with coverage_target as buildings and cov
 test_that("generate_far_uvc_switches() with coverage_target as individuals and coverage_type as targeted can be used to set UVC switches for households, and the total coverage sums to the expected input", {
   test_generate_far_uvc_switches(
     setting = "household",
-    target = "buildings",
-    type = "targeted",
+    target = "square_footage",
+    type = "targeted_riskiness",
     tol = 10
   )
 })
@@ -320,7 +320,7 @@ test_that("generate_far_uvc_switches() with coverage_target as individuals and c
 test_that("generate_far_uvc_switches() with coverage_target as individuals and coverage_type as targeted can be used to set UVC switches for households, and the total coverage sums to the expected input", {
   test_generate_far_uvc_switches(
     setting = "household",
-    target = "buildings",
-    type = "targeted"
+    target = "square_footage",
+    type = "targeted_riskiness"
   )
 })

@@ -10,7 +10,6 @@
 #' leisure setting.
 #'
 #' @param variables_list A list of model variables as generated using `create_variables()`
-#' @param leisure_sizes The sizes of the leisure settings as sampled using `sample_negbinom()`
 #' @param setting One of `"workplace"`, `"school"`, or `"household"`
 #' @family miscellaneous
 #' @export
@@ -69,7 +68,7 @@ timestep_to_day <- function(t, dt) {
   day <- ceiling(t * dt)
 
   if (!day == floor(day)) {
-    stop("calculated day is not a whole number — check that dt is a valid timestep fraction (e.g. 0.5, 1)")
+    stop("calculated day is not a whole number - check that dt is a valid timestep fraction (e.g. 0.5, 1)")
   }
 
   day

@@ -16,37 +16,11 @@ vignette: >
 bibliography: REFERENCES.bib
 ---
 
+<!-- Generated from mrc-ide/helios@b21815a -->
+
 ::: {.alert .alert-warning}
 This report is not up to date with latest changes to the model!
 :::
-
-```{r, include = FALSE}
-options(rmarkdown.html_vignette.check_title = FALSE)
-
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  echo = FALSE,
-  message = FALSE,
-  warning = FALSE,
-  dpi = 330,
-  out.width = "90%"
-)
-
-```
-
-```{r}
-library(helios)
-library(individual)
-library(ggplot2)
-library(dplyr, warn.conflicts = FALSE)
-library(purrr)
-theme_set(theme_minimal())
-blueprint_colours <- colorRampPalette(c("#00AFFF", "#03113E"))(4)
-getwd()
-exemplar_data <- readRDS("./Blueprint_Report2_July24_files/exemplar_simulations.rds")
-parameter_sweep_data <- readRDS("./Blueprint_Report2_July24_files/parameter_sweep_data.rds")
-```
 
 # Overview
 
@@ -63,24 +37,9 @@ We note here that the results presented are purely **examples** of the types of 
 
 # Model description
 
-```{r}
-human_population <- 200000L
-parameters_list <- get_parameters(list(human_population = human_population, 
-                                       number_initial_S = 180000,
-                                       number_initial_E = 20000,
-                                       number_initial_I = 0,
-                                       number_initial_R = 0,
-                                       household_distribution_country = "UK",
-                                       school_distribution_country = "UK",
-                                       workplace_distribution_country = "USA",
-                                       seed = 1))
-variables <- create_variables(parameters_list)
-disease_states <- variables$variables_list$disease_state$get_categories()
-age_classes <- variables$variables_list$age_class$get_categories()
-age_class_counts <- purrr::map_vec(age_classes, function(x) variables$variables_list$age_class$get_size_of(values = x))
-```
 
-The model implemented in `helios` has a fixed population of individuals, who are each assigned one of three age-groups (children, adults, elderly). Each individual is therefore either a child, an adult, or an elderly person. Figure \@ref(fig:age) shows the proportion in each age group from an example population of size `r human_population` individuals. We do not currently explicitly model demographic changes in the model and so we assume that no aging between the age-groups (e.g. child -\> adult) occurs during the simulation.
+
+The model implemented in `helios` has a fixed population of individuals, who are each assigned one of three age-groups (children, adults, elderly). Each individual is therefore either a child, an adult, or an elderly person. Figure \@ref(fig:age) shows the proportion in each age group from an example population of size 200000 individuals. We do not currently explicitly model demographic changes in the model and so we assume that no aging between the age-groups (e.g. child -\> adult) occurs during the simulation.
 
 During each day, individuals visit particular locations (Section \@ref(locations)) and mix with other individuals who are also visiting those same locations at the same time. We model 4 location types: **Households**, **Schools**, **Workplaces**, and **Leisure** **Venues**. Individuals are assigned to each location in a way that depends on their age-group (e.g. children are assigned to schools, adults are assigned to workplaces), with assignment to a **specific** location within a particular type (e.g. School #7) performed stochastically (see \@ref(locations) below).
 
@@ -94,75 +53,44 @@ Below we provide detail on how individuals are assigned to each Location Type.
 
 (ref:household-size) The distribution of household sizes. Households with two individuals are the most common, followed by single individual households.
 
-```{r household-size, fig.cap="(ref:household-size)"}
-households <- variables$variables_list$household$get_categories()
-household_sizes <- purrr::map_vec(households, function(x) variables$variables_list$household$get_size_of(values = x))
-
-table(household_sizes) |>
-  data.frame() |>
-  ggplot(aes(x = household_sizes, y = Freq)) +
-  geom_col() +
-  labs(x = "Number of individuals in the household", y = "Count")
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/household-size-1.png" alt="(ref:household-size)" width="90%" />
+<p class="caption">(\#fig:household-size)(ref:household-size)</p>
+</div>
 
 (ref:age) Age group sizes follow from the household sampling procedure.
 
-```{r age, fig.cap="(ref:age)"}
-data.frame(age_classes, age_class_counts) |>
-  mutate(age_classes = dplyr::recode_factor(age_classes, "child" = "Child", "adult" = "Adult", "elderly" = "Elderly")) |>
-  ggplot(aes(x = age_classes, y = age_class_counts)) +
-  geom_col() +
-  labs(x = "Age group", y = "Number of individuals") +
-  coord_flip()
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/age-1.png" alt="(ref:age)" width="90%" />
+<p class="caption">(\#fig:age)(ref:age)</p>
+</div>
 
 2.  **Schools** All children are assumed to attend school. The number of students in each school (Figure \@ref(fig:school-size)) is sampled from the 2022/2023 census of schools in the UK [@school2023], with children then assigned randomly to each school. A small number of adults also attend schools (rather than workplaces) to reflect educational staff such as teachers. For each 20 students, there is one adult teacher who works at the school (this is based on UK Office of National Statistics Data). School assignment is **static** - for each individual, the particular school they are assigned to is fixed and does not change across the course of a single simulation. They visit the same school each day.
 
 (ref:school-size) The distribution of school sizes.
 
-```{r school-size, fig.cap="(ref:school-size)"}
-schools <- variables$variables_list$school$get_categories()
-schools <- schools[schools != "0"]
-school_sizes <- purrr::map_vec(schools, function(x) variables$variables_list$school$get_size_of(values = x))
-
-data.frame(school_sizes) |>
-  ggplot(aes(x = school_sizes)) +
-  geom_histogram() +
-  labs(x = "Number of students per school", y = "Count") +
-  scale_y_continuous(limits = c(0, NA))
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/school-size-1.png" alt="(ref:school-size)" width="90%" />
+<p class="caption">(\#fig:school-size)(ref:school-size)</p>
+</div>
 
 3.  **Workplaces** All adults (who are not teachers) are assumed to attend workplaces. The number of employees in each workplace (Figure \@ref(fig:workplace-size)) is sampled from an offset truncated power statistical distribution, based on that of @ferguson2005strategies which in turn is based on data from the United States of America. Adults are assigned randomly to each of these workplaces. Workplace assignment is **static** - for each individual, the particular workplace they are assigned to is fixed and does not change across the course of a single simulation. They visit the same workplace each day.
 
 (ref:workplace-size) The distribution of workplace sizes. Here, size is shown on a logarithimic scale.
 
-```{r workplace-size, fig.cap="(ref:workplace-size)"}
-workplaces <- variables$variables_list$workplace$get_categories()
-workplaces <- workplaces[workplaces != "0"]
-workplace_sizes <- purrr::map_vec(workplaces, function(x) variables$variables_list$workplace$get_size_of(values = x))
-
-data.frame(workplace_sizes) |>
-  ggplot(aes(x = log(workplace_sizes, base = 10))) +
-  geom_histogram() +
-  scale_x_continuous(breaks = c(0, 1, 2, 3),
-                     labels = c(1, 10, 1000, 10000)) +
-  labs(x = "Workplace Size (Number of Individuals)", y = "Count")
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/workplace-size-1.png" alt="(ref:workplace-size)" width="90%" />
+<p class="caption">(\#fig:workplace-size)(ref:workplace-size)</p>
+</div>
 
 4.  **Leisure venues** All individuals (children, adults, and elderly people) are eligible to attend leisure venues. Leisure venue sizes are sampled from a negative binomial distribution, which determines their maximum occupancy. Leisure venue assignment is **dynamic** - for each individual, the particular leisure venue they are assigned to is dynamic and changes across the course of a single simulation. They visit a different leisure venue each day (and sometimes do not visit any leisure venues on a given day), with the number of leisure venues visited by each individual per week (Figure \@ref(fig:leisure-venues)) sampled from a Poisson distribution, capped at seven corresponding to one leisure visit each day. The particular leisure venue they visit is drawn from a short individual-specific list of potential leisure venues that is determined randomly.
 
 (ref:leisure-venues) The number of leisure venues that each individual attends in a week. The minimum possible number of venues is zero, and maximum possible is seven.
 
-```{r leisure-venues, fig.cap="(ref:leisure-venues)"}
-leisure_places <- variables$variables_list$leisure$get_values()
-number_leisure_places <- sapply(leisure_places, function(x) sum(x > 0))
-
-table(number_leisure_places) |>
-  data.frame() |>
-  ggplot(aes(x = number_leisure_places, y = Freq)) +
-  geom_col() +
-  labs(x = "Number of leisure venues attended in a week", y = "Count")
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/leisure-venues-1.png" alt="(ref:leisure-venues)" width="90%" />
+<p class="caption">(\#fig:leisure-venues)(ref:leisure-venues)</p>
+</div>
 
 ## Disease States & The Infection Process {#disease}
 
@@ -198,58 +126,10 @@ Exposed individuals become infectious after some delay (the *incubation period*)
 
 (ref:epidemic-endemic) Illustration of simulated epidemic and endemic pathogens.
 
-```{r epidemic-endemic, fig.cap="(ref:epidemic-endemic)"}
-
-# Plot the epidemic exemplar simulations:
-epidemic_plot <- exemplar_data |>
-  filter(Setting == "Epidemic" & Intervention == "Baseline") |>
-  filter(timestep %in% c(1:300)) |>
-  mutate(Percentage = Proportion * 100) |>
-  ggplot(aes(x = timestep, y = Percentage, colour = State)) +
-  geom_line(linewidth = 1.2) +
-  theme_bw() +
-  labs(x = "Days", y = "Percentage of Population", colour = "Disease State",
-       title = "Epidemic Pathogen Model Simulation") +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  scale_color_discrete(type = blueprint_colours) +
-  theme(strip.background = element_blank(),
-        strip.text = element_text(colour = "#03113E", size = 12),
-        panel.border=element_blank(),
-        plot.title = element_text(size = 10),
-        legend.title = element_blank(),
-        legend.position = "right",
-        legend.background = element_blank(),
-        axis.line = element_line()) 
-
-# Plot the epidemic exemplar simulations:
-endemic_plot <- exemplar_data |>
-  filter(Setting == "Endemic" & Intervention == "Baseline") |>
-  filter(timestep %in% c(400:11000)) |>
-  mutate(Percentage = Proportion * 100) |>
-  ggplot(aes(x = timestep, y = Percentage, colour = State)) +
-  geom_line(linewidth = 1.2) +
-  theme_bw() +
-  labs(x = "Days", y = "Percentage of Population", colour = "Disease State",
-       title = "Endemic Pathogen Model Simulation") +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  scale_color_discrete(type = blueprint_colours) +
-  theme(strip.background = element_blank(),
-        strip.text = element_text(colour = "#03113E", size = 12),
-        plot.title = element_text(size = 10),
-        panel.border=element_blank(),
-        legend.title = element_blank(),
-        legend.position = "right",
-        legend.background = element_blank(),
-        axis.line = element_line()) 
-
-plot_legend <- cowplot::get_legend(endemic_plot)
-cowplot::plot_grid(epidemic_plot + theme(legend.position = "none"), 
-                   endemic_plot + theme(legend.position = "none"),
-                   plot_legend, nrow = 1, rel_widths = c(1, 1, 0.4))
-
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/epidemic-endemic-1.png" alt="(ref:epidemic-endemic)" width="90%" />
+<p class="caption">(\#fig:epidemic-endemic)(ref:epidemic-endemic)</p>
+</div>
 
 ## Modelling Far UVC
 
@@ -271,35 +151,10 @@ Figure \@ref(fig:uvc) provides an example illustrating the difference between th
 
 (ref:uvc) Illustration of the targeted and random strategies for the workplace Location Type.
 
-```{r uvc, fig.cap="(ref:uvc)"}
-data.frame(workplace_sizes) |>
-  arrange(desc(workplace_sizes)) |>
-  mutate(
-    rank = row_number(),
-    Targeted = rank <= 500,
-    Random = sample(c(rep(TRUE, 500), rep(FALSE, n() - 500)))
-  ) |>
-  tidyr::pivot_longer(
-    cols = c("Targeted", "Random"),
-    names_to = "type",
-    values_to = "chosen"
-  )|> 
-  mutate(
-    chosen2 = ifelse(chosen, "Yes", "No")
-  )|>
-  ggplot(aes(x = rank, y = log10(workplace_sizes) + 1, 
-             col = chosen2, fill = chosen2)) +
-  geom_bar(stat = "identity", alpha = 1, position = position_dodge()) +
-  facet_wrap(~ type) +
-  scale_colour_manual(values = c("grey", "#03113E")) + 
-  scale_fill_manual(values = c("grey", "#03113E")) +
-  labs(x = "", y = "Base 10 logarithm of the workplace size plus one", 
-       col = "Far UVC Installed?",
-       fill = "Far UVC Installed?") +
-  theme(
-    legend.position = "bottom"
-  )
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/uvc-1.png" alt="(ref:uvc)" width="90%" />
+<p class="caption">(\#fig:uvc)(ref:uvc)</p>
+</div>
 
 # Illustrative Simulations of Far UVC
 
@@ -322,30 +177,10 @@ Figure \@ref(fig:exemplar-epidemic) shows the effect of random and targeted far 
 
 In the epidemic scenario, having pre-installed far UVC devices in the workplace, school, and leisure settings reduced the number of people who become infected by the pathogen and, when targeted specifically to the most largest settings within a setting type (the "Targeted" strategy), slowed the rate of pathogen spread in the population. Targeted far UVC provided an even greater reduction in the total number of people infected relative to the random deployment than random far UVC deployment provided relative to the no-intervention baseline.
 
-```{r exemplar-epidemic, fig.cap="(ref:exemplar-epidemic)"}
-
-# Plot the epidemic exemplar simulations:
-exemplar_data |>
-  filter(Setting == "Epidemic") |>
-  filter(timestep %in% c(1:1000)) |>
-  mutate(Percentage = Proportion * 100) |>
-  ggplot(aes(x = timestep, y = Percentage, colour = State)) +
-  geom_line(linewidth = 1.2) +
-  theme_bw() +
-  labs(x = "Days", y = "Percentage of Population", colour = "Disease State") +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
-  scale_x_continuous(expand = c(0, 0)) +
-  scale_color_discrete(type = blueprint_colours) +
-  facet_grid(~Intervention) +
-  theme(strip.background = element_blank(),
-        strip.text = element_text(colour = "#03113E", size = 12),
-        panel.border=element_blank(),
-        legend.title = element_blank(),
-        legend.position = c(0.93, 0.85),
-        legend.background = element_blank(),
-        axis.line = element_line()) 
-
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/exemplar-epidemic-1.png" alt="(ref:exemplar-epidemic)" width="90%" />
+<p class="caption">(\#fig:exemplar-epidemic)(ref:exemplar-epidemic)</p>
+</div>
 
 (ref:exemplar-epidemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen when full and lasting immunity to infection is acquired by infected individuals (i.e. the pathogen induces a single epidemic).
 
@@ -355,30 +190,10 @@ Figure \@ref(fig:exemplar-endemic) shows the effect of random and targeted far U
 
 In the endemic scenario, where a pathogen is already established in the human population, introducing far UVC decreased the proportion of individuals in the population with infections relative to the no-intervention baseline scenario (Figure \@ref(fig:exemplar-endemic)). Again, targeting far UVC deployment provided additional benefits to pathogen suppression.
 
-```{r exemplar-endemic, fig.cap="(ref:exemplar-endemic)"}
-
-# Plot the epidemic exemplar simulations:
-exemplar_data |>
-  filter(Setting == "Endemic") |>
-  filter(timestep %in% c(400:1000)) |>
-  mutate(Percentage = Proportion * 100) |>
-  ggplot(aes(x = timestep, y = Percentage, colour = State)) +
-  geom_line(linewidth = 1.2) +
-  theme_bw() +
-  labs(x = "Days", y = "Percentage of Population", colour = "Disease State") +
-  scale_y_continuous(expand = c(0, 0), limits = c(0, 100)) +
-  scale_x_continuous(expand = c(0, 0), breaks = c(400, 600, 800, 100), labels = c(0, 200, 400, 600)) +
-  scale_color_discrete(type = blueprint_colours) +
-  facet_grid(~Intervention) +
-  theme(strip.background = element_blank(),
-        strip.text = element_text(colour = "#03113E", size = 12),
-        panel.border=element_blank(),
-        legend.title = element_blank(),
-        legend.position = c(0.93, 0.5),
-        legend.background = element_blank(),
-        axis.line = element_line()) 
-
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/exemplar-endemic-1.png" alt="(ref:exemplar-endemic)" width="90%" />
+<p class="caption">(\#fig:exemplar-endemic)(ref:exemplar-endemic)</p>
+</div>
 
 (ref:exemplar-endemic) Illustration of the effect of random and targeted far UVC deployment, relative to an interventionless baseline, on the disease state dynamics of a theoretical pathogen on the disease state dynamics of a theoretical pathogen, when the immunity acquired during infection wanes over time (i.e. the pathogen exists in an endemic state).
 
@@ -394,125 +209,19 @@ For low transmission intensities (R0 $\leq$ 1.5), very high levels of far UVC co
 
 ### Sensitivity Analysis of R0 & far UVC Coverage
 
-```{r sweep-R0-coverage, fig.cap="(ref:sweep-R0-coverage)"}
-
-# Plot the epidemic exemplar simulations:
-a <- cowplot::plot_grid(
-  
-  # Plot the coverage through time:
-  parameter_sweep_data |>
-    filter(efficacy == 0.8, coverage <= 1) |>
-    ggplot(aes(x = 100 * coverage, y = 100 * final_size, col = factor(R0))) +
-    geom_line() +
-    facet_grid(.~Coverage_Strategy) +
-    theme_bw() +
-    theme(strip.background = element_rect(fill="white", colour = "black")) +
-    labs(x = "Coverage %", y = "Epidemic Final Size", colour = "R0"), 
-  
-  # Plot the heatmap of R0 against coverage for proportion contained:
-  parameter_sweep_data |>
-    filter(efficacy == 0.8, coverage <= 1) |>
-    ggplot(aes(y = factor(R0), x = 100 * coverage, fill = 100 * final_size)) +
-    geom_tile(colour = "black") +
-    scale_fill_viridis_c(option = "rocket",
-                         limits = c(0, 100),
-                         begin = 0,
-                         end = 1,
-                         name = "Proportion\nContained",
-                         direction = -1) +
-    scale_x_continuous(breaks = c(0, 20, 40, 60, 80, 100),
-                       labels = c(0, 20, 40, 60, 80, 100)) +
-    facet_grid(.~Coverage_Strategy) +
-    labs(y = "R0",
-         x = "farUVC Coverage (%)") +
-    theme(axis.text = element_text(angle = 0),
-          plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
-          legend.title = element_text(size = 12),
-          legend.text = element_text(size = 12),
-          legend.position = "right",
-          strip.background = element_rect(fill="white", colour = "black"),
-          panel.border = element_rect(linetype = "solid", fill = NA, linewidth = 0.5)) +
-    coord_cartesian(expand = FALSE),
-  
-  # Split the two figures across separate rows:
-  nrow = 2,
-  
-  # Align the figures horizontally 
-  align = "hv", 
-  
-  # Not sure
-  axis = "lr",
-  
-  # Specify the relative heights of the two figures:
-  rel_heights = c(1, 2)
-  
-)
-
-# cowplot::plot_grid(a, b, nrow = 2, labels = c("A", "B"))
-a
-
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/sweep-R0-coverage-1.png" alt="(ref:sweep-R0-coverage)" width="90%" />
+<p class="caption">(\#fig:sweep-R0-coverage)(ref:sweep-R0-coverage)</p>
+</div>
 
 (ref:sweep-R0-coverage) The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC efficacy of 80%.
 
 ### Sensitivity Analysis of R0 & far UVC Efficacy
 
-```{r sweep-R0-efficacy, fig.cap="(ref:sweep-R0-efficacy)"}
-
-b <- cowplot::plot_grid(
-  
-  # Plot the coverage through time:
-  parameter_sweep_data |>
-    filter(coverage > 0.7 & coverage < 1) |>
-    ggplot(aes(x = 100 * efficacy, y = 100 * final_size, col = factor(R0))) +
-    geom_line() +
-    facet_grid(.~Coverage_Strategy) +
-    theme_bw() +
-    theme(strip.background = element_rect(fill="white", colour = "black")) +
-    labs(x = "Efficacy %", y = "Epidemic Final Size", colour = "R0"), 
-  
-  # Plot the heatmap of R0 against efficacy for proportion contained:
-  parameter_sweep_data |>
-    filter(coverage > 0.7 & coverage < 1) |>
-    ggplot(aes(y = factor(R0), x = 100 * efficacy, fill = 100 * final_size)) +
-    geom_tile(colour = "black") +
-    scale_fill_viridis_c(option = "mako", 
-                         limits = c(0, 100),
-                         begin = 0, 
-                         end = 1, 
-                         name = "Proportion\nContained",
-                         direction = -1) +
-    scale_x_continuous(breaks = c(0, 20, 40, 60, 80, 100),
-                       labels = c(0, 20, 40, 60, 80, 100)) +
-    facet_grid(.~Coverage_Strategy) +
-    labs(y = "R0",
-         x = "farUVC Efficacy (%)") +
-    theme(axis.text = element_text(angle = 0),
-          plot.title = element_text(hjust = 0.5, size = 20, face = "bold"),
-          legend.title = element_text(size = 12),
-          legend.text = element_text(size = 12),
-          legend.position = "right",
-          strip.background = element_rect(fill="white", colour = "black"),
-          panel.border = element_rect(linetype = "solid", fill = NA, linewidth = 0.5)) +
-    coord_cartesian(expand = FALSE),
-  
-  # Split the two figures across separate rows:
-  nrow = 2,
-  
-  # Align the figures horizontally 
-  align = "hv", 
-  
-  # Not sure
-  axis = "lr",
-  
-  # Specify the relative heights of the two figures:
-  rel_heights = c(1, 2)
-  
-)
-
-b
-
-```
+<div class="figure">
+<img src="blueprint_files/figure-html/sweep-R0-efficacy-1.png" alt="(ref:sweep-R0-efficacy)" width="90%" />
+<p class="caption">(\#fig:sweep-R0-efficacy)(ref:sweep-R0-efficacy)</p>
+</div>
 
 (ref:sweep-R0-efficacy) The effect of R0 and far UVC efficacy, under random and targeted far UVC deployment, on the proportion of the population that a pathogen infects assuming a far UVC coverage of 80% is achieved.
 
