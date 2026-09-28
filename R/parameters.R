@@ -57,9 +57,11 @@
 #'   `simulation_time`, giving that setting's beta for each simulated calendar day.
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
-#' * `household_distribution_country`: TBD
-#' * `school_distribution_country`: TBD
-#' * `workplace_distribution_country`: TBD
+#' * `household_distribution_country`: "USA", "UK", or "custom". "custom" bootstraps from `household_reference_panel`.
+#' * `school_distribution_country`: "USA", "UK", or "custom". "custom" samples from `school_reference_sizes`.
+#' * `workplace_distribution_country`: "USA" or "custom". "custom" uses `workplace_a`/`workplace_c`/`workplace_prop_max`.
+#' * `household_reference_panel`: data frame with `child`/`adult`/`elderly` columns, one row per household (same shape as `baseline_household_demographics_usa`). Required when `household_distribution_country = "custom"`. Default = NULL.
+#' * `school_reference_sizes`: numeric vector of real per-school enrollment sizes to sample from. Required when `school_distribution_country = "custom"`. Default = NULL.
 #' * `endemic_or_epidemic`: TBD
 #' * `duration_immune`: TBD
 #' * `prob_inf_external`: TBD
@@ -109,6 +111,26 @@
 #' * `intervention_<s>_timestep`: first simulation timestep at which the intervention's efficacy is applied in the FOI calculation. Default = NULL
 #' * `intervention_<setting>_covered` (per-setting scopes only — workplace/school/leisure/household): 0/1 vector of length equal to the number of locations in the setting, populated by the dispatcher to mark which locations received the intervention. Default = NULL
 #'
+#' Community Setting and Intervention Parameters (community has no discrete locations, so there is no
+#' setting-specific ACH distribution, no coverage_target/coverage_type, and no _covered vector; coverage
+#' is instead a scalar multiplier on efficacy in the community FOI term):
+#' * `default_ach_community`: baseline air-change rate (1/hour) assumed for the community setting, used to
+#'   compute community intervention efficacy via the Wells-Riley framework. Default = NULL; must be set if
+#'   `intervention_community_active` is TRUE.
+#' * `volume_per_person_community`: average air volume per person in the community setting (m^3 per
+#'   person), used by the Wells-Riley calculation. Default = NULL; must be set if
+#'   `intervention_community_active` is TRUE.
+#' * `intervention_community_active`: boolean flag set to TRUE when an intervention has been installed in
+#'   the community setting using `set_intervention_ach()`. Default = FALSE.
+#' * `intervention_community_list`: list of intervention objects (each as returned by `make_intervention()`)
+#'   deployed in the community setting. Currently single-intervention only — list always has length 1 when
+#'   active. Default = NULL.
+#' * `intervention_community_coverage`: fraction of community transmission subject to the intervention's
+#'   efficacy (numeric in `[0, 1]`); inherited from the intervention object's `coverage` field. Applied
+#'   directly as a scalar multiplier on efficacy, since there are no locations to select. Default = NULL.
+#' * `intervention_community_timestep`: first simulation timestep at which the community intervention's
+#'   efficacy is applied in the FOI calculation. Default = NULL.
+#'
 #' Setting-Specific Room Size Per Individual Parameters:
 #' * `size_per_individual_workplace`: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
 #' * `size_per_individual_school`: The volume or surface area for each individual in the school setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
@@ -148,6 +170,12 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     school_meanlog = 5.49,
     school_sdlog = 1.02,
     school_student_staff_ratio = 20,
+
+    # Custom (city-specific) reference data, used when household_distribution_country
+    # or school_distribution_country is set to "custom" instead of "USA"/"UK"
+    household_reference_panel = NULL,
+    school_reference_sizes = NULL,
+
     leisure_prob_visit = 0.6,
     leisure_mean_number_settings = 3,
     leisure_mean_size = 50,
@@ -254,6 +282,16 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     intervention_household_coverage_type   = NULL,
     intervention_household_timestep        = NULL,
     intervention_household_covered         = NULL,
+
+    # Community setting and intervention parameters (no discrete locations,
+    # so no setting-specific ACH distribution, coverage_target/coverage_type,
+    # or _covered vector; coverage applies as a scalar multiplier on efficacy)
+    default_ach_community                  = NULL,
+    volume_per_person_community            = NULL,
+    intervention_community_active          = FALSE,
+    intervention_community_list            = NULL,
+    intervention_community_coverage        = NULL,
+    intervention_community_timestep        = NULL,
 
     # Room Size Per Individual Parameters: (currently used for coverage allocation)
     size_per_individual_workplace = 1,

@@ -291,6 +291,20 @@ create_variables <- function(parameters_list) {
     )
   }
 
+  # Community has no discrete locations, so it bypasses the switch generator
+  # above entirely: efficacy is calculated once from the single scalar
+  # baseline ACH, with no _covered vector (calculate_efficacy_from_ach
+  # treats a missing coverage vector as full coverage) and no per-location
+  # riskiness. Coverage is applied downstream in processes.R as a scalar
+  # multiplier on this efficacy.
+  if (isTRUE(parameters_list$intervention_community_active)) {
+    parameters_list$community_efficacy <- calculate_efficacy_from_ach(
+      ach_values      = parameters_list$default_ach_community,
+      parameters_list = parameters_list,
+      setting         = "community"
+    )
+  }
+
   # Return the list of model variables:
   return(list(
     variables_list = variables_list,
@@ -543,9 +557,19 @@ generate_initial_schools_bootstrap <- function(
       schools_usa_total$size_midpoint,
       schools_usa_total$count
     )
+  } else if (parameters_list$school_distribution_country == "custom") {
+    ## User-supplied vector of real per-school enrollment sizes (e.g. a
+    ## city-specific RTI extract), sampled from directly instead of the
+    ## nationwide USA size-bucket distribution
+    empirical_school_sizes <- parameters_list$school_reference_sizes
+    if (is.null(empirical_school_sizes)) {
+      stop(
+        "school_reference_sizes must be set when school_distribution_country is 'custom'"
+      )
+    }
   } else {
     stop(
-      "school_distribution_country must be set to either UK or USA - other countries not implemented yet"
+      "school_distribution_country must be set to UK, USA, or custom"
     )
   }
 
@@ -649,7 +673,7 @@ generate_initial_workplaces <- function(
   index_not_school <- school_variable$get_index_of(values = c("0"))$to_vector()
   index_adults <- age_class_variable$get_index_of("adult")$to_vector()
   index_unassigned_adults <- intersect(index_not_school, index_adults)
-  if (parameters_list$workplace_distribution_country == "USA") {
+  if (parameters_list$workplace_distribution_country %in% c("USA", "custom")) {
     workplace_sizes <- sample_offset_truncated_power_distribution(
       N = length(index_unassigned_adults),
       prop_max = prop_max,
@@ -658,7 +682,7 @@ generate_initial_workplaces <- function(
     )
   } else {
     stop(
-      "workplace_distribution_country must be set to USA - other countries not implemented yet"
+      "workplace_distribution_country must be set to USA or custom - other countries not implemented yet"
     )
   }
   workplace_indices <- unlist(sapply(
@@ -891,10 +915,10 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
 #' @family variables
 #' @export
 generate_initial_households_bootstrap <- function(parameters_list) {
-  ## Checking country is either "UK" or "USA"
+  ## Checking country is "UK", "USA", or "custom"
   country <- parameters_list$household_distribution_country
-  if (!(country %in% c("UK", "USA"))) {
-    stop("Country specified must be either USA or UK")
+  if (!(country %in% c("UK", "USA", "custom"))) {
+    stop("Country specified must be USA, UK, or custom")
   }
 
   ## Using data from RTI's synthetic population for San Francisco to bootstrap https://fred.publichealth.pitt.edu/syn_pops
@@ -903,6 +927,15 @@ generate_initial_households_bootstrap <- function(parameters_list) {
   } else if (country == "UK") {
     ## Using Hinch et al's synthetic population from ONS
     ref_panel <- baseline_household_demographics_uk
+  } else if (country == "custom") {
+    ## User-supplied reference panel (e.g. a city-specific RTI extract), same
+    ## child/adult/elderly column shape as baseline_household_demographics_usa
+    ref_panel <- parameters_list$household_reference_panel
+    if (is.null(ref_panel)) {
+      stop(
+        "household_reference_panel must be set when household_distribution_country is 'custom'"
+      )
+    }
   }
 
   # Creating blank age-class vectors and household assignment vectors to populate

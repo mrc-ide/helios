@@ -431,6 +431,20 @@ create_SE_process <- function(
       variables_list$disease_state$get_size_of("I_mild")/
       parameters_list$human_population
 
+    # Community has no discrete locations, so there is no per-location
+    # efficacy or riskiness to apply - the intervention instead multiplies
+    # the community FOI directly by (1 - efficacy * coverage), where
+    # coverage is the fraction of community transmission subject to the
+    # intervention (see calculate_efficacy_from_ach() and
+    # intervention_community_coverage in get_parameters()).
+    if (parameters_list$intervention_community_active) {
+      if (t > parameters_list$intervention_community_timestep) {
+        community_FOI <- community_FOI *
+          (1 - parameters_list$community_efficacy *
+            parameters_list$intervention_community_coverage)
+      }
+    }
+
     #=== Total FOI ===#
     #=================#
 
