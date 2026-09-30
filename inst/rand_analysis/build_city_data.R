@@ -104,6 +104,23 @@ fit_offset_truncated_power_distribution <- function(sizes) {
   )
 }
 
+#' Keep only rows within a radius (km) of a center point
+#'
+#' Uses a flat-earth approximation (fine at city scale). Returns a logical mask.
+#'
+#' @param lat,lon Numeric vectors of coordinates to test.
+#' @param center_lat,center_lon Numeric scalars giving the center point.
+#' @param radius_km Numeric scalar radius in kilometers.
+within_radius_km <- function(lat, lon, center_lat, center_lon, radius_km) {
+  km_per_deg_lat <- 111.0
+  km_per_deg_lon <- 111.0 * cos(center_lat * pi / 180)
+  dist_km <- sqrt(
+    ((lat - center_lat) * km_per_deg_lat)^2 +
+      ((lon - center_lon) * km_per_deg_lon)^2
+  )
+  dist_km <= radius_km
+}
+
 #' Build the full set of city-specific helios inputs from RTI data
 #'
 #' @param fips_codes Character vector of one or more 5-digit FIPS codes.
@@ -111,10 +128,29 @@ fit_offset_truncated_power_distribution <- function(sizes) {
 #' @param city_name A short label used only for cache subdirectory naming.
 #' @param cache_dir Directory to cache downloaded/extracted RTI files in.
 #' Defaults to a subdirectory of the R session's temp directory.
+#' @param geo_filter Optional list with `center_lat`, `center_lon`, and
+#' `radius_km`, used when a FIPS code covers a wider area than the city of
+#' interest (e.g. a county spanning both a city and its suburbs). Households,
+#' schools, and workplaces are each filtered to this radius using their own
+#' coordinates before being pooled. Default = NULL (no filtering, use the
+#' full FIPS area as-is).
+#'
+#' @section Known issue -- workplace_a/workplace_c/workplace_prop_max:
+#' The `workers` field in RTI's workplaces.txt does not check out against
+#' real employment figures (e.g. it sums to several times San Francisco's
+#' actual job count), and the workers-per-household ratio varies 6.6x-24.6x
+#' across the counties checked (SF, Allegheny, and NYC's five boroughs) --
+#' too inconsistent to be a uniform scaling artifact that would at least
+#' preserve the *shape* of the fit. Do not use the fitted workplace_a/
+#' workplace_c/workplace_prop_max for a live analysis without re-validating
+#' this first; the household_reference_panel and school_reference_sizes
+#' outputs do not have this problem and checked out against real household/
+#' school counts.
 build_city_data <- function(
   fips_codes,
   city_name,
-  cache_dir = file.path(tempdir(), "rti_cache")
+  cache_dir = file.path(tempdir(), "rti_cache"),
+  geo_filter = NULL
 ) {
   household_rows <- list()
   school_sizes <- c()
@@ -125,10 +161,32 @@ build_city_data <- function(
     files <- list.files(county_dir, full.names = TRUE)
 
     people_file <- files[grepl("synth_people\\.txt$", files)]
+    households_file <- files[grepl("synth_households\\.txt$", files)]
     schools_file <- files[grepl("_schools\\.txt$", files)]
     workplaces_file <- files[grepl("_workplaces\\.txt$", files)]
 
     people <- utils::read.csv(people_file, stringsAsFactors = FALSE)
+    schools <- utils::read.csv(schools_file, stringsAsFactors = FALSE)
+    workplaces <- utils::read.csv(workplaces_file, stringsAsFactors = FALSE)
+
+    if (!is.null(geo_filter)) {
+      households <- utils::read.csv(households_file, stringsAsFactors = FALSE)
+      keep_hh_ids <- households$sp_id[within_radius_km(
+        households$latitude, households$longitude,
+        geo_filter$center_lat, geo_filter$center_lon, geo_filter$radius_km
+      )]
+      people <- dplyr::filter(people, sp_hh_id %in% keep_hh_ids)
+
+      schools <- dplyr::filter(schools, within_radius_km(
+        latitude, longitude,
+        geo_filter$center_lat, geo_filter$center_lon, geo_filter$radius_km
+      ))
+      workplaces <- dplyr::filter(workplaces, within_radius_km(
+        latitude, longitude,
+        geo_filter$center_lat, geo_filter$center_lon, geo_filter$radius_km
+      ))
+    }
+
     household_rows[[fips]] <- dplyr::group_by(people, sp_hh_id) |>
       dplyr::summarise(
         child = sum(age <= 18),
@@ -138,10 +196,12 @@ build_city_data <- function(
       ) |>
       dplyr::select(child, adult, elderly)
 
-    schools <- utils::read.csv(schools_file, stringsAsFactors = FALSE)
-    school_sizes <- c(school_sizes, schools$total[!is.na(schools$total) & schools$total > 0])
-
-    workplaces <- utils::read.csv(workplaces_file, stringsAsFactors = FALSE)
+    # A small number of rows carry latitude/longitude (0, 0) and implausible
+    # enrollment totals -- data-entry errors unrelated to this county (e.g. a
+    # Maine school record with a multi-million enrollment turned up in the
+    # SF extract). Drop them regardless of which city's data is being pulled.
+    valid_schools <- !is.na(schools$total) & schools$total > 0 & schools$latitude != 0
+    school_sizes <- c(school_sizes, schools$total[valid_schools])
     workplace_sizes <- c(workplace_sizes, workplaces$workers[!is.na(workplaces$workers) & workplaces$workers > 0])
   }
 
