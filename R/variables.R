@@ -17,8 +17,13 @@ create_variables <- function(parameters_list) {
 
   # Initialise and populate the age and household variables
 
-  # If user wants to use empirical distribution of households and ages from ONS (UK) or RTI synth pop (USA)
-  if (parameters_list$household_distribution_country %in% c("UK", "USA")) {
+  # If user wants to use empirical distribution of households and ages from ONS (UK), RTI synth pop (USA),
+  # or a user-supplied reference panel ("custom" with household_reference_panel set). "custom" without a
+  # panel keeps its original meaning: manually specified age proportions and parametric households.
+  use_household_bootstrap <- parameters_list$household_distribution_country %in% c("UK", "USA") ||
+    (parameters_list$household_distribution_country == "custom" &&
+       !is.null(parameters_list$household_reference_panel))
+  if (use_household_bootstrap) {
     # Bootstrap sampling of households from either ONS 2011 Census reference panel of household sizes and age composition
     # or RTI synthetic population of household sizes and age composition for San Francisco
     household_age_list <- generate_initial_households_bootstrap(
@@ -66,8 +71,12 @@ create_variables <- function(parameters_list) {
     )
   }
 
-  # School setting variable
-  if (parameters_list$household_distribution_country %in% c("UK", "USA")) {
+  # School setting variable. Empirical school sizes are bootstrapped when the household data are
+  # empirical (original behaviour), or when a user-supplied school_reference_sizes vector is given.
+  use_school_bootstrap <- parameters_list$household_distribution_country %in% c("UK", "USA") ||
+    (parameters_list$school_distribution_country == "custom" &&
+       !is.null(parameters_list$school_reference_sizes))
+  if (use_school_bootstrap) {
     initial_school_settings <- generate_initial_schools_bootstrap(
       parameters_list = parameters_list,
       age_class_variable = age_class_variable

@@ -57,8 +57,8 @@
 #'   `simulation_time`, giving that setting's beta for each simulated calendar day.
 #' * `dt`: TBD
 #' * `simulation_time`: TBD
-#' * `household_distribution_country`: "USA", "UK", or "custom". "custom" bootstraps from `household_reference_panel`.
-#' * `school_distribution_country`: "USA", "UK", or "custom". "custom" samples from `school_reference_sizes`.
+#' * `household_distribution_country`: "USA", "UK", or "custom". "custom" bootstraps from `household_reference_panel` if it is set; otherwise it uses the manually specified age proportions and the parametric household generator.
+#' * `school_distribution_country`: "USA", "UK", or "custom". "custom" samples from `school_reference_sizes` if it is set.
 #' * `workplace_distribution_country`: "USA" or "custom". "custom" uses `workplace_a`/`workplace_c`/`workplace_prop_max`.
 #' * `household_reference_panel`: data frame with `child`/`adult`/`elderly` columns, one row per household (same shape as `baseline_household_demographics_usa`). Required when `household_distribution_country = "custom"`. Default = NULL.
 #' * `school_reference_sizes`: numeric vector of real per-school enrollment sizes to sample from. Required when `school_distribution_country = "custom"`. Default = NULL.

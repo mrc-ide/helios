@@ -53,7 +53,7 @@ if (!requireNamespace("individual", quietly = TRUE)) {
 }
 
 pkg_path <- normalizePath(".")
-devtools::install(pkg_path, quiet = TRUE, upgrade = "never")
+devtools::install(pkg_path, quiet = TRUE, upgrade = FALSE)
 devtools::load_all(pkg_path)
 
 # ---------------------------------------------------------------------------
