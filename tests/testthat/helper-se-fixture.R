@@ -85,15 +85,9 @@ make_se_fixture <- function(
     disease_state = individual::CategoricalVariable$new(
       c("S", "E", "I_mild", "I_hosp", "R", "D"), state
     ),
-    household = individual::CategoricalVariable$new(
-      as.character(1:12), as.character(ids$household)
-    ),
-    school = individual::CategoricalVariable$new(
-      as.character(0:4), as.character(ids$school)
-    ),
-    workplace = individual::CategoricalVariable$new(
-      as.character(0:5), as.character(ids$workplace)
-    ),
+    household = individual::IntegerVariable$new(as.integer(ids$household)),
+    school = individual::IntegerVariable$new(as.integer(ids$school)),
+    workplace = individual::IntegerVariable$new(as.integer(ids$workplace)),
     leisure = individual::RaggedInteger$new(leisure_visits),
     specific_leisure = individual::IntegerVariable$new(rep(0L, n))
   )

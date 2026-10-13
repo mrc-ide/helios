@@ -34,12 +34,8 @@ create_variables <- function(parameters_list) {
     )
 
     # Household variable
-    household_variable <- individual::CategoricalVariable$new(
-      categories = sprintf(
-        "%d",
-        1:max(household_age_list$individual_households)
-      ),
-      initial_values = sprintf("%d", household_age_list$individual_households)
+    household_variable <- individual::IntegerVariable$new(
+      initial_values = as.integer(initial_household_ids)
     )
 
     # If user wants to specify age-class proportions and associated households manually
@@ -62,9 +58,8 @@ create_variables <- function(parameters_list) {
       age_class_variable = age_class_variable
     )
     initial_household_ids <- initial_households
-    household_variable <- individual::CategoricalVariable$new(
-      categories = sprintf("%d", 1:max(initial_households)),
-      initial_values = sprintf("%d", initial_households)
+    household_variable <- individual::IntegerVariable$new(
+      initial_values = as.integer(initial_household_ids)
     )
   }
 
@@ -86,9 +81,8 @@ create_variables <- function(parameters_list) {
       "There are less than or equal to 2 schools. Consider the population size may be too small!"
     )
   }
-  school_variable <- individual::CategoricalVariable$new(
-    categories = as.character(0:num_schools),
-    initial_values = initial_school_settings
+  school_variable <- individual::IntegerVariable$new(
+    initial_values = as.integer(initial_school_settings)
   )
 
   # Workplace setting variable
@@ -103,9 +97,8 @@ create_variables <- function(parameters_list) {
       "There are less than or equal to 2 workplaces. Consider the population size may be too small!"
     )
   }
-  workplace_variable <- individual::CategoricalVariable$new(
-    categories = as.character(0:num_workplaces),
-    initial_values = initial_workplace_settings
+  workplace_variable <- individual::IntegerVariable$new(
+    initial_values = as.integer(initial_workplace_settings)
   )
 
   # Generating the number and sizes of each leisure setting
@@ -187,7 +180,7 @@ create_variables <- function(parameters_list) {
   parameters_list$setting_sizes <- setting_sizes
 
   # Creating vector of setting-specific ACH for each setting type
-  num_households <- max(as.numeric(variables_list$household$get_categories()))
+  num_households <- max(initial_household_ids)
   parameters_list$household_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "household",
@@ -200,7 +193,6 @@ create_variables <- function(parameters_list) {
     setting = "household"
   )
 
-  num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
   parameters_list$workplace_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "workplace",
@@ -213,7 +205,6 @@ create_variables <- function(parameters_list) {
     setting = "workplace"
   )
 
-  num_schools <- max(as.numeric(variables_list$school$get_categories()))
   parameters_list$school_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "school",
@@ -647,7 +638,7 @@ generate_initial_workplaces <- function(
 
   # Calculating number of unassigned adults and assigning them to workplaces
   set.seed(parameters_list$seed)
-  index_not_school <- school_variable$get_index_of(values = c("0"))$to_vector()
+  index_not_school <- school_variable$get_index_of(set = 0L)$to_vector()
   index_adults <- age_class_variable$get_index_of("adult")$to_vector()
   index_unassigned_adults <- intersect(index_not_school, index_adults)
   if (parameters_list$workplace_distribution_country == "USA") {

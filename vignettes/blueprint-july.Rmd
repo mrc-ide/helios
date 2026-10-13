@@ -97,8 +97,7 @@ To parameterise the model's household size and age distribution we use data from
 (ref:household-size) A distribution of household sizes for a synthetic population of size `r format(human_population, big.mark = ",", scientific = FALSE)` using data from the UK (A) and from the USA (B).
 
 ```{r household-size, fig.cap="(ref:household-size)"}
-households_usa <- variables_usa$variables_list$household$get_categories()
-household_sizes_usa <- purrr::map_vec(households_usa, function(x) variables_usa$variables_list$household$get_size_of(values = x))
+household_sizes_usa <- get_setting_size(variables_usa$variables_list, setting = "household")
 
 plot_household_usa <- table(household_sizes_usa)[1:10] |>
   data.frame() |>
@@ -106,8 +105,7 @@ plot_household_usa <- table(household_sizes_usa)[1:10] |>
   geom_col() +
   labs(x = "Number of individuals in the household", y = "% of Households")
 
-households_uk <- variables_uk$variables_list$household$get_categories()
-household_sizes_uk <- purrr::map_vec(households_uk, function(x) variables_uk$variables_list$household$get_size_of(values = x))
+household_sizes_uk <- get_setting_size(variables_uk$variables_list, setting = "household")
 
 plot_household_uk <- table(household_sizes_uk) |>
   data.frame() |>
@@ -147,9 +145,7 @@ To parameterise the model's schools sizes, we used US school size data from 2019
 (ref:school-size) A distribution of school sizes for a synthetic population of size `r human_population` using data from the UK (A) and from the USA (B). As the UK has a higher proportion of children, the total school occupancy in the UK is higher than in the US.
 
 ```{r school-size, fig.cap="(ref:school-size)"}
-schools_usa <- variables_usa$variables_list$school$get_categories()
-schools_usa <- schools_usa[schools_usa != "0"]
-school_sizes_usa <- purrr::map_vec(schools_usa, function(x) variables_usa$variables_list$school$get_size_of(values = x))
+school_sizes_usa <- get_setting_size(variables_usa$variables_list, setting = "school")
 
 plot_schools_usa <- data.frame(school_sizes_usa) |>
   ggplot(aes(x = school_sizes_usa)) +
@@ -158,9 +154,7 @@ plot_schools_usa <- data.frame(school_sizes_usa) |>
   scale_y_continuous(limits = c(0, NA)) +
   scale_x_continuous(limits = c(0, 3000))
 
-schools_uk <- variables_uk$variables_list$school$get_categories()
-schools_uk <- schools_uk[schools_uk != "0"]
-school_sizes_uk <- purrr::map_vec(schools_uk, function(x) variables_uk$variables_list$school$get_size_of(values = x))
+school_sizes_uk <- get_setting_size(variables_uk$variables_list, setting = "school")
 
 plot_schools_uk <- data.frame(school_sizes_uk) |>
   ggplot(aes(x = school_sizes_uk)) +

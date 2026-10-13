@@ -110,8 +110,8 @@ create_SE_process <- function(
   population <- parameters_list$human_population
 
   ##### HOUSEHOLDS #####
-  num_households <- max(as.numeric(variables_list$household$get_categories()))
-  household_id <- get_location_ids(variables_list$household)
+  household_id <- variables_list$household$get_values()
+  num_households <- max(household_id)
   household_size <- tabulate(household_id, nbins = num_households)
   household_intervention <- prepare_se_intervention(
     parameters_list,
@@ -120,8 +120,8 @@ create_SE_process <- function(
   )
 
   ##### WORKPLACES #####
-  num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
-  workplace_id <- get_location_ids(variables_list$workplace)
+  workplace_id <- variables_list$workplace$get_values()
+  num_workplaces <- max(workplace_id)
   workplace_size <- tabulate(workplace_id, nbins = num_workplaces)
   workplace_intervention <- prepare_se_intervention(
     parameters_list,
@@ -130,8 +130,8 @@ create_SE_process <- function(
   )
 
   ##### SCHOOLS #####
-  num_schools <- max(as.numeric(variables_list$school$get_categories()))
-  school_id <- get_location_ids(variables_list$school)
+  school_id <- variables_list$school$get_values()
+  num_schools <- max(school_id)
   school_size <- tabulate(school_id, nbins = num_schools)
   school_intervention <- prepare_se_intervention(
     parameters_list,
@@ -388,27 +388,6 @@ prepare_se_intervention <- function(parameters_list, setting, riskiness) {
     timestep = parameters_list[[paste0("intervention_", setting, "_timestep")]]
   )
 }
-
-#' The location id of every person, read from a categorical location variable
-#'
-#' Equivalent to `as.integer(variable$get_values())` but built from one
-#' `get_index_of()` per category. `CategoricalVariable$get_values()` costs
-#' (people x categories) per call, which is minutes for the household variable
-#' at tens of thousands of people.
-#'
-#' @param variable An `individual::CategoricalVariable` whose categories are the
-#'   location ids as text (`"0"` meaning no location).
-#'
-#' @return An integer vector, one entry per person, 0 for people in no location.
-#' @noRd
-get_location_ids <- function(variable) {
-  location_id <- integer(variable$size())
-  for (category in setdiff(variable$get_categories(), "0")) {
-    location_id[variable$get_index_of(category)$to_vector()] <- as.integer(category)
-  }
-  location_id
-}
-
 
 #' Create process governing exposed to infectious disease state transition
 #'

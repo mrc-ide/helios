@@ -783,3 +783,36 @@ test_that("create_variables stores setting sizes equal to those counted from the
     }
   }
 })
+
+#=========================================================#
+#===== household, workplace and school are integer variables =====#
+#=========================================================#
+
+test_that("household, workplace and school are IntegerVariables holding the location id of each person", {
+  parameters_list <- with_default_ach(get_parameters(list(
+    human_population = 2500,
+    number_initial_S = 2495,
+    number_initial_E = 5,
+    seed = 31
+  )))
+  x <- suppressMessages(create_variables(parameters_list))
+
+  for (setting in c("household", "workplace", "school")) {
+    variable <- x$variables_list[[setting]]
+    expect_s3_class(variable, "IntegerVariable")
+
+    ids <- variable$get_values()
+    expect_length(ids, 2500)
+    expect_true(is.integer(ids))
+
+    # The sizes agree with asking the variable for the members of each location directly
+    sizes <- get_setting_size(x$variables_list, setting = setting)
+    members <- vapply(
+      seq_along(sizes),
+      function(i) variable$get_index_of(set = i)$size(),
+      numeric(1)
+    )
+    expect_identical(as.numeric(sizes), members, info = setting)
+    expect_identical(sizes, x$parameters_list$setting_sizes[[setting]], info = setting)
+  }
+})

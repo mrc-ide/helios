@@ -19,30 +19,8 @@ get_setting_size <- function(variables_list, setting) {
     stop('setting must be either "workplace", "school" or "household"')
   }
 
-  location_sizes <- vector()
-
-  if (setting == "workplace") {
-    workplaces <- 1:max(as.numeric(variables_list$workplace$get_categories()))
-    for (i in workplaces) {
-      location_sizes[i] <- variables_list$workplace$get_size_of(as.character(i))
-    }
-  }
-
-  if (setting == "school") {
-    schools <- 1:max(as.numeric(variables_list$school$get_categories()))
-    for (i in schools) {
-      location_sizes[i] <- variables_list$school$get_size_of(as.character(i))
-    }
-  }
-
-  if (setting == "household") {
-    households <- 1:max(as.numeric(variables_list$household$get_categories()))
-    for (i in households) {
-      location_sizes[i] <- variables_list$household$get_size_of(as.character(i))
-    }
-  }
-
-  return(location_sizes)
+  values <- variables_list[[setting]]$get_values()
+  tabulate(values, nbins = max(values))
 }
 
 #' timestep_to_day
