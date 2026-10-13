@@ -680,6 +680,17 @@ generate_initial_workplaces <- function(
 #' Each element of this list indicates which settings each individual visits on
 #' which day. The value 0 indicates that the person stays in on that day.
 #'
+#' @details
+#' Each person makes a Poisson number of leisure visits per week (capped at one
+#' per day). The venues they go to are drawn without replacement with
+#' probability proportional to venue size, and are then spread over a uniformly
+#' random choice of days of the week. This is done for all people at once. The
+#' venue draws are inverse-CDF draws, and a draw that repeats a venue the person
+#' already has is redrawn, which is exactly sequential sampling without
+#' replacement. For a given seed the result is therefore different from the
+#' per-person implementation used before (it has the same distribution but
+#' consumes the random number stream differently).
+#'
 #' @inheritParams create_variables
 #'
 #' @family variables
@@ -709,54 +720,73 @@ generate_initial_leisure <- function(parameters_list, leisure_setting_sizes) {
   # Setting the seed
   set.seed(parameters_list$seed)
 
+  population <- parameters_list$human_population
+
   # Calculating the number of leisure visits that each person makes per week
   leisure_visits_per_person_per_week <- rpois(
-    n = parameters_list$human_population,
+    n = population,
     lambda = parameters_list$leisure_mean_number_settings
   )
   leisure_visits_per_person_per_week[
     leisure_visits_per_person_per_week > 7
   ] <- 7 # capping it at 1 leisure visit per day (max 7 per week)
 
-  # Populating a list with the leisure visits made by each individual
-  leisure_visit_list <- vector(
-    mode = "list",
-    length = parameters_list$human_population
-  )
-  for (i in 1:parameters_list$human_population) {
-    # Creating a temporary vector of leisure visits for that person
-    # -> Each element indicates where they visit on which day of the week
-    #    and a 0 means nowhere visited on that day of the week
-    temp_leisure_visit <- rep(0, 7)
-
-    # Sampling which locations individuals visit for their leisure visits (weighted according to leisure setting size)
-    temp_location_leisure_visits <- sample(
-      x = 1:length(leisure_setting_sizes),
-      size = leisure_visits_per_person_per_week[i],
-      replace = FALSE,
-      prob = leisure_setting_sizes
+  # Venues are drawn with probability proportional to their size, without replacement within a person
+  venue_probability <- leisure_setting_sizes / sum(leisure_setting_sizes)
+  num_venues <- length(venue_probability)
+  if (sum(venue_probability > 0) < max(leisure_visits_per_person_per_week)) {
+    stop(
+      "cannot assign each individual distinct leisure venues: fewer venues than the largest number of weekly visits"
     )
-
-    # Sampling which day(s) of the week the individual makes those visit(s) and assigning visits randomly
-    days_visits_made <- sample(
-      x = 1:7,
-      size = leisure_visits_per_person_per_week[i],
-      replace = FALSE
-    )
-    if (leisure_visits_per_person_per_week[i] == 1) {
-      temp_leisure_visit[days_visits_made] <- temp_location_leisure_visits
-    } else {
-      temp_leisure_visit[days_visits_made] <- sample(
-        x = temp_location_leisure_visits,
-        size = leisure_visits_per_person_per_week[i],
-        replace = FALSE
-      )
-    }
-    leisure_visit_list[[i]] <- temp_leisure_visit
+  }
+  venue_cumulative_probability <- cumsum(venue_probability)
+  draw_venues <- function(n) {
+    pmin(findInterval(runif(n), venue_cumulative_probability) + 1L, num_venues)
   }
 
-  return(leisure_visit_list) # a list where each element contains a vector that specifies the ids of the leisure settings
+  # venues[i, r] is the r-th venue drawn for person i (0 = fewer than r visits)
+  venues <- matrix(0L, nrow = population, ncol = 7)
+  for (r in seq_len(max(leisure_visits_per_person_per_week))) {
+    people <- which(leisure_visits_per_person_per_week >= r)
+    drawn <- draw_venues(length(people))
+    if (r > 1) {
+      # Redraw any venue the person already has until nobody has a repeat
+      repeat {
+        repeated <- rowSums(
+          venues[people, seq_len(r - 1), drop = FALSE] == drawn
+        ) >
+          0
+        if (!any(repeated)) {
+          break
+        }
+        drawn[repeated] <- draw_venues(sum(repeated))
+      }
+    }
+    venues[people, r] <- drawn
+  }
+
+  # Which days the visits fall on, and which venue goes on which day: the first k
+  # entries of a uniformly random permutation of the 7 days are the k days, and
+  # the r-th venue goes on the r-th of them
+  visitors <- which(leisure_visits_per_person_per_week > 0)
+  keys <- matrix(runif(7 * length(visitors)), nrow = length(visitors), ncol = 7)
+  sorted <- order(rep(seq_along(visitors), 7), as.vector(keys))
+  day_order <- matrix(
+    ((sorted - 1L) %/% length(visitors)) + 1L,
+    ncol = 7,
+    byrow = TRUE
+  )
+
+  visits <- matrix(0, nrow = population, ncol = 7)
+  for (r in seq_len(max(leisure_visits_per_person_per_week))) {
+    visitors_r <- which(leisure_visits_per_person_per_week[visitors] >= r)
+    visits[cbind(visitors[visitors_r], day_order[visitors_r, r])] <-
+      venues[visitors[visitors_r], r]
+  }
+
+  # a list where each element contains a vector that specifies the ids of the leisure settings
   # that each individual visits e.g. list(c(2, 6, 19, 35), c(1, 8), c(6, 10, 45)... etc)
+  unname(split(as.vector(t(visits)), rep(seq_len(population), each = 7)))
 }
 
 #' Generates a vector of households for all individuals in the population
@@ -902,56 +932,60 @@ generate_initial_households_bootstrap <- function(parameters_list) {
     ref_panel <- baseline_household_demographics_uk
   }
 
-  # Creating blank age-class vectors and household assignment vectors to populate
-  age_class_vector <- rep("", parameters_list$human_population)
-  individual_households <- rep(NA, parameters_list$human_population)
+  population <- parameters_list$human_population
+  panel <- as.matrix(as.data.frame(ref_panel))
+  panel_household_size <- rowSums(panel)
+  if (any(panel_household_size < 1)) {
+    stop("the reference household panel contains an empty household")
+  }
+  panel_rows <- nrow(panel)
 
-  ## Looping over this whilst there still remain any unassigned individuals
-  counter <- 1
-  household_counter <- 1
-  while (counter <= parameters_list$human_population) {
-    ## Sampling a random household from the reference panel
-    temp_index <- sample(1:nrow(ref_panel), 1, replace = TRUE)
-    random_household <- ref_panel[temp_index, ]
-
-    ## Expanding out the random household
-    household_age_individuals <- rep(
-      x = names(random_household),
-      times = random_household
+  ## Sampling random households from the reference panel until the population is filled.
+  ## Drawing m households with one sample.int(panel_rows, m, replace = TRUE) uses exactly
+  ## the same random numbers as m separate draws of one household, so this gives the same
+  ## households as drawing them one at a time. We draw in blocks, work out how many
+  ## households were needed to reach the population size, and if the last block went past
+  ## that, rewind the random number generator and redraw exactly that many. The generator
+  ## then ends in the same state as it would after drawing one household at a time.
+  if (!exists(".Random.seed", envir = globalenv())) {
+    runif(1) # initialise the generator
+  }
+  start_state <- get(".Random.seed", envir = globalenv())
+  block_size <- max(16L, ceiling(1.2 * population / mean(panel_household_size)))
+  sampled_rows <- integer(0)
+  repeat {
+    sampled_rows <- c(
+      sampled_rows,
+      sample.int(panel_rows, block_size, replace = TRUE)
     )
-    for (i in 1:length(household_age_individuals)) {
-      age_class_vector[counter] <- household_age_individuals[i]
-      individual_households[counter] <- household_counter
-      counter <- counter + 1
+    filled <- which(cumsum(panel_household_size[sampled_rows]) >= population)
+    if (length(filled) > 0) {
+      num_households <- filled[1]
+      break
     }
-    household_counter <- household_counter + 1
+  }
+  if (length(sampled_rows) > num_households) {
+    assign(".Random.seed", start_state, envir = globalenv())
+    sampled_rows <- sample.int(panel_rows, num_households, replace = TRUE)
   }
 
-  ## Checking if there are any NAs or missing age_class assignments - if there are, randomly assigning
-  ## them to houses and age-groups
-  if (sum(is.na(individual_households)) > 0) {
-    index_unassigned <- which(is.na(individual_households))
-    if (length(index_unassigned) > 3) {
-      stop("too many NAs in household generation - check this")
-    }
-    individual_households[index] <- sample(
-      x = 1:max(individual_households),
-      size = length(index_unassigned),
-      replace = TRUE
-    )
-    age_class_vector[index] <- sample(
-      x = unique(age_class_vector),
-      size = length(index_unassigned),
-      replace = TRUE,
-      prob = unname(table(age_class_vector)) / parameters_list$human_population
-    )
-  }
+  ## Expanding out the sampled households. The last household may run past the
+  ## population size, those individuals are dropped below.
+  household_members <- panel[sampled_rows, , drop = FALSE]
+  age_class_vector <- rep(
+    rep(colnames(panel), num_households),
+    times = as.vector(t(household_members))
+  )
+  individual_households <- as.numeric(rep(
+    seq_len(num_households),
+    times = panel_household_size[sampled_rows]
+  ))
 
   ## Scrambling the order of individuals so that household members don't appear right next to each other
   ## -> This might not be needed, need to give this some thought
   scrambled_index <- sample(
-    x = 1:parameters_list$human_population,
-    size = parameters_list$human_population,
+    x = 1:population,
+    size = population,
     replace = FALSE
   )
 

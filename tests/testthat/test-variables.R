@@ -581,6 +581,115 @@ test_that("generate_initial_workplaces errors if parameter_list does not contain
 #===== generate_initial_leisure =====#
 #====================================#
 
+# generate_initial_leisure() is vectorised and is NOT stream-identical to the
+# per-person implementation it replaced (reference_generate_initial_leisure() in
+# helper-variables-reference.R), so these tests check its properties and that it
+# has the same distribution as the reference.
+
+leisure_test_inputs <- function(population, seed) {
+  parameters_list <- get_parameters(list(
+    human_population = population,
+    number_initial_S = population - 5,
+    number_initial_E = 5,
+    seed = seed
+  ))
+  set.seed(seed)
+  sizes <- sample_negbinom(
+    N = population,
+    prop_max = parameters_list$leisure_prop_max,
+    mu = parameters_list$leisure_mean_size,
+    size = parameters_list$leisure_overdispersion_size
+  )
+  list(parameters_list = parameters_list, sizes = sizes)
+}
+
+test_that("generate_initial_leisure returns 7 possible visits per person with valid venue ids", {
+  inputs <- leisure_test_inputs(2000, seed = 3)
+  visits <- generate_initial_leisure(inputs$parameters_list, inputs$sizes)
+
+  expect_length(visits, 2000)
+  expect_true(all(lengths(visits) == 7))
+  all_ids <- unlist(visits)
+  expect_true(all(all_ids >= 0 & all_ids <= length(inputs$sizes)))
+  expect_true(all(all_ids == round(all_ids)))
+})
+
+test_that("generate_initial_leisure gives each person the Poisson number of visits, on distinct venues", {
+  inputs <- leisure_test_inputs(2000, seed = 4)
+  visits <- generate_initial_leisure(inputs$parameters_list, inputs$sizes)
+
+  # The number of weekly visits is the first thing drawn after the seed is set
+  set.seed(4)
+  expected_visits <- pmin(
+    rpois(2000, inputs$parameters_list$leisure_mean_number_settings),
+    7
+  )
+  expect_identical(vapply(visits, function(v) sum(v > 0), numeric(1)), as.numeric(expected_visits))
+
+  # No venue appears twice in a person's week
+  distinct <- vapply(visits, function(v) length(unique(v[v > 0])), numeric(1))
+  expect_identical(distinct, as.numeric(expected_visits))
+})
+
+test_that("generate_initial_leisure is reproducible for a seed and differs between seeds", {
+  inputs <- leisure_test_inputs(1000, seed = 5)
+  first <- generate_initial_leisure(inputs$parameters_list, inputs$sizes)
+  second <- generate_initial_leisure(inputs$parameters_list, inputs$sizes)
+  expect_identical(first, second)
+
+  other <- inputs$parameters_list
+  other$seed <- 6
+  expect_false(identical(first, generate_initial_leisure(other, inputs$sizes)))
+})
+
+test_that("generate_initial_leisure spreads visits uniformly over weekdays and in proportion to venue size", {
+  inputs <- leisure_test_inputs(4000, seed = 7)
+  visits <- do.call(rbind, generate_initial_leisure(inputs$parameters_list, inputs$sizes))
+
+  weekday_share <- colMeans(visits > 0) / mean(visits > 0) / 7
+  expect_true(all(abs(weekday_share - 1 / 7) < 0.01))
+
+  visits_per_venue <- tabulate(visits[visits > 0], nbins = length(inputs$sizes))
+  expect_gt(cor(visits_per_venue, inputs$sizes), 0.98)
+})
+
+test_that("generate_initial_leisure has the same distribution as the per-person reference implementation", {
+  statistics <- function(visits, sizes) {
+    visit_matrix <- do.call(rbind, visits)
+    visited <- visit_matrix[visit_matrix > 0]
+    per_venue <- tabulate(visited, nbins = length(sizes))
+    top5 <- order(sizes, decreasing = TRUE)[1:5]
+    c(
+      share_top5 = sum(per_venue[top5]) / length(visited),
+      cor_size_visits = cor(sizes, per_venue),
+      weekday_spread = sd(colMeans(visit_matrix > 0)),
+      share_in_largest = max(per_venue) / length(visited)
+    )
+  }
+  replicates <- 30
+  new <- old <- NULL
+  for (seed in seq_len(replicates)) {
+    inputs <- leisure_test_inputs(1500, seed)
+    new <- rbind(new, statistics(generate_initial_leisure(inputs$parameters_list, inputs$sizes), inputs$sizes))
+    old <- rbind(old, statistics(reference_generate_initial_leisure(inputs$parameters_list, inputs$sizes), inputs$sizes))
+  }
+  z <- (colMeans(new) - colMeans(old)) /
+    sqrt(apply(new, 2, var) / replicates + apply(old, 2, var) / replicates)
+  expect_true(all(abs(z) < 4), info = paste(names(z), round(z, 2), collapse = ", "))
+})
+
+test_that("generate_initial_leisure handles people with no visits and errors when there are too few venues", {
+  inputs <- leisure_test_inputs(300, seed = 8)
+  none <- inputs$parameters_list
+  none$leisure_mean_number_settings <- 0
+  expect_true(all(unlist(generate_initial_leisure(none, inputs$sizes)) == 0))
+
+  expect_error(
+    generate_initial_leisure(inputs$parameters_list, leisure_setting_sizes = c(5, 5)),
+    regexp = "fewer venues than the largest number of weekly visits"
+  )
+})
+
 #=======================================#
 #===== generate_initial_households =====#
 #=======================================#
@@ -588,3 +697,64 @@ test_that("generate_initial_workplaces errors if parameter_list does not contain
 #=================================================#
 #===== generate_initial_households_bootstrap =====#
 #=================================================#
+
+# generate_initial_households_bootstrap() is vectorised but consumes the random
+# number stream exactly like the per-household loop it replaced, so it is checked
+# for identical output and an identical final generator state.
+
+test_that("generate_initial_households_bootstrap matches the per-household reference exactly, including the RNG state", {
+  for (country in c("USA", "UK")) {
+    for (population in c(150, 1200, 6000)) {
+      for (seed in 1:4) {
+        parameters_list <- get_parameters(list(
+          human_population = population,
+          number_initial_S = population - 5,
+          number_initial_E = 5,
+          seed = seed,
+          household_distribution_country = country
+        ))
+        set.seed(seed)
+        expected <- reference_generate_initial_households_bootstrap(parameters_list)
+        expected_state <- get(".Random.seed", envir = globalenv())
+        set.seed(seed)
+        observed <- generate_initial_households_bootstrap(parameters_list)
+        observed_state <- get(".Random.seed", envir = globalenv())
+
+        info <- paste(country, population, "seed", seed)
+        expect_identical(observed, expected, info = info)
+        expect_identical(observed_state, expected_state, info = info)
+      }
+    }
+  }
+})
+
+test_that("generate_initial_households_bootstrap assigns every individual a household and an age class", {
+  parameters_list <- get_parameters(list(
+    human_population = 2000,
+    number_initial_S = 1995,
+    number_initial_E = 5,
+    seed = 11
+  ))
+  set.seed(11)
+  households <- generate_initial_households_bootstrap(parameters_list)
+
+  expect_length(households$individual_households, 2000)
+  expect_length(households$age_class_vector, 2000)
+  expect_false(anyNA(households$individual_households))
+  expect_true(all(households$age_class_vector %in% c("child", "adult", "elderly")))
+  expect_true(all(households$individual_households >= 1))
+})
+
+test_that("generate_initial_households_bootstrap errors for an unsupported country", {
+  parameters_list <- get_parameters(list(
+    human_population = 100,
+    number_initial_S = 95,
+    number_initial_E = 5,
+    seed = 1
+  ))
+  parameters_list$household_distribution_country <- "custom"
+  expect_error(
+    generate_initial_households_bootstrap(parameters_list),
+    regexp = "Country specified must be either USA or UK"
+  )
+})

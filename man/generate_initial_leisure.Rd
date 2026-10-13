@@ -13,6 +13,17 @@ generate_initial_leisure(parameters_list, leisure_setting_sizes)
 Each element of this list indicates which settings each individual visits on
 which day. The value 0 indicates that the person stays in on that day.
 }
+\details{
+Each person makes a Poisson number of leisure visits per week (capped at one
+per day). The venues they go to are drawn without replacement with
+probability proportional to venue size, and are then spread over a uniformly
+random choice of days of the week. This is done for all people at once. The
+venue draws are inverse-CDF draws, and a draw that repeats a venue the person
+already has is redrawn, which is exactly sequential sampling without
+replacement. For a given seed the result is therefore different from the
+per-person implementation used before (it has the same distribution but
+consumes the random number stream differently).
+}
 \seealso{
 Other variables: 
 \code{\link{create_variables}()},
