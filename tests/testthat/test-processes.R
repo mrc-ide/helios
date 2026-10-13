@@ -184,6 +184,25 @@ test_that("random daily leisure draws reproduce the per-person draws of the orig
   }
 })
 
+test_that("a process created mid-day (a resumed run) picks up the leisure assignment saved in specific_leisure", {
+  # When a run is resumed from a saved state, create_SE_process() is called afresh and
+  # the first resumed step is usually NOT a redraw step, so the assignment drawn on the
+  # last step of the first leg has to come back from the specific_leisure variable.
+  fixture <- make_se_fixture(riskiness = TRUE)
+  first_leg <- se_foi_probe(fixture)
+  dqrng::dqset.seed(5)
+  first_leg(1)
+  first_leg(2) # day boundary: today's venues are drawn and queued
+  fixture$variables_list$specific_leisure$.update() # what the simulation loop does at the end of the step
+  saved <- fixture$variables_list$specific_leisure$get_values()
+  expect_gt(sum(saved > 0), 0)
+  expect_true(all(saved %in% c(0, 2, 5, 7)))
+
+  expected_next_step <- first_leg(3) # same process, no redraw
+  resumed <- se_foi_probe(fixture) # a new process on the same (restored) variables
+  expect_foi_equal(resumed(3), expected_next_step, label = "first resumed step")
+})
+
 test_that("the naive oracle agrees with the golden scenarios (so it is a fair referee)", {
   # All golden scenarios use deterministic leisure lists, so the venue visited is
   # the single non-zero id in each person's list (or none before the first draw).

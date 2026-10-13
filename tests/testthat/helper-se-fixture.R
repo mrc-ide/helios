@@ -95,9 +95,7 @@ make_se_fixture <- function(
       as.character(0:5), as.character(ids$workplace)
     ),
     leisure = individual::RaggedInteger$new(leisure_visits),
-    specific_leisure = individual::CategoricalVariable$new(
-      as.character(leisure_indices), rep("0", n)
-    )
+    specific_leisure = individual::IntegerVariable$new(rep(0L, n))
   )
 
   risk <- function(k, offset) if (riskiness) 0.6 + 0.07 * ((seq_len(k) * 3 + offset) %% 11) else rep(1, k)

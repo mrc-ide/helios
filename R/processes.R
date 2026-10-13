@@ -148,7 +148,7 @@ create_SE_process <- function(
     stop("every individual must have exactly 7 possible leisure visits (one per day of the week)")
   }
   leisure_possible_visits <- matrix(leisure_possible_visits, ncol = 7, byrow = TRUE)
-  leisure_locations <- as.numeric(variables_list$specific_leisure$get_categories())
+  leisure_locations <- sort(as.numeric(parameters_list$leisure_indices))
   leisure_locations <- leisure_locations[leisure_locations != 0] # removing the "0" category which is not visited
   num_leisure_locations <- length(leisure_locations)
   leisure_intervention <- prepare_se_intervention(
@@ -235,7 +235,7 @@ create_SE_process <- function(
     #=== Leisure FOI ===#
     #=====================#
     if (is.null(leisure_position)) {
-      set_leisure_position(get_location_ids(variables_list$specific_leisure))
+      set_leisure_position(as.numeric(variables_list$specific_leisure$get_values()))
     }
     if ((t * parameters_list$dt) == floor(t * parameters_list$dt)) {
       # For each individual, work out which leisure location they go to that particular day. 0 = they don't go to any
@@ -251,10 +251,7 @@ create_SE_process <- function(
       ## Also note that parameters_list$leisure_indices aren't 1:num_leisure as i) it includes 0 (no leisure visited); and
       ## 2) as part of the leisure variable creation in variables.R, some initially created leisure locations
       ##    don't feature in the RaggedInteger vector, and so these locations are removed as indices.
-      variables_list$specific_leisure$initialize(
-        categories = as.character(parameters_list$leisure_indices),
-        initial_values = as.character(leisure_visit)
-      ) #  update the states with leisure_visit for that day
+      variables_list$specific_leisure$queue_update(values = leisure_visit) #  update the states with leisure_visit for that day
       set_leisure_position(leisure_visit)
     }
 
