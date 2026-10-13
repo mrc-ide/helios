@@ -758,3 +758,28 @@ test_that("generate_initial_households_bootstrap errors for an unsupported count
     regexp = "Country specified must be either USA or UK"
   )
 })
+
+#==============================================#
+#===== setting sizes (create_variables) =====#
+#==============================================#
+
+test_that("create_variables stores setting sizes equal to those counted from the variables", {
+  for (country in c("USA", "custom")) {
+    parameters_list <- with_default_ach(get_parameters(list(
+      human_population = 3000,
+      number_initial_S = 2995,
+      number_initial_E = 5,
+      seed = 21,
+      household_distribution_country = country
+    )))
+    x <- suppressMessages(create_variables(parameters_list))
+
+    for (setting in c("household", "workplace", "school")) {
+      expect_identical(
+        x$parameters_list$setting_sizes[[setting]],
+        get_setting_size(x$variables_list, setting = setting),
+        info = paste(country, setting)
+      )
+    }
+  }
+})

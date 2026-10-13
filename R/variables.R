@@ -24,6 +24,7 @@ create_variables <- function(parameters_list) {
     household_age_list <- generate_initial_households_bootstrap(
       parameters_list = parameters_list
     )
+    initial_household_ids <- household_age_list$individual_households
 
     # Age class variable
     age_classes <- c("child", "adult", "elderly")
@@ -60,6 +61,7 @@ create_variables <- function(parameters_list) {
       parameters_list = parameters_list,
       age_class_variable = age_class_variable
     )
+    initial_household_ids <- initial_households
     household_variable <- individual::CategoricalVariable$new(
       categories = sprintf("%d", 1:max(initial_households)),
       initial_values = sprintf("%d", initial_households)
@@ -172,11 +174,13 @@ create_variables <- function(parameters_list) {
   )
 
   # Store setting sizes in a list:
+  # (counted from the vectors the variables were built from. get_setting_size() gives the same
+  # numbers but needs one call per location, which is slow for the tens of thousands of households)
   setting_sizes <- list(
-    workplace = get_setting_size(variables_list, setting = "workplace"),
-    school = get_setting_size(variables_list, setting = "school"),
+    workplace = tabulate(as.integer(initial_workplace_settings), nbins = num_workplaces),
+    school = tabulate(as.integer(initial_school_settings), nbins = num_schools),
     leisure = leisure_setting_sizes,
-    household = get_setting_size(variables_list, setting = "household")
+    household = tabulate(as.integer(initial_household_ids), nbins = max(initial_household_ids))
   )
 
   # Append setting sizes to variables_list:
