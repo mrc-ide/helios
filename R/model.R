@@ -68,6 +68,12 @@ run_simulation <- function(parameters_list, state = NULL) {
   }
   set.seed(parameters_list$seed)
 
+  # The daily leisure redraw uses dqrng, which has its own generator that
+  # set.seed() does not touch. A NULL seed leaves it unseeded, like set.seed(NULL):
+  if (!is.null(parameters_list$seed)) {
+    dqrng::dqset.seed(parameters_list$seed)
+  }
+
   # Generate the model variables:
   variables_list <- create_variables(parameters_list)
   parameters_list <- variables_list$parameters_list  # note: this could be written more nicely and in a way
