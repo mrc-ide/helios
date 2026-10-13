@@ -1,3 +1,70 @@
+#' Pick locations at random until their combined size reaches a target
+#'
+#' Repeatedly draws one location uniformly from those not yet picked and adds its
+#' size to a running total, until the total reaches `target`. This is the
+#' "random" coverage rule of the intervention set-up.
+#'
+#' The locations still available are kept in their original order and the r-th
+#' available one is found with a block decomposition (about `sqrt(L)` blocks,
+#' each with a count of its available locations). That makes a draw cost about
+#' `sqrt(L)` instead of rebuilding the list of candidates every time, which was
+#' quadratic in the number of locations. It consumes the random number stream
+#' exactly like the earlier `sample()` / `setdiff()` loop, so the same seed picks
+#' the same locations.
+#'
+#' @param location_size Number of individuals (or floor area) in each location.
+#' @param target The combined size to reach.
+#' @param error_message Message for the error raised when every location has been
+#'   picked and the target is still not reached.
+#'
+#' @return The picked locations, in the order they were drawn, or `NULL` if the
+#'   target is zero.
+#' @noRd
+select_random_locations <- function(location_size, target, error_message) {
+  num_locations <- length(location_size)
+  selected <- integer(num_locations)
+  n_selected <- 0L
+  total <- 0
+
+  block_size <- max(1L, ceiling(sqrt(num_locations)))
+  num_blocks <- ceiling(num_locations / block_size)
+  available <- rep(TRUE, num_locations)
+  block_available <- tabulate(
+    ((seq_len(num_locations) - 1L) %/% block_size) + 1L,
+    nbins = num_blocks
+  )
+  num_available <- num_locations
+
+  while (total < target) {
+    if (num_available == 1L) {
+      # sample(x, 1) on a single number x means sample(1:x, 1), as in the original loop
+      only <- which(available)
+      i <- sample(only, 1)
+      removed <- i == only
+    } else {
+      rank <- sample.int(num_available, 1)
+      block <- findInterval(rank, cumsum(block_available), left.open = TRUE) + 1L
+      rank_in_block <- rank - sum(block_available[seq_len(block - 1L)])
+      in_block <- ((block - 1L) * block_size + 1L):min(block * block_size, num_locations)
+      i <- in_block[which(available[in_block])[rank_in_block]]
+      removed <- TRUE
+    }
+    total <- total + location_size[i]
+    n_selected <- n_selected + 1L
+    selected[n_selected] <- i
+    if (removed) {
+      available[i] <- FALSE
+      block_i <- ((i - 1L) %/% block_size) + 1L
+      block_available[block_i] <- block_available[block_i] - 1L
+      num_available <- num_available - 1L
+    }
+    if (num_available == 0L && total < target) {
+      stop(error_message)
+    }
+  }
+  if (n_selected == 0L) NULL else selected[seq_len(n_selected)]
+}
+
 #' Update model parameters with intervention switches
 #'
 #' @description
@@ -95,18 +162,11 @@ generate_joint_intervention_switches <- function(parameters_list, variables_list
   # Pick locations until cumulative size meets the budget, either at random
   # or in decreasing order of riskiness
   if (parameters_list[["intervention_joint_coverage_type"]] == "random") {
-    sum <- 0
-    indices <- c()
-    location_indices <- 1:total_length
-    while (sum < total_with_intervention) {
-      i <- sample(location_indices, 1)
-      sum <- sum + setting_size_flat[i]
-      indices <- c(indices, i)
-      location_indices <- setdiff(location_indices, i)
-      if (length(location_indices) == 0 & sum < total_with_intervention) {
-        stop("Insufficient space to meet joint intervention coverage")
-      }
-    }
+    indices <- select_random_locations(
+      location_size = setting_size_flat,
+      target = total_with_intervention,
+      error_message = "Insufficient space to meet joint intervention coverage"
+    )
   } else if (parameters_list[["intervention_joint_coverage_type"]] == "targeted_riskiness") {
     riskiness_list <- list(
       "workplace" = parameters_list$workplace_specific_riskiness,
@@ -203,19 +263,11 @@ generate_setting_intervention_switches <- function(
 
 
   if (parameters_list[[paste0("intervention_", setting, "_coverage_type")]] == "random") {
-    sum <- 0
-    indices <- c()
-    location_indices <- 1:length(setting_size)
-
-    while (sum < total_with_intervention) {
-      i <- sample(location_indices, 1)
-      sum <- sum + setting_size[i]
-      indices <- c(indices, i)
-      location_indices <- setdiff(location_indices, i)
-      if (length(location_indices) == 0 & sum < total_with_intervention) {
-        stop("Insufficient individuals to meet intervention coverage")
-      }
-    }
+    indices <- select_random_locations(
+      location_size = setting_size,
+      target = total_with_intervention,
+      error_message = "Insufficient individuals to meet intervention coverage"
+    )
     intervention_switches[indices] <- 1
     parameters_list[[paste0("intervention_", setting, "_covered")]] <- intervention_switches
   } else if (
