@@ -64,6 +64,12 @@
 #' * `duration_immune`: TBD
 #' * `prob_inf_external`: TBD
 #'
+#' Near-Field Transmission Parameters (used by `calculate_setting_FOI()`, which computes each setting's FOI as the sum of a far-field and a near-field term):
+#' * `near_field_fraction_household`: share of household FOI transmitted at close range, in `[0, 1]`; default = 0
+#' * `near_field_fraction_workplace`: share of workplace FOI transmitted at close range, in `[0, 1]`; default = 0
+#' * `near_field_fraction_school`: share of school FOI transmitted at close range, in `[0, 1]`; default = 0
+#' * `near_field_fraction_leisure`: share of leisure FOI transmitted at close range, in `[0, 1]`; default = 0
+#'
 #' Rendering Parameters
 #' * `render_diagnostics`: FALSE
 #'
@@ -161,6 +167,12 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     beta_school = 0.5, # check this as default
     beta_leisure = 0.5, # check this as default
     beta_community = 0.2, # check this as default
+
+    # Near-field (close-range) share of each setting's FOI; 0 = all far-field
+    near_field_fraction_household = 0,
+    near_field_fraction_workplace = 0,
+    near_field_fraction_school = 0,
+    near_field_fraction_leisure = 0,
 
     time_varying_transmission_on = FALSE,
     dt = 0.5, # check this as default
@@ -435,6 +447,22 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     ) {
       stop(
         "ERROR: A setting-specific beta has length not equal to 1. All setting-specific betas must be of length 1"
+      )
+    }
+  }
+
+  # Check that each near-field fraction is a single number in [0, 1]
+  for (setting in c("household", "workplace", "school", "leisure")) {
+    near_field_fraction <- parameters[[paste0("near_field_fraction_", setting)]]
+    if (
+      !is.numeric(near_field_fraction) ||
+        length(near_field_fraction) != 1 ||
+        is.na(near_field_fraction) ||
+        near_field_fraction < 0 ||
+        near_field_fraction > 1
+    ) {
+      stop(
+        "near_field_fraction_", setting, " must be a single number between 0 and 1"
       )
     }
   }

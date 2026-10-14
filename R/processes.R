@@ -193,6 +193,19 @@ create_SE_process <- function(
       beta_community_t <- parameters_list$beta_community
     }
 
+    #=== Intervention switches ===#
+    #=============================#
+    # An installed intervention's efficacy is applied to the far-field FOI from the
+    # timestep after intervention_<setting>_timestep onwards.
+    household_efficacy_on <- parameters_list$intervention_household_active &&
+      t > parameters_list$intervention_household_timestep
+    workplace_efficacy_on <- parameters_list$intervention_workplace_active &&
+      t > parameters_list$intervention_workplace_timestep
+    school_efficacy_on <- parameters_list$intervention_school_active &&
+      t > parameters_list$intervention_school_timestep
+    leisure_efficacy_on <- parameters_list$intervention_leisure_active &&
+      t > parameters_list$intervention_leisure_timestep
+
     #=== Household FOI ===#
     #=====================#
     # Open vector to store household FOIs experienced by each individual
@@ -212,33 +225,18 @@ create_SE_process <- function(
         )
 
         #  Calculate the FOI for the i-th household - with and without AQI installed
-        if (parameters_list$intervention_household_active) {
-          if (
-            t > parameters_list$intervention_household_timestep
-          ) {
-            spec_household_FOI <- parameters_list$household_specific_riskiness[
-              i
-            ] *
-              (1 - parameters_list$household_specific_efficacy[i]) *
-              (beta_household_t *
-                spec_household_I_size /
-                household_size_list[[i]])
+        spec_household_FOI <- calculate_setting_FOI(
+          beta = beta_household_t,
+          n_infectious = spec_household_I_size,
+          size = household_size_list[[i]],
+          riskiness = parameters_list$household_specific_riskiness[i],
+          near_field_fraction = parameters_list$near_field_fraction_household,
+          efficacy = if (household_efficacy_on) {
+            parameters_list$household_specific_efficacy[i]
           } else {
-            spec_household_FOI <- parameters_list$household_specific_riskiness[
-              i
-            ] *
-              beta_household_t *
-              spec_household_I_size /
-              household_size_list[[i]]
+            0
           }
-        } else {
-          spec_household_FOI <- parameters_list$household_specific_riskiness[
-            i
-          ] *
-            beta_household_t *
-            spec_household_I_size /
-            household_size_list[[i]]
-        }
+        )
 
         # Assign the i-th households FOI to the indices of the individuals residing in that household
         household_FOI[household_index_list[[i]]] <- spec_household_FOI
@@ -263,31 +261,18 @@ create_SE_process <- function(
       )
 
       # Calculate the workplace-specific FOI of the i-th workplace - with and without AQI installed
-      if (parameters_list$intervention_workplace_active) {
-        if (
-          t > parameters_list$intervention_workplace_timestep
-        ) {
-          spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[
-            i
-          ] *
-            (1 - parameters_list$workplace_specific_efficacy[i]) *
-            (beta_workplace_t *
-              spec_workplace_I_size /
-              workplace_size_list[[i]])
+      spec_workplace_FOI <- calculate_setting_FOI(
+        beta = beta_workplace_t,
+        n_infectious = spec_workplace_I_size,
+        size = workplace_size_list[[i]],
+        riskiness = parameters_list$workplace_specific_riskiness[i],
+        near_field_fraction = parameters_list$near_field_fraction_workplace,
+        efficacy = if (workplace_efficacy_on) {
+          parameters_list$workplace_specific_efficacy[i]
         } else {
-          spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[
-            i
-          ] *
-            beta_workplace_t *
-            spec_workplace_I_size /
-            workplace_size_list[[i]]
+          0
         }
-      } else {
-        spec_workplace_FOI <- parameters_list$workplace_specific_riskiness[i] *
-          beta_workplace_t *
-          spec_workplace_I_size /
-          workplace_size_list[[i]]
-      }
+      )
 
       # Store the workplace-specific FOR in the indices of all individuals that work there:
       workplace_FOI[workplace_index_list[[i]]] <- spec_workplace_FOI
@@ -311,27 +296,18 @@ create_SE_process <- function(
       )
 
       # Calculate the school-specific FOI for the i-th school - with and without AQI installed
-      if (parameters_list$intervention_school_active) {
-        if (
-          t > parameters_list$intervention_school_timestep
-        ) {
-          spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-            (1 - parameters_list$school_specific_efficacy[i]) *
-            (beta_school_t *
-              spec_school_I_size /
-              school_size_list[[i]])
+      spec_school_FOI <- calculate_setting_FOI(
+        beta = beta_school_t,
+        n_infectious = spec_school_I_size,
+        size = school_size_list[[i]],
+        riskiness = parameters_list$school_specific_riskiness[i],
+        near_field_fraction = parameters_list$near_field_fraction_school,
+        efficacy = if (school_efficacy_on) {
+          parameters_list$school_specific_efficacy[i]
         } else {
-          spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-            beta_school_t *
-            spec_school_I_size /
-            school_size_list[[i]]
+          0
         }
-      } else {
-        spec_school_FOI <- parameters_list$school_specific_riskiness[i] *
-          beta_school_t *
-          spec_school_I_size /
-          school_size_list[[i]]
-      }
+      )
 
       # Store the school-specific FOI at the indices of all children that attend it:
       school_FOI[school_index_list[[i]]] <- spec_school_FOI
@@ -396,27 +372,18 @@ create_SE_process <- function(
         ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure locations
         ## (this is in contrast to leisure_indices, which uses the original indices from their generation,
         ##  and which span 1 to max(leisure_indices) with some gaps)
-        if (parameters_list$intervention_leisure_active) {
-          if (
-            t > parameters_list$intervention_leisure_timestep
-          ) {
-            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-              (1 - parameters_list$leisure_specific_efficacy[i]) *
-              (beta_leisure_t *
-                spec_leisure_I_size /
-                spec_leisure$size()) ## this calculation needs more in it
+        spec_leisure_FOI <- calculate_setting_FOI(
+          beta = beta_leisure_t,
+          n_infectious = spec_leisure_I_size,
+          size = spec_leisure$size(), ## this calculation needs more in it
+          riskiness = parameters_list$leisure_specific_riskiness[i],
+          near_field_fraction = parameters_list$near_field_fraction_leisure,
+          efficacy = if (leisure_efficacy_on) {
+            parameters_list$leisure_specific_efficacy[i]
           } else {
-            spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-              beta_leisure_t *
-              spec_leisure_I_size /
-              spec_leisure$size() ## this calculation needs more in it
+            0
           }
-        } else {
-          spec_leisure_FOI <- parameters_list$leisure_specific_riskiness[i] *
-            beta_leisure_t *
-            spec_leisure_I_size /
-            spec_leisure$size() ## this calculation needs more in it
-        }
+        )
 
         # Store the leisure location-specific FOI at the indices of all individuals that attend it:
         leisure_FOI[spec_leisure$to_vector()] <- spec_leisure_FOI
@@ -472,6 +439,47 @@ create_SE_process <- function(
   }
 }
 
+
+#' Calculate the force of infection in a single location
+#'
+#' @description
+#' Computes a location's within-setting FOI as the sum of a far-field and a
+#' near-field term:
+#'
+#' \deqn{FOI_i = \beta_s \frac{I_i}{N_i} \left[(1 - \phi_s) \, r_i \, (1 - E_i) + \phi_s\right]}
+#'
+#' The far-field term is room-scale airborne transmission. It scales with the
+#' location's ventilation-derived riskiness \eqn{r_i} and is reduced by an installed
+#' intervention's efficacy \eqn{E_i}. The near-field term is close-range transmission
+#' within the exhaled jet. It is unaffected by ventilation and by eACH interventions,
+#' and its riskiness is currently fixed at 1.
+#'
+#' @param beta The setting-specific transmission rate at the current timestep.
+#' @param n_infectious The number of infectious individuals in the location.
+#' @param size The number of individuals in the location.
+#' @param riskiness The location's far-field riskiness, as returned by
+#' [convert_ach_to_riskiness()].
+#' @param near_field_fraction The near-field share \eqn{\phi_s} of the setting's FOI,
+#' in `[0, 1]`.
+#' @param efficacy The far-field efficacy of the intervention installed in the location,
+#' as returned by [calculate_efficacy_from_ach()]. 0 when no intervention is in effect.
+#'
+#' @return The FOI experienced by each individual in the location.
+#'
+#' @family processes
+calculate_setting_FOI <- function(
+  beta,
+  n_infectious,
+  size,
+  riskiness,
+  near_field_fraction,
+  efficacy = 0
+) {
+  far_field_FOI <- riskiness * (1 - efficacy) * beta * n_infectious / size
+  near_field_FOI <- beta * n_infectious / size
+
+  (1 - near_field_fraction) * far_field_FOI + near_field_fraction * near_field_FOI
+}
 
 #' Create process governing exposed to infectious disease state transition
 #'

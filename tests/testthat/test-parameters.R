@@ -1,3 +1,13 @@
+test_that("get_parameters() errors when a near-field fraction is not a single number in [0, 1]", {
+  for (bad_value in list(-0.1, 1.5, c(0.2, 0.3), NA_real_, "0.5")) {
+    expect_error(
+      get_parameters(overrides = list(near_field_fraction_school = bad_value)),
+      regexp = "near_field_fraction_school must be a single number between 0 and 1"
+    )
+  }
+  expect_no_error(get_parameters(overrides = list(near_field_fraction_school = 1)))
+})
+
 test_that("get_parameters() accepts setting-specific betas as vectors matching simulation_time when time_varying_transmission_on is TRUE", {
   expect_no_error(
     get_parameters(

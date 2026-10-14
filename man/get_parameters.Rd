@@ -68,6 +68,14 @@ setting-specific beta must instead be a numeric vector of length
 \item \code{prob_inf_external}: TBD
 }
 
+Near-Field Transmission Parameters (used by \code{calculate_setting_FOI()}, which computes each setting's FOI as the sum of a far-field and a near-field term):
+\itemize{
+\item \code{near_field_fraction_household}: share of household FOI transmitted at close range, in \verb{[0, 1]}; default = 0
+\item \code{near_field_fraction_workplace}: share of workplace FOI transmitted at close range, in \verb{[0, 1]}; default = 0
+\item \code{near_field_fraction_school}: share of school FOI transmitted at close range, in \verb{[0, 1]}; default = 0
+\item \code{near_field_fraction_leisure}: share of leisure FOI transmitted at close range, in \verb{[0, 1]}; default = 0
+}
+
 Rendering Parameters
 \itemize{
 \item \code{render_diagnostics}: FALSE
