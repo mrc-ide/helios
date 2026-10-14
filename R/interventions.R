@@ -109,9 +109,9 @@ generate_joint_intervention_switches <- function(parameters_list, variables_list
     }
   } else if (parameters_list[["intervention_joint_coverage_type"]] == "targeted_riskiness") {
     riskiness_list <- list(
-      "workplace" = parameters_list$workplace_specific_riskiness,
-      "school"    = parameters_list$school_specific_riskiness,
-      "leisure"   = parameters_list$leisure_specific_riskiness
+      "workplace" = parameters_list$workplace_specific_far_field_riskiness,
+      "school"    = parameters_list$school_specific_far_field_riskiness,
+      "leisure"   = parameters_list$leisure_specific_far_field_riskiness
     )
     riskiness_flat   <- unlist(riskiness_list, use.names = FALSE)
     riskiness_sorted <- sort(
@@ -221,7 +221,7 @@ generate_setting_intervention_switches <- function(
   } else if (
     parameters_list[[paste0("intervention_", setting, "_coverage_type")]] == "targeted_riskiness"
   ) {
-    riskiness <- parameters_list[[paste0(setting, "_specific_riskiness")]]
+    riskiness <- parameters_list[[paste0(setting, "_specific_far_field_riskiness")]]
     riskiness_sorted <- sort(
       x = riskiness,
       decreasing = TRUE,

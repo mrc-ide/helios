@@ -229,10 +229,10 @@ create_SE_process <- function(
           beta = beta_household_t,
           n_infectious = spec_household_I_size,
           size = household_size_list[[i]],
-          riskiness = parameters_list$household_specific_riskiness[i],
+          riskiness = parameters_list$household_specific_far_field_riskiness[i],
           near_field_fraction = parameters_list$near_field_fraction_household,
           efficacy = if (household_efficacy_on) {
-            parameters_list$household_specific_efficacy[i]
+            parameters_list$household_specific_far_field_efficacy[i]
           } else {
             0
           }
@@ -265,10 +265,10 @@ create_SE_process <- function(
         beta = beta_workplace_t,
         n_infectious = spec_workplace_I_size,
         size = workplace_size_list[[i]],
-        riskiness = parameters_list$workplace_specific_riskiness[i],
+        riskiness = parameters_list$workplace_specific_far_field_riskiness[i],
         near_field_fraction = parameters_list$near_field_fraction_workplace,
         efficacy = if (workplace_efficacy_on) {
-          parameters_list$workplace_specific_efficacy[i]
+          parameters_list$workplace_specific_far_field_efficacy[i]
         } else {
           0
         }
@@ -300,10 +300,10 @@ create_SE_process <- function(
         beta = beta_school_t,
         n_infectious = spec_school_I_size,
         size = school_size_list[[i]],
-        riskiness = parameters_list$school_specific_riskiness[i],
+        riskiness = parameters_list$school_specific_far_field_riskiness[i],
         near_field_fraction = parameters_list$near_field_fraction_school,
         efficacy = if (school_efficacy_on) {
-          parameters_list$school_specific_efficacy[i]
+          parameters_list$school_specific_far_field_efficacy[i]
         } else {
           0
         }
@@ -369,17 +369,17 @@ create_SE_process <- function(
         spec_leisure_I_size <- individual:::bitset_count_and(I, spec_leisure)
 
         # Calculate the leisure-specific FOI for the i-th leisure location - with and without AQI installed
-        ## Note that leisure_specific_riskiness uses indices 1:num_leisure to index the leisure locations
+        ## Note that leisure_specific_far_field_riskiness uses indices 1:num_leisure to index the leisure locations
         ## (this is in contrast to leisure_indices, which uses the original indices from their generation,
         ##  and which span 1 to max(leisure_indices) with some gaps)
         spec_leisure_FOI <- calculate_setting_FOI(
           beta = beta_leisure_t,
           n_infectious = spec_leisure_I_size,
           size = spec_leisure$size(), ## this calculation needs more in it
-          riskiness = parameters_list$leisure_specific_riskiness[i],
+          riskiness = parameters_list$leisure_specific_far_field_riskiness[i],
           near_field_fraction = parameters_list$near_field_fraction_leisure,
           efficacy = if (leisure_efficacy_on) {
-            parameters_list$leisure_specific_efficacy[i]
+            parameters_list$leisure_specific_far_field_efficacy[i]
           } else {
             0
           }

@@ -193,7 +193,7 @@ create_variables <- function(parameters_list) {
     number_of_locations = num_households
   )
 
-  parameters_list$household_specific_riskiness <- convert_ach_to_riskiness(
+  parameters_list$household_specific_far_field_riskiness <- convert_ach_to_riskiness(
     ach_values = parameters_list$household_specific_ach,
     parameters_list = parameters_list,
     setting = "household"
@@ -206,7 +206,7 @@ create_variables <- function(parameters_list) {
     number_of_locations = num_workplaces
   )
 
-  parameters_list$workplace_specific_riskiness <- convert_ach_to_riskiness(
+  parameters_list$workplace_specific_far_field_riskiness <- convert_ach_to_riskiness(
     ach_values = parameters_list$workplace_specific_ach,
     parameters_list = parameters_list,
     setting = "workplace"
@@ -219,7 +219,7 @@ create_variables <- function(parameters_list) {
     number_of_locations = num_schools
   )
 
-  parameters_list$school_specific_riskiness <- convert_ach_to_riskiness(
+  parameters_list$school_specific_far_field_riskiness <- convert_ach_to_riskiness(
     ach_values = parameters_list$school_specific_ach,
     parameters_list = parameters_list,
     setting = "school"
@@ -232,7 +232,7 @@ create_variables <- function(parameters_list) {
     number_of_locations = num_leisure
   )
 
-  parameters_list$leisure_specific_riskiness <- convert_ach_to_riskiness(
+  parameters_list$leisure_specific_far_field_riskiness <- convert_ach_to_riskiness(
     ach_values = parameters_list$leisure_specific_ach,
     parameters_list = parameters_list,
     setting = "leisure"
@@ -260,7 +260,7 @@ create_variables <- function(parameters_list) {
   # above and is consumed inside calculate_efficacy_from_ach to zero out delta
   # for uncovered locations.
   if (isTRUE(parameters_list$intervention_workplace_active)) {
-    parameters_list$workplace_specific_efficacy <- calculate_efficacy_from_ach(
+    parameters_list$workplace_specific_far_field_efficacy <- calculate_efficacy_from_ach(
       ach_values      = parameters_list$workplace_specific_ach,
       parameters_list = parameters_list,
       setting         = "workplace"
@@ -268,7 +268,7 @@ create_variables <- function(parameters_list) {
   }
 
   if (isTRUE(parameters_list$intervention_school_active)) {
-    parameters_list$school_specific_efficacy <- calculate_efficacy_from_ach(
+    parameters_list$school_specific_far_field_efficacy <- calculate_efficacy_from_ach(
       ach_values      = parameters_list$school_specific_ach,
       parameters_list = parameters_list,
       setting         = "school"
@@ -276,7 +276,7 @@ create_variables <- function(parameters_list) {
   }
 
   if (isTRUE(parameters_list$intervention_leisure_active)) {
-    parameters_list$leisure_specific_efficacy <- calculate_efficacy_from_ach(
+    parameters_list$leisure_specific_far_field_efficacy <- calculate_efficacy_from_ach(
       ach_values      = parameters_list$leisure_specific_ach,
       parameters_list = parameters_list,
       setting         = "leisure"
@@ -284,7 +284,7 @@ create_variables <- function(parameters_list) {
   }
 
   if (isTRUE(parameters_list$intervention_household_active)) {
-    parameters_list$household_specific_efficacy <- calculate_efficacy_from_ach(
+    parameters_list$household_specific_far_field_efficacy <- calculate_efficacy_from_ach(
       ach_values      = parameters_list$household_specific_ach,
       parameters_list = parameters_list,
       setting         = "household"

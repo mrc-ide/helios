@@ -504,11 +504,11 @@ test_that("generate_intervention_switches() with coverage_target as individuals 
   x <- create_variables(parameters_list)
 
   expect_vector(
-    x$parameters_list$household_specific_efficacy,
+    x$parameters_list$household_specific_far_field_efficacy,
     ptype = double(),
     size = length(x$parameters_list$household_specific_ach)
   )
-  expect_true(any(x$parameters_list$household_specific_efficacy > 0))
+  expect_true(any(x$parameters_list$household_specific_far_field_efficacy > 0))
 })
 
 test_that("generate_intervention_switches() with coverage_target as square_footage and coverage_type as targeted_riskiness allocates the expected total coverage for workplaces", {
@@ -528,7 +528,7 @@ test_that("generate_intervention_switches() with coverage_target as square_foota
 
   # Targeted-riskiness should preferentially cover the riskiest (lowest-ACH)
   # locations first:
-  riskiness <- x$parameters_list$workplace_specific_riskiness
+  riskiness <- x$parameters_list$workplace_specific_far_field_riskiness
   expect_gte(min(riskiness[covered == 1]), 0)
   if (any(covered == 0) && any(covered == 1)) {
     expect_gte(min(riskiness[covered == 1]), 0)
@@ -590,7 +590,7 @@ test_that("generate_joint_intervention_switches() pools workplace, school, and l
   # Household is excluded from joint deployment, so it should have no
   # installed intervention and zero efficacy:
   expect_false(isTRUE(x$parameters_list$intervention_household_active))
-  expect_true(is.null(x$parameters_list$household_specific_efficacy))
+  expect_true(is.null(x$parameters_list$household_specific_far_field_efficacy))
 
   # Workplace, school, and leisure should each have some covered locations:
   for (setting in c("workplace", "school", "leisure")) {
@@ -626,7 +626,7 @@ test_that("an installed intervention with full coverage reduces every location's
 
   x <- create_variables(parameters_list)
 
-  efficacy <- x$parameters_list$workplace_specific_efficacy
+  efficacy <- x$parameters_list$workplace_specific_far_field_efficacy
   # coverage = 1 with coverage_target = "individuals" allocates until the
   # full headcount budget is met, which can occasionally leave a
   # zero-occupancy location's covered switch at 0 -- so check on average
