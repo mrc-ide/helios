@@ -424,6 +424,52 @@ test_that("calculate_efficacy_from_ach() never produces a negative delta even wi
   expect_true(all(efficacy >= 0))
 })
 
+test_that("calculate_efficacy_from_ach() errors when a negative delta pushes efficacy outside [0, 1]", {
+  # With baseline ACH 3 and kD = 0.64, a delta of -1 gives an efficacy below 0,
+  # and a delta of -5 makes the post-intervention removal rate negative, giving an
+  # efficacy above 1.
+  for (delta in c(-1, -5)) {
+    intervention <- make_intervention(
+      name = "negative_delta",
+      delta_function = function(delta) delta,
+      delta_params = list(delta = delta),
+      coverage = 1
+    )
+    parameters <- set_intervention_ach(
+      parameters_list = get_parameters(),
+      setting = "workplace",
+      coverage_target = "individuals",
+      coverage_type = "random",
+      timestep = 1,
+      intervention = intervention
+    )
+
+    expect_error(
+      calculate_efficacy_from_ach(
+        ach_values = rep(3, 5),
+        parameters_list = parameters,
+        setting = "workplace"
+      ),
+      regexp = "workplace far-field efficacy outside \\[0, 1\\]"
+    )
+  }
+})
+
+#==================================================#
+#===== check_efficacy() =====#
+#==================================================#
+
+test_that("check_efficacy() accepts efficacies in [0, 1] and errors otherwise", {
+  expect_identical(check_efficacy(c(0, 0.5, 1), "test efficacy"), c(0, 0.5, 1))
+
+  for (bad_value in c(-0.1, 1.1, NA, Inf)) {
+    expect_error(
+      check_efficacy(c(0.5, bad_value), "test efficacy"),
+      regexp = "test efficacy outside \\[0, 1\\]"
+    )
+  }
+})
+
 #=========================================================#
 #===== uv_to_delta() / ach_to_efficacy() / efficacy_to_delta() =====#
 #=========================================================#

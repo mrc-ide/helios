@@ -488,7 +488,29 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   p_pre  <- 1 - exp(-r * (I * pi / (alpha_pre  * V)) * RRtv * t)
   p_post <- 1 - exp(-r * (I * pi / (alpha_post * V)) * RRtv * t)
 
-  return(1 - p_post / p_pre)
+  check_efficacy(1 - p_post / p_pre, paste(setting, "far-field efficacy"))
+}
+
+#' Check that per-location efficacies lie in `[0, 1]`
+#'
+#' @description
+#' An efficacy below 0 would act as an FOI multiplier greater than 1, silently
+#' amplifying transmission, and one above 1 would make the FOI negative. Either is
+#' an error. For far-field efficacy, the usual cause is a `delta_function` that
+#' returns negative values.
+#'
+#' @param efficacy Numeric vector of per-location efficacies.
+#' @param description Character. What `efficacy` is, for the error message (e.g.
+#' `"workplace far-field efficacy"`).
+#'
+#' @return `efficacy`, unchanged.
+#'
+#' @family intervention
+check_efficacy <- function(efficacy, description) {
+  if (any(!is.finite(efficacy)) || any(efficacy < 0) || any(efficacy > 1)) {
+    stop("Error: ", description, " outside [0, 1] at one or more locations")
+  }
+  efficacy
 }
 
 

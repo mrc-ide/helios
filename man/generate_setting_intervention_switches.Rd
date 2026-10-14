@@ -28,6 +28,7 @@ size meets the budget, either at random or in decreasing order of riskiness.
 Other intervention: 
 \code{\link{ach_to_efficacy}()},
 \code{\link{calculate_efficacy_from_ach}()},
+\code{\link{check_efficacy}()},
 \code{\link{efficacy_to_delta}()},
 \code{\link{generate_intervention_switches}()},
 \code{\link{generate_joint_intervention_switches}()},

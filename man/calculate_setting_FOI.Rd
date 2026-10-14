@@ -8,9 +8,11 @@ calculate_setting_FOI(
   beta,
   n_infectious,
   size,
-  riskiness,
   near_field_fraction,
-  efficacy = 0
+  far_field_riskiness,
+  near_field_riskiness,
+  far_field_efficacy = 0,
+  near_field_efficacy = 0
 )
 }
 \arguments{
@@ -20,14 +22,20 @@ calculate_setting_FOI(
 
 \item{size}{The number of individuals in the location.}
 
-\item{riskiness}{The location's far-field riskiness, as returned by
-\code{\link[=convert_ach_to_riskiness]{convert_ach_to_riskiness()}}.}
-
 \item{near_field_fraction}{The near-field share \eqn{\phi_s} of the setting's FOI,
 in \verb{[0, 1]}.}
 
-\item{efficacy}{The far-field efficacy of the intervention installed in the location,
-as returned by \code{\link[=calculate_efficacy_from_ach]{calculate_efficacy_from_ach()}}. 0 when no intervention is in effect.}
+\item{far_field_riskiness}{The location's far-field riskiness, as returned by
+\code{\link[=convert_ach_to_riskiness]{convert_ach_to_riskiness()}}.}
+
+\item{near_field_riskiness}{The location's near-field riskiness.}
+
+\item{far_field_efficacy}{The far-field efficacy of the intervention in effect in
+the location, as returned by \code{\link[=calculate_efficacy_from_ach]{calculate_efficacy_from_ach()}}. 0 when no
+intervention is in effect.}
+
+\item{near_field_efficacy}{The near-field efficacy of the intervention in effect in
+the location. 0 when no intervention is in effect.}
 }
 \value{
 The FOI experienced by each individual in the location.
@@ -36,13 +44,12 @@ The FOI experienced by each individual in the location.
 Computes a location's within-setting FOI as the sum of a far-field and a
 near-field term:
 
-\deqn{FOI_i = \beta_s \frac{I_i}{N_i} \left[(1 - \phi_s) \, r_i \, (1 - E_i) + \phi_s\right]}
+\deqn{FOI_i = \beta_s \frac{I_i}{N_i} \left[(1 - \phi_s) \, r_i^{\mathrm{far}} \, (1 - E_i^{\mathrm{far}}) + \phi_s \, r_i^{\mathrm{near}} \, (1 - E_i^{\mathrm{near}})\right]}
 
-The far-field term is room-scale airborne transmission. It scales with the
-location's ventilation-derived riskiness \eqn{r_i} and is reduced by an installed
-intervention's efficacy \eqn{E_i}. The near-field term is close-range transmission
-within the exhaled jet. It is unaffected by ventilation and by eACH interventions,
-and its riskiness is currently fixed at 1.
+The far-field term is room-scale airborne transmission, and the near-field term
+is close-range transmission within the exhaled jet. Each term has its own
+per-location riskiness \eqn{r_i} and its own efficacy \eqn{E_i} for the
+intervention in effect in the location.
 }
 \seealso{
 Other processes: 
