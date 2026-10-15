@@ -193,11 +193,15 @@ create_variables <- function(parameters_list) {
     number_of_locations = num_households
   )
 
-  parameters_list$household_specific_riskiness <- convert_ach_to_riskiness(
+  parameters_list$household_specific_far_field_riskiness <- convert_ach_to_riskiness(
     ach_values = parameters_list$household_specific_ach,
     parameters_list = parameters_list,
     setting = "household"
   )
+
+  # Near-field riskiness does not depend on ACH. It is currently the same (1) at
+  # every location in every setting.
+  parameters_list$household_specific_near_field_riskiness <- rep(1, num_households)
 
   num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
   parameters_list$workplace_specific_ach <- generate_setting_specific_ach(
@@ -206,11 +210,12 @@ create_variables <- function(parameters_list) {
     number_of_locations = num_workplaces
   )
 
-  parameters_list$workplace_specific_riskiness <- convert_ach_to_riskiness(
+  parameters_list$workplace_specific_far_field_riskiness <- convert_ach_to_riskiness(
     ach_values = parameters_list$workplace_specific_ach,
     parameters_list = parameters_list,
     setting = "workplace"
   )
+  parameters_list$workplace_specific_near_field_riskiness <- rep(1, num_workplaces)
 
   num_schools <- max(as.numeric(variables_list$school$get_categories()))
   parameters_list$school_specific_ach <- generate_setting_specific_ach(
@@ -219,11 +224,12 @@ create_variables <- function(parameters_list) {
     number_of_locations = num_schools
   )
 
-  parameters_list$school_specific_riskiness <- convert_ach_to_riskiness(
+  parameters_list$school_specific_far_field_riskiness <- convert_ach_to_riskiness(
     ach_values = parameters_list$school_specific_ach,
     parameters_list = parameters_list,
     setting = "school"
   )
+  parameters_list$school_specific_near_field_riskiness <- rep(1, num_schools)
 
   num_leisure <- length(parameters_list$setting_sizes$leisure)
   parameters_list$leisure_specific_ach <- generate_setting_specific_ach(
@@ -232,11 +238,12 @@ create_variables <- function(parameters_list) {
     number_of_locations = num_leisure
   )
 
-  parameters_list$leisure_specific_riskiness <- convert_ach_to_riskiness(
+  parameters_list$leisure_specific_far_field_riskiness <- convert_ach_to_riskiness(
     ach_values = parameters_list$leisure_specific_ach,
     parameters_list = parameters_list,
     setting = "leisure"
   )
+  parameters_list$leisure_specific_near_field_riskiness <- rep(1, num_leisure)
 
   # If any intervention is active (per-setting or joint), dispatch to the
   # intervention switches generator. For joint mode, this also propagates the
@@ -259,35 +266,54 @@ create_variables <- function(parameters_list) {
   # (intervention_<setting>_covered) was already populated by the dispatcher
   # above and is consumed inside calculate_efficacy_from_ach to zero out delta
   # for uncovered locations.
+  #
+  # No intervention acts on near-field transmission yet, so near-field efficacy
+  # is 0 at every location.
   if (isTRUE(parameters_list$intervention_workplace_active)) {
-    parameters_list$workplace_specific_efficacy <- calculate_efficacy_from_ach(
+    parameters_list$workplace_specific_far_field_efficacy <- calculate_efficacy_from_ach(
       ach_values      = parameters_list$workplace_specific_ach,
       parameters_list = parameters_list,
       setting         = "workplace"
     )
+    parameters_list$workplace_specific_near_field_efficacy <- check_efficacy(
+      rep(0, num_workplaces),
+      "workplace near-field efficacy"
+    )
   }
 
   if (isTRUE(parameters_list$intervention_school_active)) {
-    parameters_list$school_specific_efficacy <- calculate_efficacy_from_ach(
+    parameters_list$school_specific_far_field_efficacy <- calculate_efficacy_from_ach(
       ach_values      = parameters_list$school_specific_ach,
       parameters_list = parameters_list,
       setting         = "school"
     )
+    parameters_list$school_specific_near_field_efficacy <- check_efficacy(
+      rep(0, num_schools),
+      "school near-field efficacy"
+    )
   }
 
   if (isTRUE(parameters_list$intervention_leisure_active)) {
-    parameters_list$leisure_specific_efficacy <- calculate_efficacy_from_ach(
+    parameters_list$leisure_specific_far_field_efficacy <- calculate_efficacy_from_ach(
       ach_values      = parameters_list$leisure_specific_ach,
       parameters_list = parameters_list,
       setting         = "leisure"
     )
+    parameters_list$leisure_specific_near_field_efficacy <- check_efficacy(
+      rep(0, num_leisure),
+      "leisure near-field efficacy"
+    )
   }
 
   if (isTRUE(parameters_list$intervention_household_active)) {
-    parameters_list$household_specific_efficacy <- calculate_efficacy_from_ach(
+    parameters_list$household_specific_far_field_efficacy <- calculate_efficacy_from_ach(
       ach_values      = parameters_list$household_specific_ach,
       parameters_list = parameters_list,
       setting         = "household"
+    )
+    parameters_list$household_specific_near_field_efficacy <- check_efficacy(
+      rep(0, num_households),
+      "household near-field efficacy"
     )
   }
 

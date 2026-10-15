@@ -42,6 +42,7 @@ Called once at simulation init from \code{\link[=create_variables]{create_variab
 \seealso{
 Other intervention: 
 \code{\link{ach_to_efficacy}()},
+\code{\link{check_efficacy}()},
 \code{\link{efficacy_to_delta}()},
 \code{\link{generate_intervention_switches}()},
 \code{\link{generate_joint_intervention_switches}()},

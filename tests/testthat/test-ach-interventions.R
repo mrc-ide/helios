@@ -424,6 +424,52 @@ test_that("calculate_efficacy_from_ach() never produces a negative delta even wi
   expect_true(all(efficacy >= 0))
 })
 
+test_that("calculate_efficacy_from_ach() errors when a negative delta pushes efficacy outside [0, 1]", {
+  # With baseline ACH 3 and kD = 0.64, a delta of -1 gives an efficacy below 0,
+  # and a delta of -5 makes the post-intervention removal rate negative, giving an
+  # efficacy above 1.
+  for (delta in c(-1, -5)) {
+    intervention <- make_intervention(
+      name = "negative_delta",
+      delta_function = function(delta) delta,
+      delta_params = list(delta = delta),
+      coverage = 1
+    )
+    parameters <- set_intervention_ach(
+      parameters_list = get_parameters(),
+      setting = "workplace",
+      coverage_target = "individuals",
+      coverage_type = "random",
+      timestep = 1,
+      intervention = intervention
+    )
+
+    expect_error(
+      calculate_efficacy_from_ach(
+        ach_values = rep(3, 5),
+        parameters_list = parameters,
+        setting = "workplace"
+      ),
+      regexp = "workplace far-field efficacy outside \\[0, 1\\]"
+    )
+  }
+})
+
+#==================================================#
+#===== check_efficacy() =====#
+#==================================================#
+
+test_that("check_efficacy() accepts efficacies in [0, 1] and errors otherwise", {
+  expect_identical(check_efficacy(c(0, 0.5, 1), "test efficacy"), c(0, 0.5, 1))
+
+  for (bad_value in c(-0.1, 1.1, NA, Inf)) {
+    expect_error(
+      check_efficacy(c(0.5, bad_value), "test efficacy"),
+      regexp = "test efficacy outside \\[0, 1\\]"
+    )
+  }
+})
+
 #=========================================================#
 #===== uv_to_delta() / ach_to_efficacy() / efficacy_to_delta() =====#
 #=========================================================#
@@ -504,11 +550,11 @@ test_that("generate_intervention_switches() with coverage_target as individuals 
   x <- create_variables(parameters_list)
 
   expect_vector(
-    x$parameters_list$household_specific_efficacy,
+    x$parameters_list$household_specific_far_field_efficacy,
     ptype = double(),
     size = length(x$parameters_list$household_specific_ach)
   )
-  expect_true(any(x$parameters_list$household_specific_efficacy > 0))
+  expect_true(any(x$parameters_list$household_specific_far_field_efficacy > 0))
 })
 
 test_that("generate_intervention_switches() with coverage_target as square_footage and coverage_type as targeted_riskiness allocates the expected total coverage for workplaces", {
@@ -528,7 +574,7 @@ test_that("generate_intervention_switches() with coverage_target as square_foota
 
   # Targeted-riskiness should preferentially cover the riskiest (lowest-ACH)
   # locations first:
-  riskiness <- x$parameters_list$workplace_specific_riskiness
+  riskiness <- x$parameters_list$workplace_specific_far_field_riskiness
   expect_gte(min(riskiness[covered == 1]), 0)
   if (any(covered == 0) && any(covered == 1)) {
     expect_gte(min(riskiness[covered == 1]), 0)
@@ -590,7 +636,7 @@ test_that("generate_joint_intervention_switches() pools workplace, school, and l
   # Household is excluded from joint deployment, so it should have no
   # installed intervention and zero efficacy:
   expect_false(isTRUE(x$parameters_list$intervention_household_active))
-  expect_true(is.null(x$parameters_list$household_specific_efficacy))
+  expect_true(is.null(x$parameters_list$household_specific_far_field_efficacy))
 
   # Workplace, school, and leisure should each have some covered locations:
   for (setting in c("workplace", "school", "leisure")) {
@@ -626,7 +672,7 @@ test_that("an installed intervention with full coverage reduces every location's
 
   x <- create_variables(parameters_list)
 
-  efficacy <- x$parameters_list$workplace_specific_efficacy
+  efficacy <- x$parameters_list$workplace_specific_far_field_efficacy
   # coverage = 1 with coverage_target = "individuals" allocates until the
   # full headcount budget is met, which can occasionally leave a
   # zero-occupancy location's covered switch at 0 -- so check on average

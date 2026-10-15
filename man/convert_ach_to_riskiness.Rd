@@ -42,7 +42,7 @@ ACH. The constants \code{I}, \code{pi}, \code{RR_tv}, \code{t}, and \code{V} can
 
 Called once per setting during \code{\link[=create_variables]{create_variables()}} init, immediately
 after \code{\link[=generate_setting_specific_ach]{generate_setting_specific_ach()}}. The result is stored at
-\verb{<setting>_specific_riskiness} and used by \code{processes.R} to scale the
+\verb{<setting>_specific_far_field_riskiness} and used by \code{processes.R} to scale the
 per-setting FOI.
 }
 \seealso{

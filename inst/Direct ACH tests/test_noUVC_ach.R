@@ -68,16 +68,16 @@ print(p1)
 
 riskiness_data <- data.frame(
   setting = c(
-    rep("Workplace", length(params_with_riskiness$workplace_specific_riskiness)),
-    rep("School", length(params_with_riskiness$school_specific_riskiness)),
-    rep("Leisure", length(params_with_riskiness$leisure_specific_riskiness)),
-    rep("Household", length(params_with_riskiness$household_specific_riskiness))
+    rep("Workplace", length(params_with_riskiness$workplace_specific_far_field_riskiness)),
+    rep("School", length(params_with_riskiness$school_specific_far_field_riskiness)),
+    rep("Leisure", length(params_with_riskiness$leisure_specific_far_field_riskiness)),
+    rep("Household", length(params_with_riskiness$household_specific_far_field_riskiness))
   ),
   riskiness = c(
-    params_with_riskiness$workplace_specific_riskiness,
-    params_with_riskiness$school_specific_riskiness,
-    params_with_riskiness$leisure_specific_riskiness,
-    params_with_riskiness$household_specific_riskiness
+    params_with_riskiness$workplace_specific_far_field_riskiness,
+    params_with_riskiness$school_specific_far_field_riskiness,
+    params_with_riskiness$leisure_specific_far_field_riskiness,
+    params_with_riskiness$household_specific_far_field_riskiness
   )
 )
 

@@ -80,7 +80,7 @@ generate_setting_specific_ach <- function(parameters_list, setting, number_of_lo
 #'
 #' Called once per setting during [create_variables()] init, immediately
 #' after [generate_setting_specific_ach()]. The result is stored at
-#' `<setting>_specific_riskiness` and used by `processes.R` to scale the
+#' `<setting>_specific_far_field_riskiness` and used by `processes.R` to scale the
 #' per-setting FOI.
 #'
 #' @param ach_values Numeric vector of per-location baseline ACH values

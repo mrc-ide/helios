@@ -26,6 +26,7 @@ Counts \code{D_new} at the moment the death decision is made.
 }
 \seealso{
 Other processes: 
+\code{\link{calculate_setting_FOI}()},
 \code{\link{create_EI_process}()},
 \code{\link{create_I_mild_R_process}()},
 \code{\link{create_RS_process}()},

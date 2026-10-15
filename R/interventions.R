@@ -109,9 +109,9 @@ generate_joint_intervention_switches <- function(parameters_list, variables_list
     }
   } else if (parameters_list[["intervention_joint_coverage_type"]] == "targeted_riskiness") {
     riskiness_list <- list(
-      "workplace" = parameters_list$workplace_specific_riskiness,
-      "school"    = parameters_list$school_specific_riskiness,
-      "leisure"   = parameters_list$leisure_specific_riskiness
+      "workplace" = parameters_list$workplace_specific_far_field_riskiness,
+      "school"    = parameters_list$school_specific_far_field_riskiness,
+      "leisure"   = parameters_list$leisure_specific_far_field_riskiness
     )
     riskiness_flat   <- unlist(riskiness_list, use.names = FALSE)
     riskiness_sorted <- sort(
@@ -221,7 +221,7 @@ generate_setting_intervention_switches <- function(
   } else if (
     parameters_list[[paste0("intervention_", setting, "_coverage_type")]] == "targeted_riskiness"
   ) {
-    riskiness <- parameters_list[[paste0(setting, "_specific_riskiness")]]
+    riskiness <- parameters_list[[paste0(setting, "_specific_far_field_riskiness")]]
     riskiness_sorted <- sort(
       x = riskiness,
       decreasing = TRUE,
@@ -488,7 +488,29 @@ calculate_efficacy_from_ach <- function(ach_values, parameters_list, setting) {
   p_pre  <- 1 - exp(-r * (I * pi / (alpha_pre  * V)) * RRtv * t)
   p_post <- 1 - exp(-r * (I * pi / (alpha_post * V)) * RRtv * t)
 
-  return(1 - p_post / p_pre)
+  check_efficacy(1 - p_post / p_pre, paste(setting, "far-field efficacy"))
+}
+
+#' Check that per-location efficacies lie in `[0, 1]`
+#'
+#' @description
+#' An efficacy below 0 would act as an FOI multiplier greater than 1, silently
+#' amplifying transmission, and one above 1 would make the FOI negative. Either is
+#' an error. For far-field efficacy, the usual cause is a `delta_function` that
+#' returns negative values.
+#'
+#' @param efficacy Numeric vector of per-location efficacies.
+#' @param description Character. What `efficacy` is, for the error message (e.g.
+#' `"workplace far-field efficacy"`).
+#'
+#' @return `efficacy`, unchanged.
+#'
+#' @family intervention
+check_efficacy <- function(efficacy, description) {
+  if (any(!is.finite(efficacy)) || any(efficacy < 0) || any(efficacy > 1)) {
+    stop("Error: ", description, " outside [0, 1] at one or more locations")
+  }
+  efficacy
 }
 
 

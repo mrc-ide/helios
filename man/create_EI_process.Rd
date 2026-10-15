@@ -21,6 +21,7 @@ individuals between I_mild and I_hosp. Counts \code{H_new} at entry to I_hosp.
 }
 \seealso{
 Other processes: 
+\code{\link{calculate_setting_FOI}()},
 \code{\link{create_I_hosp_exit_process}()},
 \code{\link{create_I_mild_R_process}()},
 \code{\link{create_RS_process}()},

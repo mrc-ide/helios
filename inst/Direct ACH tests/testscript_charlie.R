@@ -135,7 +135,7 @@ plot_seir(out_2, "2: ACH on, no intervention")
 # Inspect the drawn distributions:
 v_2 <- create_variables(params_2)$parameters_list
 cat("Workplace ACH summary:\n");       print(summary(v_2$workplace_specific_ach))
-cat("Workplace riskiness summary:\n"); print(summary(v_2$workplace_specific_riskiness))
+cat("Workplace riskiness summary:\n"); print(summary(v_2$workplace_specific_far_field_riskiness))
 
 # TRY: change mean=4.8 to mean=0.5 for workplace -> very stuffy workplaces.
 # TRY: omit one setting's set_setting_specific_ach() call -> that setting
@@ -179,7 +179,7 @@ plot_seir(out_3, sprintf("3: Constant delta=%.1f, joint, 50%% cov, random",
 # Inspect realized per-location efficacy:
 v_3 <- create_variables(params_3)$parameters_list
 for (s in c("workplace", "school", "leisure")) {
-  eff <- v_3[[paste0(s, "_specific_efficacy")]]
+  eff <- v_3[[paste0(s, "_specific_far_field_efficacy")]]
   cov <- v_3[[paste0("intervention_", s, "_covered")]]
   cat(sprintf("%-9s mean efficacy over covered locations: %.3f\n",
               s, mean(eff[cov == 1])))

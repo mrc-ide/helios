@@ -161,16 +161,16 @@ print(p2)
 
 riskiness_data <- data.frame(
   setting = c(
-    rep("Workplace", length(params_with_details$workplace_specific_riskiness)),
-    rep("School", length(params_with_details$school_specific_riskiness)),
-    rep("Leisure", length(params_with_details$leisure_specific_riskiness)),
-    rep("Household", length(params_with_details$household_specific_riskiness))
+    rep("Workplace", length(params_with_details$workplace_specific_far_field_riskiness)),
+    rep("School", length(params_with_details$school_specific_far_field_riskiness)),
+    rep("Leisure", length(params_with_details$leisure_specific_far_field_riskiness)),
+    rep("Household", length(params_with_details$household_specific_far_field_riskiness))
   ),
   riskiness = c(
-    params_with_details$workplace_specific_riskiness,
-    params_with_details$school_specific_riskiness,
-    params_with_details$leisure_specific_riskiness,
-    params_with_details$household_specific_riskiness
+    params_with_details$workplace_specific_far_field_riskiness,
+    params_with_details$school_specific_far_field_riskiness,
+    params_with_details$leisure_specific_far_field_riskiness,
+    params_with_details$household_specific_far_field_riskiness
   )
 )
 
@@ -230,13 +230,13 @@ print(riskiness_summary)
 
 cat("\n=== ACH → RISKINESS CONVERSION ===\n")
 cat("Household: median ACH =", median(params_with_details$household_specific_ach),
-    "→ median riskiness =", round(median(params_with_details$household_specific_riskiness), 3), "\n")
+    "→ median riskiness =", round(median(params_with_details$household_specific_far_field_riskiness), 3), "\n")
 cat("Workplace: median ACH =", median(params_with_details$workplace_specific_ach),
-    "→ median riskiness =", round(median(params_with_details$workplace_specific_riskiness), 3), "\n")
+    "→ median riskiness =", round(median(params_with_details$workplace_specific_far_field_riskiness), 3), "\n")
 cat("School: median ACH =", median(params_with_details$school_specific_ach),
-    "→ median riskiness =", round(median(params_with_details$school_specific_riskiness), 3), "\n")
+    "→ median riskiness =", round(median(params_with_details$school_specific_far_field_riskiness), 3), "\n")
 cat("Leisure: median ACH =", median(params_with_details$leisure_specific_ach),
-    "→ median riskiness =", round(median(params_with_details$leisure_specific_riskiness), 3), "\n")
+    "→ median riskiness =", round(median(params_with_details$leisure_specific_far_field_riskiness), 3), "\n")
 
 cat("\n=== UVC TARGETING ===\n")
 cat("Coverage type: targeted_riskiness (targets high-riskiness locations)\n")

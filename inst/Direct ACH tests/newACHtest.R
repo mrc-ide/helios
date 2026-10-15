@@ -45,7 +45,7 @@ output_df <- run_simulation(params_test)
 
 
 for (s in c("workplace", "school", "leisure", "household")) {
-  eff <- params_with_details[[paste0(s, "_specific_efficacy")]]
+  eff <- params_with_details[[paste0(s, "_specific_far_field_efficacy")]]
   cat(s, ": mean =", round(mean(eff), 3),
       "| min =", round(min(eff), 3),
       "| max =", round(max(eff), 3), "\n")
@@ -110,16 +110,16 @@ print(p2)
 
 efficacy_data <- data.frame(
   setting = c(
-    rep("Workplace", length(params_with_details$workplace_specific_efficacy)),
-    rep("School",    length(params_with_details$school_specific_efficacy)),
-    rep("Leisure",   length(params_with_details$leisure_specific_efficacy)),
-    rep("Household", length(params_with_details$household_specific_efficacy))
+    rep("Workplace", length(params_with_details$workplace_specific_far_field_efficacy)),
+    rep("School",    length(params_with_details$school_specific_far_field_efficacy)),
+    rep("Leisure",   length(params_with_details$leisure_specific_far_field_efficacy)),
+    rep("Household", length(params_with_details$household_specific_far_field_efficacy))
   ),
   efficacy = c(
-    params_with_details$workplace_specific_efficacy,
-    params_with_details$school_specific_efficacy,
-    params_with_details$leisure_specific_efficacy,
-    params_with_details$household_specific_efficacy
+    params_with_details$workplace_specific_far_field_efficacy,
+    params_with_details$school_specific_far_field_efficacy,
+    params_with_details$leisure_specific_far_field_efficacy,
+    params_with_details$household_specific_far_field_efficacy
   )
 )
 
@@ -159,16 +159,16 @@ print(p4)
 
 riskiness_data <- data.frame(
   setting = c(
-    rep("Workplace", length(params_with_details$workplace_specific_riskiness)),
-    rep("School",    length(params_with_details$school_specific_riskiness)),
-    rep("Leisure",   length(params_with_details$leisure_specific_riskiness)),
-    rep("Household", length(params_with_details$household_specific_riskiness))
+    rep("Workplace", length(params_with_details$workplace_specific_far_field_riskiness)),
+    rep("School",    length(params_with_details$school_specific_far_field_riskiness)),
+    rep("Leisure",   length(params_with_details$leisure_specific_far_field_riskiness)),
+    rep("Household", length(params_with_details$household_specific_far_field_riskiness))
   ),
   riskiness = c(
-    params_with_details$workplace_specific_riskiness,
-    params_with_details$school_specific_riskiness,
-    params_with_details$leisure_specific_riskiness,
-    params_with_details$household_specific_riskiness
+    params_with_details$workplace_specific_far_field_riskiness,
+    params_with_details$school_specific_far_field_riskiness,
+    params_with_details$leisure_specific_far_field_riskiness,
+    params_with_details$household_specific_far_field_riskiness
   )
 )
 

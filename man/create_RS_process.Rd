@@ -18,6 +18,7 @@ Create process governing recovered (and immune) back to susceptible disease stat
 }
 \seealso{
 Other processes: 
+\code{\link{calculate_setting_FOI}()},
 \code{\link{create_EI_process}()},
 \code{\link{create_I_hosp_exit_process}()},
 \code{\link{create_I_mild_R_process}()},
