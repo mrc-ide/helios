@@ -104,7 +104,7 @@ for (s in scenarios) {
   v <- create_variables(params)$parameters_list
   for (setting in c("workplace", "school", "leisure")) {
     ach <- v[[paste0(setting, "_specific_ach")]]
-    eff <- v[[paste0(setting, "_specific_efficacy")]]
+    eff <- v[[paste0(setting, "_specific_far_field_efficacy")]]
     cov <- v[[paste0("intervention_", setting, "_covered")]]
     cat(sprintf(
       "  %-9s | ACH range: [%.2f, %.2f] | efficacy on covered: mean=%.3f, range=[%.3f, %.3f]\n",
