@@ -49,8 +49,15 @@ test_that("run_simulations_from_table() run_simulations_from_table() returns lis
 })
 
 test_that("run_simulations_from_table() run_simulations_from_table() returns list of parameters when output_type set to simulations", {
-  # Set up example parameter table input:
-  parameter_table <- data.frame("simulation_time" = c(2, 4))
+  # Set up example parameter table input. default_ach_* columns are required
+  # because get_parameters() no longer defaults ACH silently:
+  parameter_table <- data.frame(
+    "simulation_time"        = c(2, 4),
+    "default_ach_household"  = c(4, 4),
+    "default_ach_workplace"  = c(4, 4),
+    "default_ach_school"     = c(4, 4),
+    "default_ach_leisure"    = c(4, 4)
+  )
 
   # Run the function using the parameters setting:
   simulation_output <- run_simulations_from_table(
@@ -66,8 +73,15 @@ test_that("run_simulations_from_table() run_simulations_from_table() returns lis
 })
 
 test_that("run_simulations_from_table() run_simulations_from_table() returns list of parameters and simulation outputs when output_type set to both", {
-  # Set up example parameter table input:
-  parameter_table <- data.frame("simulation_time" = c(2, 4))
+  # Set up example parameter table input. default_ach_* columns are required
+  # because get_parameters() no longer defaults ACH silently:
+  parameter_table <- data.frame(
+    "simulation_time"        = c(2, 4),
+    "default_ach_household"  = c(4, 4),
+    "default_ach_workplace"  = c(4, 4),
+    "default_ach_school"     = c(4, 4),
+    "default_ach_leisure"    = c(4, 4)
+  )
 
   # Run the function using the parameters setting:
   simulation_output <- run_simulations_from_table(

@@ -3,6 +3,7 @@
 .Rdata
 .httr-oauth
 .DS_Store
+.claude/
 inst/doc
 docs/
-.claude/
+

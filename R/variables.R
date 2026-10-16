@@ -185,63 +185,110 @@ create_variables <- function(parameters_list) {
   # Append setting sizes to variables_list:
   parameters_list$setting_sizes <- setting_sizes
 
-  # Creating vector of setting-specific riskinesses for each setting type
+  # Creating vector of setting-specific ACH for each setting type
   num_households <- max(as.numeric(variables_list$household$get_categories()))
-  parameters_list$household_specific_riskiness <- generate_setting_specific_riskinesses(
+  parameters_list$household_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "household",
     number_of_locations = num_households
   )
+
+  parameters_list$household_specific_riskiness <- convert_ach_to_riskiness(
+    ach_values = parameters_list$household_specific_ach,
+    parameters_list = parameters_list,
+    setting = "household"
+  )
+
   num_workplaces <- max(as.numeric(variables_list$workplace$get_categories()))
-  parameters_list$workplace_specific_riskiness <- generate_setting_specific_riskinesses(
+  parameters_list$workplace_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "workplace",
     number_of_locations = num_workplaces
   )
+
+  parameters_list$workplace_specific_riskiness <- convert_ach_to_riskiness(
+    ach_values = parameters_list$workplace_specific_ach,
+    parameters_list = parameters_list,
+    setting = "workplace"
+  )
+
   num_schools <- max(as.numeric(variables_list$school$get_categories()))
-  parameters_list$school_specific_riskiness <- generate_setting_specific_riskinesses(
+  parameters_list$school_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "school",
     number_of_locations = num_schools
   )
+
+  parameters_list$school_specific_riskiness <- convert_ach_to_riskiness(
+    ach_values = parameters_list$school_specific_ach,
+    parameters_list = parameters_list,
+    setting = "school"
+  )
+
   num_leisure <- length(parameters_list$setting_sizes$leisure)
-  parameters_list$leisure_specific_riskiness <- generate_setting_specific_riskinesses(
+  parameters_list$leisure_specific_ach <- generate_setting_specific_ach(
     parameters_list = parameters_list,
     setting = "leisure",
     number_of_locations = num_leisure
   )
 
-  # If any setting has UVC installed, retrieve the sizes of all of the settings:
+  parameters_list$leisure_specific_riskiness <- convert_ach_to_riskiness(
+    ach_values = parameters_list$leisure_specific_ach,
+    parameters_list = parameters_list,
+    setting = "leisure"
+  )
+
+  # If any intervention is active (per-setting or joint), dispatch to the
+  # intervention switches generator. For joint mode, this also propagates the
+  # joint intervention list, timestep, and active flags to each per-setting
+  # slot, so the per-setting efficacy blocks below run uniformly.
   if (
     any(
-      parameters_list$far_uvc_joint,
-      parameters_list$far_uvc_workplace,
-      parameters_list$far_uvc_school,
-      parameters_list$far_uvc_leisure,
-      parameters_list$far_uvc_household
+      isTRUE(parameters_list$intervention_joint_active),
+      isTRUE(parameters_list$intervention_workplace_active),
+      isTRUE(parameters_list$intervention_school_active),
+      isTRUE(parameters_list$intervention_leisure_active),
+      isTRUE(parameters_list$intervention_household_active)
     )
   ) {
-    # Generate and append the far UVC switches for settings in which it has been switched on:
-    parameters_list <- generate_far_uvc_switches(
-      parameters_list,
-      variables_list
-    )
+    parameters_list <- generate_intervention_switches(parameters_list, variables_list)
+  }
 
-    # If joint has been specified, updating setting-type specific far UVC parameters used during model running
-    setting_types <- c("workplace", "school", "leisure") # , "household")
-    if (parameters_list$far_uvc_joint) {
-      parameters_list[paste0("far_uvc_", setting_types)] <- TRUE
-      parameters_list[paste0(
-        "far_uvc_",
-        setting_types,
-        "_efficacy"
-      )] <- parameters_list$far_uvc_joint_efficacy
-      parameters_list[paste0(
-        "far_uvc_",
-        setting_types,
-        "_timestep"
-      )] <- parameters_list$far_uvc_joint_timestep
-    }
+  # Calculate location-specific efficacy from ACH using W-R for each setting
+  # with an active intervention. The coverage vector
+  # (intervention_<setting>_covered) was already populated by the dispatcher
+  # above and is consumed inside calculate_efficacy_from_ach to zero out delta
+  # for uncovered locations.
+  if (isTRUE(parameters_list$intervention_workplace_active)) {
+    parameters_list$workplace_specific_efficacy <- calculate_efficacy_from_ach(
+      ach_values      = parameters_list$workplace_specific_ach,
+      parameters_list = parameters_list,
+      setting         = "workplace"
+    )
+  }
+
+  if (isTRUE(parameters_list$intervention_school_active)) {
+    parameters_list$school_specific_efficacy <- calculate_efficacy_from_ach(
+      ach_values      = parameters_list$school_specific_ach,
+      parameters_list = parameters_list,
+      setting         = "school"
+    )
+  }
+
+  if (isTRUE(parameters_list$intervention_leisure_active)) {
+    parameters_list$leisure_specific_efficacy <- calculate_efficacy_from_ach(
+      ach_values      = parameters_list$leisure_specific_ach,
+      parameters_list = parameters_list,
+      setting         = "leisure"
+    )
+  }
+
+  if (isTRUE(parameters_list$intervention_household_active)) {
+    parameters_list$household_specific_efficacy <- calculate_efficacy_from_ach(
+      ach_values      = parameters_list$household_specific_ach,
+      parameters_list = parameters_list,
+      setting         = "household"
+    )
   }
 
   # Return the list of model variables:
@@ -250,6 +297,7 @@ create_variables <- function(parameters_list) {
     parameters_list = parameters_list
   ))
 }
+
 
 #' Generate a vector of the initial disease states of all individuals in the population
 #'
@@ -356,7 +404,7 @@ generate_initial_age_classes <- function(parameters_list) {
       parameters_list$initial_proportion_adult,
       parameters_list$initial_proportion_elderly
     ) !=
-      1
+    1
   ) {
     stop("initial age class proportions do not sum to 1")
   }
@@ -462,8 +510,8 @@ generate_initial_schools <- function(parameters_list, age_class_variable) {
 #' @family variables
 #' @export
 generate_initial_schools_bootstrap <- function(
-  parameters_list,
-  age_class_variable
+    parameters_list,
+    age_class_variable
 ) {
   # Check that the requisite parameters are present:
   if (!("human_population" %in% names(parameters_list))) {
@@ -558,9 +606,9 @@ generate_initial_schools_bootstrap <- function(
 #' @family variables
 #' @export
 generate_initial_workplaces <- function(
-  parameters_list,
-  age_class_variable,
-  school_variable
+    parameters_list,
+    age_class_variable,
+    school_variable
 ) {
   # Checking that the parameter list contains the requisite parameters
   if (!("human_population" %in% names(parameters_list))) {
@@ -738,7 +786,7 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
   ## Checking population size N is the same as implied by age_class_variable
   if (
     parameters_list$human_population !=
-      age_class_variable$get_size_of(age_class_variable$get_categories())
+    age_class_variable$get_size_of(age_class_variable$get_categories())
   ) {
     stop("Human population and age_class_vector are different lengths")
   }
@@ -784,7 +832,7 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
     ## Looping over this whilst current household isn't full
     while (
       length(temp_household) < household_size &&
-        sum(assigned) < parameters_list$human_population
+      sum(assigned) < parameters_list$human_population
     ) {
       # Randomly select an unassigned individual
       candidates <- which(!assigned)
@@ -834,7 +882,8 @@ generate_initial_households <- function(parameters_list, age_class_variable) {
 #' Alternative to [generate_initial_households()]. Rather than using a parametric
 #' distribution, this function uses sampling with replacement from a reference
 #' dataset. This is known as bootstrapping. The dataset used is
-#' [`baseline_household_demographics`]. Unlike [generate_initial_households()],
+#' [`baseline_household_demographics_uk`] or
+#' [`baseline_household_demographics_usa`]. Unlike [generate_initial_households()],
 #' this function generates both the household and age class assignments together.
 #'
 #' @inheritParams create_variables

@@ -213,7 +213,7 @@ test_that("generate_initial_age_classes errors if initial age class proportions 
 
 test_that("generate_initial_schools errors if parameter_list does not contain human_population", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -239,7 +239,7 @@ test_that("generate_initial_schools errors if parameter_list does not contain hu
 
 test_that("generate_initial_schools errors if parameter_list does not contain seed", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -265,7 +265,7 @@ test_that("generate_initial_schools errors if parameter_list does not contain se
 
 test_that("generate_initial_schools errors if parameter_list does not contain school_meanlog", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -291,7 +291,7 @@ test_that("generate_initial_schools errors if parameter_list does not contain sc
 
 test_that("generate_initial_schools errors if parameter_list does not contain school_sdlog", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -317,7 +317,7 @@ test_that("generate_initial_schools errors if parameter_list does not contain sc
 
 test_that("generate_initial_schools errors if parameter_list does not contain school_student_staff_ratio", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -343,7 +343,7 @@ test_that("generate_initial_schools errors if parameter_list does not contain sc
 
 test_that("generate_initial_schools returns a vector equal in length to the number of people simulated and assigns some zeroes", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -369,7 +369,7 @@ test_that("generate_initial_schools returns a vector equal in length to the numb
 
 test_that("generate_initial_schools assigns at least one adult to each school", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -405,7 +405,7 @@ test_that("generate_initial_schools assigns at least one adult to each school", 
 
 test_that("generate_initial_schools assigns no elderly individuals to any school", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -444,7 +444,7 @@ test_that("generate_initial_schools assigns no elderly individuals to any school
 
 test_that("generate_initial_workplaces errors if parameter_list does not contain human_population", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -471,7 +471,7 @@ test_that("generate_initial_workplaces errors if parameter_list does not contain
 
 test_that("generate_initial_workplaces errors if parameter_list does not contain seed", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -498,7 +498,7 @@ test_that("generate_initial_workplaces errors if parameter_list does not contain
 
 test_that("generate_initial_workplaces errors if parameter_list does not contain workplace_prop_max", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -525,7 +525,7 @@ test_that("generate_initial_workplaces errors if parameter_list does not contain
 
 test_that("generate_initial_workplaces errors if parameter_list does not contain workplace_a", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)
@@ -552,7 +552,7 @@ test_that("generate_initial_workplaces errors if parameter_list does not contain
 
 test_that("generate_initial_workplaces errors if parameter_list does not contain workplace_c", {
   # Establish the list of model parameters:
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
 
   # Establish the list of model variables:
   vars_and_params <- create_variables(parameters_list = parameters_list)

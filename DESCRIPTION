@@ -35,6 +35,7 @@ Imports:
     dplyr,
     EnvStats,
     dqrng,
+    truncnorm,
     parallel
 Remotes:
     mrc-ide/individual@feat/logi_size
