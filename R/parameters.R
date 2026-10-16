@@ -15,7 +15,8 @@
 #' * `number_initial_E`: number of humans initially Exposed (state = E)
 #' * `number_initial_I`: number of humans initially Infectious (state = I)
 #' * `number_initial_R`: number of humans initially Recovered (state = R)
-#' * `seed`: a seed to run the simulation with
+#' * `seed`: a seed to run the simulation with. It seeds both R's generator
+#'   and dqrng's (used for the daily leisure draw). `NULL` leaves both unseeded
 #' * `mean_household_size`: TBD
 #' * `workplace_prop_max`: maximum size of a workplace as a proportion of total adult population size
 #' * `workplace_a`: the a parameter for the Zipf-like distribution on workplace size

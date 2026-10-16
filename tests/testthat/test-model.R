@@ -100,3 +100,20 @@ test_that("run_simulations_from_table() run_simulations_from_table() returns lis
   # Check that the length of the output matches the number of rows in the parameter table
   expect_length(object = simulation_output[[1]], n = nrow(parameter_table))
 })
+
+test_that("run_simulation() gives identical results for the same seed without seeding dqrng by hand", {
+  parameters_list <- with_default_ach(get_parameters(overrides = list(
+    human_population = 1500,
+    number_initial_S = 1495,
+    number_initial_E = 5,
+    simulation_time = 15,
+    seed = 5
+  )))
+
+  # Two runs in the same session: the first leaves dqrng's stream advanced, so
+  # the second only matches if run_simulation() reseeds dqrng from the seed:
+  first_run <- run_simulation(parameters_list = parameters_list)$result
+  second_run <- run_simulation(parameters_list = parameters_list)$result
+
+  expect_identical(object = second_run, expected = first_run)
+})
