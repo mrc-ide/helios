@@ -41,7 +41,8 @@ Default = 4.}
 \value{
 Efficacy in \verb{[0, 1]}: the relative reduction in single-exposure
 infection probability the intervention produces in this hypothetical
-location.
+location. Errors (via \code{\link[=check_efficacy]{check_efficacy()}}) if the result falls outside
+\verb{[0, 1]}, e.g. because \code{delta} is negative or an input is \code{NA}.
 }
 \description{
 Standalone helper that computes the Wells-Riley efficacy for a single

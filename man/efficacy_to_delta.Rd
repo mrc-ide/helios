@@ -17,12 +17,14 @@ efficacy_to_delta(
 )
 }
 \arguments{
-\item{target_efficacy}{Desired efficacy in \verb{[0, 1)}.}
+\item{target_efficacy}{Desired efficacy in \verb{[0, 1)}. Values outside this
+range, or \code{NA}, are an error: an efficacy of 1 would need an infinite delta.}
 
 \item{baseline_ach}{Baseline air-change rate of the hypothetical location
-used for calibration (1/hour).}
+used for calibration (1/hour). Must be finite and non-negative.}
 
-\item{V}{Air volume per person in the setting (m^3 per person). Required.}
+\item{V}{Air volume per person in the setting (m^3 per person). Required.
+Must be finite and positive.}
 
 \item{kD}{Natural decay rate of the airborne pathogen (1/hour).
 Default = 0.64.}

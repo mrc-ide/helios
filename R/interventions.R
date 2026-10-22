@@ -571,7 +571,8 @@ uv_to_delta <- function(f, E_avg, k) {
 #'
 #' @return Efficacy in `[0, 1]`: the relative reduction in single-exposure
 #' infection probability the intervention produces in this hypothetical
-#' location.
+#' location. Errors (via [check_efficacy()]) if the result falls outside
+#' `[0, 1]`, e.g. because `delta` is negative or an input is `NA`.
 #'
 #' @family intervention
 #' @export
@@ -589,7 +590,7 @@ ach_to_efficacy <- function(baseline_ach,
   alpha_post <- baseline_ach + kD + delta
   p_pre  <- 1 - exp(-A / alpha_pre)
   p_post <- 1 - exp(-A / alpha_post)
-  return(1 - p_post / p_pre)
+  check_efficacy(1 - p_post / p_pre, "efficacy")
 }
 
 #' Wells-Riley delta-eACH required to hit a target efficacy
@@ -609,10 +610,12 @@ ach_to_efficacy <- function(baseline_ach,
 #' *distribution* of realised efficacies centred near (but not exactly
 #' equal to) `target_efficacy`.
 #'
-#' @param target_efficacy Desired efficacy in `[0, 1)`.
+#' @param target_efficacy Desired efficacy in `[0, 1)`. Values outside this
+#' range, or `NA`, are an error: an efficacy of 1 would need an infinite delta.
 #' @param baseline_ach Baseline air-change rate of the hypothetical location
-#' used for calibration (1/hour).
+#' used for calibration (1/hour). Must be finite and non-negative.
 #' @param V Air volume per person in the setting (m^3 per person). Required.
+#' Must be finite and positive.
 #' @param kD Natural decay rate of the airborne pathogen (1/hour).
 #' Default = 0.64.
 #' @param r Probability of infection per inhaled FFU. Default = 1.37e-2.
@@ -635,6 +638,16 @@ efficacy_to_delta <- function(target_efficacy,
                               I    = 1,
                               RRtv = 0.45,
                               t    = 4) {
+  if (any(!is.finite(target_efficacy)) || any(target_efficacy < 0) ||
+      any(target_efficacy >= 1)) {
+    stop("Error: target_efficacy must be in [0, 1)")
+  }
+  if (any(!is.finite(baseline_ach)) || any(baseline_ach < 0)) {
+    stop("Error: baseline_ach must be finite and non-negative")
+  }
+  if (any(!is.finite(V)) || any(V <= 0)) {
+    stop("Error: V must be finite and positive")
+  }
   A          <- r * I * pi * RRtv * t / V
   alpha_pre  <- baseline_ach + kD
   p_pre      <- 1 - exp(-A / alpha_pre)

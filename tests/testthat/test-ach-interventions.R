@@ -496,6 +496,46 @@ test_that("ach_to_efficacy() increases towards 1 as delta grows", {
   expect_true(high < 1)
 })
 
+test_that("ach_to_efficacy() errors when efficacy falls outside [0, 1]", {
+  for (bad_delta in list(-1, NA, c(1, -1))) {
+    expect_error(
+      ach_to_efficacy(baseline_ach = 4, delta = bad_delta, V = 27),
+      regexp = "efficacy outside \\[0, 1\\]"
+    )
+  }
+})
+
+test_that("efficacy_to_delta() returns 0 for a target efficacy of 0", {
+  expect_equal(
+    efficacy_to_delta(target_efficacy = 0, baseline_ach = 4, V = 27),
+    0
+  )
+})
+
+test_that("efficacy_to_delta() errors when target_efficacy is outside [0, 1)", {
+  for (bad_target in c(-0.1, 1, 1.1, NA)) {
+    expect_error(
+      efficacy_to_delta(target_efficacy = bad_target, baseline_ach = 4, V = 27),
+      regexp = "target_efficacy must be in \\[0, 1\\)"
+    )
+  }
+})
+
+test_that("efficacy_to_delta() errors when baseline_ach or V is invalid", {
+  for (bad_ach in c(-1, NA, Inf)) {
+    expect_error(
+      efficacy_to_delta(target_efficacy = 0.5, baseline_ach = bad_ach, V = 27),
+      regexp = "baseline_ach must be finite and non-negative"
+    )
+  }
+  for (bad_V in c(0, -1, NA, Inf)) {
+    expect_error(
+      efficacy_to_delta(target_efficacy = 0.5, baseline_ach = 4, V = bad_V),
+      regexp = "V must be finite and positive"
+    )
+  }
+})
+
 test_that("efficacy_to_delta() is the inverse of ach_to_efficacy()", {
   baseline_ach <- 4
   V <- 27
