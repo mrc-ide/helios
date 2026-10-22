@@ -610,6 +610,9 @@ test_that("generate_intervention_switches() errors when both joint and a per-set
 test_that("generate_joint_intervention_switches() pools workplace, school, and leisure coverage and excludes household", {
   coverage <- 0.5
   parameters_list <- with_default_ach(get_parameters())
+  # Random allocation on the default population (at most 2 schools) leaves
+  # every school uncovered in roughly 1 run in 10, so fix the seed:
+  parameters_list$seed <- 12345
   intervention <- make_intervention(
     name = "test_intervention",
     delta_function = function(delta) delta,
