@@ -81,33 +81,35 @@
 #' * `setting_specific_ach_household_mean`: The mean of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 2.0
 #' * `setting_specific_ach_household_sd`: The standard deviation of the truncated normal distribution from which the setting-specific ACH of individual households is drawn; default = 0.80
 #'
-#' Default (Uniform) ACH Parameters (used when `setting_specific_ach_<setting>` is FALSE; if both are unset, `generate_setting_specific_ach()` errors):
+#' Default (Uniform) ACH Parameters (used when `setting_specific_ach_<setting>` is FALSE. If `setting_specific_ach_<setting>` is FALSE and `default_ach_<setting>` is NULL, `generate_setting_specific_ach()` errors rather than assuming a baseline):
 #' * `default_ach_workplace`: uniform ACH assigned to every workplace location when `setting_specific_ach_workplace` is FALSE. Set via [set_default_ach()]. Default = 3.1.
 #' * `default_ach_school`: uniform ACH assigned to every school location when `setting_specific_ach_school` is FALSE. Default = 3.3.
 #' * `default_ach_leisure`: uniform ACH assigned to every leisure location when `setting_specific_ach_leisure` is FALSE. Default = 3.5.
 #' * `default_ach_household`: uniform ACH assigned to every household location when `setting_specific_ach_household` is FALSE. Default = 2.0.
 #'
-#' Volume Per Person Parameters (used in the Wells-Riley calculation; units: m^3 per person):
-#' * `volume_per_person_workplace`: average air volume per person in a workplace; default = 27 (assumes ~10 m^2 floor area at 2.7 m height)
-#' * `volume_per_person_school`: average air volume per person in a school; default = 10 (assumes ~3.33 m^2 floor area at 3 m height)
-#' * `volume_per_person_leisure`: average air volume per person in a leisure setting; default = 8 (assumes ~2 m^2 floor area at 4 m height)
-#' * `volume_per_person_household`: average air volume per person in a household; default = 50 (assumes ~20 m^2 floor area at 2.5 m height)
+#' Indoor Air Volume Per Person Parameters (used in the Wells-Riley calculation, which assumes a well-mixed enclosed space; units: m^3 per person):
+#' * `volume_per_person_workplace`: average indoor air volume per person in a workplace; default = 27 (assumes ~10 m^2 floor area at 2.7 m height)
+#' * `volume_per_person_school`: average indoor air volume per person in a school; default = 10 (assumes ~3.33 m^2 floor area at 3 m height)
+#' * `volume_per_person_leisure`: average indoor air volume per person in a leisure setting; default = 8 (assumes ~2 m^2 floor area at 4 m height)
+#' * `volume_per_person_household`: average indoor air volume per person in a household; default = 50 (assumes ~20 m^2 floor area at 2.5 m height)
 #'
-#' Wells-Riley Parameters (used by `convert_ach_to_riskiness()` to derive per-location riskiness from ACH, and by `calculate_efficacy_from_ach()` to derive per-location intervention efficacy from ACH and the intervention delta):
-#' * `wells_riley_emission_rate`: rate at which an infectious individual emits airborne infectious units; units = FFU/hour; default = 27
-#' * `wells_riley_decay_rate`: natural decay rate of airborne pathogens (denoted k_D); units = 1/hour; default = 0.64
-#' * `wells_riley_infection_prob_per_ffu`: probability of infection per inhaled FFU (denoted r); default = 1.37e-2
-#' * `wells_riley_respiratory_rate_factor`: respiratory rate multiplied by tidal volume (denoted RR_tv); units = m^3/hour; default = 0.45
+#' Wells-Riley Parameters (used by `convert_ach_to_riskiness()` to derive per-location riskiness from ACH, and by `calculate_efficacy_from_ach()` to derive per-location intervention efficacy from ACH and the intervention delta - the extra equivalent ACH an intervention adds to covered locations, see [make_intervention()]):
+#' * `wells_riley_emission_rate`: rate at which an infectious individual emits airborne infectious units (denoted pi); units = FFU/hour; default = 27, scenario A ("resting, oral breathing") of the eight in Blatchley & Cui (2023) Table 2, and the lowest of them - speaking is 365 and singing 2335
+#' * `wells_riley_decay_rate`: natural decay rate of airborne pathogens (denoted k_D); units = 1/hour; default = 0.64 (Blatchley & Cui 2023)
+#' * `wells_riley_infection_prob_per_ffu`: probability of infection per inhaled FFU (denoted r); default = 1.37e-2, an exponential fit to Killingley et al. (2022), in which 10 TCID50 (55 FFU) infected 18 of 34 volunteers: `-log(1 - 18/34) / 55`
+#' * `wells_riley_respiratory_rate_factor`: respiratory rate multiplied by tidal volume (denoted RR_tv); units = m^3/hour; default = 0.45 (15 breaths/minute at 500 ml)
 #' * `wells_riley_time_in_room`: exposure window used inside the Wells-Riley calculation (denoted t); units = hours; default = 4
 #'
-#' Intervention Parameters (populated internally by `set_intervention_ach()` and by `generate_intervention_switches()`; users do not normally set these directly. One block per scope <s> in {joint, workplace, school, leisure, household}):
+#' `r` and `pi` are a matched pair: `1/r` = 73 FFU is one Wells-Riley quantum, so `pi` = 27 is 0.37 quanta/hour. Both consumers return ratios and the exponent is small (0.008-0.05 at ACH = 1), so this level has limited leverage, but a higher-emission scenario would lower efficacy - in schools, scenario D delivers 0.23 where A delivers 0.60.
+#'
+#' Intervention Parameters (populated internally by `set_intervention_ach()` and by `generate_intervention_switches()`; users do not normally set these directly. One set of intervention parameters is generated per scope <s> in {joint, workplace, school, leisure, household}):
 #' * `intervention_<s>_active`: boolean flag set to TRUE when an intervention has been installed in scope <s>. Default = FALSE
 #' * `intervention_<s>_list`: list of intervention objects (each as returned by `make_intervention()`) deployed in scope <s>. Currently single-intervention only — list always has length 1 when active. Default = NULL
 #' * `intervention_<s>_coverage`: fraction of total setting size to cover (numeric in `[0, 1]`); inherited from the intervention object's `coverage` field. Default = NULL
 #' * `intervention_<s>_coverage_target`: what the coverage fraction applies to. Either "individuals" or "square_footage". Default = NULL
 #' * `intervention_<s>_coverage_type`: how locations are selected for coverage. Either "random" (uniform sampling) or "targeted_riskiness" (locations ranked in decreasing order of riskiness). Default = NULL
 #' * `intervention_<s>_timestep`: first simulation timestep at which the intervention's efficacy is applied in the FOI calculation. Default = NULL
-#' * `intervention_<setting>_covered` (per-setting scopes only — workplace/school/leisure/household): 0/1 vector of length equal to the number of locations in the setting, populated by the dispatcher to mark which locations received the intervention. Default = NULL
+#' * `intervention_<setting>_covered` (per-setting scopes only — workplace/school/leisure/household): 0/1 vector of length equal to the number of locations in the setting, populated by `generate_intervention_switches()` to mark which locations received the intervention. Default = NULL
 #'
 #' Setting-Specific Room Size Per Individual Parameters:
 #' * `size_per_individual_workplace`: The volume or surface area for each individual in the workplace setting type; default = 1 (in which case "square_footage" coverage_target gives same results as "individuals" coverage_target)
@@ -207,12 +209,13 @@ get_parameters <- function(overrides = list(), archetype = "none") {
     volume_per_person_leisure = 8, # 2m^2*4M
     volume_per_person_household = 50, # 20m^2 * 2.5m
 
-    # W-R parameters
-    wells_riley_emission_rate = 27, # FFU/hour
+    # W-R parameters (sources in the roxygen block above). r and pi are a
+    # matched pair: 1/r = 73 FFU per quantum, so pi = 27 is 0.37 quanta/hour.
+    wells_riley_emission_rate = 27, # pi, FFU/hour; Blatchley Table 2 scenario A
     wells_riley_decay_rate = 0.64, # k_D, natural decay rate (1/hr)
-    wells_riley_infection_prob_per_ffu = 1.37e-2, # r, infection probability per FFU
-    wells_riley_respiratory_rate_factor = 0.45, # RR_tv
-    wells_riley_time_in_room = 4,# t, hours spent in room
+    wells_riley_infection_prob_per_ffu = 1.37e-2, # r, per FFU; -log(1-18/34)/55
+    wells_riley_respiratory_rate_factor = 0.45, # RR_tv, m^3/hr
+    wells_riley_time_in_room = 4, # t, hours spent in room
 
 
   # Intervention parameters (Wells-Riley ACH-based efficacy):

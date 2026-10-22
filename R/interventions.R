@@ -1,7 +1,7 @@
 #' Update model parameters with intervention switches
 #'
 #' @description
-#' Dispatcher that determines which locations have an intervention deployed.
+#' Determines which locations have an intervention deployed.
 #' If `intervention_joint_active` is TRUE, coverage is computed across the
 #' workplace/school/leisure pool using `generate_joint_intervention_switches()`.
 #' Otherwise, per-setting coverage is computed for each setting whose
