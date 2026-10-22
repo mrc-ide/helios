@@ -1,5 +1,5 @@
 test_that("get_setting_size() returns integer vectors for setting as workplace, school, and household", {
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
   x <- create_variables(parameters_list)
   testthat::expect_vector(
     get_setting_size(x$variables_list, setting = "workplace"),
@@ -16,7 +16,7 @@ test_that("get_setting_size() returns integer vectors for setting as workplace, 
 })
 
 test_that("get_setting_size() returns integer vectors for setting as workplace, school, and household", {
-  parameters_list <- get_parameters()
+  parameters_list <- with_default_ach(get_parameters())
   x <- create_variables(parameters_list)
   testthat::expect_error(get_setting_size(
     x$variables_list,
